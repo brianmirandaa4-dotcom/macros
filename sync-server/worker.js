@@ -1,4 +1,4 @@
-// MACROS sync server — a Cloudflare Worker you own.
+// Syncope sync server — a Cloudflare Worker you own.
 // Pulls your WHOOP (official OAuth API) and Garmin (official Personal API key) data
 // and hands it to the MACROS app. Nothing here is shared with anyone else.
 //
@@ -59,6 +59,7 @@ export default {
         ctx.waitUntil(env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data)));
         return json(data, 200, cors);
       }
+      if (p.startsWith('/api/social/')) return social(p.slice(12), req, url, user, env, cors);
       if (p === '/api/raw') {
         // Troubleshooting: shows the raw shape returned by each source for one day.
         const day = url.searchParams.get('date') || isoDate(new Date());
@@ -341,4 +342,142 @@ async function rawSample(user, env, day) {
     out.whoop = { recovery: await w('/recovery'), sleep: await w('/activity/sleep'), cycle: await w('/cycle'), workout: await w('/activity/workout') };
   }
   return out;
+}
+
+
+/* ---------------- Friends & leaderboard ----------------
+   Opt-in. Each person stores one record: soc:<uid>. Friends see only what that person chose to share. */
+const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const SHARE_KEYS = ['streak', 'workouts', 'protein', 'steps', 'weight', 'meals'];
+const EVENT_SHARE = { workout: 'workouts', pr: 'workouts', protein: 'protein', streak: 'streak', steps: 'steps', weight: 'weight', day: 'meals', score: null };
+const clampN = (v, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : 0; };
+const cleanStr = (v, n) => String(v ?? '').replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, n);
+async function socGet(env, uid) { return env.MACROS_KV.get('soc:' + uid, 'json'); }
+async function socPut(env, rec) { rec.updated = Date.now(); await env.MACROS_KV.put('soc:' + rec.uid, JSON.stringify(rec)); }
+async function phoneKey(env, raw) {
+  let d = String(raw || '').replace(/\D/g, ''); if (d.length === 10) d = '1' + d; if (d.length < 8 || d.length > 15) return null;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.PHONE_PEPPER || env.WHOOP_CLIENT_SECRET || 'syncope'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode('phone:' + d));
+  return { h: [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 40), last4: d.slice(-4) };
+}
+const cleanUser = (v) => String(v || '').trim().replace(/^@/, '').toLowerCase();
+function newCode() { const b = crypto.getRandomValues(new Uint8Array(6)); return [...b].map(x => CODE_CHARS[x % CODE_CHARS.length]).join(''); }
+function publicView(r, forSelf) {
+  const sh = r.share || {}, st = r.stats || {};
+  const stats = { week: st.week, score: st.score || 0, days: st.days || 0 };
+  if (forSelf || sh.streak) stats.streak = st.streak || 0;
+  if (forSelf || sh.workouts) { stats.workouts = st.workouts || 0; stats.prs = st.prs || 0; }
+  if (forSelf || sh.protein) stats.protein = st.protein || 0;
+  if (forSelf || sh.steps) stats.steps = st.steps || 0;
+  if (forSelf || sh.weight) stats.wchg = st.wchg ?? null;
+  if (forSelf || sh.meals) stats.onTarget = st.onTarget || 0;
+  const events = (r.events || []).filter(e => forSelf || EVENT_SHARE[e.type] === null || sh[EVENT_SHARE[e.type]]).slice(0, 15)
+    .map(e => ({ ...e, cheers: ((r.cheers || {})[e.id] || []).map(c => c.name) }));
+  return { uid: r.uid, name: r.name, username: r.username, color: r.color, stats, events, updated: r.updated };
+}
+async function social(action, req, url, user, env, cors) {
+  const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
+  let me = await socGet(env, user.id);
+  if (action === 'profile') {
+    const name = cleanStr(body.name, 24);
+    if (!name) return json({ error: 'Add a name your friends will recognize.' }, 400, cors);
+    if (!me) {
+      let code; for (let i = 0; i < 6; i++) { code = newCode(); if (!(await env.MACROS_KV.get('code:' + code))) break; }
+      me = { uid: user.id, code, friends: [], events: [], cheers: {}, stats: {} };
+      await env.MACROS_KV.put('code:' + code, user.id);
+    }
+    if (body.username !== undefined) {
+      const un = cleanUser(body.username);
+      if (!/^[a-z0-9_.]{3,20}$/.test(un)) return json({ error: 'Usernames are 3–20 letters, numbers, dots or underscores.' }, 400, cors);
+      if (un !== me.username) {
+        const owner = await env.MACROS_KV.get('un:' + un);
+        if (owner && owner !== me.uid) return json({ error: `@${un} is taken. Try another.` }, 409, cors);
+        await env.MACROS_KV.put('un:' + un, me.uid); if (me.username) await env.MACROS_KV.delete('un:' + me.username); me.username = un;
+      }
+    }
+    if (body.phone !== undefined) {
+      if (!String(body.phone).trim()) { if (me.ph) await env.MACROS_KV.delete('ph:' + me.ph); delete me.ph; delete me.phLast4; }
+      else {
+        const pk = await phoneKey(env, body.phone); if (!pk) return json({ error: 'That phone number doesn’t look right.' }, 400, cors);
+        if (pk.h !== me.ph) {
+          const owner = await env.MACROS_KV.get('ph:' + pk.h);
+          if (owner && owner !== me.uid) return json({ error: 'That number is already linked to another Syncope account.' }, 409, cors);
+          await env.MACROS_KV.put('ph:' + pk.h, me.uid); if (me.ph) await env.MACROS_KV.delete('ph:' + me.ph); me.ph = pk.h; me.phLast4 = pk.last4;
+        }
+      }
+    }
+    me.name = name; me.color = cleanStr(body.color, 9) || '#C7B6FF';
+    if (body.share || !me.share) me.share = Object.fromEntries(SHARE_KEYS.map(k => [k, !!(body.share || {})[k]]));
+    await socPut(env, me);
+    return json({ code: me.code, share: me.share, name: me.name, username: me.username, phoneLast4: me.phLast4 || null }, 200, cors);
+  }
+  if (!me) return json({ error: 'Set up your Syncope profile first.' }, 400, cors);
+  if (action === 'stats') {
+    const st = body.stats || {};
+    me.stats = { week: cleanStr(st.week, 10), score: clampN(st.score, 0, 5000), streak: clampN(st.streak, 0, 3650), workouts: clampN(st.workouts, 0, 50), prs: clampN(st.prs, 0, 200),
+      protein: clampN(st.protein, 0, 7), steps: clampN(st.steps, 0, 2e6), onTarget: clampN(st.onTarget, 0, 7), days: clampN(st.days, 0, 7), wchg: st.wchg == null ? null : clampN(st.wchg, -30, 30) };
+    const types = Object.keys(EVENT_SHARE);
+    me.events = (Array.isArray(body.events) ? body.events : []).filter(e => e && types.includes(e.type)).slice(0, 20)
+      .map(e => ({ id: cleanStr(e.id, 40), type: e.type, date: cleanStr(e.date, 10), t: clampN(e.t, 0, 9e15), n: clampN(e.n, -1e6, 1e6), s: cleanStr(e.s, 40) }));
+    const keep = new Set(me.events.map(e => e.id)); me.cheers = Object.fromEntries(Object.entries(me.cheers || {}).filter(([k]) => keep.has(k)));
+    await socPut(env, me);
+    return json({ ok: true }, 200, cors);
+  }
+  if (action === 'add') {
+    const q = String(body.q ?? body.code ?? '').trim();
+    let fid = null, via = 'code';
+    const digits = q.replace(/\D/g, '');
+    if (/^[+()\d\s.-]+$/.test(q) && digits.length >= 7) { const pk = await phoneKey(env, q); fid = pk && await env.MACROS_KV.get('ph:' + pk.h); via = 'phone'; }
+    else if (q.startsWith('@')) { fid = await env.MACROS_KV.get('un:' + cleanUser(q)); via = 'username'; }
+    else {
+      if (/^[A-Za-z0-9]{6}$/.test(q)) fid = await env.MACROS_KV.get('code:' + q.toUpperCase());
+      if (!fid) { fid = await env.MACROS_KV.get('un:' + cleanUser(q)); via = 'username'; }
+    }
+    if (!fid) return json({ error: via === 'phone' ? 'No one on Syncope Friends has that number yet. Send them an invite instead.' : via === 'username' ? 'No one has that username.' : 'No one has that code. Check it and try again.' }, 404, cors);
+    if (fid === me.uid) return json({ error: 'That’s you.' }, 400, cors);
+    const fr = await socGet(env, fid); if (!fr) return json({ error: 'That person left Syncope Friends.' }, 404, cors);
+    if ((me.friends || []).includes(fid)) return json({ ok: true, already: true, name: fr.name }, 200, cors);
+    if ((me.friends || []).length >= 50) return json({ error: 'You can have up to 50 friends.' }, 400, cors);
+    const theyAsked = (me.reqs || {})[fid];
+    if (via === 'code' || theyAsked) {
+      me.friends = [...new Set([...(me.friends || []), fid])]; fr.friends = [...new Set([...(fr.friends || []), me.uid])];
+      if (me.reqs) delete me.reqs[fid]; await socPut(env, me); await socPut(env, fr);
+      return json({ ok: true, name: fr.name }, 200, cors);
+    }
+    fr.reqs = fr.reqs || {}; fr.reqs[me.uid] = { name: me.name, username: me.username || '', color: me.color, t: Date.now() };
+    await env.MACROS_KV.put('soc:' + fr.uid, JSON.stringify(fr));
+    return json({ ok: true, requested: true, name: fr.name }, 200, cors);
+  }
+  if (action === 'accept' || action === 'decline') {
+    const fid = cleanStr(body.uid, 64); const req0 = (me.reqs || {})[fid]; if (!req0) return json({ error: 'That request is gone.' }, 404, cors);
+    delete me.reqs[fid];
+    if (action === 'accept') { const fr = await socGet(env, fid); if (fr) { me.friends = [...new Set([...(me.friends || []), fid])]; fr.friends = [...new Set([...(fr.friends || []), me.uid])]; await socPut(env, fr); } }
+    await socPut(env, me); return json({ ok: true }, 200, cors);
+  }
+  if (action === 'remove') {
+    const fid = cleanStr(body.uid, 64); me.friends = (me.friends || []).filter(x => x !== fid); await socPut(env, me);
+    const fr = await socGet(env, fid); if (fr) { fr.friends = (fr.friends || []).filter(x => x !== me.uid); await socPut(env, fr); }
+    return json({ ok: true }, 200, cors);
+  }
+  if (action === 'cheer') {
+    const fid = cleanStr(body.to, 64), id = cleanStr(body.id, 40);
+    if (!(me.friends || []).includes(fid)) return json({ error: 'Not your friend.' }, 403, cors);
+    const fr = await socGet(env, fid); if (!fr) return json({ error: 'Not found' }, 404, cors);
+    fr.cheers = fr.cheers || {}; const list = fr.cheers[id] || [];
+    if (!list.some(c => c.uid === me.uid)) list.push({ uid: me.uid, name: me.name, t: Date.now() });
+    fr.cheers[id] = list.slice(-30); await env.MACROS_KV.put('soc:' + fr.uid, JSON.stringify(fr));
+    return json({ ok: true }, 200, cors);
+  }
+  if (action === 'board') {
+    const friends = (await Promise.all((me.friends || []).map(id => socGet(env, id)))).filter(Boolean);
+    const reqs = Object.entries(me.reqs || {}).map(([uid, r]) => ({ uid, ...r })).sort((a, b) => b.t - a.t);
+    return json({ me: { ...publicView(me, true), code: me.code, share: me.share, phoneLast4: me.phLast4 || null }, friends: friends.map(f => publicView(f, false)), reqs }, 200, cors);
+  }
+  if (action === 'leave') {
+    for (const id of me.friends || []) { const fr = await socGet(env, id); if (fr) { fr.friends = (fr.friends || []).filter(x => x !== me.uid); await socPut(env, fr); } }
+    await env.MACROS_KV.delete('code:' + me.code); await env.MACROS_KV.delete('soc:' + me.uid);
+    if (me.username) await env.MACROS_KV.delete('un:' + me.username); if (me.ph) await env.MACROS_KV.delete('ph:' + me.ph);
+    return json({ ok: true }, 200, cors);
+  }
+  return json({ error: 'Not found' }, 404, cors);
 }
