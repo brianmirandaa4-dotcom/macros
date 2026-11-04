@@ -356,7 +356,8 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 .onb::before{content:"";position:fixed;inset:-30% -30% auto auto;width:80vmax;height:80vmax;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--kcal) 16%,transparent),transparent 60%);pointer-events:none}
 .onb-in{width:100%;max-width:520px;display:flex;flex-direction:column;gap:22px;position:relative}
 .onb-top{display:flex;align-items:center;gap:12px}
-.onb-prog{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.onb-prog{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.onb-prog i.on:nth-child(6){background:var(--over)}
 .onb-prog i{height:5px;border-radius:3px;background:var(--surface-2);transition:background .3s}
 .onb-prog i.on:nth-child(1){background:var(--pro)}.onb-prog i.on:nth-child(2){background:var(--carb)}.onb-prog i.on:nth-child(3){background:var(--fat)}.onb-prog i.on:nth-child(4){background:var(--kcal)}.onb-prog i.on:nth-child(5){background:var(--good)}
 .onb-skip{border:0;background:none;color:var(--muted);font-weight:600;font-size:13px}
@@ -542,6 +543,15 @@ button:active{transform:translateY(0) scale(.98)}
   .sets input{padding:9px 4px}
   .wk-bar{top:calc(env(safe-area-inset-top,0px) + 57px)}
 }
+.conn-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:4px 12px;align-items:center;background:var(--surface-2);border-radius:14px;padding:12px 14px}
+.conn-row .pill-btn{grid-column:3;grid-row:2}
+.conn-logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font:800 18px var(--f-display);color:var(--bg);background:var(--c);grid-row:1/3}
+.conn-t b{display:block;font:700 15px var(--f-display)}
+.conn-t span{font-size:12px;color:var(--muted)}
+.conn-t{grid-row:1/3}
+.conn-chip{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 8px;justify-self:end}
+.conn-chip.on{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
+.hgrid .hm{animation:rise .3s ease both}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -591,7 +601,7 @@ button:active{transform:translateY(0) scale(.98)}
     <div class="meals" id="meals"></div>
 
     <div class="card" id="healthCard">
-      <div class="card-h"><div><div class="eyebrow">Recovery &amp; activity · Apple Health</div><h2>WHOOP, Garmin or Apple Watch</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="hSync">Sync</button><button class="pill-btn" id="hEdit">Edit</button><button class="pill-btn" id="hHow">Set up</button></div></div>
+      <div class="card-h"><div><div class="eyebrow">Recovery &amp; activity</div><h2 id="hSrc">WHOOP, Garmin or Apple Watch</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="hSync">Sync</button><button class="pill-btn" id="hEdit">Edit</button><button class="pill-btn" id="hHow">Set up</button></div></div>
       <div class="hgrid" id="hGrid"></div>
       <p class="note" id="hNote" style="margin-top:12px"></p>
     </div>
@@ -630,6 +640,10 @@ button:active{transform:translateY(0) scale(.98)}
           <div class="card-h"><div><div class="eyebrow">History</div><h2>Recent workouts</h2></div></div>
           <ul class="hist" id="hist"></ul>
         </div>
+        <div class="card" id="devWkCard" hidden>
+          <div class="card-h"><div><div class="eyebrow">From WHOOP &amp; Garmin</div><h2>Workouts your watch recorded</h2></div></div>
+          <ul class="hist" id="devWk"></ul>
+        </div>
       </div>
     </div>
     <div id="trainActive" hidden style="display:flex;flex-direction:column;gap:14px"></div>
@@ -656,6 +670,10 @@ button:active{transform:translateY(0) scale(.98)}
     <div class="card">
       <div class="card-h"><div><div class="eyebrow">Day by day</div><h2>Tap a day to open it</h2></div></div>
       <div class="tbl-wrap" id="wTable"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><div><div class="eyebrow">Sleep &amp; recovery</div><h2>How your body handled the week</h2></div></div>
+      <div class="tbl-wrap" id="wRec"></div>
     </div>
   </section>
 
@@ -799,6 +817,11 @@ button:active{transform:translateY(0) scale(.98)}
           <div class="fact" style="--c:var(--fat)"><b>9</b><span>kcal per g fat</span></div>
         </div>
       </div>
+    </div>
+
+    <div class="card" id="connCard" style="display:flex;flex-direction:column;gap:14px">
+      <div><div class="eyebrow">Connections</div><h2>WHOOP &amp; Garmin, synced automatically</h2></div>
+      <div id="connBody" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
 
     <div class="card" style="display:flex;flex-direction:column;gap:14px">
@@ -1093,10 +1116,10 @@ const UNIT_LABEL=(u,q,food)=>{if(u==='serving'&&food&&food.servName)return food.
 /* ---------- state & storage ---------- */
 const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
-  days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120};
+  days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]}};
 let storageOK=true;
-function load(){try{const j=JSON.parse(localStorage.getItem(LS)||'null');if(j){S.days=j.days||{};if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
-function save(){try{localStorage.setItem(LS,JSON.stringify({v:1,days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,lastBackup:S.lastBackup,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,tplSeeded:S.tplSeeded,active:S.active,health:S.health,restSec:S.restSec}));storageOK=true}catch(e){storageOK=false}
+function load(){try{const j=JSON.parse(localStorage.getItem(LS)||'null');if(j){S.days=j.days||{};if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.dev=j.dev||{days:{},workouts:[]};S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
+function save(){try{localStorage.setItem(LS,JSON.stringify({v:1,days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,lastBackup:S.lastBackup,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,tplSeeded:S.tplSeeded,active:S.active,health:S.health,restSec:S.restSec,dev:S.dev}));storageOK=true}catch(e){storageOK=false}
   const s=$('saved'); s.textContent=storageOK?'Saved on this device':'Not saving — storage blocked'; s.style.color=storageOK?'':'var(--over)'; checkBackup();}
 let FOODS=[],ALIAS=[];
 function buildFoods(){
@@ -1512,6 +1535,8 @@ function renderWeek(){
   const stack=(p,c,f,s)=>{const P=p*4/s*100,C=c*4/s*100,F=f*9/s*100;return `<div class="stack"><i style="width:${P}%;background:var(--pro)">${P>=9?r0(P)+'%':''}</i><i style="width:${C}%;background:var(--carb)">${C>=9?r0(C)+'%':''}</i><i style="width:${F}%;background:var(--fat)">${F>=9?r0(F)+'%':''}</i></div>`};
   $('wSplit').innerHTML=`<div class="cmp-row"><span>You ate</span>${st.has&&as?stack(a.p,a.c,a.f,as):'<div class="stack"></div>'}</div><div class="cmp-row"><span>Target</span>${stack(g.p,g.c,g.f,gs)}</div>`;
   $('wTable').innerHTML=dayTable(keys);
+  $('wRec').innerHTML=recoveryTable(keys);
+  $('wRec').onclick=e=>{const r=e.target.closest('[data-day]');if(r){S.day=r.dataset.day;setView('today')}};
   $('wTable').onclick=e=>{const r=e.target.closest('[data-day]');if(r){S.day=r.dataset.day;setView('today')}};
 }
 function dayTable(keys){
@@ -1722,7 +1747,7 @@ function renderPlan(){
   }
   $('pStartBtn').textContent=S.plan?'Replace current plan with this one':'Start this plan';
   $('pStop').hidden=!S.plan;
-  renderPlanLive();renderWeights();renderManual();renderAiSettings();renderDataNote();
+  renderPlanLive();renderWeights();renderManual();renderAiSettings();renderDataNote();renderConn();
 }
 function renderTypeSeg(){$('pType').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===S.pType))}
 function planChart(pl,weights){
@@ -1999,7 +2024,7 @@ document.addEventListener('paste',e=>{if(S.view!=='today')return;const f=[...(e.
 
 /* data */
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-function backup(){S.lastBackup=Date.now();save();download(`macros-backup-${todayKey()}.json`,JSON.stringify({app:'MACROS',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
+function backup(){S.lastBackup=Date.now();save();download(`macros-backup-${todayKey()}.json`,JSON.stringify({app:'MACROS',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
 $('exportJson').onclick=backup; $('backupNow').onclick=backup;
 $('exportCsv').onclick=()=>{
   const rows=[['date','meal','food','amount','grams','kcal','protein_g','carbs_g','fat_g']];
@@ -2050,17 +2075,18 @@ function openProfile(){
 }
 
 let ob=null;
-const OB_STEPS=['welcome','name','body','activity','goal','result','tour'];
+const OB_STEPS=['welcome','name','body','activity','goal','wear','result','connect','tour'];
+const WEAR=[['whoop','WHOOP','Recovery, HRV, sleep, strain','var(--good)'],['garmin','Garmin','Steps, Body Battery, sleep, workouts','var(--fat)'],['apple','Apple Watch','Activity, heart rate, sleep','var(--pro)'],['none','Nothing yet','Skip device data for now','var(--muted)']];
 function openOnb(){
   const c=S.calc||{};
-  ob={i:0,d:{name:S.profile.name||'',sex:c.sex||'m',age:c.age||'',ft:c.ht?Math.floor(c.ht/12):'',inch:c.ht?r1(c.ht%12):'',wt:c.wt||'',bf:c.bf||'',act:c.act||'1.55',type:S.pType||'cut',lbs:c.lbs||10,dur:c.dur||4,unit:c.unit||'months'}};
+  ob={i:0,d:{wear:(S.profile.wear||[]).slice(),name:S.profile.name||'',sex:c.sex||'m',age:c.age||'',ft:c.ht?Math.floor(c.ht/12):'',inch:c.ht?r1(c.ht%12):'',wt:c.wt||'',bf:c.bf||'',act:c.act||'1.55',type:S.pType||'cut',lbs:c.lbs||10,dur:c.dur||4,unit:c.unit||'months'}};
   $('onb').hidden=false;document.documentElement.style.overflow='hidden';drawOnb();
 }
 function closeOnb(){$('onb').hidden=true;document.documentElement.style.overflow='';ob=null}
 function obVal(id){const e=$(id);return e?e.value:''}
 function drawOnb(){
-  const st=OB_STEPS[ob.i],d=ob.d,prog=Math.min(5,Math.max(0,ob.i));
-  const top=`<div class="onb-top"><div class="brand" style="font-size:16px"><i><b></b><b></b><b></b></i></div><div class="onb-prog">${[1,2,3,4,5].map(n=>`<i class="${n<=prog?'on':''}"></i>`).join('')}</div>${st!=='tour'?'<button class="onb-skip" id="obSkip">Skip</button>':''}</div>`;
+  const st=OB_STEPS[ob.i],d=ob.d,prog=Math.min(6,Math.max(0,ob.i));
+  const top=`<div class="onb-top"><div class="brand" style="font-size:16px"><i><b></b><b></b><b></b></i></div><div class="onb-prog">${[1,2,3,4,5,6].map(n=>`<i class="${n<=prog?'on':''}"></i>`).join('')}</div>${st!=='tour'?'<button class="onb-skip" id="obSkip">Skip</button>':''}</div>`;
   let body='',next='Continue',back=ob.i>0&&st!=='tour';
   if(st==='welcome'){body=`<div class="hero-bars"><b></b><b></b><b></b></div><h1>Eat with a <em>plan</em>, not a guess.</h1><p class="lede">MACROS turns your body stats and goal into daily calorie and macro targets that adjust every week, then helps you log food, lifts and how you feel.</p><p class="lede" style="font-size:14px">Takes about a minute. Everything stays on this phone.</p>`;next="Let's set you up"}
   if(st==='name'){body=`<h1>What should we call you?</h1><input class="big-in" id="obName" type="text" autocomplete="given-name" placeholder="Your name" value="${esc(d.name)}">`}
@@ -2073,6 +2099,16 @@ function drawOnb(){
   if(st==='activity'){body=`<h1>How active are you?</h1><p class="lede">Count workouts and how much you move at work.</p><div class="choice">${[['1.2','Mostly sitting','Desk job, little exercise'],['1.375','Lightly active','Train 1–3 days a week'],['1.55','Active','Train 3–5 days a week'],['1.725','Very active','Train hard 6–7 days a week'],['1.9','Athlete','Twice-a-day training or a physical job']].map(([v,l,s])=>`<button type="button" data-act="${v}" aria-pressed="${d.act===v}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='goal'){body=`<h1>What's the goal?</h1><div class="choice">${[['cut','Cut','Lose fat and keep muscle','var(--fat)'],['maintain','Maintain','Hold your weight, recomp slowly','var(--good)'],['bulk','Bulk','Build muscle with a small surplus','var(--pro)']].map(([v,l,s,c])=>`<button type="button" data-goal="${v}" aria-pressed="${d.type===v}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>
     ${d.type==='maintain'?'':`<div class="grid2"><div class="field"><label for="obLbs">Pounds to ${d.type==='bulk'?'gain':'lose'}</label><input id="obLbs" type="number" inputmode="decimal" value="${esc(d.lbs)}"></div><div class="field"><label for="obDur">Over</label><div class="dur-row"><input id="obDur" type="number" inputmode="numeric" value="${esc(d.dur)}" aria-label="Duration"><select id="obUnit" aria-label="Unit"><option value="months" ${d.unit==='months'?'selected':''}>months</option><option value="weeks" ${d.unit==='weeks'?'selected':''}>weeks</option></select></div></div></div>`}`}
+  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. MACROS uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
+  if(st==='connect'){
+    const ws=(d.wear||[]).filter(x=>x!=='none'),srv=!!(SYNC_URL||syncCfg().url),st2=syncCfg().st||{};
+    const row=(id,name,c,desc,btn,done)=>`<div class="conn-row"><div class="conn-logo" style="--c:${c}">${name[0]}</div><div class="conn-t"><b>${name}</b><span>${desc}</span></div>${done?'<span class="conn-chip on">Connected</span>':`<button class="pill-btn" id="${id}">${btn}</button>`}</div>`;
+    body=`<h1>Connect your ${ws.length>1?'devices':'device'}</h1><p class="lede">One tap each. You can always do this later from Plan → Connections.</p><div style="display:flex;flex-direction:column;gap:10px">
+      ${ws.includes('whoop')?row('obCW','WHOOP','var(--good)',srv?'Sign in to WHOOP once. Syncs on its own after that.':'WHOOP connections open soon. You’ll find them under Plan → Connections.',srv?'Connect':'Later',st2.whoop):''}
+      ${ws.includes('garmin')?row('obCG','Garmin','var(--fat)','Steps, sleep, workouts and calories through Apple Health.','Set up',false):''}
+      ${ws.includes('apple')?row('obCA','Apple Watch','var(--pro)','Activity, heart rate and sleep through Apple Health.','Set up',false):''}</div>`;
+    next='Continue';
+  }
   if(st==='result'){
     const pl=obPlan(),w0=pl.weeks[0],fin=pl.weeks.slice(0,pl.N).filter(w=>w.ph!=='Diet break').pop()||w0,sm=w0.p*4+w0.c*4+w0.f*9;
     const rate=pl.type==='maintain'?0:Math.abs(pl.endW-pl.startW)/pl.N,pct=rate/pl.startW*100;
@@ -2093,6 +2129,10 @@ function drawOnb(){
   if($('obBack'))$('obBack').onclick=()=>{obRead();ob.i--;drawOnb()};
   $('onbIn').querySelectorAll('[data-sex]').forEach(b=>b.onclick=()=>{obRead();d.sex=b.dataset.sex;drawOnb()});
   $('onbIn').querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{d.act=b.dataset.act;drawOnb()});
+  $('onbIn').querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{const v=b.dataset.wear;d.wear=d.wear||[];if(v==='none')d.wear=d.wear.includes('none')?[]:['none'];else{d.wear=d.wear.filter(x=>x!=='none');d.wear=d.wear.includes(v)?d.wear.filter(x=>x!==v):[...d.wear,v]}drawOnb()});
+  if($('obCW'))$('obCW').onclick=()=>{if(!(SYNC_URL||syncCfg().url)){toast('WHOOP connection isn’t set up yet. Find it later under Plan → Connections.');return}connectWhoop()};
+  if($('obCG'))$('obCG').onclick=()=>openHealthGuide();
+  if($('obCA'))$('obCA').onclick=()=>openHealthGuide();
   $('onbIn').querySelectorAll('[data-goal]').forEach(b=>b.onclick=()=>{obRead();d.type=b.dataset.goal;drawOnb()});
   $('obNext').onclick=obNext;
   const f=$('onbIn').querySelector('input');if(f&&st!=='body')setTimeout(()=>f.focus(),80);
@@ -2109,12 +2149,14 @@ function obNext(){
   obRead();const st=OB_STEPS[ob.i],d=ob.d;
   if(st==='body'){const p=obProf();let er='';if(!(p.age>=13&&p.age<=100))er='Enter your age.';else if(!(p.ht>=48&&p.ht<=96))er='Enter your height in feet and inches.';else if(!(p.wt>=70&&p.wt<=700))er='Enter your weight in pounds.';else if(p.bf&&!(p.bf>=3&&p.bf<=60))er='Body fat should be between 3 and 60%, or leave it blank.';if(er){$('obErr').textContent=er;return}}
   if(st==='goal'&&d.type!=='maintain'&&!(+d.lbs>0&&+d.dur>0)){toast('Enter how many pounds and how long');return}
+  if(st==='wear'){if(!(d.wear&&d.wear.length)){toast('Pick what you wear, or Nothing yet');return}S.profile.wear=d.wear;save()}
   if(st==='result'){
     const p=obProf();S.profile={...S.profile,name:d.name,onboarded:true};
     S.calc={sex:p.sex,age:p.age,ht:p.ht,wt:p.wt,bf:p.bf,act:p.act,lbs:p.lbs,dur:p.dur,unit:p.unit,style:'gradual',pro:'auto',breaks:'on',type:p.type};
     S.pType=p.type;S.plan=buildPlan(p);if(!S.weights[todayKey()])S.weights[todayKey()]=r1(p.wt);
     renderPlan.filled=false;save();renderProfileBtn();
   }
+  if(st==='result'&&!(d.wear||[]).some(x=>x!=='none')){ob.i+=2;drawOnb();return}
   if(st==='tour'){closeOnb();setView('today');renderAll();toast(`Welcome${firstName()?', '+esc(firstName()):''}! Log your first meal below.`);return}
   ob.i++;drawOnb();
 }
@@ -2166,6 +2208,7 @@ function renderTrain(){
   $('exChart').innerHTML=cur?exChart(cur):'';
   $('exNote').textContent=cur?'':'Finish a workout with weight and reps to see your strength trend. Estimated 1-rep max uses the Epley formula: weight × (1 + reps ÷ 30).';
   // history
+  renderDevWorkouts();
   $('hist').innerHTML=S.workouts.length?S.workouts.slice(0,12).map((w,i)=>{const v=w.ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0);
     return `<li><button data-wk="${i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}</b><span class="r">${fmt(v)} lb<br><span class="dim">${fmtDur(w.end-w.start)}</span></span><span class="s">${niceDate(w.date,{weekday:'short',month:'short',day:'numeric'})} · ${w.ex.length} exercises · ${w.ex.reduce((a,x)=>a+x.sets.length,0)} sets</span></button></li>`}).join(''):'<li class="note">No workouts yet. Start one above.</li>';
 }
@@ -2277,7 +2320,7 @@ function renderRest(){
 setInterval(()=>{if(S.active){const t=$('wkTime');if(t)t.textContent=clock(Date.now()-S.active.start)}if(S.rest)renderRest()},1000);
 
 /* ================= HEALTH (WHOOP / Garmin / Apple Watch via Apple Health) ================= */
-const H_FIELDS=[['sleep','Sleep','h','var(--kcal)'],['recovery','Recovery','%','var(--good)'],['hrv','HRV','ms','var(--fat)'],['rhr','Resting HR','bpm','var(--pro)'],['steps','Steps','','var(--carb)'],['active','Active energy','kcal','var(--over)']];
+const H_FIELDS=[['recovery','Recovery','%','var(--good)'],['sleep','Sleep','h','var(--kcal)'],['sleepScore','Sleep score','','var(--kcal)'],['hrv','HRV','ms','var(--fat)'],['rhr','Resting HR','bpm','var(--pro)'],['strain','Strain','','var(--carb)'],['bodyBattery','Body Battery','','var(--good)'],['steps','Steps','','var(--carb)'],['active','Active energy','kcal','var(--over)']];
 const H_ALIAS={steps:'steps',step:'steps',stepcount:'steps',active:'active',activeenergy:'active',activecalories:'active',activekcal:'active',rhr:'rhr',restinghr:'rhr',restingheartrate:'rhr',hrv:'hrv',heartratevariability:'hrv',sleep:'sleep',sleephours:'sleep',sleepanalysis:'sleep',weight:'weight',bodymass:'weight',recovery:'recovery',whooprecovery:'recovery',date:'date',workouts:'workouts',workout:'workouts'};
 function parseHealth(text){
   const out={};let found=0;
@@ -2297,10 +2340,15 @@ function applyHealth(h){
   save();renderAll();return k;
 }
 function renderHealth(){
-  const el=$('healthCard');if(!el)return;const h=S.health[S.day]||{},has=H_FIELDS.some(([k])=>h[k]!=null);
-  $('hGrid').hidden=!has;
-  $('hGrid').innerHTML=H_FIELDS.map(([k,l,u,c])=>`<div class="hm ${h[k]==null?'na':''}" style="--c:${c}"><small>${l}</small><b>${h[k]==null?'—':(k==='steps'||k==='active'?fmt(h[k]):h[k])}${h[k]!=null&&u?`<span> ${u}</span>`:''}</b></div>`).join('');
-  $('hNote').innerHTML=has?(h.workouts?`<b>Workouts:</b> ${esc(h.workouts)}<br>`:'')+(h.t?`Updated ${new Date(h.t).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}.`:''):'Pull sleep, heart rate, steps and workouts from WHOOP, Garmin or Apple Watch through Apple Health. Set it up once, then tap Sync each morning.';
+  const el=$('healthCard');if(!el)return;const h=hv(S.day),m=S.health[S.day]||{},shown=H_FIELDS.filter(([k])=>h[k]!=null),c=syncCfg(),conn=!!(c.url&&c.uid);
+  $('hGrid').hidden=!shown.length;
+  $('hGrid').innerHTML=shown.map(([k,l,u,col])=>`<div class="hm" style="--c:${col}"><small>${l}</small><b>${k==='steps'||k==='active'?fmt(h[k]):h[k]}${u?`<span> ${u}</span>`:''}</b></div>`).join('');
+  $('hSync').textContent=conn?'Sync now':'Sync';
+  $('hSrc').textContent=h.src.length?h.src.join(' + '):(conn?'WHOOP · Garmin':'WHOOP, Garmin or Apple Watch');
+  const x=h.extra||{},bits=[];
+  if(x.deep!=null)bits.push(`Deep ${x.deep}h · REM ${x.rem}h`);if(x.eff!=null)bits.push(`Efficiency ${x.eff}%`);if(x.resp!=null)bits.push(`Resp. rate ${x.resp}`);if(x.stress!=null)bits.push(`Stress ${x.stress}`);if(x.hrvStatus)bits.push(`HRV ${String(x.hrvStatus).toLowerCase()}`);
+  $('hNote').innerHTML=shown.length?[bits.join(' · '),h.workouts?`<b>Workouts:</b> ${esc(h.workouts)}`:'',conn&&c.last?`Synced ${new Date(c.last).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`:''].filter(Boolean).join('<br>')
+    :(conn?'Nothing synced for this day yet. Tap Sync now, or wear your device overnight.':'Bring in recovery, sleep, HRV and workouts from WHOOP and Garmin automatically. Tap Set up.');
 }
 async function syncHealth(){
   let text='';
@@ -2353,7 +2401,7 @@ weight=[Weight]</div>
   $('hgOk').onclick=closeSheet;
 }
 
-$('profBtn').onclick=openProfile;$('hSync').onclick=syncHealth;$('hEdit').onclick=openHealthEdit;$('hHow').onclick=openHealthGuide;
+$('profBtn').onclick=openProfile;$('hSync').onclick=()=>{const c=syncCfg();if(c.url&&c.uid)syncDevices(true);else syncHealth()};$('hEdit').onclick=openHealthEdit;$('hHow').onclick=openSetupChooser;
 function renderJust(){
   const el=$('justAdded');if(!el)return;const j=S.just;
   const list=j&&j.k===S.day?(S.days[S.day]||[]).filter(e=>j.ids.includes(e.id)):[];
@@ -2364,11 +2412,138 @@ function renderJust(){
   $('justClose').onclick=()=>{S.just=null;renderJust()};
 }
 $('justAdded').addEventListener('click',e=>{const b=e.target.closest('[data-edit]');if(b)openEdit(b.dataset.edit)});
+/* ================= DEVICE SYNC (WHOOP + Garmin via your sync server) ================= */
+const SYK='macros.sync.v1';
+// The app owner's sync server. Once set, everyone using this link gets one-tap "Connect WHOOP".
+const SYNC_URL='';
+async function ensureSync(){
+  const c=syncCfg();if(c.uid&&c.url)return c;
+  const url=(c.url||SYNC_URL).replace(/\/+$/,'');if(!url)throw new Error('No sync server yet.');
+  const r=await fetch(url+'/api/register',{method:'POST'});if(!r.ok)throw new Error('Couldn\u2019t reach the sync server.');
+  const j=await r.json();const n={url,uid:j.uid,token:j.token};syncSave(n);return n;
+}
+async function connectWhoop(){
+  try{await ensureSync();const j=await api('/api/whoop-link',{method:'POST'});if(ob){S.profile.onboarded=true;save()}location.href=j.url}
+  catch(e){toast(esc(e.message))}
+}
+function syncCfg(){try{return JSON.parse(localStorage.getItem(SYK)||'null')||{}}catch(e){return {}}}
+function syncSave(c){try{localStorage.setItem(SYK,JSON.stringify(c))}catch(e){}}
+async function api(path,opt={}){
+  const c=syncCfg();if(!c.url)throw new Error('No sync server yet.');
+  const r=await fetch(c.url+path,{...opt,headers:{...(opt.headers||{}),...(c.uid?{Authorization:`Bearer ${c.uid}.${c.token}`}:{}),...(opt.body?{'Content-Type':'application/json'}:{})}});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||`Sync server error (${r.status})`);
+  return j;
+}
+let syncing=false;
+async function syncDevices(force){
+  const c=syncCfg();if(!c.url||!c.uid||syncing)return;
+  if(!force&&c.last&&Date.now()-c.last<15*60000)return;
+  syncing=true;setConnStatus('Syncing…');
+  try{
+    const d=await api(`/api/sync?days=${c.last?14:45}${force?'&force=1':''}`);
+    mergeDevice(d);c.last=Date.now();c.err=(d.errors||[]).join(' · ');c.st={whoop:!!d.whoop,garmin:!!d.garmin};syncSave(c);
+    setConnStatus('');if(force)toast('Synced WHOOP & Garmin');
+  }catch(e){c.err=e.message;syncSave(c);setConnStatus('');if(force)toast(esc(e.message))}
+  syncing=false;renderAll();
+}
+function mergeDevice(d){
+  S.dev=S.dev||{days:{},workouts:[]};
+  const put=(src,days)=>Object.entries(days||{}).forEach(([k,v])=>{S.dev.days[k]=S.dev.days[k]||{};S.dev.days[k][src]=v;if(src==='g'&&v.weightLb&&!S.weights[k])S.weights[k]=v.weightLb});
+  if(d.whoop)put('w',d.whoop.days);if(d.garmin)put('g',d.garmin.days);
+  const ws=[...(d.whoop?d.whoop.workouts:[]),...(d.garmin?d.garmin.workouts:[])];
+  const map=new Map(S.dev.workouts.map(w=>[w.id,w]));ws.forEach(w=>map.set(w.id,w));
+  S.dev.workouts=[...map.values()].sort((a,b)=>String(b.start||b.date).localeCompare(String(a.start||a.date))).slice(0,200);
+  save();
+}
+/* combined daily metrics: what you typed > WHOOP > Garmin */
+function hv(k){
+  const m=S.health[k]||{},dv=(S.dev&&S.dev.days[k])||{},w=dv.w||{},g=dv.g||{};
+  const f=(...xs)=>xs.find(x=>x!=null&&x!=='');
+  return {recovery:f(m.recovery,w.recovery),sleep:f(m.sleep,w.sleepH,g.sleepH),sleepScore:f(m.sleepScore,w.sleepPerf,g.sleepScore),hrv:f(m.hrv,w.hrv,g.hrv),rhr:f(m.rhr,w.rhr,g.rhr),
+    strain:f(m.strain,w.strain),bodyBattery:f(m.bodyBattery,g.bodyBattery),steps:f(m.steps,g.steps),active:f(m.active,g.activeKcal),
+    workouts:m.workouts,src:[w.recovery!=null||w.sleepH!=null?'WHOOP':'',Object.keys(g).length?'Garmin':'',Object.keys(m).some(x=>x!=='t'&&x!=='workouts')?'manual':''].filter(Boolean),
+    extra:{deep:w.deepH,rem:w.remH,resp:w.respRate,spo2:w.spo2,stress:g.stress,hrvStatus:g.hrvStatus,eff:w.sleepEff}};
+}
+function setConnStatus(t){const e=$('connSyncing');if(e)e.textContent=t}
+function renderConn(){
+  const el=$('connBody');if(!el)return;const c=syncCfg();
+  if((!c.url||!c.uid)&&!SYNC_URL){
+    el.innerHTML=`<p class="note">Pull WHOOP recovery, HRV, strain and sleep plus Garmin steps, Body Battery, sleep score and workouts into MACROS automatically. It runs on a free server you own (Cloudflare), about 10 minutes to set up once.</p>
+      <div class="field"><label for="cnUrl">Your sync server address</label><input id="cnUrl" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="https://macros-sync.yourname.workers.dev" value="${esc(c.url||'')}"></div>
+      <div class="row"><button class="primary" id="cnGo">Connect server</button><button class="ghost" id="cnHow">How to set it up</button><span class="status" id="cnErr"></span></div>`;
+    $('cnHow').onclick=openSyncGuide;
+    $('cnGo').onclick=async()=>{let u=$('cnUrl').value.trim().replace(/\/+$/,'');if(!/^https:\/\//.test(u)){$('cnErr').className='status err';$('cnErr').textContent='Use the https:// address Cloudflare gave your worker.';return}
+      $('cnErr').className='status';$('cnErr').textContent='Connecting…';
+      try{const r=await fetch(u+'/api/register',{method:'POST'});if(!r.ok)throw 0;const j=await r.json();syncSave({url:u,uid:j.uid,token:j.token});renderConn();toast('Sync server connected')}
+      catch(e){$('cnErr').className='status err';$('cnErr').textContent='Couldn’t reach that server. Check the address and that the worker is deployed with its MACROS_KV binding.'}};
+    return;
+  }
+  const st=c.st||{},last=c.last?new Date(c.last).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'never';
+  el.innerHTML=`<div class="conn-row"><div class="conn-logo" style="--c:var(--good)">W</div><div class="conn-t"><b>WHOOP</b><span>Recovery, HRV, resting HR, sleep, strain, workouts</span></div><span class="conn-chip ${st.whoop?'on':''}">${st.whoop?'Connected':'Not connected'}</span><button class="pill-btn" id="cnW">${st.whoop?'Reconnect':'Connect'}</button></div>
+    <div class="conn-row"><div class="conn-logo" style="--c:var(--fat)">G</div><div class="conn-t"><b>Garmin</b><span>Steps, Body Battery, sleep score, HRV, stress, workouts, weight</span></div><span class="conn-chip ${st.garmin?'on':''}">${st.garmin?'Connected':'Not connected'}</span><button class="pill-btn" id="cnG">${st.garmin?'New key':'Add key'}</button></div>
+    <div class="row" style="justify-content:space-between"><span class="note">Last sync: ${esc(last)} <span id="connSyncing" style="color:var(--kcal)"></span></span><div class="row"><button class="ghost" id="cnSync">Sync now</button><button class="link" id="cnRm" style="color:var(--muted)">Disconnect server</button></div></div>
+    ${c.err?`<p class="status err" style="margin:0">${esc(c.err)}</p>`:''}`;
+  $('cnSync').onclick=async()=>{try{await ensureSync();syncDevices(true)}catch(e){toast(esc(e.message))}};
+  $('cnW').onclick=connectWhoop;
+  $('cnG').onclick=async()=>{try{await ensureSync();openGarminKey()}catch(e){toast(esc(e.message))}};
+  $('cnRm').onclick=()=>{const b=$('cnRm');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to disconnect';return}api('/api/disconnect',{method:'POST',body:JSON.stringify({source:'all'})}).catch(()=>{});syncSave({});renderConn();toast('Sync server disconnected')};
+}
+function openGarminKey(){
+  sheet(`<div><div class="eyebrow">Garmin</div><h3>Add your Personal API key</h3><p class="note">On a computer, open Garmin Connect → Settings → Personal API, create a key (365 days is easiest), copy it, and paste it here. It goes only to your own sync server.</p></div>
+    <div class="field"><label for="gkIn">Garmin Personal API key</label><input id="gkIn" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste key"></div>
+    <div class="status" id="gkErr"></div>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="gkCancel">Cancel</button><button class="primary" id="gkOk">Save key</button></div>`);
+  $('gkCancel').onclick=closeSheet;
+  $('gkOk').onclick=async()=>{const k=$('gkIn').value.trim();if(!k){$('gkIn').focus();return}$('gkErr').className='status';$('gkErr').textContent='Checking with Garmin…';
+    try{const s=await api('/api/garmin',{method:'POST',body:JSON.stringify({apiKey:k})});const c=syncCfg();c.st={...(c.st||{}),...s};syncSave(c);closeSheet();renderConn();toast('Garmin connected');syncDevices(true)}
+    catch(e){$('gkErr').className='status err';$('gkErr').textContent=e.message}};
+}
+function openSyncGuide(){
+  const app=location.origin+location.pathname;
+  sheet(`<div><div class="eyebrow">One-time setup · about 10 minutes · free</div><h3>Your own sync server</h3><p class="note">MACROS lives on your phone, so it needs a tiny server of yours to sign in to WHOOP and Garmin and fetch your data while you sleep. Cloudflare runs it free.</p></div>
+    <ol class="steps-guide">
+      <li><b>Create the worker.</b> Sign up at dash.cloudflare.com → Workers &amp; Pages → Create → Start with Hello World → name it <b>macros-sync</b> → Deploy → Edit code. Replace everything with the code from <span class="num">sync-server/worker.js</span> in your macros GitHub repository, then Deploy.</li>
+      <li><b>Add storage.</b> Storage &amp; Databases → KV → Create namespace <b>MACROS_KV</b>. Then your worker → Settings → Bindings → Add → KV namespace, variable name <b>MACROS_KV</b>.</li>
+      <li><b>Register a WHOOP app.</b> developer-dashboard.whoop.com → Create app. Redirect URL: <span class="num">https://macros-sync.YOUR-SUBDOMAIN.workers.dev/whoop/callback</span>. Tick every read scope and offline. Copy the Client ID and Client Secret.</li>
+      <li><b>Add settings.</b> Worker → Settings → Variables and Secrets: <b>APP_URL</b> = <span class="num">${esc(app)}</span> (text), <b>WHOOP_CLIENT_ID</b> and <b>WHOOP_CLIENT_SECRET</b> (secrets).</li>
+      <li><b>Turn on auto-refresh.</b> Worker → Settings → Trigger events → Cron → <span class="num">17 */6 * * *</span> (every 6 hours).</li>
+      <li><b>Connect.</b> Paste your worker address above, tap Connect server, then Connect WHOOP and Add key for Garmin.</li>
+    </ol>
+    <p class="note">After that, MACROS syncs whenever you open it. Your WHOOP and Garmin sign-ins are stored only on your Cloudflare account.</p>
+    <div class="row" style="justify-content:flex-end"><button class="primary" id="sgOk">Got it</button></div>`);
+  $('sgOk').onclick=closeSheet;
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices(false)});
+function renderDevWorkouts(){
+  const el=$('devWk');if(!el)return;const ws=(S.dev&&S.dev.workouts)||[];
+  $('devWkCard').hidden=!ws.length;
+  el.innerHTML=ws.slice(0,10).map(w=>`<li><button data-devwk="${esc(w.id)}"><b>${esc(w.name)} <span class="mus">${esc(w.src)}</span></b><span class="r">${w.kcal!=null?fmt(w.kcal)+' kcal':''}${w.strain!=null?`<br><span class="dim">strain ${w.strain}</span>`:w.avgHr?`<br><span class="dim">${w.avgHr} bpm avg</span>`:''}</span><span class="s">${niceDate(w.date,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.reps?` · ${w.reps} reps`:''}</span></button></li>`).join('');
+}
+$('devWk')&&$('devWk').addEventListener('click',e=>{const b=e.target.closest('[data-devwk]');if(!b)return;const w=S.dev.workouts.find(x=>x.id===b.dataset.devwk);if(!w)return;
+  sheet(`<div><div class="eyebrow">${esc(w.src)} · ${niceDate(w.date,{weekday:'long',month:'short',day:'numeric'})}</div><h3>${esc(w.name)}</h3></div>
+    <div class="live"><div style="--c:var(--pro)"><b>${w.min??'—'}</b><span>minutes</span></div><div style="--c:var(--over)"><b>${w.kcal!=null?fmt(w.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--carb)"><b>${w.strain??(w.avgHr||'—')}</b><span>${w.strain!=null?'strain':'avg bpm'}</span></div><div style="--c:var(--fat)"><b>${w.maxHr||'—'}</b><span>max bpm</span></div></div>
+    <p class="note">Your watch records time, heart rate and calories. To track weights and reps for this session, log the sets in MACROS.</p>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Log sets for this</button></div>`);
+  $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();startWorkout(w.name,[])};});
+function recoveryTable(keys){
+  const rows=keys.map(k=>[k,hv(k)]).filter(([,h])=>['sleep','recovery','hrv','rhr','steps'].some(x=>h[x]!=null));
+  if(!rows.length)return '<p class="note">Connect WHOOP or Garmin (Plan → Connections), or sync from Apple Health on Today, to see sleep and recovery here.</p>';
+  return `<table class="dtable"><thead><tr><th>Day</th><th>Sleep</th><th style="color:var(--good)">Recovery</th><th style="color:var(--fat)">HRV</th><th style="color:var(--pro)">RHR</th><th>Steps</th></tr></thead><tbody>${rows.map(([k,h])=>`<tr class="go-row" data-day="${k}"><td>${niceDate(k,{weekday:'short',day:'numeric'})}</td><td>${h.sleep!=null?h.sleep+'h':'—'}</td><td>${h.recovery!=null?h.recovery+'%':'—'}</td><td>${h.hrv??'—'}</td><td>${h.rhr??'—'}</td><td>${h.steps!=null?fmt(h.steps):'—'}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function openSetupChooser(){
+  sheet(`<div><div class="eyebrow">Recovery &amp; activity</div><h3>How should data come in?</h3></div>
+    <div class="choice"><button type="button" id="scAuto" style="--c:var(--good)"><i></i><div><b>Automatic: WHOOP &amp; Garmin</b><span>Everything, including Recovery, HRV, strain, Body Battery and sleep score. Syncs on its own.</span></div></button>
+    <button type="button" id="scShort" style="--c:var(--kcal)"><i></i><div><b>Apple Health Shortcut</b><span>Works with Apple Watch too. Fewer metrics and one tap each morning.</span></div></button></div>`);
+  $('scAuto').onclick=()=>{closeSheet();setView('plan');setTimeout(()=>$('connCard').scrollIntoView({behavior:'smooth',block:'start'}),120)};
+  $('scShort').onclick=()=>{openHealthGuide()};
+}
 /* ---------- start ---------- */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-setView(location.hash.slice(1)||'today'); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb();
+setView(location.hash.slice(1)||'today'); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);
 if(!storageOK){$('saved').textContent='Not saving — storage blocked';$('saved').style.color='var(--over)'}
 document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&S.view==='today'){e.preventDefault();input.focus()}});
 let lastDay=todayKey();

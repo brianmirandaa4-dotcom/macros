@@ -1,0 +1,13 @@
+name = "macros-sync"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+APP_URL = "https://brianmirandaa4-dotcom.github.io/macros/"
+
+[[kv_namespaces]]
+binding = "MACROS_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[triggers]
+crons = ["17 */6 * * *"]
