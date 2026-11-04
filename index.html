@@ -566,7 +566,9 @@ button:active{transform:translateY(0) scale(.98)}
 .page-back{justify-self:start;border:0;background:none;color:var(--kcal);font:600 16px var(--f-body);display:flex;align-items:center;gap:0;padding:6px 6px 6px 0;max-width:40vw;white-space:nowrap;overflow:hidden}
 .page-back span{overflow:hidden;text-overflow:ellipsis}
 .page-t{font:700 17px/1.2 var(--f-display);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56vw}
-.page-body{max-width:720px;margin:0 auto;padding:18px 16px calc(48px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:18px}
+.page-body{max-width:720px;margin:0 auto;padding:18px 16px calc(48px + env(safe-area-inset-bottom,0px));}
+@media (max-width:780px){.tabbar{z-index:16!important}.page-body{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}}
+.page-body{display:flex;flex-direction:column;gap:18px}
 .pg{display:flex;flex-direction:column;gap:18px}
 .glabel{font:700 12px/1 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:8px 6px -8px}
 .glist{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -614,6 +616,76 @@ button:active{transform:translateY(0) scale(.98)}
 .xp-go{flex:none;padding:10px 0 calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--surface)}
 .xp-go .primary{width:100%;padding:14px}
 .ex-h .link{padding:4px 6px}
+
+.ti{display:grid;place-items:center;font-style:normal}
+.tabs .tab.add{background:var(--kcal);color:#0B0C10}.tabs .tab.add:hover{color:#0B0C10;filter:brightness(1.08)}
+@media (max-width:780px){
+  .tabbar .tab.add{gap:4px}
+  .tabbar .tab.add .ti{width:52px;height:52px;border-radius:50%;background:var(--kcal);color:#0B0C10;margin-top:-24px;box-shadow:0 8px 22px color-mix(in srgb,var(--kcal) 30%,transparent),0 0 0 5px var(--bg);transition:transform .15s}
+  .tabbar .tab.add:active .ti{transform:scale(.92)}
+  .tabbar .tab.add svg{width:26px;height:26px}
+  .tabbar .tab.add span{color:var(--fg)}
+}
+.addgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.addt{display:flex;flex-direction:column;align-items:flex-start;gap:10px;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:16px;padding:14px;color:var(--fg);min-height:108px}
+.addt:active{transform:scale(.98)}
+.addt .gi{width:38px;height:38px;border-radius:11px}.addt .gi svg{width:21px;height:21px}
+.addt b{font:700 15.5px/1.2 var(--f-display)}.addt span{font-size:12.5px;color:var(--muted);line-height:1.3}
+.coach{display:flex;flex-direction:column;gap:12px}
+.coach-h{display:flex;align-items:center;gap:12px}
+.coach-ring{width:46px;height:46px;flex:none}
+.coach-h h2{margin:0;font:700 18px/1.2 var(--f-display)}.coach-h p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.todo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.todo button{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:12px;text-align:left;border:1px solid transparent;background:var(--surface-2);border-radius:13px;padding:11px 12px;color:var(--fg)}
+.todo .ck{width:24px;height:24px;border-radius:50%;border:2px solid var(--faint);display:grid;place-items:center}
+.todo .done .ck{background:var(--good);border-color:var(--good);color:#0B0C10}
+.todo .done b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--faint)}
+.todo b{font-weight:650;font-size:14.5px;display:block}.todo span.s{font-size:12.5px;color:var(--muted);display:block}
+.todo .next{border-color:color-mix(in srgb,var(--kcal) 55%,transparent);background:color-mix(in srgb,var(--kcal) 9%,var(--surface-2))}
+.todo .go2{font:700 12.5px var(--f-body);color:#0B0C10;background:var(--kcal);border-radius:999px;padding:6px 11px;white-space:nowrap}
+.todo .arr{color:var(--faint)}
+.coach-x{border:0;background:none;color:var(--muted);font-size:12.5px;align-self:flex-start;padding:2px 0}
+.tip{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--kcal) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--kcal) 35%,var(--line));border-radius:16px;padding:13px 14px;margin-bottom:16px;font-size:14px;line-height:1.45}
+.tip[hidden]{display:none}
+.tip .tic{flex:none;width:28px;height:28px;border-radius:50%;background:var(--kcal);color:#0B0C10;display:grid;place-items:center;font:800 15px var(--f-display)}
+.tip .tt{display:block;font-family:var(--f-display);font-size:15px;margin-bottom:2px}.tip .tx span b{color:var(--fg)}
+.tip .tx{flex:1;min-width:0;color:var(--fg)}.tip .tx span{color:var(--muted)}
+.tip button{border:0;background:none;color:var(--kcal);font-weight:700;padding:4px 0 0;font-size:13.5px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 14px}
+.faq details+details{margin-top:8px}
+.faq summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:650;display:flex;justify-content:space-between;gap:10px}
+.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--muted);font-weight:400;font-size:20px;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq p{margin:0 0 14px;color:var(--muted);line-height:1.55}
+
+/* ---- visual layer ---- */
+html{background:var(--bg)}body{background:transparent}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(520px 380px at 92% -6%,color-mix(in srgb,var(--kcal) 16%,transparent),transparent 70%),
+  radial-gradient(460px 420px at -12% 38%,rgba(120,213,140,.07),transparent 70%),
+  radial-gradient(520px 420px at 110% 92%,rgba(255,126,107,.06),transparent 70%),var(--bg)}
+.card,.glist{border-color:rgba(255,255,255,.07);background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,0) 45%),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 34px rgba(0,0,0,.28)}
+.card{border-radius:22px}.glist{border-radius:18px}
+.card.hero{background:radial-gradient(380px 240px at 12% 0%,color-mix(in srgb,var(--kcal) 13%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0) 45%),var(--surface)}
+.pnav.banner{position:relative;isolation:isolate;min-height:156px;align-items:flex-end;padding:18px 16px 16px;border-radius:24px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(11,12,16,0) 0%,rgba(11,12,16,.35) 45%,rgba(11,12,16,.9) 100%),linear-gradient(90deg,rgba(11,12,16,.72),rgba(11,12,16,.05) 70%),var(--bnr);
+  border:1px solid rgba(255,255,255,.07);box-shadow:0 18px 44px rgba(0,0,0,.4)}
+.pnav.banner h1{font-size:30px;text-shadow:0 2px 16px rgba(0,0,0,.65);letter-spacing:-.01em}
+.pnav.banner .sub{color:rgba(255,255,255,.82);text-shadow:0 1px 8px rgba(0,0,0,.7)}
+.pnav.banner .icon-btn,.pnav.banner .pill-btn{background:rgba(11,12,16,.5);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-color:rgba(255,255,255,.14);color:#fff}
+.pnav.banner .primary{box-shadow:0 6px 20px rgba(0,0,0,.4)}
+@media (max-width:780px){
+  .pnav.banner.flush{margin:-14px calc(-1*max(16px,env(safe-area-inset-left,0px))) 0;border-radius:0 0 30px 30px;border-width:0 0 1px;min-height:190px;padding:18px max(16px,env(safe-area-inset-left,0px)) 18px}
+}
+.meal-h .ic.thumb{width:46px;height:46px;border-radius:14px;background-size:150%;background-position:center;background-color:#20242D;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 6px 14px rgba(0,0,0,.3)}
+.empty-meal b{color:var(--kcal)}
+.me-hero.art{border-radius:26px;padding:26px 16px 22px;overflow:hidden;position:relative;isolation:isolate;background:linear-gradient(180deg,rgba(11,12,16,.25),rgba(11,12,16,.88)),var(--bnr);border:1px solid rgba(255,255,255,.07)}
+.me-hero.art p{color:rgba(255,255,255,.8)}
+.onb.photo{background:linear-gradient(180deg,rgba(11,12,16,.05) 0%,rgba(11,12,16,.55) 22%,rgba(11,12,16,.93) 42%,var(--bg) 70%),var(--bnr),var(--bg)}
+.tabbar{background:rgba(14,16,21,.82)!important;-webkit-backdrop-filter:blur(20px) saturate(1.4)!important;backdrop-filter:blur(20px) saturate(1.4)!important}
+.top{background:rgba(11,12,16,.72)!important;-webkit-backdrop-filter:blur(20px) saturate(1.4)!important;backdrop-filter:blur(20px) saturate(1.4)!important}
+.addt{background:linear-gradient(160deg,color-mix(in srgb,var(--c,#fff) 9%,var(--surface-2)),var(--surface-2))}
+.primary{box-shadow:0 6px 18px color-mix(in srgb,var(--kcal) 25%,transparent)}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -650,7 +722,9 @@ button:active{transform:translateY(0) scale(.98)}
       <button class="icon-btn" id="dNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
 
+    <div class="tip" id="tip-today" hidden></div>
     <div class="card hero" id="hero"></div>
+    <div class="card coach" id="coach" hidden></div>
 
     <div class="card composer">
       <div class="row" style="justify-content:space-between">
@@ -673,21 +747,7 @@ button:active{transform:translateY(0) scale(.98)}
 
     <div class="meals" id="meals"></div>
 
-    <div class="card" id="healthCard">
-      <div class="card-h"><div><div class="eyebrow">Recovery &amp; activity</div><h2 id="hSrc">WHOOP, Garmin or Apple Watch</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="hSync">Sync</button><button class="pill-btn" id="hEdit">Edit</button><button class="pill-btn" id="hHow">Set up</button></div></div>
-      <div class="hgrid" id="hGrid"></div>
-      <p class="note" id="hNote" style="margin-top:12px"></p>
-    </div>
-
-    <div class="card checkin" id="checkin">
-      <div class="card-h" style="margin-bottom:0"><div><div class="eyebrow">Daily check-in</div><h2 id="ciTitle">How are you today?</h2></div><span class="status" id="ciSaved" style="color:var(--good)"></span></div>
-      <div class="ci-grid">
-        <div class="field"><label for="ciW">Morning weight (lb)</label><input id="ciW" type="number" inputmode="decimal" placeholder="e.g. 174.6"><span class="kc" id="ciTrend"></span></div>
-        <div class="rates" id="ciRates"></div>
-      </div>
-      <div class="field"><label for="ciNote">Notes</label><textarea id="ciNote" rows="3" placeholder="How did you feel? Training, cravings, digestion, how your physique looks in the mirror…"></textarea></div>
-      <div class="row"><button class="primary" id="ciSave">Save check-in</button><button class="link" data-goto="plan" type="button">See all check-ins</button></div>
-    </div>
+    <div class="glist" id="todayRows"></div>
   </section>
 
   <!-- TRAIN -->
@@ -695,6 +755,7 @@ button:active{transform:translateY(0) scale(.98)}
     <div id="trainHome">
       <div class="pnav" style="margin-bottom:18px"><div class="title"><div class="sub" id="trSub">Lifts and workouts</div><h1>Train</h1></div><button class="pill-btn" id="trSync" hidden>Sync</button></div>
       <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="tip" id="tip-train" hidden></div>
         <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
           <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div></div>
@@ -713,6 +774,7 @@ button:active{transform:translateY(0) scale(.98)}
 
   <!-- WEEK -->
   <section class="view" id="v-week" aria-label="Week" hidden>
+    <div class="tip" id="tip-week" hidden></div>
     <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="true">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button></div>
     <div class="pnav">
       <button class="icon-btn" id="wPrev" aria-label="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -741,6 +803,7 @@ button:active{transform:translateY(0) scale(.98)}
 
   <!-- MONTH -->
   <section class="view" id="v-month" aria-label="Month" hidden>
+    <div class="tip" id="tip-month" hidden></div>
     <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="true">Month</button></div>
     <div class="pnav">
       <button class="icon-btn" id="mPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -766,6 +829,7 @@ button:active{transform:translateY(0) scale(.98)}
 
   <!-- FOODS -->
   <section class="view" id="v-foods" aria-label="Foods" hidden>
+    <div class="tip" id="tip-foods" hidden></div>
     <div class="pnav"><div class="title"><div class="sub">Food library</div><h1>Foods</h1></div><button class="primary" id="newFood">+ New food</button></div>
     <div class="card" style="display:flex;flex-direction:column;gap:14px">
       <input class="search" id="fSearch" type="search" placeholder="Search foods" aria-label="Search foods">
@@ -789,6 +853,7 @@ button:active{transform:translateY(0) scale(.98)}
   <!-- PLAN -->
   <section class="view" id="v-plan" aria-label="Plan" hidden>
     <div class="pnav"><div class="title"><div class="sub">Cut · Maintain · Bulk</div><h1>Your plan</h1></div></div>
+    <div class="tip" id="tip-plan" hidden></div>
     <div class="card plan-live" id="planLive" hidden></div>
     <div class="glist" id="planRows"></div>
     <div id="planBuilder" style="display:flex;flex-direction:column;gap:18px">
@@ -826,6 +891,24 @@ button:active{transform:translateY(0) scale(.98)}
 
 <div id="pageStore" hidden>
   <div class="pg" id="pg-me"></div>
+  <div class="pg" id="pg-health">    <div class="card" id="healthCard">
+      <div class="card-h"><div><div class="eyebrow">Recovery &amp; activity</div><h2 id="hSrc">WHOOP, Garmin or Apple Watch</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="hSync">Sync</button><button class="pill-btn" id="hEdit">Edit</button><button class="pill-btn" id="hHow">Set up</button></div></div>
+      <div class="hgrid" id="hGrid"></div>
+      <p class="note" id="hNote" style="margin-top:12px"></p>
+    </div>
+
+</div>
+  <div class="pg" id="pg-checkin">    <div class="card checkin" id="checkin">
+      <div class="card-h" style="margin-bottom:0"><div><div class="eyebrow">Daily check-in</div><h2 id="ciTitle">How are you today?</h2></div><span class="status" id="ciSaved" style="color:var(--good)"></span></div>
+      <div class="ci-grid">
+        <div class="field"><label for="ciW">Morning weight (lb)</label><input id="ciW" type="number" inputmode="decimal" placeholder="e.g. 174.6"><span class="kc" id="ciTrend"></span></div>
+        <div class="rates" id="ciRates"></div>
+      </div>
+      <div class="field"><label for="ciNote">Notes</label><textarea id="ciNote" rows="3" placeholder="How did you feel? Training, cravings, digestion, how your physique looks in the mirror…"></textarea></div>
+      <div class="row"><button class="primary" id="ciSave">Save check-in</button><button class="link" data-pg="weigh" type="button">See your weight trend</button></div>
+    </div>
+</div>
+  <div class="pg" id="pg-help"></div>
   <div class="pg" id="pg-account"></div>
   <div class="pg" id="pg-prefs"></div>
   <div class="pg" id="pg-body">      <div class="card" style="display:flex;flex-direction:column;gap:16px">
@@ -943,6 +1026,7 @@ const IC = {
   today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8"/></svg>',
   week:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9"/></svg>',
   month:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
+  add:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   foods:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11h16a8 8 0 0 1-16 0zM8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4"/></svg>',
   train:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12"/></svg>',
   progress:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16M6 15l4-5 4 3 5-7"/></svg>',
@@ -953,7 +1037,8 @@ const IC = {
   snack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 7c-4-3-8 0-7 5s4 9 7 8c3 1 6-3 7-8s-3-8-7-5zM12 7c0-2 1-4 3-4"/></svg>'
 };
 const VIEWS=[['today','Today'],['train','Train'],['week','Week'],['month','Month'],['foods','Foods'],['plan','Plan']];
-const TABS=[['today','Today'],['train','Train'],['progress','Progress'],['foods','Foods'],['plan','Plan']];
+const TABS=[['today','Today'],['train','Train'],['progress','Progress'],['foods','Foods'],['plan','Plan'],['add','Log']];
+const TABS_M=[['today','Today'],['train','Train'],['add','Log'],['progress','Progress'],['plan','Plan']];
 const MEALS=[['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snacks']];
 
 /* ---------- built-in foods: #category, then aliases;kcal;P;C;F per 100 g;units (first = default) ---------- */
@@ -1292,18 +1377,19 @@ function entryFor(food,qty,unit,alias){
 function mk(n,a,g,k,p,c,f,src){return {id:uid(),n,a,g:r1(g),k:r0(k),p:r1(p),c:r1(c),f:r1(f),src,t:Date.now()}}
 
 /* ---------- tabs / routing ---------- */
-function tabsHTML(){const cur=(S.view==='week'||S.view==='month')?'progress':S.view;return TABS.map(([k,l])=>`<button class="tab" data-v="${k}" ${cur===k?'aria-current="page"':''}>${IC[k]}<span>${l}</span></button>`).join('')}
+function tabsHTML(list=TABS){const cur=(S.view==='week'||S.view==='month')?'progress':S.view;return list.map(([k,l])=>`<button class="tab${k==='add'?' add':''}" data-v="${k}" ${cur===k?'aria-current="page"':''} ${k==='add'?'aria-label="Log something"':''}><i class="ti">${IC[k]}</i><span>${l}</span></button>`).join('')}
 function setView(v){
+  if(typeof pgStack!=='undefined'&&pgStack.length)closePages();closeSheet();
   if(v==='progress')v=S.prog||'week';
   if(!VIEWS.some(x=>x[0]===v))v='today';
   if(v==='week'||v==='month')S.prog=v;
   S.view=v; VIEWS.forEach(([k])=>$('v-'+k).hidden=k!==v);
-  $('tabsTop').innerHTML=tabsHTML(); $('tabsBottom').innerHTML=tabsHTML();
+  $('tabsTop').innerHTML=tabsHTML(); $('tabsBottom').innerHTML=tabsHTML(TABS_M);
   if(location.hash.slice(1)!==v){try{history.replaceState(null,'','#'+v)}catch(e){}}
-  renderView(); window.scrollTo({top:0});
+  renderView(); decorate(); window.scrollTo({top:0});
   if(v==='train'||v==='today')setTimeout(()=>syncDevices(false),300);
 }
-document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)setView(t.dataset.v);const g=e.target.closest('[data-goto]');if(g)setView(g.dataset.goto)});
+document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t){if(t.dataset.v==='add')openAdd();else setView(t.dataset.v)};const g=e.target.closest('[data-goto]');if(g)setView(g.dataset.goto)});
 window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h&&h!==S.view)setView(h)});
 function renderAll(){renderView();renderRecent();if(typeof pgStack!=='undefined'&&pgStack.length){const id=pgStack[pgStack.length-1];if(id==='me'||id==='prefs')(PG_R[id])()}}
 function renderView(){({today:renderToday,week:renderWeek,month:renderMonth,foods:renderFoods,plan:renderPlan,train:renderTrain})[S.view]()}
@@ -1319,9 +1405,9 @@ function gaugeSVG(t,goal){
   let ticks='';for(let i=0;i<20;i++){const a=i/20*2*Math.PI-Math.PI/2,a1=104,a2=i%5===0?110:107;ticks+=`<line x1="${100+a1*Math.cos(a)}" y1="${100+a1*Math.sin(a)}" x2="${100+a2*Math.cos(a)}" y2="${100+a2*Math.sin(a)}" stroke="var(--faint)" stroke-width="${i%5===0?1.6:1}"/>`}
   return `<svg viewBox="-14 -14 228 228" role="img" aria-label="${fmt(t.k)} of ${fmt(goal)} calories"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${arcs}${over}${ticks}</svg>`;
 }
-function renderToday(){renderCheckin();renderHealth();renderJust();
+function renderToday(){renderCheckin();renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');
   const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk;
-  $('dTitle').textContent=niceDate(k,{weekday:'long',month:'short',day:'numeric'});
+  $('dTitle').textContent=niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   const diff=Math.round((parseKey(k)-parseKey(tk))/864e5);
   $('dSub').textContent=isToday?(firstName()?`${greet()}, ${firstName()}`:'Today'):diff===-1?'Yesterday':diff===1?'Tomorrow':diff<0?`${-diff} days ago`:`In ${diff} days`;
   $('dToday').hidden=isToday; $('dPick').value=k;
@@ -1338,11 +1424,11 @@ function renderToday(){renderCheckin();renderHealth();renderJust();
   $('meals').innerHTML=MEALS.map(([m,l])=>{
     const es=list.filter(e=>(e.meal||'snack')===m),mt=sumEntries(es),ms=mt.p*4+mt.c*4+mt.f*9||1;
     const pe=prev.filter(e=>(e.meal||'snack')===m);
-    return `<div class="card meal"><div class="meal-h"><div class="ic">${IC[m]}</div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>`:'Empty'}</div></div>
+    return `<div class="card meal"><div class="meal-h"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>`:'Empty'}</div></div>
       <button class="meal-add" data-addto="${m}" aria-label="Add food to ${l}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <div class="k"><b>${fmt(mt.k)}</b><small>kcal</small>${es.length?`<div class="mini"><i style="width:${mt.p*4/ms*100}%;background:var(--pro)"></i><i style="width:${mt.c*4/ms*100}%;background:var(--carb)"></i><i style="width:${mt.f*9/ms*100}%;background:var(--fat)"></i></div>`:''}</div></div>
       ${es.length?`<ul class="entries">${es.map(e=>`<li><button class="entry" data-edit="${e.id}"><span class="n">${esc(e.n)}${e.src==='guess'?'<span class="tag">check</span>':''}</span><span class="kc">${fmt(e.k)}</span><span class="a">${esc(e.a)}${e.g?` · ${r0(e.g)} g`:''}</span><span class="mc"><span style="--c:var(--pro)">${r0(e.p)}P</span><span style="--c:var(--carb)">${r0(e.c)}C</span><span style="--c:var(--fat)">${r0(e.f)}F</span></span></button></li>`).join('')}</ul><div class="meal-f"><button class="save-meal" data-savemeal="${m}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save as a meal</button></div>`
-        :`<div class="empty-meal"><span>Nothing here yet.</span>${pe.length?`<button class="repeat" data-repeat="${m}">Repeat yesterday's ${l.toLowerCase()} <span>· ${fmt(sumEntries(pe).k)} kcal</span></button>`:''}</div>`}</div>`;
+        :`<div class="empty-meal"><span>Nothing yet. Tap <b>+</b> to add ${l.toLowerCase()}.</span>${pe.length?`<button class="repeat" data-repeat="${m}">Repeat yesterday's ${l.toLowerCase()} <span>· ${fmt(sumEntries(pe).k)} kcal</span></button>`:''}</div>`}</div>`;
   }).join('');
 }
 $('mealPick').addEventListener('click',e=>{const b=e.target.closest('[data-meal]');if(!b)return;S.mealSel=b.dataset.meal;renderToday();$('foodIn').focus()});
@@ -1594,7 +1680,7 @@ function tilesHTML(st,total){
     <div class="tile"><div class="eyebrow">Avg carbs · fat</div><div class="v">${st.has?`${r0(st.avg.c)}<small>g</small> · ${r0(st.avg.f)}<small>g</small>`:'—'}</div><div class="d">Goal ${r0(G.c)} g · ${r0(G.f)} g</div></div>
     <div class="tile"><div class="eyebrow">Days logged</div><div class="v">${st.logged.length}<small> / ${total}</small></div><div class="d">${st.onCal} within ±10% of goal</div></div>`;
 }
-function renderWeek(){
+function renderWeek(){renderTip('week');
   const ws=weekStart(S.weekRef),keys=[...Array(7)].map((_,i)=>addDays(ws,i)),tk=todayKey();
   const dW=Math.round((parseKey(ws)-parseKey(weekStart(tk)))/(7*864e5));
   $('wSub').textContent=dW===0?'This week':dW===-1?'Last week':dW<0?`${-dW} weeks ago`:`In ${dW} weeks`;
@@ -1631,7 +1717,7 @@ $('wPrev').onclick=()=>{S.weekRef=addDays(weekStart(S.weekRef),-7);renderWeek()}
 $('wNext').onclick=()=>{S.weekRef=addDays(weekStart(S.weekRef),7);renderWeek()};
 
 /* ---------- MONTH ---------- */
-function renderMonth(){
+function renderMonth(){renderTip('month');
   const [Y,M]=S.monthRef.split('-').map(Number),first=new Date(Y,M-1,1),nDays=new Date(Y,M,0).getDate();
   const keys=[...Array(nDays)].map((_,i)=>keyOf(new Date(Y,M-1,i+1))),tk=todayKey();
   $('mTitle').textContent=`${MON[M-1]} ${Y}`;
@@ -1671,7 +1757,7 @@ $('mNext').onclick=()=>{const [y,m]=S.monthRef.split('-').map(Number),d=new Date
 /* ---------- FOODS ---------- */
 function fItem(fd){const k=servKcal(fd),sg=fd.units[fd.def],sc=sg/100;
   return `<li><button class="fitem" data-food="${esc(fd.id)}"><span class="n">${esc(cap(fd.name))}</span><span class="kc">${fmt(k)}</span><span class="s">${esc(servLabel(fd))}</span><span class="mc"><span style="--c:var(--pro)">${r0(fd.p*sc)}P</span><span style="--c:var(--carb)">${r0(fd.c*sc)}C</span><span style="--c:var(--fat)">${r0(fd.f*sc)}F</span></span></button></li>`}
-function renderFoods(){
+function renderFoods(){renderTip('foods');
   const q=$('fSearch').value.trim().toLowerCase();
   const hit=fd=>!q||fd.aliases.some(a=>a.includes(q));
   $('fCats').innerHTML=['All',...CATS].map(c=>`<button class="chip" data-cat="${esc(c)}" aria-pressed="${S.fCat===c}">${esc(c)}</button>`).join('');
@@ -1804,7 +1890,7 @@ function wAvg(k){const v=[...Array(7)].map((_,j)=>S.weights[addDays(k,-j)]).filt
 function latestWeight(){const ks=Object.keys(S.weights).sort();return ks.length?{k:ks[ks.length-1],w:S.weights[ks[ks.length-1]]}:null}
 
 let draft=null;
-function renderPlan(){
+function renderPlan(){renderTip('plan');
   // fill profile once from saved
   const c=S.calc||{};
   if(!renderPlan.filled){renderPlan.filled=true;
@@ -2188,8 +2274,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -2208,7 +2294,7 @@ function planLabel(){if(!S.plan)return 'No plan';return S.plan.type==='cut'?'Cut
 function renderMe(){
   const c=syncCfg(),st=c.st||{},lw=latestWeight(),g=goalsFor(todayKey()),nWk=trainFeed().length,nd=Object.keys(S.days).filter(k=>(S.days[k]||[]).length).length,sk=streak();
   const conn=[st.whoop?'WHOOP':'',st.garmin?'Garmin':''].filter(Boolean);
-  $('pg-me').innerHTML=`<div class="me-hero"><div class="avatar"><span>${esc(initials(S.profile.name))}</span></div><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p></div>
+  $('pg-me').innerHTML=`<div class="me-hero art" style='--bnr:${bnr("plan")}'><div class="avatar"><span>${esc(initials(S.profile.name))}</span></div><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p></div>
     <div class="live"><div style="--c:var(--carb)"><b>${sk}</b><span>day streak</span></div><div style="--c:var(--kcal)"><b>${nd}</b><span>days logged</span></div><div style="--c:var(--pro)"><b>${nWk}</b><span>workouts</span></div><div style="--c:var(--fat)"><b>${lw?r1(lw.w):'—'}</b><span>latest lb</span></div></div>
     <div class="glabel">Account</div><div class="glist">
       ${grow({pg:'account',ic:'user',c:'--kcal',t:'Personal info',s:'Name and the devices you wear',v:esc(S.profile.name||'')})}
@@ -2223,9 +2309,11 @@ function renderMe(){
       ${grow({pg:'scan',ic:'camera',c:'--kcal',t:'Photo scanning',s:'Snap a meal, get the macros',v:AI.key?'On':'Off',vc:AI.key?'on':''})}</div>
     <div class="glabel">App</div><div class="glist">
       ${grow({pg:'prefs',ic:'sliders',c:'--carb',t:'Settings',s:'Training fuel, rest timer, accent color, sync'})}
+      ${grow({ga:'foods',ic:'list',c:'--carb',t:'My foods & meals',s:'Saved meals and the food library',v:String((S.meals||[]).length+(S.custom||[]).length)})}
       ${grow({ga:'templates',ic:'dumbbell',c:'--pro',t:'Workout templates',v:String(S.templates.length)})}
       ${grow({pg:'data',ic:'download',c:'--fat',t:'Backup & export',s:'Save or move your data',v:S.lastBackup?niceDate(keyOf(new Date(S.lastBackup)),{month:'short',day:'numeric'}):'Never',vc:S.lastBackup?'':'warn'})}</div>
     <div class="glabel">About</div><div class="glist">
+      ${grow({pg:'help',ic:'info',c:'--kcal',t:'How to use Syncope',s:'Quick answers to common questions'})}
       ${grow({pg:'method',ic:'book',c:'--good',t:'The science',s:'How your plan sets macros'})}
       ${grow({href:'privacy.html',ic:'shield',c:'--muted',t:'Privacy',s:'Your log stays on this phone'})}
       ${grow({ga:'redo',ic:'refresh',c:'--muted',t:'Redo welcome setup'})}</div>
@@ -2249,20 +2337,168 @@ function renderPrefs(){
   $('pg-prefs').innerHTML=`<div class="glabel">Nutrition</div><div class="glist">
       ${grow({ic:'fire',c:'--good',t:'Fuel for training',s:'Add carbs on days your watch logs a workout',ctl:`<input type="checkbox" class="sw" data-tog="fuel" ${P.fuel!==false?'checked':''} aria-label="Fuel for training">`})}
       ${P.fuel!==false?`<div style="padding:0 0 2px"><div class="note" style="padding:0 14px 8px 58px;margin:0">Eat back this much of the extra burn${P.fuelPct==null?` (auto: ${cutDef}% on your ${S.plan&&S.plan.type==='cut'?'cut':'plan'})`:''}</div>${chips('fuelPct',[['auto','Auto'],[50,'50%'],[75,'75%'],[100,'100%']],P.fuelPct==null?'auto':P.fuelPct)}</div>`:''}</div>
+    <div class="glabel">Today screen</div><div class="glist">${grow({ic:'list',c:'--kcal',t:'Daily checklist',s:'Weigh in, meals, protein, train, check-in',ctl:`<input type="checkbox" class="sw" data-tog="showCoach" ${!P.hideCoach?'checked':''} aria-label="Daily checklist">`})}</div>
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}</div>
     <div class="glabel">Look</div><div class="glist">
       ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="gopts">${ACCENTS.map(([v,l])=>`<button type="button" class="chip" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}"><i class="swatch" style="--c:${v}"></i>${l}</button>`).join('')}</div>
+      ${grow({ic:'camera',c:'--carb',t:'Food photos',s:'Photo headers from Unsplash (needs internet)',ctl:`<input type="checkbox" class="sw" data-tog="photos" ${P.photos!==false?'checked':''} aria-label="Food photos">`})}
       ${grow({ic:'cal',c:'--fat',t:'Week starts on',ctl:' '})}${chips('wkSun',[[0,'Monday'],[1,'Sunday']],P.wkSun?1:0)}</div>
     <div class="glabel">Sync</div><div class="glist">
       ${grow({ic:'refresh',c:'--good',t:'Auto-sync',s:'Pull WHOOP and Garmin data when you open Syncope',ctl:`<input type="checkbox" class="sw" data-tog="autoSync" ${P.autoSync!==false?'checked':''} aria-label="Auto-sync">`})}
       ${grow({ga:'syncnow',ic:'watch',c:'--fat',t:'Sync now',v:syncCfg().last?new Date(syncCfg().last).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):''})}</div>`;
   const el=$('pg-prefs');
-  el.onchange=e=>{const t=e.target.closest('[data-tog]');if(!t)return;S.prefs[t.dataset.tog]=t.checked;save();renderPrefs()};
+  el.onchange=e=>{const t=e.target.closest('[data-tog]');if(!t)return;if(t.dataset.tog==='showCoach')S.prefs.hideCoach=!t.checked;else S.prefs[t.dataset.tog]=t.checked;save();renderPrefs()};
   el.onclick=e=>{const b=e.target.closest('[data-pk]');if(!b)return;const k=b.dataset.pk,v=b.dataset.pv;
     if(k==='restSec')S.restSec=+v;else if(k==='fuelPct'){if(v==='auto')delete S.prefs.fuelPct;else S.prefs.fuelPct=+v}else if(k==='wkSun')S.prefs.wkSun=v==='1';else if(k==='accent')S.prefs.accent=v;
     save();applyPrefs();renderPrefs()};
 }
+
+/* ================= ART: illustrated food & gym scenes, plus optional photos ================= */
+function rng(seed){let x=seed>>>0||1;return ()=>((x=Math.imul(x^x>>>15,x|1),x^=x+Math.imul(x^x>>>7,x|61),((x^x>>>14)>>>0)/4294967296))}
+const ART={};
+(function(){
+  const R=(r,a,b)=>a+(b-a)*r();
+  const defs=`<defs>
+    <radialGradient id="bw" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#F4EFE6"/><stop offset=".78" stop-color="#E4DCCD"/><stop offset="1" stop-color="#B9AF9E"/></radialGradient>
+    <radialGradient id="bwd" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#2A2F3A"/><stop offset=".8" stop-color="#1F232C"/><stop offset="1" stop-color="#11141A"/></radialGradient>
+    <radialGradient id="sh" cx="50%" cy="50%" r="50%"><stop offset=".6" stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sal" x1="0" x2="1"><stop offset="0" stop-color="#FF9A76"/><stop offset="1" stop-color="#F0603F"/></linearGradient>
+    <linearGradient id="stk" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5A2E22"/><stop offset=".22" stop-color="#C46A5B"/><stop offset=".78" stop-color="#C46A5B"/><stop offset="1" stop-color="#5A2E22"/></linearGradient>
+    <radialGradient id="yk" cx="40%" cy="38%" r="60%"><stop offset="0" stop-color="#FFD54F"/><stop offset="1" stop-color="#F59E0B"/></radialGradient>
+    <radialGradient id="av" cx="50%" cy="50%" r="55%"><stop offset="0" stop-color="#E6F2A8"/><stop offset=".75" stop-color="#B5D46A"/><stop offset="1" stop-color="#4C7A2A"/></radialGradient>
+    <radialGradient id="plt" cx="50%" cy="50%" r="50%"><stop offset=".55" stop-color="#2B303B"/><stop offset=".7" stop-color="#C9F26B"/><stop offset=".74" stop-color="#2B303B"/><stop offset="1" stop-color="#151820"/></radialGradient>
+    <linearGradient id="tst" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#F3C680"/><stop offset="1" stop-color="#D99A4E"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="1.2"/></filter>
+  </defs>`;
+  const leaf=(x,y,s,rot,c)=>`<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 0C10-14 34-14 46 0C34 14 10 14 0 0Z" fill="${c}"/><path d="M2 0H44" stroke="#000" stroke-opacity=".18" stroke-width="1.2"/></g>`;
+  const greens=(r,cx,cy,rad,n)=>{let o='';for(let i=0;i<n;i++){const a=R(r,0,6.28),d=R(r,0,rad);o+=leaf(cx+Math.cos(a)*d,cy+Math.sin(a)*d,R(r,.6,1.15),R(r,0,360),['#3E7F3A','#5BA24B','#2E6430','#77B85A'][i%4])}return o};
+  const salmon=(x,y,rot)=>`<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-26" y="-11" width="52" height="22" rx="9" fill="url(#sal)"/>${[-14,-3,8,19].map(d=>`<path d="M${d} -10q-5 10 0 20" stroke="#FFE3D6" stroke-opacity=".75" stroke-width="2.2" fill="none"/>`).join('')}</g>`;
+  const avo=(x,y,rot)=>`<g transform="translate(${x} ${y}) rotate(${rot})">${[0,1,2,3,4].map(i=>`<ellipse cx="${i*9-18}" cy="${Math.abs(i-2)*2}" rx="9" ry="26" transform="rotate(${(i-2)*9} ${i*9-18} 0)" fill="url(#av)" stroke="#3E6B22" stroke-width="2"/>`).join('')}</g>`;
+  const egg=(x,y,rot,s=1)=>`<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><ellipse rx="30" ry="22" fill="#FBF8F2"/><ellipse rx="30" ry="22" fill="none" stroke="#000" stroke-opacity=".08" stroke-width="3"/><circle cx="2" cy="1" r="12" fill="url(#yk)"/><circle cx="-2" cy="-3" r="3.5" fill="#fff" fill-opacity=".55"/></g>`;
+  const dots=(r,cx,cy,rad,n,c,sz)=>{let o='';for(let i=0;i<n;i++){const a=R(r,0,6.28),d=R(r,0,rad);o+=`<ellipse cx="${cx+Math.cos(a)*d}" cy="${cy+Math.sin(a)*d}" rx="${sz}" ry="${sz*.6}" transform="rotate(${R(r,0,180)} ${cx+Math.cos(a)*d} ${cy+Math.sin(a)*d})" fill="${c}"/>`}return o};
+  const tomato=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><circle r="13" fill="#E5463B"/><circle r="9" fill="#F26B5B"/>${[0,120,240].map(a=>`<ellipse cx="${Math.cos(a*Math.PI/180)*5}" cy="${Math.sin(a*Math.PI/180)*5}" rx="2.6" ry="1.6" fill="#FFE08A"/>`).join('')}<circle cx="-4" cy="-5" r="2.5" fill="#fff" fill-opacity=".5"/></g>`;
+  const blue=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})"><circle r="8" fill="#3B4A8C"/><circle r="8" fill="#5865B8" fill-opacity=".5" transform="translate(-1.5 -1.5) scale(.7)"/><path d="M-2 0h4M0-2v4" stroke="#1E2552" stroke-width="1.4"/></g>`;
+  const straw=(x,y,rot,s=1)=>`<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M0 18C-16 8-15-10 0-10C15-10 16 8 0 18Z" fill="#E8394A"/><path d="M-8-10l4 4 4-6 4 6 4-4-6-4h-4z" fill="#3E8E3A"/>${[[-5,0],[4,-2],[0,7],[-6,7],[6,6],[1,-4]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="1" ry="1.6" fill="#FFE08A"/>`).join('')}</g>`;
+  const lemon=(x,y,rot,s=1)=>`<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><path d="M-26 0A26 26 0 0 1 26 0Z" fill="#F7D046"/><path d="M-21 0A21 21 0 0 1 21 0Z" fill="#FBE68A"/>${[-60,-30,0,30,60].map(a=>`<path d="M0 0L${Math.sin(a*Math.PI/180)*20} ${-Math.cos(a*Math.PI/180)*20}" stroke="#F7D046" stroke-width="2"/>`).join('')}</g>`;
+  const broc=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})">${[[0,0,13],[-11,-6,9],[10,-7,10],[-6,10,9],[9,9,8]].map(([a,b,r])=>`<circle cx="${a}" cy="${b}" r="${r}" fill="#3F8A3C"/><circle cx="${a-3}" cy="${b-3}" r="${r*.5}" fill="#5DAE4F"/>`).join('')}</g>`;
+  const steak=(x,y,rot)=>`<g transform="translate(${x} ${y}) rotate(${rot})">${[0,1,2,3].map(i=>`<rect x="${i*15-30}" y="-28" width="13" height="56" rx="4" fill="url(#stk)"/>`).join('')}</g>`;
+  const toast=(x,y,rot)=>`<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-38" y="-34" width="76" height="68" rx="16" fill="#B9773A"/><rect x="-32" y="-28" width="64" height="58" rx="12" fill="url(#tst)"/></g>`;
+  const almond=(x,y,rot)=>`<ellipse cx="${x}" cy="${y}" rx="9" ry="5" transform="rotate(${rot} ${x} ${y})" fill="#C08A55" stroke="#8B5A2B" stroke-width="1.2"/>`;
+  const potato=(x,y,rot)=>`<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-13" y="-11" width="26" height="22" rx="8" fill="#E9B65C"/><rect x="-9" y="-7" width="12" height="9" rx="4" fill="#F7D68C"/></g>`;
+  const bowl=(cx,cy,r,inner,dark)=>`<circle cx="${cx+r*.06}" cy="${cy+r*.1}" r="${r*1.04}" fill="url(#sh)"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${dark?'bwd':'bw'})"/><circle cx="${cx}" cy="${cy}" r="${r*.86}" fill="${dark?'#191C23':'#EDE6DA'}"/><g>${inner}</g><circle cx="${cx}" cy="${cy}" r="${r*.86}" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="${r*.04}"/>`;
+  const rice=(r,cx,cy,rad)=>`<circle cx="${cx}" cy="${cy}" r="${rad}" fill="#F7F3EA"/>`+dots(r,cx,cy,rad-4,50,'#E6DFD0',2.6);
+  const scene={
+    lunch:(r,cx,cy,s)=>bowl(cx,cy,110*s,rice(r,cx,cy,90*s)+greens(r,cx-40*s,cy-30*s,30*s,9)+salmon(cx+30*s,cy-30*s,-25)+salmon(cx+45*s,cy-5*s,-20)+salmon(cx+35*s,cy+22*s,-15)+avo(cx-30*s,cy+35*s,30)+dots(r,cx+5*s,cy+55*s,18*s,12,'#7CB342',5)+dots(r,cx,cy,70*s,40,'#F5EBD0',1.4)+tomato(cx-55*s,cy+5*s,.9)),
+    breakfast:(r,cx,cy,s)=>bowl(cx,cy,110*s,toast(cx-30*s,cy+10*s,-12)+avo(cx-30*s,cy+8*s,10)+egg(cx+38*s,cy-28*s,15)+egg(cx+42*s,cy+22*s,-20,.9)+blue(cx-55*s,cy-48*s)+blue(cx-40*s,cy-58*s)+straw(cx-70*s,cy-25*s,20,.9)+greens(r,cx+5*s,cy+60*s,12*s,4),true),
+    dinner:(r,cx,cy,s)=>bowl(cx,cy,110*s,steak(cx+10*s,cy-25*s,-20)+broc(cx-45*s,cy+20*s)+broc(cx-25*s,cy+50*s,.8)+potato(cx+35*s,cy+35*s,15)+potato(cx+55*s,cy+15*s,-20)+potato(cx+20*s,cy+58*s,35)+greens(r,cx-55*s,cy-35*s,14*s,5)+lemon(cx+65*s,cy-50*s,40,.7),true),
+    snack:(r,cx,cy,s)=>bowl(cx,cy,110*s,`<circle cx="${cx}" cy="${cy}" r="${92*s}" fill="#F8F5EF"/><path d="M${cx-50*s} ${cy}q25 -30 50 0t50 0" stroke="#EDE6DA" stroke-width="6" fill="none"/>`+straw(cx-30*s,cy-35*s,-15)+straw(cx+5*s,cy-50*s,25)+blue(cx+35*s,cy-20*s)+blue(cx+45*s,cy-5*s)+blue(cx+28*s,cy+2*s)+blue(cx+50*s,cy+15*s)+almond(cx-35*s,cy+30*s,30)+almond(cx-20*s,cy+45*s,-20)+almond(cx-45*s,cy+48*s,70)+dots(r,cx+10*s,cy+40*s,20*s,20,'#C9A26B',2.2)+leaf(cx+25*s,cy+50*s,.5,-30,'#5BA24B'))};
+  const plate=(cx,cy,r)=>`<circle cx="${cx+r*.05}" cy="${cy+r*.08}" r="${r*1.03}" fill="url(#sh)"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#plt)"/><circle cx="${cx}" cy="${cy}" r="${r*.22}" fill="#0E1015"/><circle cx="${cx}" cy="${cy}" r="${r*.14}" fill="#2B303B"/>${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<circle cx="${cx+Math.cos(a)*r*.86}" cy="${cy+Math.sin(a)*r*.86}" r="${r*.025}" fill="#3A404D"/>`}).join('')}<text x="${cx}" y="${cy-r*.36}" text-anchor="middle" font-family="Avenir Next,system-ui" font-weight="800" font-size="${r*.16}" fill="#C9F26B" fill-opacity=".9">45</text>`;
+  const bg=(w,h,c1,c2)=>`<rect width="${w}" height="${h}" fill="#0E1015"/><rect width="${w}" height="${h}" fill="url(#tb)"/><defs><radialGradient id="tb" cx="70%" cy="40%" r="80%"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient></defs>`;
+  ART.thumb=(kind)=>{const r=rng(kind.length*97+3);return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">${defs}${scene[kind](r,120,120,1)}</svg>`};
+  ART.banner=(kind)=>{const r=rng(kind.length*131+7),W=800,H=320;let o='';
+    if(kind==='train'){o=bg(W,H,'#1C2430','#0B0D12')+plate(640,150,150)+plate(470,250,95)+`<rect x="80" y="70" width="430" height="10" rx="5" fill="#8A93A3" transform="rotate(-8 300 75)"/>`+plate(520,40,70)+dots(r,300,260,120,30,'#C9F26B',1.6)}
+    else{const main=kind==='plan'?'lunch':kind;o=bg(W,H,'#2A2620','#0D0E12')+scene[main](r,620,165,1.45)+scene[main==='lunch'?'snack':'lunch'](rng(5),355,300,.8)+greens(r,470,40,50,7)+lemon(250,70,-30,1.1)+tomato(520,300,1.2)+blue(300,170,1.2)+blue(318,182,1)+straw(760,40,30,1.4)+leaf(210,200,1.1,40,'#5BA24B')}
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">${defs}${o}</svg>`};
+})();
+const artURL=svg=>`url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+const PHOTO={breakfast:'photo-1484723091739-30a097e8f929',lunch:'photo-1546069901-ba9599a7e63c',dinner:'photo-1467003909585-2f8a72700288',snack:'photo-1512621776951-a57141f2eefd',train:'photo-1534438327276-14e5300c3a48',plan:'photo-1490645935967-10de6ba17061',progress:'photo-1540189549336-e6e99c3679fe',foods:'photo-1504674900247-0877df9cc836'};
+const ARTC={};
+function bnr(kind){const art=ARTC[kind]||(ARTC[kind]=artURL(ART.banner(kind==='progress'||kind==='foods'?'lunch':kind)));
+  const ph=(S.prefs||{}).photos!==false&&PHOTO[kind]?`url("https://images.unsplash.com/${PHOTO[kind]}?w=1200&q=70&auto=format&fit=crop") center/cover no-repeat,`:'';
+  return `${ph}${art} center/cover no-repeat`}
+const THC={};function thumbURL(m){return THC[m]||(THC[m]=artURL(ART.thumb(m)))}
+function mealOfNow(){const h=new Date().getHours();return h<11?'breakfast':h<16?'lunch':'dinner'}
+function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySelector('.pnav');if(!pn)return;
+  const kind=S.view==='today'?mealOfNow():S.view==='week'||S.view==='month'?'progress':S.view;
+  pn.classList.add('banner');pn.classList.toggle('flush',pn===sec.firstElementChild||(pn.previousElementSibling&&pn.previousElementSibling.classList.contains('tip')&&pn.previousElementSibling===sec.firstElementChild));
+  pn.style.setProperty('--bnr',bnr(kind))}
+/* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
+function openAdd(){
+  const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
+  const tiles=[['food','--kcal',GI.plus,'Food','Type it like a text: “2 eggs, toast”'],['scan','--pro',GI.camera,'Snap a photo','Claude reads the plate for you'],
+    ['meal','--carb',GI.copy,'Saved meal','Your regulars, one tap'],['weight','--fat',GI.scale,'Weight','Morning weigh-in'],
+    ['workout','--good',GI.dumbbell,w.t,w.s],['checkin','--over',GI.heart,'Check-in','Energy, hunger, sleep, notes']];
+  sheet(`<div><div class="eyebrow">${niceDate(S.day,{weekday:'long',month:'short',day:'numeric'})}</div><h3>What do you want to log?</h3></div>
+    <div class="addgrid">${tiles.map(([k,c,ic,t,sub])=>`<button type="button" class="addt" data-add="${k}" style="--c:var(${c})"><span class="gi" style="--c:var(${c})">${ic}</span><span><b>${t}</b><br><span>${sub}</span></span></button>`).join('')}</div>`,{nofocus:true});
+  $('sheetRoot').querySelector('.addgrid').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;const k=b.dataset.add;
+    if(k==='scan'){closeSheet();$('photoIn').click();return}
+    closeSheet();
+    if(k==='food'){setView('today');setTimeout(()=>{document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'});$('foodIn').focus({preventScroll:true})},200)}
+    if(k==='meal')setView('foods');
+    if(k==='weight')openWeigh();
+    if(k==='workout'){if(S.active){setView('train');return}const d=devList().find(x=>x.date===todayKey()&&!S.workouts.some(w=>w.devId===x.id));if(d){setView('train');pickLiftFor(d)}else openStart()}
+    if(k==='checkin'){setView('today');openPage('checkin')}};
+}
+function openStart(){
+  sheet(`<div><div class="eyebrow">Start a workout</div><h3>What are you training?</h3></div>
+    <div class="glist">${S.templates.map((t,i)=>`<button class="gr" data-st="${i}"><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></span><span class="gv">${t.ex.length}</span>${CHEV}</button>`).join('')}
+    <button class="gr" data-st="-1"><span class="gi" style="--c:var(--good)">${GI.plus}</span><span class="gt"><b>Empty workout</b><span>Pick lifts as you go</span></span><span></span>${CHEV}</button></div>`,{nofocus:true});
+  $('sheetRoot').querySelector('.glist').onclick=e=>{const b=e.target.closest('[data-st]');if(!b)return;const i=+b.dataset.st,t=i>=0?S.templates[i]:{name:'Workout',ex:[]};closeSheet();startWorkout(t.name,t.ex);if(i<0)setTimeout(()=>openExPicker({eyebrow:'New workout',onDone:addExercises}),150)};
+}
+function openWeigh(){
+  const k=todayKey(),cur=S.weights[k],lw=latestWeight();
+  sheet(`<div><div class="eyebrow">Morning weigh-in · ${niceDate(k,{weekday:'short',month:'short',day:'numeric'})}</div><h3>What do you weigh?</h3><p class="note">Best first thing in the morning, after the bathroom. Syncope tracks the 7-day average, so daily ups and downs don't matter.</p></div>
+    <div class="inrow"><div class="inbox"><input id="qwIn" type="number" inputmode="decimal" placeholder="${lw?r1(lw.w):'e.g. 170'}" value="${cur??''}" aria-label="Weight in pounds"></div><button class="go" type="button" id="qwOk">Save</button></div>`);
+  const go=()=>{const v=+$('qwIn').value;if(!(v>50&&v<800)){$('qwIn').focus();toast('Enter your weight in pounds');return}S.weights[k]=r1(v);save();closeSheet();renderAll();toast(`Weigh-in saved · ${r1(v)} lb`)};
+  $('qwOk').onclick=go;$('qwIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
+}
+const ringSVG=(f,c)=>{const R=19,C=2*Math.PI*R;return `<svg class="coach-ring" viewBox="0 0 46 46"><circle cx="23" cy="23" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="23" cy="23" r="${R}" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" transform="rotate(-90 23 23)"/><text x="23" y="27.5" text-anchor="middle" font-size="12" font-weight="800" fill="var(--fg)" font-family="var(--f-num)">${Math.round(f*100)}%</text></svg>`};
+function coachItems(){
+  const k=todayKey(),c=S.calc||{},cfg=syncCfg(),wear=S.profile.wear||[],P=S.prefs||{};
+  const setup=[];
+  if(!(c.age&&c.wt&&c.ht))setup.push({id:'body',t:'Add your body stats',s:'Height, weight and age set your calories',go:()=>openPage('body'),cta:'Add'});
+  if(!S.plan)setup.push({id:'plan',t:'Pick your goal',s:'Cut, maintain or bulk, takes a minute',go:()=>setView('plan'),cta:'Start'});
+  if(wear.includes('whoop')&&!(cfg.st&&cfg.st.whoop))setup.push({id:'whoop',t:'Connect your WHOOP',s:'Sleep, recovery and workouts flow in',go:()=>openPage('conn'),cta:'Connect'});
+  if(wear.includes('garmin')&&!(cfg.st&&cfg.st.garmin))setup.push({id:'garmin',t:'Connect your Garmin',s:'Steps, sleep and workouts flow in',go:()=>openPage('conn'),cta:'Connect'});
+  if(setup.length&&!P.skipSetup)return {mode:'setup',items:setup};
+  const t=dayTotals(k),g=goalsFor(k),list=S.days[k]||[],meals=new Set(list.map(e=>e.meal||'snack')),wk=trainFeed().some(x=>x.date===k);
+  const items=[
+    {id:'w',t:'Weigh in',s:S.weights[k]?`${r1(S.weights[k])} lb`:'Takes 5 seconds',done:S.weights[k]!=null,go:openWeigh,cta:'Log'},
+    {id:'m',t:'Log your meals',s:`${['breakfast','lunch','dinner'].filter(m=>meals.has(m)).length} of 3 main meals`,done:['breakfast','lunch','dinner'].every(m=>meals.has(m)),go:()=>{const n=['breakfast','lunch','dinner'].find(m=>!meals.has(m));if(n)S.mealSel=n;renderToday();document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('foodIn').focus({preventScroll:true}),250)},cta:'Add'},
+    {id:'p',t:'Hit your protein',s:`${r0(t.p)} of ${r0(g.p)} g`,done:t.p>=g.p*0.9,go:()=>{document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'})},cta:'Add'},
+    {id:'t',t:'Train',s:wk?'Done, nice work':'Or take a rest day',done:wk,go:()=>setView('train'),cta:'Go'},
+    {id:'c',t:'Daily check-in',s:'How you felt, 20 seconds',done:!!S.checkins[k],go:()=>openPage('checkin'),cta:'Open'}];
+  return {mode:'day',items};
+}
+let coachGo=[];
+function renderCoach(){
+  const el=$('coach');if(!el)return;if(S.day!==todayKey()||(S.prefs&&S.prefs.hideCoach)){el.hidden=true;return}
+  const {mode,items}=coachItems();coachGo=items.map(i=>i.go);el.hidden=false;
+  const done=items.filter(i=>i.done).length,f=mode==='setup'?0:done/items.length,next=items.findIndex(i=>!i.done);
+  const head=mode==='setup'?`<div class="coach-h"><span class="tip" style="margin:0;padding:0;border:0;background:none"><span class="tic" style="width:46px;height:46px;font-size:20px">${items.length}</span></span><div><h2>Let's get you set up</h2><p>${items.length} quick step${items.length>1?'s':''} so your targets fit you.</p></div></div>`
+    :`<div class="coach-h">${ringSVG(f,f>=1?'var(--good)':'var(--kcal)')}<div><h2>${f>=1?'Day complete':next===0?'Start your day':'Your day'}</h2><p>${f>=1?'Everything done. See you tomorrow.':`${done} of ${items.length} done. Next: ${items[next].t.toLowerCase()}.`}</p></div></div>`;
+  el.innerHTML=head+`<ul class="todo">${items.map((it,i)=>`<li><button type="button" data-cg="${i}" class="${it.done?'done':''} ${i===next?'next':''}"><span class="ck">${it.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span><b>${it.t}</b><span class="s">${it.s}</span></span>${it.done?'':i===next?`<span class="go2">${it.cta}</span>`:CHEV}</button></li>`).join('')}</ul>
+    ${mode==='setup'?'<button class="coach-x" data-cx="setup">Skip setup for now</button>':''}`;
+}
+$('coach').addEventListener('click',e=>{const b=e.target.closest('[data-cg]');if(b){const f=coachGo[+b.dataset.cg];if(f)f();return}if(e.target.closest('[data-cx]')){S.prefs.skipSetup=true;save();renderToday()}});
+function renderTodayRows(){
+  const el=$('todayRows');if(!el)return;const k=S.day,h=hv(k),c=S.checkins[k],cfg=syncCfg();
+  const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
+  const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
+  el.innerHTML=grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:hs||((cfg.st&&(cfg.st.whoop||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
+    +grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
+}
+const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like “2 eggs and toast”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
+  train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
+  week:['Progress','Your week at a glance. Tap any day to open it. Switch to Month at the top.'],month:['Month view','Each square is a day, colored by how close you were to your calories. Tap one to open it.'],
+  foods:['Foods','Search the food library or save meals you eat often, then log them in one tap.'],
+  plan:['Your plan','Your plan sets your daily calories and macros and adjusts them week by week. Just weigh in a few times a week.']};
+function renderTip(v){const el=$('tip-'+v);if(!el)return;const P=S.prefs||{};if((P.tipsSeen||{})[v]||!TIPS[v]){el.hidden=true;return}
+  el.hidden=false;el.innerHTML=`<span class="tic">i</span><div class="tx"><b class="tt">${TIPS[v][0]}</b><span>${TIPS[v][1]}</span><br><button type="button" data-tipx="${v}">Got it</button></div>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tipx]');if(!b)return;S.prefs.tipsSeen={...(S.prefs.tipsSeen||{}),[b.dataset.tipx]:true};save();renderTip(b.dataset.tipx)});
+const FAQ=[['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
+  ['Where do my calorie and macro targets come from?','From your body stats and goal. Syncope estimates what you burn, then sets a gradual weekly plan. Protein stays high to protect muscle. You can see every week in Plan.'],
+  ['What is the + button?','A shortcut for logging anything: food, a photo, a saved meal, your weight, a workout or your daily check-in.'],
+  ['How do WHOOP and Garmin work?','Connect once in Profile → WHOOP & Garmin. After that, sleep, recovery, strain and workouts come in on their own whenever you open the app.'],
+  ['Why did my carbs go up today?','Your watch logged a hard workout, so Syncope added some carbs to refuel. Tap the green “training” pill on Today to see the math, or turn it off in Settings.'],
+  ['WHOOP logged my lift but not the exercises. Why?','WHOOP doesn’t share exercise details with other apps. Tap “Same as last…” on the Train tab and Syncope fills in your sets from last time.'],
+  ['How do I add an exercise that isn’t listed?','Search for it in the exercise picker and tap “Create”. Pick the muscle and equipment once and it’s saved for good.'],
+  ['Is my data private?','Everything you log stays on this phone. Download a backup now and then in Profile → Backup & export, since deleting the app deletes its data.']];
+function renderHelp(){$('pg-help').innerHTML=`<div class="faq">${FAQ.map(([q,a],i)=>`<details ${i?'':'open'}><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
+  <div class="glist">${grow({ga:'tipsreset',ic:'info',c:'--kcal',t:'Show tips again',s:'Bring back the hints on each screen'})}${grow({ga:'redo',ic:'refresh',c:'--muted',t:'Redo welcome setup'})}</div>`}
+GACT.tipsreset=()=>{S.prefs.tipsSeen={};S.prefs.skipSetup=false;S.prefs.hideCoach=false;save();toast('Tips are back');closePages();setView('today')};
+GACT.foods=()=>{closePages();setView('foods')};
 function renderPlanRows(){
   const el=$('planRows');if(!el)return;const lw=latestWeight(),bl=bodyLine();
   el.innerHTML=grow({pg:'body',ic:'body',c:'--fat',t:'Body metrics',s:bl?'Used for every target':'Fill these in first',v:bl||'Not set',vc:bl?'':'warn'})
@@ -2286,6 +2522,7 @@ function drawOnb(){
   const st=OB_STEPS[ob.i],d=ob.d,prog=Math.min(6,Math.max(0,ob.i));
   const top=`<div class="onb-top"><div class="brand" style="font-size:16px"><svg class="logo" style="width:28px;height:28px" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1E3A3B"/><circle cx="50" cy="50" r="29.6" fill="none" stroke="#C9F26B" stroke-width="4.6"/><path d="M50 16.5V25.5M50 74.5V83.5M16.5 50H29M71 50H83.5" stroke="#C9F26B" stroke-width="4.6" stroke-linecap="round"/><path d="M30 50H40L43.5 41L47.5 59.5L50 50" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50L52.5 41L56.5 58.5L59 50H70" fill="none" stroke="#A0A8AA" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="4.4" fill="#C9F26B"/></svg></div><div class="onb-prog">${[1,2,3,4,5,6].map(n=>`<i class="${n<=prog?'on':''}"></i>`).join('')}</div>${st!=='tour'?'<button class="onb-skip" id="obSkip">Skip</button>':''}</div>`;
   let body='',next='Continue',back=ob.i>0&&st!=='tour';
+  $('onb').classList.toggle('photo',st==='welcome');if(st==='welcome')$('onb').style.setProperty('--bnr',((S.prefs||{}).photos!==false?`url("https://images.unsplash.com/${PHOTO.lunch}?w=1000&q=70&auto=format&fit=crop") center top/cover no-repeat,`:'')+`${thumbURL('lunch')} right -130px top -60px/400px no-repeat,${thumbURL('snack')} left -70px top 40px/200px no-repeat`);
   if(st==='welcome'){body=`<div class="hero-logo"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1E3A3B"/><circle cx="50" cy="50" r="29.6" fill="none" stroke="#C9F26B" stroke-width="4.6"/><path d="M50 16.5V25.5M50 74.5V83.5M16.5 50H29M71 50H83.5" stroke="#C9F26B" stroke-width="4.6" stroke-linecap="round"/><path d="M30 50H40L43.5 41L47.5 59.5L50 50" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50L52.5 41L56.5 58.5L59 50H70" fill="none" stroke="#A0A8AA" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="4.4" fill="#C9F26B"/></svg></div><div class="eyebrow" style="letter-spacing:.2em">syncope</div><h1>Eat with a <em>plan</em>, not a guess.</h1><p class="lede">Syncope turns your body stats and goal into daily calorie and macro targets that adjust every week, then helps you log food, lifts and how you feel.</p><p class="lede" style="font-size:14px">Takes about a minute. Everything stays on this phone.</p>`;next="Let's set you up"}
   if(st==='name'){body=`<h1>What should we call you?</h1><input class="big-in" id="obName" type="text" autocomplete="given-name" placeholder="Your name" value="${esc(d.name)}">`}
   if(st==='body'){body=`<h1>Your body today</h1><p class="lede">This sets your maintenance calories. Body fat % is optional but makes the math sharper.</p>
@@ -2425,7 +2662,7 @@ function renderTrain(){
   $('tplGrid').innerHTML=S.templates.map((t,i)=>`<button class="tpl" data-tpl="${i}"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></button>`).join('')+`<button class="tpl empty" data-tpl="-1"><b>+ Empty workout</b><span>Add exercises as you go</span></button>`;
   // week stats
   const ws=weekStart(todayKey()),inWk=S.workouts.filter(w=>w.date>=ws),feed=trainFeed(),fWk=feed.filter(x=>x.date>=ws),burn=fWk.reduce((a,x)=>a+((x.dev&&x.dev.kcal)||0),0);
-  renderWatchNow();const cs=syncCfg();$('trSync').hidden=!(cs.url&&cs.uid);
+  renderWatchNow();renderTip('train');const cs=syncCfg();$('trSync').hidden=!(cs.url&&cs.uid);
   const sets=inWk.reduce((a,w)=>a+w.ex.reduce((b,x)=>b+x.sets.length,0),0),vol=inWk.reduce((a,w)=>a+w.ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0),0),prs=inWk.reduce((a,w)=>a+(w.prs||[]).length,0);
   $('trTiles').innerHTML=`<div class="tile"><div class="eyebrow">Workouts</div><div class="v c-p">${fWk.length}<small> this week</small></div><div class="d">${burn?`${fmt(burn)} kcal burned`:`${feed.length} all time`}</div></div>
     <div class="tile"><div class="eyebrow">Hard sets</div><div class="v">${sets}</div><div class="d">this week</div></div>
