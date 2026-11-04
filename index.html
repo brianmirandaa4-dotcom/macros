@@ -3415,6 +3415,7 @@ function openSyncGuide(){
   $('sgOk').onclick=closeSheet;
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices(false)});
+setInterval(()=>{if(document.visibilityState==='visible')syncDevices(false)},5*60000);
 /* ---- watch workouts in Train ---- */
 function devList(){return (S.dev&&S.dev.workouts)||[]}
 function autoLink(){

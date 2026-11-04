@@ -223,7 +223,8 @@ async function syncWhoop(user, env, days) {
     });
   }
   for (const c of cyc) {
-    const k = localDate(c.start, c.timezone_offset); if (!k) continue;
+    // A WHOOP cycle starts when you fall asleep, so label it by the day you're awake for (start + 12h).
+    const k = c.start ? localDate(new Date(Date.parse(c.start) + 12 * 36e5).toISOString(), c.timezone_offset) : null; if (!k) continue;
     const sc = c.score || {};
     const st = c.step_count ?? sc.step_count;
     Object.assign(d(k), { strain: sc.strain != null ? r1(sc.strain) : undefined, kcal: sc.kilojoule != null ? Math.round(sc.kilojoule / 4.184) : undefined, avgHr: sc.average_heart_rate, steps: st != null ? Math.round(st) : undefined });
