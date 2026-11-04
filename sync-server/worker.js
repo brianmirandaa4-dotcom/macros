@@ -224,7 +224,8 @@ async function syncWhoop(user, env, days) {
   for (const c of cyc) {
     const k = localDate(c.start, c.timezone_offset); if (!k) continue;
     const sc = c.score || {};
-    Object.assign(d(k), { strain: sc.strain != null ? r1(sc.strain) : undefined, kcal: sc.kilojoule != null ? Math.round(sc.kilojoule / 4.184) : undefined, avgHr: sc.average_heart_rate });
+    const st = c.step_count ?? sc.step_count;
+    Object.assign(d(k), { strain: sc.strain != null ? r1(sc.strain) : undefined, kcal: sc.kilojoule != null ? Math.round(sc.kilojoule / 4.184) : undefined, avgHr: sc.average_heart_rate, steps: st != null ? Math.round(st) : undefined });
   }
   const workouts = wko.map(w => {
     const sc = w.score || {};

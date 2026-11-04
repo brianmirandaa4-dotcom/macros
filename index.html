@@ -686,6 +686,29 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .top{background:rgba(11,12,16,.72)!important;-webkit-backdrop-filter:blur(20px) saturate(1.4)!important;backdrop-filter:blur(20px) saturate(1.4)!important}
 .addt{background:linear-gradient(160deg,color-mix(in srgb,var(--c,#fff) 9%,var(--surface-2)),var(--surface-2))}
 .primary{box-shadow:0 6px 18px color-mix(in srgb,var(--kcal) 25%,transparent)}
+
+.idea-card,.prep-card{display:flex;flex-direction:column;gap:12px}
+.idea-top{display:flex;gap:12px;align-items:center}
+.idea-top .ic.thumb{width:58px;height:58px;border-radius:16px;flex:none;background-size:150%;background-position:center;background-color:#20242D;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 6px 14px rgba(0,0,0,.3)}
+.idea-t{flex:1;min-width:0}.idea-t h2{margin:2px 0 0;font:700 18px/1.2 var(--f-display)}.idea-t p{margin:4px 0 0;font-size:13px;color:var(--muted);line-height:1.4}
+.idea-mac{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.mp{font:500 12.5px var(--f-num);color:var(--muted);border:1px solid color-mix(in srgb,var(--c) 40%,var(--line));background:color-mix(in srgb,var(--c) 8%,transparent);border-radius:999px;padding:4px 9px}
+.mp b{color:var(--c);font-weight:700}
+.idea-fit{margin-left:auto;font:800 12px var(--f-body);color:var(--muted);border-radius:999px;padding:4px 9px;background:var(--surface-2);white-space:nowrap}
+.idea-fit.hi{color:#0B0C10;background:var(--good)}
+.ing{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.ing li{display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px dashed var(--line);font-size:14px}
+.ing li:last-child{border-bottom:0}.ing b{font:600 13.5px var(--f-num);white-space:nowrap}
+.rems{display:flex;flex-direction:column;gap:8px}
+.rem{display:grid;grid-template-columns:70px 64px 1fr;align-items:center;gap:10px;font-size:13.5px}
+.rem b{font:700 14px var(--f-num);color:var(--c)}.rem i{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}.rem u{display:block;height:100%;background:var(--c);border-radius:99px}
+.prep-card,.prep-hero{background:linear-gradient(180deg,rgba(11,12,16,.35),rgba(11,12,16,.92)),var(--bnr)!important}
+.prep-card h2,.prep-hero h2{margin:2px 0 0;font:800 21px/1.2 var(--f-display)}.prep-card p,.prep-hero p{margin:0;color:rgba(255,255,255,.78);font-size:13.5px}
+.prep-hero{min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px}
+details.steps summary{cursor:pointer;font-weight:650;color:var(--kcal);padding:4px 0}
+details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:14px;line-height:1.5}
+.groc .gr{grid-template-columns:24px minmax(0,1fr) auto 0;cursor:pointer}
+.gck{width:20px;height:20px;accent-color:var(--good)}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -724,7 +747,9 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 
     <div class="tip" id="tip-today" hidden></div>
     <div class="card hero" id="hero"></div>
+    <div class="card prep-card" id="prepCard" hidden></div>
     <div class="card coach" id="coach" hidden></div>
+    <div class="card idea-card" id="ideasCard" hidden></div>
 
     <div class="card composer">
       <div class="row" style="justify-content:space-between">
@@ -909,6 +934,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
     </div>
 </div>
   <div class="pg" id="pg-help"></div>
+  <div class="pg" id="pg-ideas"></div>
+  <div class="pg" id="pg-prep"></div>
   <div class="pg" id="pg-account"></div>
   <div class="pg" id="pg-prefs"></div>
   <div class="pg" id="pg-body">      <div class="card" style="display:flex;flex-direction:column;gap:16px">
@@ -1405,7 +1432,7 @@ function gaugeSVG(t,goal){
   let ticks='';for(let i=0;i<20;i++){const a=i/20*2*Math.PI-Math.PI/2,a1=104,a2=i%5===0?110:107;ticks+=`<line x1="${100+a1*Math.cos(a)}" y1="${100+a1*Math.sin(a)}" x2="${100+a2*Math.cos(a)}" y2="${100+a2*Math.sin(a)}" stroke="var(--faint)" stroke-width="${i%5===0?1.6:1}"/>`}
   return `<svg viewBox="-14 -14 228 228" role="img" aria-label="${fmt(t.k)} of ${fmt(goal)} calories"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${arcs}${over}${ticks}</svg>`;
 }
-function renderToday(){renderCheckin();renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');
+function renderToday(){renderCheckin();renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();
   const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk;
   $('dTitle').textContent=niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   const diff=Math.round((parseKey(k)-parseKey(tk))/864e5);
@@ -2274,8 +2301,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -2302,7 +2329,9 @@ function renderMe(){
     <div class="glabel">Goals</div><div class="glist">
       ${grow({ga:'plan',ic:'plan',c:'--good',t:'Your plan',s:'Cut, maintain or bulk',v:planLabel()})}
       ${grow({pg:'weigh',ic:'scale',c:'--carb',t:'Weigh-ins',s:'Log weight and see your trend',v:lw?`${r1(lw.w)} lb`:''})}
-      ${grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:'Set protein, carbs and fat yourself',v:S.plan?'From plan':fmt(goalKcal(S.goals))+' kcal'})}</div>
+      ${grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:'Set protein, carbs and fat yourself',v:S.plan?'From plan':fmt(goalKcal(S.goals))+' kcal'})}
+      ${grow({pg:'ideas',ic:'fire',c:'--good',t:'Meals that fit',s:'Ideas sized to your remaining macros'})}
+      ${grow({pg:'prep',ic:'list',c:'--carb',t:'Weekly meal prep',s:'New high-protein recipes every Sunday'})}</div>
     <div class="glabel">Connections</div><div class="glist">
       ${grow({pg:'conn',ic:'watch',c:'--good',t:'WHOOP & Garmin',s:'Sleep, recovery, strain and workouts',v:conn.length?conn.join(' + '):'Connect',vc:conn.length?'on':''})}
       ${grow({ga:'apple',ic:'heart',c:'--over',t:'Apple Health',s:'Through an iPhone Shortcut'})}
@@ -2413,12 +2442,156 @@ function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySe
   const kind=S.view==='today'?mealOfNow():S.view==='week'||S.view==='month'?'progress':S.view;
   pn.classList.add('banner');pn.classList.toggle('flush',pn===sec.firstElementChild||(pn.previousElementSibling&&pn.previousElementSibling.classList.contains('tip')&&pn.previousElementSibling===sec.firstElementChild));
   pn.style.setProperty('--bnr',bnr(kind))}
+/* ================= MEAL IDEAS: meals sized to close your remaining macros ================= */
+// name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Syncope adjusts the amount, x = fixed)
+const IDEA_SRC=`Greek yogurt power bowl|bs|3|greek yogurt:p:cup:1:0.5:2.5;granola:c:cup:0.25:0:1;blueberries:c:cup:0.5:0:1.5;honey:c:tbsp:1:0:2;almonds:f:oz:0.5:0:1.5
+Protein oats|b|8|oats:c:cup:0.5:0.25:1.5;whey:p:scoop:1:0:2;banana:c:each:1:0:2;peanut butter:f:tbsp:1:0:2.5
+Egg white scramble & toast|b|10|egg white:p:each:4:0:10;egg:f:each:1:0:3;wheat bread:c:slice:2:0:4;spinach:x:cup:1:1:1;salsa:x:tbsp:2:2:2
+Bagel, eggs & turkey|b|10|bagel:c:each:1:0.5:1.5;egg:f:each:2:0:3;turkey slices:p:oz:3:0:6;cheese:f:oz:0.5:0:1
+Protein pancakes|b|15|pancake:c:each:2:1:5;whey:p:scoop:1:0:2;blueberries:x:cup:0.5:0.5:0.5;maple syrup:c:tbsp:1:0:3;butter:f:tbsp:0.5:0:1
+Cottage cheese & fruit|bs|2|cottage cheese:p:cup:1:0.5:2;pineapple:c:cup:0.75:0:2;almonds:f:oz:0.5:0:1.5
+Overnight oats & berries|b|5|oats:c:cup:0.5:0.25:1.25;greek yogurt:p:cup:0.75:0:1.5;skim milk:c:cup:0.5:0:1;strawberries:c:cup:0.5:0:1.5;chia seeds:f:tbsp:1:0:2
+Sweet potato & egg whites|bd|20|sweet potato:c:each:1:0.5:2.5;egg white:p:each:5:0:10;egg:f:each:1:0:2;spinach:x:cup:1:1:1
+Chicken burrito bowl|ld|20|chicken breast:p:oz:6:3:12;white rice:c:cup:1:0:2.5;black beans:c:cup:0.5:0:1;salsa:x:tbsp:3:3:3;avocado:f:each:0.25:0:0.75;cheese:f:oz:0.5:0:1.5
+Salmon, rice & broccoli|ld|25|salmon:p:oz:6:3:10;white rice:c:cup:1:0:2.5;broccoli:x:cup:1:1:1;olive oil:f:tsp:1:0:3
+Turkey taco bowl|ld|20|ground turkey:p:oz:6:3:10;white rice:c:cup:1:0:2.5;corn:c:cup:0.25:0:1;salsa:x:tbsp:3:3:3;cheese:f:oz:0.5:0:1.5;salad:x:cup:1:1:1
+Steak, sweet potato & green beans|d|30|steak:p:oz:6:3:10;sweet potato:c:each:1:0:2.5;green beans:x:cup:1:1:1;butter:f:tbsp:0.5:0:1.5
+Shrimp stir-fry|ld|20|shrimp:p:oz:6:3:12;white rice:c:cup:1:0:2.5;bell pepper:x:each:0.5:0.5:0.5;broccoli:x:cup:1:1:1;soy sauce:x:tbsp:1:1:1;olive oil:f:tsp:2:0:4
+Chicken pasta marinara|ld|20|chicken breast:p:oz:5:3:10;pasta:c:cup:1:0.5:3;marinara:x:cup:0.5:0.5:0.5;parmesan:f:tbsp:1:0:3
+Lean beef & potatoes|d|30|ground beef 90/10:p:oz:5:3:9;potato:c:each:1:0:2.5;green beans:x:cup:1:1:1;olive oil:f:tsp:1:0:3
+Tuna wrap|ls|5|tuna:p:oz:4:2:8;tortilla:c:each:1:1:2;mayo:f:tbsp:0.5:0:2;salad:x:cup:1:1:1;tomato:x:each:0.5:0.5:0.5
+Grilled chicken sandwich|l|10|chicken breast:p:oz:5:3:9;wheat bread:c:slice:2:2:3;cheese:f:oz:0.5:0:1.5;mayo:f:tbsp:0.5:0:1.5;tomato:x:each:0.5:0.5:0.5
+Tofu & edamame rice bowl|ld|20|tofu:p:oz:6:3:12;edamame:p:cup:0.5:0:1;brown rice:c:cup:1:0:2.5;soy sauce:x:tbsp:1:1:1;olive oil:f:tsp:1:0:3
+Cod, quinoa & asparagus|d|25|cod:p:oz:7:4:12;quinoa:c:cup:0.75:0:2;asparagus:x:cup:1:1:1;olive oil:f:tsp:2:0:4
+Chicken thigh & couscous|d|25|chicken thigh:p:each:1.5:1:3;couscous:c:cup:1:0:2;carrots:x:cup:0.5:0.5:0.5;olive oil:f:tsp:0:0:2
+Lean egg fried rice|ld|15|egg white:p:each:4:0:10;white rice:c:cup:1:0:2.5;peas:c:cup:0.5:0:1;egg:f:each:1:0:2;soy sauce:x:tbsp:1:1:1
+Chicken & rice, plain and simple|ld|20|chicken breast:p:oz:6:3:12;white rice:c:cup:1:0:3;broccoli:x:cup:1:1:1
+Protein shake & banana|s|2|whey:p:scoop:1:0.5:2;banana:c:each:1:0:2;skim milk:c:cup:1:0:2;peanut butter:f:tbsp:0:0:2
+Turkey roll-ups & crackers|s|3|turkey slices:p:oz:3:1:6;cheese:f:oz:0.5:0:1.5;crackers:c:serving:1:0:2
+Rice cakes, PB & jerky|s|2|rice cake:c:each:2:0:5;peanut butter:f:tbsp:1:0:2;beef jerky:p:oz:1:0:3
+Premier Protein & apple|s|1|premier protein:p:each:1:1:2;apple:c:each:1:0:2
+Bagel & jam|bs|3|bagel:c:each:1:0.5:1.5;jam:c:tbsp:1:0:3;skim milk:p:cup:1:0:2
+Fruit, rice cakes & honey|s|2|rice cake:c:each:2:0:5;banana:c:each:1:0:2;honey:c:tbsp:1:0:2;egg white:p:each:0:0:6
+Skyr & granola|bs|2|skyr:p:cup:1:0.5:2;granola:c:cup:0.25:0:0.75;raspberries:c:cup:0.5:0:1`;
+const STEP={oz:.5,cup:.25,tbsp:.5,tsp:.5,each:.5,slice:1,scoop:.5,g:10,serving:.5};
+const IDEAS=IDEA_SRC.split('\n').map(l=>{const [name,slots,min,ing]=l.split('|');return {name,slots,min:+min,ing:ing.split(';').map(x=>{const [food,role,unit,d,lo,hi]=x.split(':');return {food,role,unit,d:+d,lo:+lo,hi:+hi}})}});
+function ingFood(a){const [fd]=matchFood(a);return fd}
+function fq(q){const w=Math.floor(q+1e-9),r=q-w,fr=Math.abs(r-.25)<.01?'¼':Math.abs(r-.5)<.01?'½':Math.abs(r-.75)<.01?'¾':r>.01?String(r1(r)).slice(1):'';return w?(fr&&!fr.startsWith('.')?w+fr:w+(fr.startsWith('.')?fr:'')):(fr.startsWith('.')?'0'+fr:fr||'0')}
+function ingEntry(i,q){const fd=ingFood(i.food);if(!fd||q<=0)return null;const e=entryFor(fd,q,i.unit,i.food);const u=i.unit==='each'?'':' '+(UNIT_LABEL(i.unit,q,fd)||i.unit);e.a=fq(q)+u;return e}
+function unitMac(i){const e=ingEntry(i,1);return e?{p:e.p,c:e.c,f:e.f,k:e.k}:{p:0,c:0,f:0,k:0}}
+function fitIdea(idea,T){
+  const ing=idea.ing.map(i=>({...i,m:unitMac(i),q:i.d}));
+  const tot=()=>ing.reduce((a,i)=>({p:a.p+i.m.p*i.q,c:a.c+i.m.c*i.q,f:a.f+i.m.f*i.q}),{p:0,c:0,f:0});
+  const W={p:1.6,c:1,f:T.f<=1?1.6:1},K={p:4,c:4,f:9};
+  const err=t=>['p','c','f'].reduce((a,m)=>a+W[m]*Math.pow(K[m]*(t[m]-Math.max(0,T[m])),2),0);
+  for(let it=0;it<30;it++)ing.forEach(i=>{if(i.role==='x')return;i.q=0;const t=tot();let num=0,den=0;['p','c','f'].forEach(m=>{const w=W[m]*K[m]*K[m];num+=w*i.m[m]*(Math.max(0,T[m])-t[m]);den+=w*i.m[m]*i.m[m]});i.q=Math.min(i.hi,Math.max(i.lo,den?num/den:i.d))});
+  ing.forEach(i=>{if(i.role!=='x'){const s=STEP[i.unit]||.5;i.q=Math.min(i.hi,Math.max(i.lo,Math.round(i.q/s)*s))}});
+  for(let pass=0;pass<3;pass++)ing.forEach(i=>{if(i.role==='x')return;const s=STEP[i.unit]||.5;let best=err(tot()),bq=i.q;[i.q-s,i.q+s].forEach(q=>{if(q<i.lo-1e-9||q>i.hi+1e-9)return;const o=i.q;i.q=q;const e=err(tot());if(e<best-1e-6){best=e;bq=q}i.q=o});i.q=bq});
+  const entries=ing.map(i=>ingEntry(i,i.q)).filter(Boolean),got=sumEntries(entries);
+  const tk=Math.max(250,Math.max(0,T.p)*4+Math.max(0,T.c)*4+Math.max(0,T.f)*9);
+  const off=Math.abs(4*(got.p-Math.max(0,T.p)))*1.3+Math.abs(4*(got.c-Math.max(0,T.c)))+Math.abs(9*(got.f-Math.max(0,T.f)));
+  return {idea,entries,got,fit:Math.max(0,Math.min(1,1-off/(2*tk)))};
+}
+const SLOT_OF={breakfast:'b',lunch:'l',dinner:'d',snack:'s'};
+function ideaTarget(mode){
+  const k=S.day,g=goalsFor(k),t=dayTotals(k),R={p:g.p-t.p,c:g.c-t.c,f:g.f-t.f};
+  const logged=new Set((S.days[k]||[]).map(e=>e.meal)),order=['breakfast','lunch','dinner'],h=new Date().getHours()+new Date().getMinutes()/60,isToday=k===todayKey();
+  const nowIdx=!isToday?0:h<10.5?0:h<15.5?1:2;
+  const left=order.filter((m,i)=>i>=nowIdx&&!logged.has(m));const n=Math.max(1,left.length);
+  const slot=S.ideaSlot||left[0]||(isToday&&h>=21?'snack':'snack');
+  const share=mode==='day'?1:slot==='snack'?Math.min(1,.5/n):1/n;
+  return {R,T:{p:R.p*share,c:R.c*share,f:R.f*share},n,slot,left};
+}
+function mealIdeas(mode,slot){const {T}=ideaTarget(mode);const s=SLOT_OF[slot]||'l';
+  return IDEAS.filter(i=>i.slots.includes(s)).map(i=>fitIdea(i,T)).sort((a,b)=>b.fit-a.fit)}
+function fmtQ(e){return e.a}
+function renderIdeasCard(){
+  const el=$('ideasCard');if(!el)return;const g=goalsFor(S.day),t=dayTotals(S.day);
+  const R={p:g.p-t.p,c:g.c-t.c,f:g.f-t.f},rk=R.p*4+R.c*4+Math.max(0,R.f)*9;
+  if(rk<120&&R.p<10){el.hidden=true;return}
+  const {slot,T}=ideaTarget(S.ideaMode||'meal'),best=mealIdeas(S.ideaMode||'meal',slot)[0];if(!best){el.hidden=true;return}
+  el.hidden=false;
+  el.innerHTML=`<div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot==='snack'?'snack':slot)}'></div><div class="idea-t"><div class="eyebrow">${mealName(slot)} idea · fits your macros</div><h2>${esc(best.idea.name)}</h2><p>${best.entries.map(e=>`${esc(e.a)} ${esc(e.n.toLowerCase())}`).join(' · ')}</p></div></div>
+    <div class="idea-mac">${macPill('P',best.got.p,T.p,'--pro')}${macPill('C',best.got.c,T.c,'--carb')}${macPill('F',best.got.f,T.f,'--fat')}<span class="idea-fit">${Math.round(best.fit*100)}% match</span></div>
+    <div class="row" style="gap:8px"><button class="primary" type="button" data-ilog="0">Log it to ${mealName(slot).toLowerCase()}</button><button class="ghost" type="button" data-pg="ideas">More ideas</button></div>`;
+  el.dataset.slot=slot;el._best=best;
+}
+function macPill(l,v,t,c){return `<span class="mp" style="--c:var(${c})"><b>${r0(v)}</b>/${r0(Math.max(0,t))}g ${l}</span>`}
+$('ideasCard')&&$('ideasCard').addEventListener('click',e=>{if(e.target.closest('[data-ilog]')){const b=$('ideasCard')._best;if(b)addEntries(b.entries.map(x=>({...x,id:uid(),t:Date.now()})),S.day,$('ideasCard').dataset.slot)}});
+function renderIdeas(){
+  const mode=S.ideaMode||'meal',{R,T,n,slot,left}=ideaTarget(mode),list=mealIdeas(mode,slot).slice(0,8),g=goalsFor(S.day);
+  const bar=(l,v,goal,c)=>{const left2=Math.max(0,v);return `<div class="rem" style="--c:var(${c})"><span>${l}</span><b>${r0(left2)} g</b><i><u style="width:${goal?Math.min(100,Math.max(0,(goal-v)/goal*100)):0}%"></u></i></div>`};
+  $('pg-ideas').innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:12px"><div><div class="eyebrow">Left for ${S.day===todayKey()?'today':niceDate(S.day,{weekday:'long'})}</div><h2 style="margin:2px 0 0">${fmt(Math.max(0,R.p*4+R.c*4+Math.max(0,R.f)*9))} kcal to go</h2></div>
+      <div class="rems">${bar('Protein',R.p,g.p,'--pro')}${bar('Carbs',R.c,g.c,'--carb')}${bar('Fat',R.f,g.f,'--fat')}</div>
+      ${R.f<0?`<p class="note" style="margin:0;color:var(--carb)">You're ${r0(-R.f)} g over on fat, so these ideas keep fat as low as possible.</p>`:''}
+      <div class="seg2" role="group" aria-label="Size"><button type="button" data-im="meal" aria-pressed="${mode==='meal'}">${n>1?`Next meal (1 of ${n})`:'Next meal'}</button><button type="button" data-im="day" aria-pressed="${mode==='day'}">Rest of the day</button></div>
+      <div class="xp-f" style="margin:0">${['breakfast','lunch','dinner','snack'].map(m=>`<button type="button" class="chip" data-isl="${m}" aria-pressed="${slot===m}">${mealName(m)}</button>`).join('')}</div>
+      ${T.p*4+T.c*4+Math.max(0,T.f)*9>1300?'<p class="note" style="margin:0;color:var(--carb)">That\'s more than one normal meal. These get you most of the way; a snack later covers the rest.</p>':''}
+      <p class="note" style="margin:0">Aiming for <b>${r0(Math.max(0,T.p))} g protein · ${r0(Math.max(0,T.c))} g carbs · ${r0(Math.max(0,T.f))} g fat</b> ${mode==='day'?'in one meal':`this meal${n>1?`, leaving room for ${n-1} more`:''}`}. Amounts are sized to fit.</p></div>
+    ${list.map((x,i)=>`<div class="card idea" style="display:flex;flex-direction:column;gap:12px">
+      <div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot)}'></div><div class="idea-t"><div class="eyebrow">${x.idea.min} min · ${r0(x.got.k)} kcal</div><h2>${esc(x.idea.name)}</h2></div><span class="idea-fit ${x.fit>=.85?'hi':''}">${Math.round(x.fit*100)}%</span></div>
+      <ul class="ing">${x.entries.map(e=>`<li><span>${esc(e.n)}</span><b>${esc(e.a)}</b></li>`).join('')}</ul>
+      <div class="idea-mac">${macPill('P',x.got.p,T.p,'--pro')}${macPill('C',x.got.c,T.c,'--carb')}${macPill('F',x.got.f,T.f,'--fat')}</div>
+      <button class="primary" type="button" data-ilog2="${i}">Log to ${mealName(slot).toLowerCase()}</button></div>`).join('')}
+    <p class="note" style="padding:0 6px">Match % is how close the meal lands to your target protein, carbs and fat, with protein counted most. Amounts round to easy measures like ½ cup or 1 oz.</p>`;
+  const P=$('pg-ideas');P._list=list;P._slot=slot;
+}
+$('pg-ideas')&&$('pg-ideas').addEventListener('click',e=>{const m=e.target.closest('[data-im]');if(m){S.ideaMode=m.dataset.im;renderIdeas();return}
+  const s=e.target.closest('[data-isl]');if(s){S.ideaSlot=s.dataset.isl;renderIdeas();return}
+  const l=e.target.closest('[data-ilog2]');if(l){const P=$('pg-ideas'),x=P._list[+l.dataset.ilog2];if(x){addEntries(x.entries.map(y=>({...y,id:uid(),t:Date.now()})),S.day,P._slot);renderIdeas()}}});
+
+/* ================= SUNDAY MEAL PREP ================= */
+// name | servings | minutes | batch ingredients "food:unit:qty" | steps separated by ~
+const PREP_SRC=`Teriyaki chicken rice bowls|5|45|chicken breast:lb:2.5;white rice:cup:5;broccoli:cup:5;teriyaki sauce:tbsp:5|Cook 2 cups dry rice (makes about 5 cups).~Cube the chicken, sear in a hot pan 6–8 min until cooked through.~Steam or roast the broccoli.~Toss chicken with teriyaki sauce and split everything into 5 containers.
+Turkey chili|5|50|ground turkey:lb:2;kidney beans:cup:2;black beans:cup:1;onion:each:1;tomato:each:3;cheese:oz:2.5|Brown the turkey with diced onion.~Add beans, chopped tomatoes (or a can of crushed), chili powder, cumin and 1 cup water.~Simmer 30 min.~Portion into 5 bowls; top each with ½ oz cheese when you eat it.
+Greek chicken & potatoes|5|50|chicken thigh:lb:2.5;potato:each:5;cucumber:each:1;feta:oz:2.5;olive oil:tbsp:2|Toss chicken and cubed potatoes with olive oil, lemon, garlic and oregano.~Roast at 425°F for 35–40 min.~Dice cucumber, crumble feta on top when serving.~Split into 5 containers.
+Beef & sweet potato bowls|5|45|ground beef 90/10:lb:2;sweet potato:each:4;green beans:cup:5;salsa:tbsp:10|Cube sweet potatoes and roast at 425°F for 30 min.~Brown the beef with taco seasoning.~Steam green beans.~Split into 5 containers; add salsa when you eat it.
+Salmon & quinoa power bowls|4|35|salmon:oz:24;quinoa:cup:4;asparagus:cup:4;edamame:cup:1|Cook 1⅓ cups dry quinoa.~Bake salmon at 400°F for 12–15 min.~Roast asparagus alongside for the last 10 min.~Split salmon, quinoa, asparagus and edamame into 4 containers.
+Egg white breakfast burritos|6|30|egg white:cup:3;egg:each:6;tortilla:each:6;cheese:oz:3;salsa:tbsp:6;black beans:cup:1|Scramble egg whites and eggs.~Warm beans.~Fill each tortilla with eggs, beans, ½ oz cheese and salsa, roll tight.~Wrap in foil and freeze; microwave 2 min from frozen.
+Shrimp fried rice|4|30|shrimp:lb:1.5;white rice:cup:4;peas:cup:1;carrots:cup:1;egg:each:3;soy sauce:tbsp:4|Use day-old rice if you can.~Sauté shrimp 3 min, set aside.~Scramble eggs, add peas, carrots and rice, then soy sauce.~Fold shrimp back in and split into 4 containers.
+Chicken pesto pasta|5|30|chicken breast:lb:2;pasta:cup:6;spinach:cup:4;parmesan:tbsp:5;olive oil:tbsp:1|Boil pasta.~Grill or pan-sear chicken, then slice.~Wilt spinach into the warm pasta, add a little pesto or olive oil and garlic.~Top with chicken and parmesan, split into 5.
+Overnight protein oats|5|10|oats:cup:2.5;greek yogurt:cup:2.5;whey:scoop:5;skim milk:cup:2.5;blueberries:cup:2.5|In 5 jars, mix ½ cup oats, ½ cup yogurt, 1 scoop whey and ½ cup milk.~Top with berries.~Refrigerate overnight; good for 4–5 days.
+Steak, rice & peppers|4|35|steak:oz:24;white rice:cup:4;bell pepper:each:3;onion:each:1|Sear steak 4 min a side, rest, then slice.~Sauté sliced peppers and onion.~Split steak, rice and peppers into 4 containers.
+Lean turkey meatballs & marinara|5|40|ground turkey:lb:2;egg:each:1;pasta:cup:5;marinara:cup:2.5;parmesan:tbsp:5|Mix turkey, egg, garlic and Italian seasoning; roll about 25 meatballs.~Bake at 400°F for 18–20 min.~Warm marinara, boil pasta.~Split into 5 with parmesan on top.
+Cottage cheese protein boxes|5|10|cottage cheese:cup:5;pineapple:cup:2.5;almonds:oz:2.5;turkey slices:oz:10|Fill 5 containers with 1 cup cottage cheese and ½ cup pineapple.~Add 2 oz turkey and ½ oz almonds on the side.~Grab-and-go snack for the week.`;
+const PREP=PREP_SRC.split('\n').map(l=>{const [name,sv,min,ing,steps]=l.split('|');return {name,sv:+sv,min:+min,ing:ing.split(';').map(x=>{const [food,unit,q]=x.split(':');return {food,unit,q:+q}}),steps:steps.split('~')}});
+function prepServing(r){const es=r.ing.map(i=>ingEntry({food:i.food,unit:i.unit},i.q)).filter(Boolean),t=sumEntries(es);return {k:t.k/r.sv,p:t.p/r.sv,c:t.c/r.sv,f:t.f/r.sv}}
+setTimeout(()=>{const bad=[...IDEAS.flatMap(i=>i.ing),...PREP.flatMap(r=>r.ing)].filter(i=>!ingFood(i.food)||!ingEntry({food:i.food,unit:i.unit},1)).map(i=>i.food+':'+i.unit);if(bad.length)console.warn('SYNCOPE_MISSING',[...new Set(bad)].join(','))},0);
+function weekNo(k){const d=parseKey(weekStart(k));return Math.floor(d.getTime()/(7*864e5))}
+function weekPrep(k=todayKey()){const w=weekNo(k),n=PREP.length,out=[];for(let i=0;out.length<3;i++){const r=PREP[(w*3+i*5)%n];if(!out.includes(r))out.push(r)}return out}
+function renderPrep(){
+  const k=todayKey(),rs=weekPrep(k),g=goalsFor(k),wk=weekStart(k);
+  const groc={};rs.forEach(r=>r.ing.forEach(i=>{const key=i.food+'|'+i.unit;groc[key]=(groc[key]||0)+i.q}));
+  const have=((S.prefs.groc||{})[wk])||[];
+  const uL=(u,q)=>({lb:'lb',oz:'oz',cup:q===1?'cup':'cups',tbsp:'tbsp',each:'',scoop:q===1?'scoop':'scoops'}[u]??u);
+  $('pg-prep').innerHTML=`<div class="card prep-hero" style='--bnr:${bnr("plan")}'><div class="eyebrow">Week of ${niceDate(wk,{month:'short',day:'numeric'})}</div><h2>3 high-protein meals to prep this Sunday</h2><p>About ${r0(rs.reduce((a,r)=>a+r.min,0)/60*10)/10} hours of cooking for ${rs.reduce((a,r)=>a+r.sv,0)} meals. New recipes every Sunday.</p></div>
+    ${rs.map((r,i)=>{const s=prepServing(r);return `<div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(['lunch','dinner','breakfast'][i%3])}'></div><div class="idea-t"><div class="eyebrow">${r.sv} servings · ${r.min} min</div><h2>${esc(r.name)}</h2></div></div>
+      <div class="idea-mac"><span class="mp" style="--c:var(--kcal)"><b>${fmt(s.k)}</b> kcal</span><span class="mp" style="--c:var(--pro)"><b>${r0(s.p)}</b>g P</span><span class="mp" style="--c:var(--carb)"><b>${r0(s.c)}</b>g C</span><span class="mp" style="--c:var(--fat)"><b>${r0(s.f)}</b>g F</span><span class="idea-fit">per serving</span></div>
+      <p class="note" style="margin:0">One serving covers <b>${r0(s.p/g.p*100)}%</b> of your daily protein.</p>
+      <details class="steps"><summary>Ingredients & steps</summary><ul class="ing">${r.ing.map(x=>`<li><span>${esc(cap(x.food))}</span><b>${fq(x.q)} ${uL(x.unit,x.q)}</b></li>`).join('')}</ul><ol>${r.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></details>
+      <div class="row" style="gap:8px"><button class="primary" type="button" data-plog="${i}">Log 1 serving</button><button class="ghost" type="button" data-psave="${i}">Save to my meals</button></div></div>`}).join('')}
+    <div class="glabel">Grocery list</div><div class="glist groc">${Object.entries(groc).map(([key,q])=>{const [f,u]=key.split('|'),on=have.includes(key);return `<label class="gr static"><input type="checkbox" class="gck" data-gk="${esc(key)}" ${on?'checked':''}><span class="gt"><b style="${on?'text-decoration:line-through;color:var(--muted)':''}">${esc(cap(f))}</b></span><span class="gv">${fq(q)} ${uL(u,q)}</span><span></span></label>`}).join('')}</div>`;
+  const P=$('pg-prep');P._rs=rs;
+}
+$('pg-prep')&&$('pg-prep').addEventListener('click',e=>{const P=$('pg-prep'),l=e.target.closest('[data-plog]'),sv=e.target.closest('[data-psave]');
+  const one=r=>{const s=prepServing(r);return mk(r.name,'1 prepped serving',0,s.k,s.p,s.c,s.f,'db')};
+  if(l){const r=P._rs[+l.dataset.plog];addEntries([one(r)],S.day,autoMeal())}
+  if(sv){const r=P._rs[+sv.dataset.psave],e2=one(r);S.meals=S.meals.filter(m=>m.name!==r.name);S.meals.unshift({id:uid(),name:r.name,items:[e2]});save();toast(`Saved “${esc(r.name)}” to your meals`)}});
+$('pg-prep')&&$('pg-prep').addEventListener('change',e=>{const c=e.target.closest('[data-gk]');if(!c)return;const wk=weekStart(todayKey());S.prefs.groc=S.prefs.groc||{};const a=new Set(S.prefs.groc[wk]||[]);c.checked?a.add(c.dataset.gk):a.delete(c.dataset.gk);S.prefs.groc={[wk]:[...a]};save();renderPrep()});
+function renderPrepCard(){const el=$('prepCard');if(!el)return;const k=todayKey(),wk=weekStart(k),P=S.prefs||{};
+  const sunday=parseKey(S.day).getDay()===0&&S.day===k;
+  if(!sunday||(P.prepSeen===wk)){el.hidden=true;return}
+  const rs=weekPrep(k);el.hidden=false;
+  el.innerHTML=`<div class="eyebrow" style="color:var(--good)">Sunday meal prep</div><h2>This week's high-protein prep is ready</h2><p>${rs.map(r=>esc(r.name)).join(' · ')}</p><div class="row" style="gap:8px"><button class="primary" type="button" data-pg="prep">See recipes & grocery list</button><button class="ghost" type="button" data-prepx>Later</button></div>`;
+  el.style.setProperty('--bnr',bnr('plan'))}
+document.addEventListener('click',e=>{if(e.target.closest('[data-prepx]')){S.prefs.prepSeen=weekStart(todayKey());save();renderToday()}});
 /* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
 function openAdd(){
   const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
   const tiles=[['food','--kcal',GI.plus,'Food','Type it like a text: “2 eggs, toast”'],['scan','--pro',GI.camera,'Snap a photo','Claude reads the plate for you'],
     ['meal','--carb',GI.copy,'Saved meal','Your regulars, one tap'],['weight','--fat',GI.scale,'Weight','Morning weigh-in'],
-    ['workout','--good',GI.dumbbell,w.t,w.s],['checkin','--over',GI.heart,'Check-in','Energy, hunger, sleep, notes']];
+    ['workout','--good',GI.dumbbell,w.t,w.s],['checkin','--over',GI.heart,'Check-in','Energy, hunger, sleep, notes'],['ideas','--good',GI.target,'Meals that fit','Sized to your macros left'],['prep','--carb',GI.list,'Meal prep','This week\'s high-protein recipes']];
   sheet(`<div><div class="eyebrow">${niceDate(S.day,{weekday:'long',month:'short',day:'numeric'})}</div><h3>What do you want to log?</h3></div>
     <div class="addgrid">${tiles.map(([k,c,ic,t,sub])=>`<button type="button" class="addt" data-add="${k}" style="--c:var(${c})"><span class="gi" style="--c:var(${c})">${ic}</span><span><b>${t}</b><br><span>${sub}</span></span></button>`).join('')}</div>`,{nofocus:true});
   $('sheetRoot').querySelector('.addgrid').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;const k=b.dataset.add;
@@ -2428,7 +2601,9 @@ function openAdd(){
     if(k==='meal')setView('foods');
     if(k==='weight')openWeigh();
     if(k==='workout'){if(S.active){setView('train');return}const d=devList().find(x=>x.date===todayKey()&&!S.workouts.some(w=>w.devId===x.id));if(d){setView('train');pickLiftFor(d)}else openStart()}
-    if(k==='checkin'){setView('today');openPage('checkin')}};
+    if(k==='checkin'){setView('today');openPage('checkin')}
+    if(k==='ideas'){setView('today');openPage('ideas')}
+    if(k==='prep'){setView('today');openPage('prep')}};
 }
 function openStart(){
   sheet(`<div><div class="eyebrow">Start a workout</div><h3>What are you training?</h3></div>
@@ -2456,7 +2631,7 @@ function coachItems(){
   const items=[
     {id:'w',t:'Weigh in',s:S.weights[k]?`${r1(S.weights[k])} lb`:'Takes 5 seconds',done:S.weights[k]!=null,go:openWeigh,cta:'Log'},
     {id:'m',t:'Log your meals',s:`${['breakfast','lunch','dinner'].filter(m=>meals.has(m)).length} of 3 main meals`,done:['breakfast','lunch','dinner'].every(m=>meals.has(m)),go:()=>{const n=['breakfast','lunch','dinner'].find(m=>!meals.has(m));if(n)S.mealSel=n;renderToday();document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('foodIn').focus({preventScroll:true}),250)},cta:'Add'},
-    {id:'p',t:'Hit your protein',s:`${r0(t.p)} of ${r0(g.p)} g`,done:t.p>=g.p*0.9,go:()=>{document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'})},cta:'Add'},
+    {id:'p',t:'Hit your protein',s:`${r0(t.p)} of ${r0(g.p)} g · see meals that fit`,done:t.p>=g.p*0.9,go:()=>openPage('ideas'),cta:'Ideas'},
     {id:'t',t:'Train',s:wk?'Done, nice work':'Or take a rest day',done:wk,go:()=>setView('train'),cta:'Go'},
     {id:'c',t:'Daily check-in',s:'How you felt, 20 seconds',done:!!S.checkins[k],go:()=>openPage('checkin'),cta:'Open'}];
   return {mode:'day',items};
@@ -2477,7 +2652,7 @@ function renderTodayRows(){
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
   el.innerHTML=grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:hs||((cfg.st&&(cfg.st.whoop||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
-    +grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
+    +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
 const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like “2 eggs and toast”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
   train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
@@ -3020,7 +3195,7 @@ function hv(k){
   const m=S.health[k]||{},dv=(S.dev&&S.dev.days[k])||{},w=dv.w||{},g=dv.g||{};
   const f=(...xs)=>xs.find(x=>x!=null&&x!=='');
   return {recovery:f(m.recovery,w.recovery),sleep:f(m.sleep,w.sleepH,g.sleepH),sleepScore:f(m.sleepScore,w.sleepPerf,g.sleepScore),hrv:f(m.hrv,w.hrv,g.hrv),rhr:f(m.rhr,w.rhr,g.rhr),
-    strain:f(m.strain,w.strain),bodyBattery:f(m.bodyBattery,g.bodyBattery),steps:f(m.steps,g.steps),active:f(m.active,g.activeKcal),
+    strain:f(m.strain,w.strain),bodyBattery:f(m.bodyBattery,g.bodyBattery),steps:f(m.steps,w.steps,g.steps),active:f(m.active,g.activeKcal),
     workouts:m.workouts,src:[w.recovery!=null||w.sleepH!=null?'WHOOP':'',Object.keys(g).length?'Garmin':'',Object.keys(m).some(x=>x!=='t'&&x!=='workouts')?'manual':''].filter(Boolean),
     extra:{deep:w.deepH,rem:w.remH,resp:w.respRate,spo2:w.spo2,stress:g.stress,hrvStatus:g.hrvStatus,eff:w.sleepEff}};
 }
