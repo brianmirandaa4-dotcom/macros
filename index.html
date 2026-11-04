@@ -2415,7 +2415,7 @@ $('justAdded').addEventListener('click',e=>{const b=e.target.closest('[data-edit
 /* ================= DEVICE SYNC (WHOOP + Garmin via your sync server) ================= */
 const SYK='macros.sync.v1';
 // The app owner's sync server. Once set, everyone using this link gets one-tap "Connect WHOOP".
-const SYNC_URL='';
+const SYNC_URL='https://macros-sync.brianmirandaa4.workers.dev';
 async function ensureSync(){
   const c=syncCfg();if(c.uid&&c.url)return c;
   const url=(c.url||SYNC_URL).replace(/\/+$/,'');if(!url)throw new Error('No sync server yet.');
