@@ -22,13 +22,13 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     try {
       const p = url.pathname.replace(/\/+$/, '') || '/';
-      if (p === '/') return text('MACROS sync server is running.', 200, cors);
+      if (p === '/') return text('Syncope sync server is running.', 200, cors);
       if (p === '/api/register' && req.method === 'POST') return json(await register(env), 200, cors);
       if (p === '/whoop/connect') return whoopConnect(url, env);
       if (p === '/whoop/callback') return whoopCallback(url, env);
 
       const user = await authUser(req, env);
-      if (!user) return json({ error: 'Not signed in to the sync server. Reconnect in MACROS.' }, 401, cors);
+      if (!user) return json({ error: 'Not signed in to the sync server. Reconnect in Syncope.' }, 401, cors);
 
       if (p === '/api/status') return json(status(user), 200, cors);
       if (p === '/api/whoop-link' && req.method === 'POST') { const lnk = rand(16); await env.MACROS_KV.put('lnk:' + lnk, user.id, { expirationTtl: 600 }); return json({ url: url.origin + '/whoop/connect?l=' + lnk }, 200, cors); }
@@ -103,7 +103,7 @@ function corsHeaders(req, env) {
 }
 const json = (o, s = 200, h = {}) => new Response(JSON.stringify(o), { status: s, headers: { ...h, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const text = (t, s = 200, h = {}) => new Response(t, { status: s, headers: { ...h, 'Content-Type': 'text/plain' } });
-const page = (title, body, appUrl) => new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><body style="background:#0B0C10;color:#ECEEF4;font:16px/1.5 system-ui;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center"><div style="max-width:420px"><h1 style="font-size:26px">${title}</h1><p style="color:#8C92A4">${body}</p>${appUrl ? `<p><a href="${appUrl}" style="display:inline-block;background:#C7B6FF;color:#14101F;padding:14px 22px;border-radius:14px;font-weight:800;text-decoration:none">Back to MACROS</a></p>` : ''}</div></body>`, { headers: { 'Content-Type': 'text/html;charset=utf-8' } });
+const page = (title, body, appUrl) => new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><body style="background:#0B0C10;color:#ECEEF4;font:16px/1.5 system-ui;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center"><div style="max-width:420px"><h1 style="font-size:26px">${title}</h1><p style="color:#8C92A4">${body}</p>${appUrl ? `<p><a href="${appUrl}" style="display:inline-block;background:#C7B6FF;color:#14101F;padding:14px 22px;border-radius:14px;font-weight:800;text-decoration:none">Back to Syncope</a></p>` : ''}</div></body>`, { headers: { 'Content-Type': 'text/html;charset=utf-8' } });
 const rand = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 async function sha(s) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join(''); }
 const isoDate = (d) => d.toISOString().slice(0, 10);
@@ -131,7 +131,7 @@ function status(user) {
 async function whoopConnect(url, env) {
   const lnk = url.searchParams.get('l') || '';
   const uid = lnk && await env.MACROS_KV.get('lnk:' + lnk);
-  if (!uid) return page('Link expired', 'Open MACROS and tap Connect WHOOP again.', env.APP_URL);
+  if (!uid) return page('Link expired', 'Open Syncope and tap Connect WHOOP again.', env.APP_URL);
   await env.MACROS_KV.delete('lnk:' + lnk);
   if (!env.WHOOP_CLIENT_ID) return page('WHOOP not set up yet', 'Add WHOOP_CLIENT_ID and WHOOP_CLIENT_SECRET to this worker first.', env.APP_URL);
   const state = rand(16);
@@ -142,9 +142,9 @@ async function whoopConnect(url, env) {
 }
 async function whoopCallback(url, env) {
   const state = url.searchParams.get('state') || '', code = url.searchParams.get('code');
-  if (url.searchParams.get('error')) return page('WHOOP not connected', 'You cancelled or WHOOP declined the request. You can try again from MACROS.', env.APP_URL);
+  if (url.searchParams.get('error')) return page('WHOOP not connected', 'You cancelled or WHOOP declined the request. You can try again from Syncope.', env.APP_URL);
   const uid = await env.MACROS_KV.get('state:' + state);
-  if (!uid || !code) return page('Link expired', 'Open MACROS and tap Connect WHOOP again.', env.APP_URL);
+  if (!uid || !code) return page('Link expired', 'Open Syncope and tap Connect WHOOP again.', env.APP_URL);
   await env.MACROS_KV.delete('state:' + state);
   const r = await fetch(WHOOP_TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: url.origin + '/whoop/callback', client_id: env.WHOOP_CLIENT_ID, client_secret: env.WHOOP_CLIENT_SECRET }) });
@@ -153,14 +153,14 @@ async function whoopCallback(url, env) {
   const user = await env.MACROS_KV.get('user:' + uid, 'json');
   user.whoop = { access: t.access_token, refresh: t.refresh_token, exp: Date.now() + (t.expires_in || 3600) * 1000, since: Date.now() };
   await saveUser(env, user);
-  return page('WHOOP connected', 'Your recovery, sleep, strain and workouts will now flow into MACROS automatically.', env.APP_URL);
+  return page('WHOOP connected', 'Your recovery, sleep, strain and workouts will now flow into Syncope automatically.', env.APP_URL);
 }
 async function whoopAccess(user, env) {
   const w = user.whoop;
   if (w.access && w.exp - Date.now() > 120000) return w.access;
   const r = await fetch(WHOOP_TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: w.refresh, client_id: env.WHOOP_CLIENT_ID, client_secret: env.WHOOP_CLIENT_SECRET, scope: 'offline' }) });
-  if (!r.ok) { throw new Error('WHOOP sign-in expired. Reconnect WHOOP in MACROS.'); }
+  if (!r.ok) { throw new Error('WHOOP sign-in expired. Reconnect WHOOP in Syncope.'); }
   const t = await r.json();
   w.access = t.access_token; if (t.refresh_token) w.refresh = t.refresh_token; w.exp = Date.now() + (t.expires_in || 3600) * 1000;
   await saveUser(env, user);
@@ -241,7 +241,7 @@ async function garminToken(user, env, force) {
   const g = user.garmin;
   if (!force && g.token && g.tokenExp - Date.now() > 3600000) return g.token;
   const r = await fetch(GARMIN_API + GARMIN_TOKEN_PATH, { method: 'POST', headers: { Accept: '*/*', Authorization: 'ApiKey ' + g.key } });
-  if (!r.ok) throw new Error('Garmin key was rejected (' + r.status + '). Create a new Personal API key and paste it in MACROS.');
+  if (!r.ok) throw new Error('Garmin key was rejected (' + r.status + '). Create a new Personal API key and paste it in Syncope.');
   const tok = (await r.text()).trim();
   let exp = Date.now() + 23 * 3600000;
   try { const p = JSON.parse(atob(tok.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))); if (p.exp) exp = p.exp * 1000; } catch (e) {}

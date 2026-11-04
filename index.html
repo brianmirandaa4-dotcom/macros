@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0B0C10">
 <meta name="color-scheme" content="dark">
-<title>MACROS</title>
+<title>Syncope</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MACROS">
+<meta name="apple-mobile-web-app-title" content="Syncope">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -552,13 +552,18 @@ button:active{transform:translateY(0) scale(.98)}
 .conn-chip{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 8px;justify-self:end}
 .conn-chip.on{color:var(--good);border-color:color-mix(in srgb,var(--good) 50%,transparent)}
 .hgrid .hm{animation:rise .3s ease both}
+.brand{letter-spacing:-.01em;font-weight:800;text-transform:none}
+.brand .logo{width:30px;height:30px;border-radius:8px;flex:none;display:block}
+.hero-logo{width:104px;height:104px;border-radius:24px;overflow:hidden;box-shadow:0 18px 50px rgba(201,242,107,.18);animation:pop .7s cubic-bezier(.2,.8,.2,1) both}
+.hero-logo svg{width:100%;height:100%;display:block}
+@keyframes pop{from{transform:scale(.8);opacity:0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
 <header class="top"><div class="wrap">
-  <div class="brand"><i><b></b><b></b><b></b></i>MACROS</div>
+  <div class="brand"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1E3A3B"/><circle cx="50" cy="50" r="29.6" fill="none" stroke="#C9F26B" stroke-width="4.6"/><path d="M50 16.5V25.5M50 74.5V83.5M16.5 50H29M71 50H83.5" stroke="#C9F26B" stroke-width="4.6" stroke-linecap="round"/><path d="M30 50H40L43.5 41L47.5 59.5L50 50" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50L52.5 41L56.5 58.5L59 50H70" fill="none" stroke="#A0A8AA" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="4.4" fill="#C9F26B"/></svg><span>syncope</span></div>
   <nav class="tabs" aria-label="Views" id="tabsTop"></nav>
   <div class="saved" id="saved">Saved on this device</div>
   <button class="avatar" id="profBtn" aria-label="Profile"><span>ME</span></button>
@@ -785,7 +790,7 @@ button:active{transform:translateY(0) scale(.98)}
       <ol class="phases">
         <li style="--c:var(--fat)"><b>Phase 1 · Trim fat, hold carbs.</b> Early on the deficit comes mostly out of fat while carbs stay put to fuel training. Fat starts near 30% of calories and comes down to a floor of 20% (never under 0.25 g per lb). The ACSM sports nutrition position statement advises athletes against chronic intakes below 20%.</li>
         <li style="--c:var(--pro)"><b>Protein rises the whole time.</b> The leaner you get and the bigger the deficit, the more protein protects muscle. With body fat % entered, protein goes from 2.3 to 3.1 g per kg of lean mass (Helms, Aragon &amp; Fitschen, JISSN 2014). Without it, 1.8 to 2.4 g per kg of body weight (Roberts et al., 2020). Carbs are held steady while protein climbs.</li>
-        <li style="--c:var(--carb)"><b>Phase 2 · Lower carbs.</b> Once fat hits its floor, every further cut comes from carbs. MACROS warns if carbs fall under 2 g per kg, the low end for lifters (Roberts et al.). Lean or past week 8, a weekly <i>refeed day</i> is suggested: one training day with extra carbs, bringing that day to about maintenance.</li>
+        <li style="--c:var(--carb)"><b>Phase 2 · Lower carbs.</b> Once fat hits its floor, every further cut comes from carbs. Syncope warns if carbs fall under 2 g per kg, the low end for lifters (Roberts et al.). Lean or past week 8, a weekly <i>refeed day</i> is suggested: one training day with extra carbs, bringing that day to about maintenance.</li>
         <li style="--c:var(--good)"><b>Diet breaks and recovery.</b> An optional week at maintenance every 8 weeks gives you a mental and hormonal reset; research on structured breaks (e.g. the MATADOR trial) found they don't hurt fat loss. After the cut, 4 recovery weeks step calories back up. Fat climbs back toward 28%, carbs rise, and protein eases to 2.2 g per kg of lean mass.</li>
         <li style="--c:var(--muted)"><b>Pace.</b> Aim for 0.5–1% of body weight lost per week to keep muscle (Helms 2014). Slower, around 0.5%, is better the leaner you are. Bulks aim for 0.25–0.5% gained per week with protein around 1.8 g per kg (Iraki et al., 2019).</li>
       </ol>
@@ -826,7 +831,7 @@ button:active{transform:translateY(0) scale(.98)}
 
     <div class="card" style="display:flex;flex-direction:column;gap:14px">
       <div><div class="eyebrow">Photo scanning</div><h2>Scan meals with Claude</h2></div>
-      <p class="note">Photo scanning sends the picture to Claude using your own Anthropic API key, so it needs an internet connection. Everything else in MACROS works offline. Get a key at console.anthropic.com → API Keys, and set a monthly spend limit there. A scan typically costs under a cent. Your key is stored only in this browser and is never included in backups.</p>
+      <p class="note">Photo scanning sends the picture to Claude using your own Anthropic API key, so it needs an internet connection. Everything else in Syncope works offline. Get a key at console.anthropic.com → API Keys, and set a monthly spend limit there. A scan typically costs under a cent. Your key is stored only in this browser and is never included in backups.</p>
       <div class="grid2">
         <div class="field"><label for="aKey">API key</label><input id="aKey" type="password" autocomplete="off" placeholder="sk-ant-..."></div>
         <div class="field"><label for="aModel">Model</label><select id="aModel"><option value="claude-sonnet-5-5" selected>Claude Sonnet 5.5 (best balance)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (fastest, cheapest)</option><option value="claude-opus-5-5">Claude Opus 5.5 (most careful)</option></select></div>
@@ -1994,7 +1999,7 @@ function openPhoto(file){
   wireChips('phMeal',m=>meal=m);
   $('phCancel').onclick=closeSheet;
   $('phStatus').textContent='Loading photo…';
-  shrinkImage(file).then(u=>{dataUrl=u;$('phImg').src=u;$('phStatus').textContent='';$('phGo').disabled=false}).catch(()=>{$('phStatus').className='status err';$('phStatus').innerHTML='This browser couldn\'t open that photo. Open MACROS in Safari or Chrome (not the in-app preview), or take a screenshot of the photo and scan the screenshot.'});
+  shrinkImage(file).then(u=>{dataUrl=u;$('phImg').src=u;$('phStatus').textContent='';$('phGo').disabled=false}).catch(()=>{$('phStatus').className='status err';$('phStatus').innerHTML='This browser couldn\'t open that photo. Open Syncope in Safari or Chrome (not the in-app preview), or take a screenshot of the photo and scan the screenshot.'});
   const drawItems=()=>{
     const on=items.filter(i=>i.on),t=on.reduce((a,i)=>({k:a.k+i.k*i.sc,p:a.p+i.p*i.sc,c:a.c+i.c*i.sc,f:a.f+i.f*i.sc}),{k:0,p:0,c:0,f:0});
     $('phBody').innerHTML=items.length?`<ul class="scan-list">${items.map((it,i)=>`<li class="${it.on?'':'off'}"><label class="check"><input type="checkbox" data-on="${i}" ${it.on?'checked':''}></label>
@@ -2024,12 +2029,12 @@ document.addEventListener('paste',e=>{if(S.view!=='today')return;const f=[...(e.
 
 /* data */
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-function backup(){S.lastBackup=Date.now();save();download(`macros-backup-${todayKey()}.json`,JSON.stringify({app:'MACROS',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
+function backup(){S.lastBackup=Date.now();save();download(`syncope-backup-${todayKey()}.json`,JSON.stringify({app:'Syncope',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
 $('exportJson').onclick=backup; $('backupNow').onclick=backup;
 $('exportCsv').onclick=()=>{
   const rows=[['date','meal','food','amount','grams','kcal','protein_g','carbs_g','fat_g']];
   Object.keys(S.days).sort().forEach(k=>(S.days[k]||[]).forEach(e=>rows.push([k,e.meal||'',e.n,e.a,e.g||'',e.k,e.p,e.c,e.f])));
-  download(`macros-${todayKey()}.csv`,rows.map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\n'),'text/csv');
+  download(`syncope-${todayKey()}.csv`,rows.map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(',')).join('\n'),'text/csv');
 };
 $('importJson').onchange=e=>{
   const f=e.target.files[0];if(!f)return;const rd=new FileReader();
@@ -2041,7 +2046,7 @@ $('importJson').onchange=e=>{
       $('rReplace').onclick=()=>{S.days=j.days;if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];if(j.templates){S.templates=j.templates;S.tplSeeded=true}S.health=j.health||{};renderPlan.filled=false;done()};
       $('rMerge').onclick=()=>{Object.entries(j.days).forEach(([k,l])=>{const have=new Set((S.days[k]||[]).map(x=>x.id));S.days[k]=[...(S.days[k]||[]),...(l||[]).filter(x=>!have.has(x.id))]});const names=new Set(S.custom.map(c=>c.name.toLowerCase()));S.custom=[...S.custom,...(j.custom||[]).filter(c=>!names.has(c.name.toLowerCase()))];S.weights={...(j.weights||{}),...S.weights};if(!S.plan&&j.plan)S.plan=j.plan;const mn=new Set(S.meals.map(m=>m.name.toLowerCase()));S.meals=[...S.meals,...(j.meals||[]).filter(m=>!mn.has(m.name.toLowerCase()))];S.checkins={...(j.checkins||{}),...S.checkins};const wid=new Set(S.workouts.map(w=>w.id));S.workouts=[...S.workouts,...(j.workouts||[]).filter(w=>!wid.has(w.id))].sort((a,b)=>b.end-a.end);S.health={...(j.health||{}),...S.health};if(!S.profile.name&&j.profile)S.profile=j.profile;done()};
       function done(){buildFoods();save();closeSheet();renderAll();toast('Backup restored')}
-    }catch(err){$('dataStatus').className='status err';$('dataStatus').textContent='That file isn\'t a MACROS backup. Choose the .json file from “Download backup”.'}
+    }catch(err){$('dataStatus').className='status err';$('dataStatus').textContent='That file isn\'t a Syncope backup. Choose the .json file from “Download backup”.'}
     e.target.value=''};
   rd.readAsText(f);
 };
@@ -2067,7 +2072,7 @@ function openProfile(){
   sheet(`<div style="display:flex;gap:14px;align-items:center"><div class="avatar" style="width:56px;height:56px"><span style="font-size:18px">${esc(initials(S.profile.name))}</span></div><div><div class="eyebrow">Profile</div><h3>${esc(S.profile.name||'Your profile')}</h3></div></div>
     <div class="field"><label for="prN">Name</label><input id="prN" type="text" value="${esc(S.profile.name||'')}" placeholder="Your name"></div>
     <div class="live"><div style="--c:var(--kcal)"><b>${nd}</b><span>days logged</span></div><div style="--c:var(--pro)"><b>${nw}</b><span>workouts</span></div><div style="--c:var(--fat)"><b>${lw?r1(lw.w):'—'}</b><span>latest lb</span></div><div style="--c:var(--good)"><b>${S.plan?(S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Hold'):'—'}</b><span>plan</span></div></div>
-    <p class="note">Your profile and everything you log live only on this device. Nobody else who opens the MACROS link can see them.</p>
+    <p class="note">Your profile and everything you log live only on this device. Nobody else who opens the Syncope link can see them.</p>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="prRedo">Redo setup</button><div class="row"><button class="ghost" id="prPlan">Body stats &amp; plan</button><button class="primary" id="prSave">Save</button></div></div>`);
   $('prSave').onclick=()=>{S.profile.name=$('prN').value.trim();save();renderProfileBtn();closeSheet();renderAll()};
   $('prPlan').onclick=()=>{closeSheet();setView('plan')};
@@ -2086,9 +2091,9 @@ function closeOnb(){$('onb').hidden=true;document.documentElement.style.overflow
 function obVal(id){const e=$(id);return e?e.value:''}
 function drawOnb(){
   const st=OB_STEPS[ob.i],d=ob.d,prog=Math.min(6,Math.max(0,ob.i));
-  const top=`<div class="onb-top"><div class="brand" style="font-size:16px"><i><b></b><b></b><b></b></i></div><div class="onb-prog">${[1,2,3,4,5,6].map(n=>`<i class="${n<=prog?'on':''}"></i>`).join('')}</div>${st!=='tour'?'<button class="onb-skip" id="obSkip">Skip</button>':''}</div>`;
+  const top=`<div class="onb-top"><div class="brand" style="font-size:16px"><svg class="logo" style="width:28px;height:28px" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1E3A3B"/><circle cx="50" cy="50" r="29.6" fill="none" stroke="#C9F26B" stroke-width="4.6"/><path d="M50 16.5V25.5M50 74.5V83.5M16.5 50H29M71 50H83.5" stroke="#C9F26B" stroke-width="4.6" stroke-linecap="round"/><path d="M30 50H40L43.5 41L47.5 59.5L50 50" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50L52.5 41L56.5 58.5L59 50H70" fill="none" stroke="#A0A8AA" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="4.4" fill="#C9F26B"/></svg></div><div class="onb-prog">${[1,2,3,4,5,6].map(n=>`<i class="${n<=prog?'on':''}"></i>`).join('')}</div>${st!=='tour'?'<button class="onb-skip" id="obSkip">Skip</button>':''}</div>`;
   let body='',next='Continue',back=ob.i>0&&st!=='tour';
-  if(st==='welcome'){body=`<div class="hero-bars"><b></b><b></b><b></b></div><h1>Eat with a <em>plan</em>, not a guess.</h1><p class="lede">MACROS turns your body stats and goal into daily calorie and macro targets that adjust every week, then helps you log food, lifts and how you feel.</p><p class="lede" style="font-size:14px">Takes about a minute. Everything stays on this phone.</p>`;next="Let's set you up"}
+  if(st==='welcome'){body=`<div class="hero-logo"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1E3A3B"/><circle cx="50" cy="50" r="29.6" fill="none" stroke="#C9F26B" stroke-width="4.6"/><path d="M50 16.5V25.5M50 74.5V83.5M16.5 50H29M71 50H83.5" stroke="#C9F26B" stroke-width="4.6" stroke-linecap="round"/><path d="M30 50H40L43.5 41L47.5 59.5L50 50" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50L52.5 41L56.5 58.5L59 50H70" fill="none" stroke="#A0A8AA" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="4.4" fill="#C9F26B"/></svg></div><div class="eyebrow" style="letter-spacing:.2em">syncope</div><h1>Eat with a <em>plan</em>, not a guess.</h1><p class="lede">Syncope turns your body stats and goal into daily calorie and macro targets that adjust every week, then helps you log food, lifts and how you feel.</p><p class="lede" style="font-size:14px">Takes about a minute. Everything stays on this phone.</p>`;next="Let's set you up"}
   if(st==='name'){body=`<h1>What should we call you?</h1><input class="big-in" id="obName" type="text" autocomplete="given-name" placeholder="Your name" value="${esc(d.name)}">`}
   if(st==='body'){body=`<h1>Your body today</h1><p class="lede">This sets your maintenance calories. Body fat % is optional but makes the math sharper.</p>
     <div class="choice" style="grid-template-columns:1fr 1fr">${[['m','Male'],['f','Female']].map(([v,l])=>`<button type="button" data-sex="${v}" aria-pressed="${d.sex===v}"><i></i><div><b>${l}</b></div></button>`).join('')}</div>
@@ -2099,7 +2104,7 @@ function drawOnb(){
   if(st==='activity'){body=`<h1>How active are you?</h1><p class="lede">Count workouts and how much you move at work.</p><div class="choice">${[['1.2','Mostly sitting','Desk job, little exercise'],['1.375','Lightly active','Train 1–3 days a week'],['1.55','Active','Train 3–5 days a week'],['1.725','Very active','Train hard 6–7 days a week'],['1.9','Athlete','Twice-a-day training or a physical job']].map(([v,l,s])=>`<button type="button" data-act="${v}" aria-pressed="${d.act===v}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='goal'){body=`<h1>What's the goal?</h1><div class="choice">${[['cut','Cut','Lose fat and keep muscle','var(--fat)'],['maintain','Maintain','Hold your weight, recomp slowly','var(--good)'],['bulk','Bulk','Build muscle with a small surplus','var(--pro)']].map(([v,l,s,c])=>`<button type="button" data-goal="${v}" aria-pressed="${d.type===v}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>
     ${d.type==='maintain'?'':`<div class="grid2"><div class="field"><label for="obLbs">Pounds to ${d.type==='bulk'?'gain':'lose'}</label><input id="obLbs" type="number" inputmode="decimal" value="${esc(d.lbs)}"></div><div class="field"><label for="obDur">Over</label><div class="dur-row"><input id="obDur" type="number" inputmode="numeric" value="${esc(d.dur)}" aria-label="Duration"><select id="obUnit" aria-label="Unit"><option value="months" ${d.unit==='months'?'selected':''}>months</option><option value="weeks" ${d.unit==='weeks'?'selected':''}>weeks</option></select></div></div></div>`}`}
-  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. MACROS uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
+  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. Syncope uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='connect'){
     const ws=(d.wear||[]).filter(x=>x!=='none'),srv=!!(SYNC_URL||syncCfg().url),st2=syncCfg().st||{};
     const row=(id,name,c,desc,btn,done)=>`<div class="conn-row"><div class="conn-logo" style="--c:${c}">${name[0]}</div><div class="conn-t"><b>${name}</b><span>${desc}</span></div>${done?'<span class="conn-chip on">Connected</span>':`<button class="pill-btn" id="${id}">${btn}</button>`}</div>`;
@@ -2122,8 +2127,8 @@ function drawOnb(){
   }
   if(st==='tour'){body=`<h1>You're set${d.name?', '+esc(d.name.split(' ')[0]):''}.</h1><p class="lede">Three things to know:</p><div class="tour">
     <div style="--c:var(--kcal)">${IC.today}<div><b>Today: log food fast</b><span>Type “3 eggs, 2 slices toast”, scan a photo, or tap a saved meal. The ring shows what's left.</span></div></div>
-    <div style="--c:var(--pro)">${IC.train}<div><b>Train: log your lifts</b><span>Start a template, enter weight × reps, and MACROS remembers last time and flags new PRs.</span></div></div>
-    <div style="--c:var(--good)">${IC.plan}<div><b>Plan: weekly targets</b><span>Your calories and macros update every week. Log weigh-ins and check-ins to see if you're on track.</span></div></div></div>`;next='Open MACROS'}
+    <div style="--c:var(--pro)">${IC.train}<div><b>Train: log your lifts</b><span>Start a template, enter weight × reps, and Syncope remembers last time and flags new PRs.</span></div></div>
+    <div style="--c:var(--good)">${IC.plan}<div><b>Plan: weekly targets</b><span>Your calories and macros update every week. Log weigh-ins and check-ins to see if you're on track.</span></div></div></div>`;next='Open Syncope'}
   $('onbIn').innerHTML=top+`<div class="step">${body}</div><div class="onb-foot">${back?'<button class="ghost" id="obBack">Back</button>':''}<button class="primary" id="obNext">${next}</button></div>`;
   const sk=$('obSkip');if(sk)sk.onclick=()=>{S.profile.onboarded=true;if(obVal('obName'))S.profile.name=obVal('obName').trim();save();renderProfileBtn();closeOnb();renderAll()};
   if($('obBack'))$('obBack').onclick=()=>{obRead();ob.i--;drawOnb()};
@@ -2358,7 +2363,7 @@ async function syncHealth(){
   openHealthPaste();
 }
 function openHealthPaste(){
-  sheet(`<div><div class="eyebrow">Health data</div><h3>Paste from your Shortcut</h3><p class="note">Run your “MACROS Sync” shortcut, then paste here. Or type numbers yourself, one per line.</p></div>
+  sheet(`<div><div class="eyebrow">Health data</div><h3>Paste from your Shortcut</h3><p class="note">Run your “Syncope Sync” shortcut, then paste here. Or type numbers yourself, one per line.</p></div>
     <textarea id="hpT" rows="7" placeholder="steps=8432&#10;active=612&#10;rhr=54&#10;hrv=68&#10;sleep=7.4&#10;recovery=72"></textarea>
     <div class="status" id="hpErr"></div>
     <div class="row" style="justify-content:space-between"><button class="link" id="hpHow">How to set up the Shortcut</button><div class="row"><button class="ghost" id="hpCancel">Cancel</button><button class="primary" id="hpOk">Add</button></div></div>`);
@@ -2376,15 +2381,15 @@ function openHealthEdit(){
   $('heOk').onclick=()=>{const n={};H_FIELDS.forEach(([k])=>{const v=$('he_'+k).value;if(v!=='')n[k]=+v});const wo=$('he_wo').value.trim();if(wo)n.workouts=wo;S.health[S.day]={...n,t:Date.now()};if(!Object.keys(n).length)delete S.health[S.day];save();closeSheet();renderAll();toast('Saved')};
 }
 function openHealthGuide(){
-  sheet(`<div><div class="eyebrow">One-time setup · about 5 minutes</div><h3>Connect WHOOP or Garmin</h3><p class="note">Web apps can't read Apple Health directly, but the free Shortcuts app on your iPhone can. Your WHOOP or Garmin app already sends its data to Apple Health; the Shortcut collects it and MACROS pastes it in.</p></div>
+  sheet(`<div><div class="eyebrow">One-time setup · about 5 minutes</div><h3>Connect WHOOP or Garmin</h3><p class="note">Web apps can't read Apple Health directly, but the free Shortcuts app on your iPhone can. Your WHOOP or Garmin app already sends its data to Apple Health; the Shortcut collects it and Syncope pastes it in.</p></div>
     <ol class="steps-guide">
       <li><b>Turn on the Health connection.</b> In the WHOOP app, look in settings under Integrations for Apple Health. In Garmin Connect, look under Settings → Connected Apps → Apple Health. Allow all categories.</li>
-      <li><b>Open Shortcuts → + → name it “MACROS Sync”.</b></li>
+      <li><b>Open Shortcuts → + → name it “Syncope Sync”.</b></li>
       <li><b>Add “Find Health Samples”</b> for each item below, filtered to <i>Start Date is today</i> (sleep: <i>in the last 1 day</i>). For totals add <b>Calculate Statistics → Sum</b>; for single readings sort by Start Date, Latest First, Limit 1.
         <br>Steps (Sum) · Active Energy (Sum) · Resting Heart Rate (latest) · Heart Rate Variability (latest) · Sleep Analysis, value Asleep (Sum of durations, in hours) · Weight (latest)</li>
       <li><b>Add a “Text” action</b> and insert each result after its label:</li>
     </ol>
-    <div class="codebox">MACROS-HEALTH
+    <div class="codebox">SYNCOPE-HEALTH
 date=[Current Date, format yyyy-MM-dd]
 steps=[Steps]
 active=[Active Energy]
@@ -2394,7 +2399,7 @@ sleep=[Sleep hours]
 weight=[Weight]</div>
     <ol class="steps-guide" start="5">
       <li><b>Add “Copy to Clipboard”.</b> Run it once and allow Health access.</li>
-      <li><b>Each morning:</b> run the shortcut (or set Automation → Time of Day to run it), open MACROS, tap <b>Sync</b>.</li>
+      <li><b>Each morning:</b> run the shortcut (or set Automation → Time of Day to run it), open Syncope, tap <b>Sync</b>.</li>
     </ol>
     <p class="note">What comes through: WHOOP sends sleep, resting heart rate, active energy and workouts, but not HRV or Recovery. Garmin sends sleep, steps, active energy, workouts and weight, but not HRV or resting HR. Apple Watch sends all of it. Type anything missing, like WHOOP Recovery, with Edit.</p>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="hgOk">Got it</button></div>`);
@@ -2469,7 +2474,7 @@ function setConnStatus(t){const e=$('connSyncing');if(e)e.textContent=t}
 function renderConn(){
   const el=$('connBody');if(!el)return;const c=syncCfg();
   if((!c.url||!c.uid)&&!SYNC_URL){
-    el.innerHTML=`<p class="note">Pull WHOOP recovery, HRV, strain and sleep plus Garmin steps, Body Battery, sleep score and workouts into MACROS automatically. It runs on a free server you own (Cloudflare), about 10 minutes to set up once.</p>
+    el.innerHTML=`<p class="note">Pull WHOOP recovery, HRV, strain and sleep plus Garmin steps, Body Battery, sleep score and workouts into Syncope automatically. It runs on a free server you own (Cloudflare), about 10 minutes to set up once.</p>
       <div class="field"><label for="cnUrl">Your sync server address</label><input id="cnUrl" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="https://macros-sync.yourname.workers.dev" value="${esc(c.url||'')}"></div>
       <div class="row"><button class="primary" id="cnGo">Connect server</button><button class="ghost" id="cnHow">How to set it up</button><span class="status" id="cnErr"></span></div>`;
     $('cnHow').onclick=openSyncGuide;
@@ -2501,7 +2506,7 @@ function openGarminKey(){
 }
 function openSyncGuide(){
   const app=location.origin+location.pathname;
-  sheet(`<div><div class="eyebrow">One-time setup · about 10 minutes · free</div><h3>Your own sync server</h3><p class="note">MACROS lives on your phone, so it needs a tiny server of yours to sign in to WHOOP and Garmin and fetch your data while you sleep. Cloudflare runs it free.</p></div>
+  sheet(`<div><div class="eyebrow">One-time setup · about 10 minutes · free</div><h3>Your own sync server</h3><p class="note">Syncope lives on your phone, so it needs a tiny server of yours to sign in to WHOOP and Garmin and fetch your data while you sleep. Cloudflare runs it free.</p></div>
     <ol class="steps-guide">
       <li><b>Create the worker.</b> Sign up at dash.cloudflare.com → Workers &amp; Pages → Create → Start with Hello World → name it <b>macros-sync</b> → Deploy → Edit code. Replace everything with the code from <span class="num">sync-server/worker.js</span> in your macros GitHub repository, then Deploy.</li>
       <li><b>Add storage.</b> Storage &amp; Databases → KV → Create namespace <b>MACROS_KV</b>. Then your worker → Settings → Bindings → Add → KV namespace, variable name <b>MACROS_KV</b>.</li>
@@ -2510,7 +2515,7 @@ function openSyncGuide(){
       <li><b>Turn on auto-refresh.</b> Worker → Settings → Trigger events → Cron → <span class="num">17 */6 * * *</span> (every 6 hours).</li>
       <li><b>Connect.</b> Paste your worker address above, tap Connect server, then Connect WHOOP and Add key for Garmin.</li>
     </ol>
-    <p class="note">After that, MACROS syncs whenever you open it. Your WHOOP and Garmin sign-ins are stored only on your Cloudflare account.</p>
+    <p class="note">After that, Syncope syncs whenever you open it. Your WHOOP and Garmin sign-ins are stored only on your Cloudflare account.</p>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="sgOk">Got it</button></div>`);
   $('sgOk').onclick=closeSheet;
 }
@@ -2523,7 +2528,7 @@ function renderDevWorkouts(){
 $('devWk')&&$('devWk').addEventListener('click',e=>{const b=e.target.closest('[data-devwk]');if(!b)return;const w=S.dev.workouts.find(x=>x.id===b.dataset.devwk);if(!w)return;
   sheet(`<div><div class="eyebrow">${esc(w.src)} · ${niceDate(w.date,{weekday:'long',month:'short',day:'numeric'})}</div><h3>${esc(w.name)}</h3></div>
     <div class="live"><div style="--c:var(--pro)"><b>${w.min??'—'}</b><span>minutes</span></div><div style="--c:var(--over)"><b>${w.kcal!=null?fmt(w.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--carb)"><b>${w.strain??(w.avgHr||'—')}</b><span>${w.strain!=null?'strain':'avg bpm'}</span></div><div style="--c:var(--fat)"><b>${w.maxHr||'—'}</b><span>max bpm</span></div></div>
-    <p class="note">Your watch records time, heart rate and calories. To track weights and reps for this session, log the sets in MACROS.</p>
+    <p class="note">Your watch records time, heart rate and calories. To track weights and reps for this session, log the sets in Syncope.</p>
     <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Log sets for this</button></div>`);
   $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();startWorkout(w.name,[])};});
 function recoveryTable(keys){
