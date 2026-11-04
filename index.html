@@ -557,6 +557,50 @@ button:active{transform:translateY(0) scale(.98)}
 .hero-logo{width:104px;height:104px;border-radius:24px;overflow:hidden;box-shadow:0 18px 50px rgba(201,242,107,.18);animation:pop .7s cubic-bezier(.2,.8,.2,1) both}
 .hero-logo svg{width:100%;height:100%;display:block}
 @keyframes pop{from{transform:scale(.8);opacity:0}}
+
+/* ---- pages, grouped lists, settings ---- */
+.page{position:fixed;inset:0;z-index:15;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-top:env(safe-area-inset-top,0px)}
+.page.in .page-body{animation:slidein .26s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slidein{from{transform:translateX(28px);opacity:0}}
+.page-top{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:8px max(10px,env(safe-area-inset-left,0px));min-height:54px;background:rgba(11,12,16,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.page-back{justify-self:start;border:0;background:none;color:var(--kcal);font:600 16px var(--f-body);display:flex;align-items:center;gap:0;padding:6px 6px 6px 0;max-width:40vw;white-space:nowrap;overflow:hidden}
+.page-back span{overflow:hidden;text-overflow:ellipsis}
+.page-t{font:700 17px/1.2 var(--f-display);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56vw}
+.page-body{max-width:720px;margin:0 auto;padding:18px 16px calc(48px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:18px}
+.pg{display:flex;flex-direction:column;gap:18px}
+.glabel{font:700 12px/1 var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:8px 6px -8px}
+.glist{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.glist .gr{display:grid;grid-template-columns:32px minmax(0,1fr) auto 12px;align-items:center;gap:12px;width:100%;padding:12px 14px;background:none;border:0;border-top:1px solid var(--line);text-align:left;color:var(--fg);font:inherit;text-decoration:none;cursor:pointer;min-height:58px}
+.glist .gr:first-child{border-top:0}
+.glist .gr:active,.glist .gr:hover{background:var(--surface-2)}
+.glist .gr.static{cursor:default}.glist .gr.static:hover{background:none}
+.gi{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 17%,transparent);color:var(--c)}
+.gi svg{width:18px;height:18px}
+.gt{min-width:0}.gt b{display:block;font-weight:650;font-size:15px;line-height:1.25}
+.gt span{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+.gv{font-size:13.5px;color:var(--muted);white-space:nowrap;text-align:right}
+.gv.on{color:var(--good)}.gv.warn{color:var(--carb)}
+.chev{color:var(--faint);width:12px;height:12px}
+.gopts{display:flex;flex-wrap:wrap;gap:8px;padding:2px 14px 14px 58px}
+.me-hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:6px 0 0}
+.me-hero .avatar{width:88px;height:88px;padding:3px}.me-hero .avatar span{font-size:28px}
+.me-hero h2{margin:8px 0 0;font:800 27px/1.1 var(--f-display)}
+.me-hero p{margin:0;color:var(--muted);font-size:14px}
+.sw{appearance:none;-webkit-appearance:none;width:50px;height:30px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);position:relative;cursor:pointer;margin:0;transition:background .2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.sw:checked{background:var(--good);border-color:var(--good)}.sw:checked::after{transform:translateX(20px)}
+.swatch{width:22px;height:22px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:6px;background:var(--c)}
+@media (max-width:640px){.tpl-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 0 4px;scrollbar-width:none}.tpl-grid::-webkit-scrollbar{display:none}.tpl-grid .tpl{flex:0 0 148px;scroll-snap-align:start}}
+.wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
+.wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
+.wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
+.wn-src{color:var(--good);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:11.5px}
+.wn-acts{display:flex;flex-wrap:wrap;gap:8px}
+.wn-acts .chip{color:var(--fg)}
+.wn-acts .chip.main{background:var(--good);border-color:var(--good);color:#0B0C10}
+.fuel-pill{border-color:color-mix(in srgb,var(--good) 50%,transparent)!important;color:var(--good)!important}
+.hist .wb{font:700 10.5px/1 var(--f-body);letter-spacing:.06em;color:var(--good);border:1px solid color-mix(in srgb,var(--good) 45%,transparent);border-radius:999px;padding:3px 6px;margin-left:6px;vertical-align:2px}
+.ver{text-align:center;color:var(--faint);font-size:12px;margin-top:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -625,30 +669,19 @@ button:active{transform:translateY(0) scale(.98)}
   <!-- TRAIN -->
   <section class="view" id="v-train" aria-label="Train" hidden>
     <div id="trainHome">
-      <div class="pnav" style="margin-bottom:18px"><div class="title"><div class="sub" id="trSub">Lifts and workouts</div><h1>Train</h1></div><button class="pill-btn" id="tplEdit">Edit templates</button></div>
+      <div class="pnav" style="margin-bottom:18px"><div class="title"><div class="sub" id="trSub">Lifts and workouts</div><h1>Train</h1></div><button class="pill-btn" id="trSync" hidden>Sync</button></div>
       <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
           <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div></div>
           <div class="tpl-grid" id="tplGrid"></div>
         </div>
         <div class="tiles" id="trTiles"></div>
         <div class="card">
-          <div class="card-h"><div><div class="eyebrow">This week · hard sets per muscle</div><h2>Are you training enough?</h2></div><div class="legend"><span><i style="background:color-mix(in srgb,var(--good) 35%,transparent)"></i>10–20 sets: the range most research supports for growth</span></div></div>
-          <div class="mus-bars" id="musBars"></div>
-        </div>
-        <div class="card">
-          <div class="card-h"><div><div class="eyebrow">Strength progress</div><h2>Estimated 1-rep max over time</h2></div><select id="exSel" class="pill-btn" aria-label="Exercise"></select></div>
-          <div class="chart" id="exChart"></div>
-          <p class="note" id="exNote" style="margin-top:10px"></p>
-        </div>
-        <div class="card">
-          <div class="card-h"><div><div class="eyebrow">History</div><h2>Recent workouts</h2></div></div>
+          <div class="card-h"><div><div class="eyebrow">History · your lifts and watch sessions</div><h2>Recent workouts</h2></div></div>
           <ul class="hist" id="hist"></ul>
         </div>
-        <div class="card" id="devWkCard" hidden>
-          <div class="card-h"><div><div class="eyebrow">From WHOOP &amp; Garmin</div><h2>Workouts your watch recorded</h2></div></div>
-          <ul class="hist" id="devWk"></ul>
-        </div>
+        <div class="glist" id="trRows"></div>
       </div>
     </div>
     <div id="trainActive" hidden style="display:flex;flex-direction:column;gap:14px"></div>
@@ -732,12 +765,47 @@ button:active{transform:translateY(0) scale(.98)}
   <!-- PLAN -->
   <section class="view" id="v-plan" aria-label="Plan" hidden>
     <div class="pnav"><div class="title"><div class="sub">Cut · Maintain · Bulk</div><h1>Your plan</h1></div></div>
-
     <div class="card plan-live" id="planLive" hidden></div>
-
-    <div class="goals">
+    <div class="glist" id="planRows"></div>
+    <div id="planBuilder" style="display:flex;flex-direction:column;gap:18px">
       <div class="card" style="display:flex;flex-direction:column;gap:16px">
-        <div><div class="eyebrow">Step 1 · You</div><h2>Your body today</h2></div>
+        <div><div class="eyebrow">Build a plan</div><h2>What do you want to do?</h2></div>
+        <div class="seg" id="pType" role="group" aria-label="Goal type">
+          <button type="button" data-t="cut" style="--c:var(--fat)"><b>Cut</b><span>Lose fat</span></button>
+          <button type="button" data-t="maintain" style="--c:var(--good)"><b>Maintain</b><span>Hold weight</span></button>
+          <button type="button" data-t="bulk" style="--c:var(--pro)"><b>Bulk</b><span>Gain muscle</span></button>
+        </div>
+        <div class="grid2">
+          <div class="field" id="pLbsF"><label for="pLbs" id="pLbsL">Pounds to lose</label><input id="pLbs" type="number" inputmode="decimal" value="15"></div>
+          <div class="field"><label for="pDur">Over</label><div class="dur-row"><input id="pDur" type="number" inputmode="numeric" value="5" aria-label="Duration"><select id="pUnit" aria-label="Duration unit"><option value="months" selected>months</option><option value="weeks">weeks</option></select></div></div>
+          <div class="field"><label for="pStyle">Calorie changes</label><select id="pStyle"><option value="gradual" selected>Gradual</option><option value="steady">Steady</option></select></div>
+          <div class="field"><label for="pPro">Protein</label><select id="pPro"><option value="auto" selected>Auto</option><option value="0.8">0.8 g/lb</option><option value="1">1.0 g/lb</option><option value="1.2">1.2 g/lb</option></select></div>
+          <div class="field" id="pBrkF"><label for="pBrk">Diet breaks</label><select id="pBrk"><option value="on" selected>Every 8 weeks</option><option value="off">None</option></select></div>
+          <div class="field"><label for="pStart">Start date</label><input id="pStart" type="date"></div>
+        </div>
+        <div id="pWarn"></div>
+      </div>
+    <div class="card" id="pPreview">
+      <div class="card-h"><div><div class="eyebrow">Your schedule</div><h2 id="pHead">Fill in your body stats to see the plan</h2></div>
+        <div class="legend"><span><i style="background:var(--kcal)"></i>Daily calories</span><span><i class="line" style="background:var(--fg)"></i>Projected weight</span><span><i style="background:var(--good);border-radius:50%"></i>Your weigh-ins</span></div></div>
+      <div class="tiles" id="pTiles" style="margin-bottom:16px"></div>
+      <div class="chart" id="pChart"></div>
+      <div class="sub-h"><div class="eyebrow">How your macros shift</div><div class="legend"><span><i style="background:var(--pro)"></i>Protein</span><span><i style="background:var(--carb)"></i>Carbs</span><span><i style="background:var(--fat)"></i>Fat</span><span><i style="background:var(--carb);border-radius:50%;width:6px;height:6px"></i>Refeed week</span></div></div>
+      <div class="chart" id="pSplit"></div>
+      <details class="weeks" id="pWeeksWrap"><summary>Week-by-week targets</summary><div class="tbl-wrap" id="pWeeks"></div></details>
+      <div class="row" style="margin-top:16px"><button class="primary" id="pStartBtn" disabled>Start this plan</button><button class="ghost" id="pStop" hidden>End current plan</button><span class="status" id="pStatus"></span></div>
+    </div>
+    </div>
+
+  </section>
+</div></main>
+
+<div id="pageStore" hidden>
+  <div class="pg" id="pg-me"></div>
+  <div class="pg" id="pg-account"></div>
+  <div class="pg" id="pg-prefs"></div>
+  <div class="pg" id="pg-body">      <div class="card" style="display:flex;flex-direction:column;gap:16px">
+        <div><div class="eyebrow">Used for every calorie and macro target</div><h2>Your body today</h2></div>
         <div class="grid2">
           <div class="field"><label for="pSex">Sex</label><select id="pSex"><option value="m">Male</option><option value="f">Female</option></select></div>
           <div class="field"><label for="pAge">Age</label><input id="pAge" type="number" inputmode="numeric" placeholder="e.g. 24"></div>
@@ -755,50 +823,8 @@ button:active{transform:translateY(0) scale(.98)}
         <p class="note" id="pMethod"></p>
       </div>
 
-      <div class="card" style="display:flex;flex-direction:column;gap:16px">
-        <div><div class="eyebrow">Step 2 · Goal</div><h2>What do you want to do?</h2></div>
-        <div class="seg" id="pType" role="group" aria-label="Goal type">
-          <button type="button" data-t="cut" style="--c:var(--fat)"><b>Cut</b><span>Lose fat</span></button>
-          <button type="button" data-t="maintain" style="--c:var(--good)"><b>Maintain</b><span>Hold weight</span></button>
-          <button type="button" data-t="bulk" style="--c:var(--pro)"><b>Bulk</b><span>Gain muscle</span></button>
-        </div>
-        <div class="grid2">
-          <div class="field" id="pLbsF"><label for="pLbs" id="pLbsL">Pounds to lose</label><input id="pLbs" type="number" inputmode="decimal" value="15"></div>
-          <div class="field"><label for="pDur">Over</label><div class="dur-row"><input id="pDur" type="number" inputmode="numeric" value="5" aria-label="Duration"><select id="pUnit" aria-label="Duration unit"><option value="months" selected>months</option><option value="weeks">weeks</option></select></div></div>
-          <div class="field"><label for="pStyle">Calorie changes</label><select id="pStyle"><option value="gradual" selected>Gradual</option><option value="steady">Steady</option></select></div>
-          <div class="field"><label for="pPro">Protein</label><select id="pPro"><option value="auto" selected>Auto</option><option value="0.8">0.8 g/lb</option><option value="1">1.0 g/lb</option><option value="1.2">1.2 g/lb</option></select></div>
-          <div class="field" id="pBrkF"><label for="pBrk">Diet breaks</label><select id="pBrk"><option value="on" selected>Every 8 weeks</option><option value="off">None</option></select></div>
-          <div class="field"><label for="pStart">Start date</label><input id="pStart" type="date"></div>
-        </div>
-        <div id="pWarn"></div>
-      </div>
-    </div>
-
-    <div class="card" id="pPreview">
-      <div class="card-h"><div><div class="eyebrow">Step 3 · Your schedule</div><h2 id="pHead">Fill in your body stats to see the plan</h2></div>
-        <div class="legend"><span><i style="background:var(--kcal)"></i>Daily calories</span><span><i class="line" style="background:var(--fg)"></i>Projected weight</span><span><i style="background:var(--good);border-radius:50%"></i>Your weigh-ins</span></div></div>
-      <div class="tiles" id="pTiles" style="margin-bottom:16px"></div>
-      <div class="chart" id="pChart"></div>
-      <div class="sub-h"><div class="eyebrow">How your macros shift</div><div class="legend"><span><i style="background:var(--pro)"></i>Protein</span><span><i style="background:var(--carb)"></i>Carbs</span><span><i style="background:var(--fat)"></i>Fat</span><span><i style="background:var(--carb);border-radius:50%;width:6px;height:6px"></i>Refeed week</span></div></div>
-      <div class="chart" id="pSplit"></div>
-      <details class="weeks" id="pWeeksWrap" open><summary>Week-by-week targets</summary><div class="tbl-wrap" id="pWeeks"></div></details>
-      <div class="row" style="margin-top:16px"><button class="primary" id="pStartBtn" disabled>Start this plan</button><button class="ghost" id="pStop" hidden>End current plan</button><span class="status" id="pStatus"></span></div>
-    </div>
-
-    <div class="card why">
-      <div><div class="eyebrow">The method</div><h2>Why your macros change during a cut</h2></div>
-      <ol class="phases">
-        <li style="--c:var(--fat)"><b>Phase 1 · Trim fat, hold carbs.</b> Early on the deficit comes mostly out of fat while carbs stay put to fuel training. Fat starts near 30% of calories and comes down to a floor of 20% (never under 0.25 g per lb). The ACSM sports nutrition position statement advises athletes against chronic intakes below 20%.</li>
-        <li style="--c:var(--pro)"><b>Protein rises the whole time.</b> The leaner you get and the bigger the deficit, the more protein protects muscle. With body fat % entered, protein goes from 2.3 to 3.1 g per kg of lean mass (Helms, Aragon &amp; Fitschen, JISSN 2014). Without it, 1.8 to 2.4 g per kg of body weight (Roberts et al., 2020). Carbs are held steady while protein climbs.</li>
-        <li style="--c:var(--carb)"><b>Phase 2 · Lower carbs.</b> Once fat hits its floor, every further cut comes from carbs. Syncope warns if carbs fall under 2 g per kg, the low end for lifters (Roberts et al.). Lean or past week 8, a weekly <i>refeed day</i> is suggested: one training day with extra carbs, bringing that day to about maintenance.</li>
-        <li style="--c:var(--good)"><b>Diet breaks and recovery.</b> An optional week at maintenance every 8 weeks gives you a mental and hormonal reset; research on structured breaks (e.g. the MATADOR trial) found they don't hurt fat loss. After the cut, 4 recovery weeks step calories back up. Fat climbs back toward 28%, carbs rise, and protein eases to 2.2 g per kg of lean mass.</li>
-        <li style="--c:var(--muted)"><b>Pace.</b> Aim for 0.5–1% of body weight lost per week to keep muscle (Helms 2014). Slower, around 0.5%, is better the leaner you are. Bulks aim for 0.25–0.5% gained per week with protein around 1.8 g per kg (Iraki et al., 2019).</li>
-      </ol>
-      <p class="note">This applies published guidelines to your numbers. It's not individual medical advice, so adjust based on your weigh-ins, energy and training.</p>
-    </div>
-
-    <div class="goals">
-      <div class="card" style="display:flex;flex-direction:column;gap:14px">
+</div>
+  <div class="pg" id="pg-weigh">      <div class="card" style="display:flex;flex-direction:column;gap:14px">
         <div><div class="eyebrow">Progress journal</div><h2>Check-ins and weigh-ins</h2></div>
         <p class="note">Weigh first thing in the morning, after the bathroom, 3 or more times a week. The 7-day average is what matters, not any single day.</p>
         <div class="inrow"><div class="inbox"><input id="wIn" type="number" inputmode="decimal" placeholder="Weight in lb" aria-label="Weight in pounds"></div><button class="go" type="button" id="wAdd">Log</button></div>
@@ -806,7 +832,8 @@ button:active{transform:translateY(0) scale(.98)}
         <div id="wSparkWrap" hidden><div class="eyebrow" style="margin-bottom:6px">Weight trend · dots are weigh-ins, line is the 7-day average</div><div class="chart" id="wSpark"></div></div>
         <div id="wList"></div>
       </div>
-      <div class="card" style="display:flex;flex-direction:column;gap:16px">
+</div>
+  <div class="pg" id="pg-targets">      <div class="card" style="display:flex;flex-direction:column;gap:16px">
         <div><div class="eyebrow">Manual targets</div><h2>Set grams yourself</h2></div>
         <p class="note" id="gNote">Used whenever no plan is running.</p>
         <div class="grid3">
@@ -822,14 +849,14 @@ button:active{transform:translateY(0) scale(.98)}
           <div class="fact" style="--c:var(--fat)"><b>9</b><span>kcal per g fat</span></div>
         </div>
       </div>
-    </div>
-
-    <div class="card" id="connCard" style="display:flex;flex-direction:column;gap:14px">
-      <div><div class="eyebrow">Connections</div><h2>WHOOP &amp; Garmin, synced automatically</h2></div>
+</div>
+  <div class="pg" id="pg-conn">    <div class="card" id="connCard" style="display:flex;flex-direction:column;gap:14px">
+      <div><div class="eyebrow">Connections</div><h2>Synced automatically</h2></div>
       <div id="connBody" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
 
-    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+</div>
+  <div class="pg" id="pg-scan">    <div class="card" style="display:flex;flex-direction:column;gap:14px">
       <div><div class="eyebrow">Photo scanning</div><h2>Scan meals with Claude</h2></div>
       <p class="note">Photo scanning sends the picture to Claude using your own Anthropic API key, so it needs an internet connection. Everything else in Syncope works offline. Get a key at console.anthropic.com → API Keys, and set a monthly spend limit there. A scan typically costs under a cent. Your key is stored only in this browser and is never included in backups.</p>
       <div class="grid2">
@@ -839,7 +866,8 @@ button:active{transform:translateY(0) scale(.98)}
       <div class="row"><button class="primary" id="aSave">Save</button><button class="ghost" id="aClear">Remove key</button><span class="status" id="aStatus"></span></div>
     </div>
 
-    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+</div>
+  <div class="pg" id="pg-data">    <div class="card" style="display:flex;flex-direction:column;gap:14px">
       <div><div class="eyebrow">Your data</div><h2>Backups</h2></div>
       <p class="note" id="dataNote"></p>
       <div class="row">
@@ -850,8 +878,33 @@ button:active{transform:translateY(0) scale(.98)}
       </div>
       <span class="status" id="dataStatus"></span>
     </div>
-  </section>
-</div></main>
+</div>
+  <div class="pg" id="pg-method">    <div class="card why">
+      <div><div class="eyebrow">The method</div><h2>Why your macros change during a cut</h2></div>
+      <ol class="phases">
+        <li style="--c:var(--fat)"><b>Phase 1 · Trim fat, hold carbs.</b> Early on the deficit comes mostly out of fat while carbs stay put to fuel training. Fat starts near 30% of calories and comes down to a floor of 20% (never under 0.25 g per lb). The ACSM sports nutrition position statement advises athletes against chronic intakes below 20%.</li>
+        <li style="--c:var(--pro)"><b>Protein rises the whole time.</b> The leaner you get and the bigger the deficit, the more protein protects muscle. With body fat % entered, protein goes from 2.3 to 3.1 g per kg of lean mass (Helms, Aragon &amp; Fitschen, JISSN 2014). Without it, 1.8 to 2.4 g per kg of body weight (Roberts et al., 2020). Carbs are held steady while protein climbs.</li>
+        <li style="--c:var(--carb)"><b>Phase 2 · Lower carbs.</b> Once fat hits its floor, every further cut comes from carbs. Syncope warns if carbs fall under 2 g per kg, the low end for lifters (Roberts et al.). Lean or past week 8, a weekly <i>refeed day</i> is suggested: one training day with extra carbs, bringing that day to about maintenance.</li>
+        <li style="--c:var(--good)"><b>Diet breaks and recovery.</b> An optional week at maintenance every 8 weeks gives you a mental and hormonal reset; research on structured breaks (e.g. the MATADOR trial) found they don't hurt fat loss. After the cut, 4 recovery weeks step calories back up. Fat climbs back toward 28%, carbs rise, and protein eases to 2.2 g per kg of lean mass.</li>
+        <li style="--c:var(--muted)"><b>Pace.</b> Aim for 0.5–1% of body weight lost per week to keep muscle (Helms 2014). Slower, around 0.5%, is better the leaner you are. Bulks aim for 0.25–0.5% gained per week with protein around 1.8 g per kg (Iraki et al., 2019).</li>
+      </ol>
+      <p class="note">This applies published guidelines to your numbers. It's not individual medical advice, so adjust based on your weigh-ins, energy and training.</p>
+    </div>
+
+</div>
+  <div class="pg" id="pg-strength">        <div class="card">
+          <div class="card-h"><div><div class="eyebrow">Strength progress</div><h2>Estimated 1-rep max over time</h2></div><select id="exSel" class="pill-btn" aria-label="Exercise"></select></div>
+          <div class="chart" id="exChart"></div>
+          <p class="note" id="exNote" style="margin-top:10px"></p>
+        </div>
+</div>
+  <div class="pg" id="pg-muscle">        <div class="card">
+          <div class="card-h"><div><div class="eyebrow">This week · hard sets per muscle</div><h2>Are you training enough?</h2></div><div class="legend"><span><i style="background:color-mix(in srgb,var(--good) 35%,transparent)"></i>10–20 sets: the range most research supports for growth</span></div></div>
+          <div class="mus-bars" id="musBars"></div>
+        </div>
+</div>
+</div>
+<div class="page" id="pageRoot" hidden><div class="page-top"><button class="page-back" id="pgBack" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span id="pgBackT">Back</span></button><div class="page-t" id="pgTitle"></div><span></span></div><div class="page-body" id="pgBody"></div></div>
 
 <nav class="tabbar" id="tabsBottom" aria-label="Views"></nav>
 <div class="onb" id="onb" hidden><div class="onb-in" id="onbIn"></div></div>
@@ -1121,10 +1174,10 @@ const UNIT_LABEL=(u,q,food)=>{if(u==='serving'&&food&&food.servName)return food.
 /* ---------- state & storage ---------- */
 const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
-  days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]}};
+  days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{}};
 let storageOK=true;
-function load(){try{const j=JSON.parse(localStorage.getItem(LS)||'null');if(j){S.days=j.days||{};if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.dev=j.dev||{days:{},workouts:[]};S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
-function save(){try{localStorage.setItem(LS,JSON.stringify({v:1,days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,lastBackup:S.lastBackup,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,tplSeeded:S.tplSeeded,active:S.active,health:S.health,restSec:S.restSec,dev:S.dev}));storageOK=true}catch(e){storageOK=false}
+function load(){try{const j=JSON.parse(localStorage.getItem(LS)||'null');if(j){S.days=j.days||{};if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.dev=j.dev||{days:{},workouts:[]};S.prefs=j.prefs||{};S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
+function save(){try{localStorage.setItem(LS,JSON.stringify({v:1,days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,lastBackup:S.lastBackup,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,tplSeeded:S.tplSeeded,active:S.active,health:S.health,restSec:S.restSec,dev:S.dev,prefs:S.prefs}));storageOK=true}catch(e){storageOK=false}
   const s=$('saved'); s.textContent=storageOK?'Saved on this device':'Not saving — storage blocked'; s.style.color=storageOK?'':'var(--over)'; checkBackup();}
 let FOODS=[],ALIAS=[];
 function buildFoods(){
@@ -1141,7 +1194,7 @@ function keyOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDa
 function todayKey(){return keyOf(new Date())}
 function parseKey(k){const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)}
 function addDays(k,n){const d=parseKey(k);d.setDate(d.getDate()+n);return keyOf(d)}
-function weekStart(k){const d=parseKey(k);d.setDate(d.getDate()-(d.getDay()+6)%7);return keyOf(d)}
+function weekStart(k){const d=parseKey(k);d.setDate(d.getDate()-((S.prefs&&S.prefs.wkSun)?d.getDay():(d.getDay()+6)%7));return keyOf(d)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function r0(n){return Math.round(n||0)}
 function r1(n){return Math.round((n||0)*10)/10}
@@ -1224,10 +1277,11 @@ function setView(v){
   $('tabsTop').innerHTML=tabsHTML(); $('tabsBottom').innerHTML=tabsHTML();
   if(location.hash.slice(1)!==v){try{history.replaceState(null,'','#'+v)}catch(e){}}
   renderView(); window.scrollTo({top:0});
+  if(v==='train'||v==='today')setTimeout(()=>syncDevices(false),300);
 }
 document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)setView(t.dataset.v);const g=e.target.closest('[data-goto]');if(g)setView(g.dataset.goto)});
 window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h&&h!==S.view)setView(h)});
-function renderAll(){renderView();renderRecent()}
+function renderAll(){renderView();renderRecent();if(typeof pgStack!=='undefined'&&pgStack.length){const id=pgStack[pgStack.length-1];if(id==='me'||id==='prefs')(PG_R[id])()}}
 function renderView(){({today:renderToday,week:renderWeek,month:renderMonth,foods:renderFoods,plan:renderPlan,train:renderTrain})[S.view]()}
 
 /* ---------- TODAY ---------- */
@@ -1254,7 +1308,7 @@ function renderToday(){renderCheckin();renderHealth();renderJust();
   $('hero').innerHTML=`<div class="gauge ${left<0?'over':''}">${gaugeSVG(t,gk)}<div class="c"><div class="big">${fmt(Math.abs(left))}</div><div class="lab">${left<0?'kcal over':'kcal left'}</div><div class="of num">${fmt(t.k)} / ${fmt(gk)} eaten</div></div></div>
     <div class="channels">${ch('Protein',t.p,g.p,'--pro')}${ch('Carbs',t.c,g.c,'--carb')}${ch('Fat',t.f,g.f,'--fat')}
     <div class="split">${s?`<span><i style="background:var(--pro)"></i>${r0(kp/s*100)}% protein</span><span><i style="background:var(--carb)"></i>${r0(kc/s*100)}% carbs</span><span><i style="background:var(--fat)"></i>${r0(kf/s*100)}% fat</span>`:`<span>Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate below.</span>`}
-    ${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of} · ${g.ph}`}</button>`:g.starter?`<span>Using starter targets.</span><button class="pill-btn" style="padding:3px 10px" data-goto="plan">Build your plan</button>`:''}</div></div>`;
+    ${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · training</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of} · ${g.ph}`}</button>`:g.starter?`<span>Using starter targets.</span><button class="pill-btn" style="padding:3px 10px" data-goto="plan">Build your plan</button>`:''}</div></div>`;
   $('mealPick').innerHTML=MEALS.map(([m,l])=>`<button type="button" class="chip" data-meal="${m}" aria-pressed="${S.mealSel===m}">${l}</button>`).join('');
   const list=S.days[k]||[], prev=S.days[addDays(k,-1)]||[];
   $('meals').innerHTML=MEALS.map(([m,l])=>{
@@ -1691,12 +1745,36 @@ function planInfo(k){
   const T=pl.T||pl.weeks.length, i=Math.floor((parseKey(k)-parseKey(pl.start))/(7*864e5));
   return {i,done:i>=T,rec:i>=pl.N&&i<T,wk:pl.weeks[Math.min(i,T-1)]};
 }
-function goalsFor(k){
+function goalsFor(k){const g=goalsBase(k),f=trainFuel(k);return f?{...g,c:g.c+f.c,fuel:f}:g}
+function goalsBase(k){
   const pi=planInfo(k);
   if(pi){if(pi.done)return {...S.plan.after,plan:true,after:true};
     return {p:pi.wk.p,c:pi.wk.c,f:pi.wk.f,plan:true,week:pi.i+1,of:S.plan.N,ph:pi.wk.ph,rec:pi.rec,rw:pi.i-S.plan.N+1,rf:pi.wk.rf}}
   return S.goals;
 }
+
+/* ---- training fuel: eat back part of what your watch measured beyond what your activity level already covers ---- */
+const ACT_BASE={'1.2':0,'1.375':150,'1.55':250,'1.725':350,'1.9':450};
+function trainFuel(k){
+  const P=S.prefs||{};if(P.fuel===false)return null;
+  const ws=((S.dev&&S.dev.workouts)||[]).filter(w=>w.date===k&&w.kcal>0);if(!ws.length)return null;
+  const lw=latestWeight(),kgw=((lw&&lw.w)||(S.calc&&S.calc.wt)||170)*.4536;
+  const net=ws.reduce((a,w)=>a+Math.max(0,w.kcal-kgw*(w.min||0)/60),0);
+  const base=ACT_BASE[String((S.calc&&S.calc.act)||'1.55')]??250;
+  const pct=P.fuelPct!=null?P.fuelPct:(S.plan&&S.plan.type==='cut'?50:75);
+  const extra=Math.min(600,Math.max(0,(net-base)*pct/100));
+  const c=Math.round(extra/4/5)*5;if(c<5)return null;
+  return {c,kcal:c*4,net:Math.round(net),base,pct,ws:ws.map(w=>({name:w.name,src:w.src,kcal:w.kcal,min:w.min}))};
+}
+function openFuel(){
+  const g=goalsFor(S.day),f=g.fuel;if(!f)return;
+  sheet(`<div><div class="eyebrow">Fuel for training</div><h3>+${f.c} g carbs today</h3></div>
+    <ul class="ml-items">${f.ws.map(w=>`<li><span>${esc(w.name)} <span class="dim">· ${esc(w.src)}${w.min?` · ${w.min} min`:''}</span></span><span class="num">${fmt(w.kcal)} kcal</span></li>`).join('')}</ul>
+    <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Syncope adds back ${f.pct}% of the rest as carbs, which refill the glycogen lifting uses. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
+    <div class="row" style="justify-content:space-between"><button class="ghost" id="fuSet">Change in Settings</button><button class="primary" id="fuOk">Got it</button></div>`);
+  $('fuOk').onclick=closeSheet;$('fuSet').onclick=()=>{closeSheet();openPage('prefs')};
+}
+document.addEventListener('click',e=>{if(e.target.closest('[data-fuel]'))openFuel()});
 function rangeGoal(keys){const gs=keys.map(goalsFor),n=gs.length||1;return {p:gs.reduce((a,g)=>a+g.p,0)/n,c:gs.reduce((a,g)=>a+g.c,0)/n,f:gs.reduce((a,g)=>a+g.f,0)/n}}
 function wAvg(k){const v=[...Array(7)].map((_,j)=>S.weights[addDays(k,-j)]).filter(x=>x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null}
 function latestWeight(){const ks=Object.keys(S.weights).sort();return ks.length?{k:ks[ks.length-1],w:S.weights[ks[ks.length-1]]}:null}
@@ -1752,7 +1830,7 @@ function renderPlan(){
   }
   $('pStartBtn').textContent=S.plan?'Replace current plan with this one':'Start this plan';
   $('pStop').hidden=!S.plan;
-  renderPlanLive();renderWeights();renderManual();renderAiSettings();renderDataNote();renderConn();
+  renderPlanLive();renderWeights();renderManual();renderAiSettings();renderDataNote();renderConn();renderPlanRows();
 }
 function renderTypeSeg(){$('pType').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===S.pType))}
 function planChart(pl,weights){
@@ -2029,7 +2107,7 @@ document.addEventListener('paste',e=>{if(S.view!=='today')return;const f=[...(e.
 
 /* data */
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-function backup(){S.lastBackup=Date.now();save();download(`syncope-backup-${todayKey()}.json`,JSON.stringify({app:'Syncope',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
+function backup(){S.lastBackup=Date.now();save();download(`syncope-backup-${todayKey()}.json`,JSON.stringify({app:'Syncope',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev,prefs:S.prefs},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
 $('exportJson').onclick=backup; $('backupNow').onclick=backup;
 $('exportCsv').onclick=()=>{
   const rows=[['date','meal','food','amount','grams','kcal','protein_g','carbs_g','fat_g']];
@@ -2043,7 +2121,7 @@ $('importJson').onchange=e=>{
       sheet(`<div><div class="eyebrow">Restore backup</div><h3>Replace this device's log?</h3><p class="note">The backup holds ${nd} day${nd===1?'':'s'} and ${(j.custom||[]).length} saved foods. Merging keeps everything you have now and adds what's missing. Replacing makes this device match the backup exactly.</p></div>
         <div class="row" style="justify-content:flex-end"><button class="ghost" id="rCancel">Cancel</button><button class="ghost" id="rMerge">Merge</button><button class="primary" id="rReplace">Replace</button></div>`);
       $('rCancel').onclick=closeSheet;
-      $('rReplace').onclick=()=>{S.days=j.days;if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];if(j.templates){S.templates=j.templates;S.tplSeeded=true}S.health=j.health||{};renderPlan.filled=false;done()};
+      $('rReplace').onclick=()=>{S.days=j.days;if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];if(j.templates){S.templates=j.templates;S.tplSeeded=true}S.health=j.health||{};if(j.prefs)S.prefs=j.prefs;applyPrefs();renderPlan.filled=false;done()};
       $('rMerge').onclick=()=>{Object.entries(j.days).forEach(([k,l])=>{const have=new Set((S.days[k]||[]).map(x=>x.id));S.days[k]=[...(S.days[k]||[]),...(l||[]).filter(x=>!have.has(x.id))]});const names=new Set(S.custom.map(c=>c.name.toLowerCase()));S.custom=[...S.custom,...(j.custom||[]).filter(c=>!names.has(c.name.toLowerCase()))];S.weights={...(j.weights||{}),...S.weights};if(!S.plan&&j.plan)S.plan=j.plan;const mn=new Set(S.meals.map(m=>m.name.toLowerCase()));S.meals=[...S.meals,...(j.meals||[]).filter(m=>!mn.has(m.name.toLowerCase()))];S.checkins={...(j.checkins||{}),...S.checkins};const wid=new Set(S.workouts.map(w=>w.id));S.workouts=[...S.workouts,...(j.workouts||[]).filter(w=>!wid.has(w.id))].sort((a,b)=>b.end-a.end);S.health={...(j.health||{}),...S.health};if(!S.profile.name&&j.profile)S.profile=j.profile;done()};
       function done(){buildFoods();save();closeSheet();renderAll();toast('Backup restored')}
     }catch(err){$('dataStatus').className='status err';$('dataStatus').textContent='That file isn\'t a Syncope backup. Choose the .json file from “Download backup”.'}
@@ -2067,18 +2145,109 @@ function initials(n){const s=(n||'').trim().split(/\s+/).filter(Boolean).map(w=>
 function firstName(){return ((S.profile.name||'').trim().split(/\s+/)[0])||''}
 function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
 function renderProfileBtn(){const b=$('profBtn');if(!b)return;b.innerHTML=`<span>${esc(initials(S.profile.name))}</span>`;b.title=S.profile.name||'Profile'}
-function openProfile(){
-  const lw=latestWeight(),nw=S.workouts.length,nd=Object.keys(S.days).length;
-  sheet(`<div style="display:flex;gap:14px;align-items:center"><div class="avatar" style="width:56px;height:56px"><span style="font-size:18px">${esc(initials(S.profile.name))}</span></div><div><div class="eyebrow">Profile</div><h3>${esc(S.profile.name||'Your profile')}</h3></div></div>
-    <div class="field"><label for="prN">Name</label><input id="prN" type="text" value="${esc(S.profile.name||'')}" placeholder="Your name"></div>
-    <div class="live"><div style="--c:var(--kcal)"><b>${nd}</b><span>days logged</span></div><div style="--c:var(--pro)"><b>${nw}</b><span>workouts</span></div><div style="--c:var(--fat)"><b>${lw?r1(lw.w):'—'}</b><span>latest lb</span></div><div style="--c:var(--good)"><b>${S.plan?(S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Hold'):'—'}</b><span>plan</span></div></div>
-    <p class="note">Your profile and everything you log live only on this device. Nobody else who opens the Syncope link can see them.</p>
-    <div class="row" style="justify-content:space-between"><button class="ghost" id="prRedo">Redo setup</button><div class="row"><button class="ghost" id="prPlan">Body stats &amp; plan</button><button class="primary" id="prSave">Save</button></div></div>`);
-  $('prSave').onclick=()=>{S.profile.name=$('prN').value.trim();save();renderProfileBtn();closeSheet();renderAll()};
-  $('prPlan').onclick=()=>{closeSheet();setView('plan')};
-  $('prRedo').onclick=()=>{closeSheet();openOnb()};
+/* ================= PAGES (profile, settings, details) ================= */
+const sv=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const GI={user:sv('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),body:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 9.5a5 5 0 0 1 7 0L12 13z"/>'),
+  target:sv('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/>'),plan:sv('<path d="M4 19h16M6 15l4-5 4 3 5-7"/>'),scale:sv('<path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0zM17 7l-3 7a3 3 0 0 0 6 0z"/>'),
+  link:sv('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),heart:sv('<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>'),
+  camera:sv('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),sliders:sv('<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
+  dumbbell:sv('<path d="M3 10v4M6 7v10M18 7v10M21 10v4M6 12h12"/>'),download:sv('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),shield:sv('<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/>'),
+  refresh:sv('<path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/>'),book:sv('<path d="M5 4h9a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h9"/>'),
+  chart:sv('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),bars:sv('<path d="M4 6h10M4 12h16M4 18h7"/>'),list:sv('<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>'),
+  copy:sv('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),plus:sv('<path d="M12 5v14M5 12h14"/>'),fire:sv('<path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 2-7 2 1 3 3 3 5 1-2 1-5 1-9z"/>'),
+  palette:sv('<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.5-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>'),
+  cal:sv('<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>'),timer:sv('<circle cx="12" cy="13" r="7"/><path d="M12 9v4l2 2M9 3h6"/>'),info:sv('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+  watch:sv('<rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2l1.5 1.5"/>')};
+const CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>';
+function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.act?`data-ga="${o.act}"`:'';
+  const inner=`<span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv ${o.vc||''}">${o.v??''}</span>${o.ctl?'':CHEV}`;
+  if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
+  if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
+  return `<button class="gr" type="button" ${attr}>${inner}</button>`}
+const PG_T={me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+let pgStack=[];
+function showPage(id){const r=$('pageRoot');$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';
+  $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
+  r.classList.remove('in');void r.offsetWidth;r.classList.add('in');r.scrollTop=0}
+function openPage(id){const r=$('pageRoot');if(pgStack.length)$('pageStore').appendChild($('pg-'+pgStack[pgStack.length-1]));
+  pgStack.push(id);r.hidden=false;document.documentElement.classList.add('locked');showPage(id)}
+function pageBack(){const id=pgStack.pop();if(id)$('pageStore').appendChild($('pg-'+id));
+  if(pgStack.length)showPage(pgStack[pgStack.length-1]);else{$('pageRoot').hidden=true;document.documentElement.classList.remove('locked');renderAll()}}
+function closePages(){while(pgStack.length)$('pageStore').appendChild($('pg-'+pgStack.pop()));$('pageRoot').hidden=true;document.documentElement.classList.remove('locked')}
+$('pgBack').onclick=pageBack;
+const GACT={templates:()=>openTemplates(),plan:()=>{closePages();setView('plan')},apple:()=>openSetupChooser(),redo:()=>{closePages();openOnb()},builder:()=>{S.showBuilder=!S.showBuilder;renderPlan()},syncnow:()=>syncDevices(true)};
+document.addEventListener('click',e=>{const g=e.target.closest('[data-pg]');if(g){openPage(g.dataset.pg);return}const a=e.target.closest('[data-ga]');if(a&&GACT[a.dataset.ga])GACT[a.dataset.ga]()});
+function streak(){let k=todayKey(),n=0;if(!(S.days[k]||[]).length)k=addDays(k,-1);while((S.days[k]||[]).length){n++;k=addDays(k,-1)}return n}
+function bodyLine(){const c=S.calc||{},lw=latestWeight(),w=(lw&&lw.w)||c.wt;if(!c.age&&!w)return '';return [c.ht?`${Math.floor(c.ht/12)}′${r0(c.ht%12)}″`:'',w?`${r1(w)} lb`:'',c.age?`${c.age} y`:''].filter(Boolean).join(' · ')}
+function planLabel(){if(!S.plan)return 'No plan';return S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}
+function renderMe(){
+  const c=syncCfg(),st=c.st||{},lw=latestWeight(),g=goalsFor(todayKey()),nWk=trainFeed().length,nd=Object.keys(S.days).filter(k=>(S.days[k]||[]).length).length,sk=streak();
+  const conn=[st.whoop?'WHOOP':'',st.garmin?'Garmin':''].filter(Boolean);
+  $('pg-me').innerHTML=`<div class="me-hero"><div class="avatar"><span>${esc(initials(S.profile.name))}</span></div><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p></div>
+    <div class="live"><div style="--c:var(--carb)"><b>${sk}</b><span>day streak</span></div><div style="--c:var(--kcal)"><b>${nd}</b><span>days logged</span></div><div style="--c:var(--pro)"><b>${nWk}</b><span>workouts</span></div><div style="--c:var(--fat)"><b>${lw?r1(lw.w):'—'}</b><span>latest lb</span></div></div>
+    <div class="glabel">Account</div><div class="glist">
+      ${grow({pg:'account',ic:'user',c:'--kcal',t:'Personal info',s:'Name and the devices you wear',v:esc(S.profile.name||'')})}
+      ${grow({pg:'body',ic:'body',c:'--fat',t:'Body metrics',s:'Height, weight, age, body fat, activity',v:bodyLine()||'Not set',vc:bodyLine()?'':'warn'})}</div>
+    <div class="glabel">Goals</div><div class="glist">
+      ${grow({ga:'plan',ic:'plan',c:'--good',t:'Your plan',s:'Cut, maintain or bulk',v:planLabel()})}
+      ${grow({pg:'weigh',ic:'scale',c:'--carb',t:'Weigh-ins',s:'Log weight and see your trend',v:lw?`${r1(lw.w)} lb`:''})}
+      ${grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:'Set protein, carbs and fat yourself',v:S.plan?'From plan':fmt(goalKcal(S.goals))+' kcal'})}</div>
+    <div class="glabel">Connections</div><div class="glist">
+      ${grow({pg:'conn',ic:'watch',c:'--good',t:'WHOOP & Garmin',s:'Sleep, recovery, strain and workouts',v:conn.length?conn.join(' + '):'Connect',vc:conn.length?'on':''})}
+      ${grow({ga:'apple',ic:'heart',c:'--over',t:'Apple Health',s:'Through an iPhone Shortcut'})}
+      ${grow({pg:'scan',ic:'camera',c:'--kcal',t:'Photo scanning',s:'Snap a meal, get the macros',v:AI.key?'On':'Off',vc:AI.key?'on':''})}</div>
+    <div class="glabel">App</div><div class="glist">
+      ${grow({pg:'prefs',ic:'sliders',c:'--carb',t:'Settings',s:'Training fuel, rest timer, accent color, sync'})}
+      ${grow({ga:'templates',ic:'dumbbell',c:'--pro',t:'Workout templates',v:String(S.templates.length)})}
+      ${grow({pg:'data',ic:'download',c:'--fat',t:'Backup & export',s:'Save or move your data',v:S.lastBackup?niceDate(keyOf(new Date(S.lastBackup)),{month:'short',day:'numeric'}):'Never',vc:S.lastBackup?'':'warn'})}</div>
+    <div class="glabel">About</div><div class="glist">
+      ${grow({pg:'method',ic:'book',c:'--good',t:'The science',s:'How your plan sets macros'})}
+      ${grow({href:'privacy.html',ic:'shield',c:'--muted',t:'Privacy',s:'Your log stays on this phone'})}
+      ${grow({ga:'redo',ic:'refresh',c:'--muted',t:'Redo welcome setup'})}</div>
+    <p class="ver">Syncope 2.0</p>`;
 }
-
+function renderAccount(){
+  const wear=S.profile.wear||[];
+  $('pg-account').innerHTML=`<div class="me-hero"><div class="avatar"><span>${esc(initials(S.profile.name))}</span></div></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="field"><label for="acN">Name</label><input id="acN" type="text" value="${esc(S.profile.name||'')}" placeholder="Your name" autocomplete="name"></div>
+    <div class="field"><label>What you wear</label><div class="wn-acts" id="acW">${WEAR.map(([v,l])=>`<button type="button" class="chip" data-w="${v}" aria-pressed="${wear.includes(v)}">${l}</button>`).join('')}</div></div>
+    <div class="row" style="justify-content:flex-end"><button class="primary" id="acSave">Save</button></div></div>
+    <p class="note" style="padding:0 6px">Your profile and everything you log live only on this phone. Anyone else who opens the Syncope link gets their own separate copy.</p>`;
+  $('acW').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;const on=b.getAttribute('aria-pressed')!=='true';if(b.dataset.w==='none'&&on)$('acW').querySelectorAll('[data-w]').forEach(x=>x.setAttribute('aria-pressed','false'));else if(on)$('acW').querySelector('[data-w="none"]').setAttribute('aria-pressed','false');b.setAttribute('aria-pressed',String(on))};
+  $('acSave').onclick=()=>{S.profile.name=$('acN').value.trim();S.profile.wear=[...$('acW').querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.w);save();renderProfileBtn();toast('Saved');pageBack()};
+}
+const ACCENTS=[['#C7B6FF','Lavender'],['#C9F26B','Lime'],['#4FC8D8','Teal'],['#FF9A7A','Coral'],['#F2BF4C','Gold']];
+function applyPrefs(){const P=S.prefs||{};document.documentElement.style.setProperty('--kcal',P.accent||'#C7B6FF')}
+function renderPrefs(){
+  const P=S.prefs||(S.prefs={}),cutDef=S.plan&&S.plan.type==='cut'?50:75,pct=P.fuelPct??cutDef;
+  const chips=(key,opts,cur)=>`<div class="gopts">${opts.map(([v,l])=>`<button type="button" class="chip" data-pk="${key}" data-pv="${v}" aria-pressed="${String(cur)===String(v)}">${l}</button>`).join('')}</div>`;
+  $('pg-prefs').innerHTML=`<div class="glabel">Nutrition</div><div class="glist">
+      ${grow({ic:'fire',c:'--good',t:'Fuel for training',s:'Add carbs on days your watch logs a workout',ctl:`<input type="checkbox" class="sw" data-tog="fuel" ${P.fuel!==false?'checked':''} aria-label="Fuel for training">`})}
+      ${P.fuel!==false?`<div style="padding:0 0 2px"><div class="note" style="padding:0 14px 8px 58px;margin:0">Eat back this much of the extra burn${P.fuelPct==null?` (auto: ${cutDef}% on your ${S.plan&&S.plan.type==='cut'?'cut':'plan'})`:''}</div>${chips('fuelPct',[['auto','Auto'],[50,'50%'],[75,'75%'],[100,'100%']],P.fuelPct==null?'auto':P.fuelPct)}</div>`:''}</div>
+    <div class="glabel">Training</div><div class="glist">
+      ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}</div>
+    <div class="glabel">Look</div><div class="glist">
+      ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="gopts">${ACCENTS.map(([v,l])=>`<button type="button" class="chip" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}"><i class="swatch" style="--c:${v}"></i>${l}</button>`).join('')}</div>
+      ${grow({ic:'cal',c:'--fat',t:'Week starts on',ctl:' '})}${chips('wkSun',[[0,'Monday'],[1,'Sunday']],P.wkSun?1:0)}</div>
+    <div class="glabel">Sync</div><div class="glist">
+      ${grow({ic:'refresh',c:'--good',t:'Auto-sync',s:'Pull WHOOP and Garmin data when you open Syncope',ctl:`<input type="checkbox" class="sw" data-tog="autoSync" ${P.autoSync!==false?'checked':''} aria-label="Auto-sync">`})}
+      ${grow({ga:'syncnow',ic:'watch',c:'--fat',t:'Sync now',v:syncCfg().last?new Date(syncCfg().last).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):''})}</div>`;
+  const el=$('pg-prefs');
+  el.onchange=e=>{const t=e.target.closest('[data-tog]');if(!t)return;S.prefs[t.dataset.tog]=t.checked;save();renderPrefs()};
+  el.onclick=e=>{const b=e.target.closest('[data-pk]');if(!b)return;const k=b.dataset.pk,v=b.dataset.pv;
+    if(k==='restSec')S.restSec=+v;else if(k==='fuelPct'){if(v==='auto')delete S.prefs.fuelPct;else S.prefs.fuelPct=+v}else if(k==='wkSun')S.prefs.wkSun=v==='1';else if(k==='accent')S.prefs.accent=v;
+    save();applyPrefs();renderPrefs()};
+}
+function renderPlanRows(){
+  const el=$('planRows');if(!el)return;const lw=latestWeight(),bl=bodyLine();
+  el.innerHTML=grow({pg:'body',ic:'body',c:'--fat',t:'Body metrics',s:bl?'Used for every target':'Fill these in first',v:bl||'Not set',vc:bl?'':'warn'})
+    +grow({pg:'weigh',ic:'scale',c:'--carb',t:'Weigh-ins',s:'Your trend vs the plan',v:lw?`${r1(lw.w)} lb`:'None yet'})
+    +grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:S.plan?'Set by your plan':'Set grams yourself',v:S.plan?'Auto':fmt(goalKcal(S.goals))+' kcal'})
+    +grow({pg:'method',ic:'book',c:'--good',t:'The science',s:'Why your macros change'})
+    +(S.plan?grow({ga:'builder',ic:'refresh',c:'--kcal',t:S.showBuilder?'Hide plan builder':'Change or rebuild plan',s:'Switch goal, pace or start date'}):'');
+  $('planBuilder').hidden=!!S.plan&&!S.showBuilder;
+}
 let ob=null;
 const OB_STEPS=['welcome','name','body','activity','goal','wear','result','connect','tour'];
 const WEAR=[['whoop','WHOOP','Recovery, HRV, sleep, strain','var(--good)'],['garmin','Garmin','Steps, Body Battery, sleep, workouts','var(--fat)'],['apple','Apple Watch','Activity, heart rate, sleep','var(--pro)'],['none','Nothing yet','Skip device data for now','var(--muted)']];
@@ -2194,13 +2363,14 @@ function renderTrain(){
   if(act)return renderActive();
   $('tplGrid').innerHTML=S.templates.map((t,i)=>`<button class="tpl" data-tpl="${i}"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></button>`).join('')+`<button class="tpl empty" data-tpl="-1"><b>+ Empty workout</b><span>Add exercises as you go</span></button>`;
   // week stats
-  const ws=weekStart(todayKey()),inWk=S.workouts.filter(w=>w.date>=ws);
+  const ws=weekStart(todayKey()),inWk=S.workouts.filter(w=>w.date>=ws),feed=trainFeed(),fWk=feed.filter(x=>x.date>=ws),burn=fWk.reduce((a,x)=>a+((x.dev&&x.dev.kcal)||0),0);
+  renderWatchNow();const cs=syncCfg();$('trSync').hidden=!(cs.url&&cs.uid);
   const sets=inWk.reduce((a,w)=>a+w.ex.reduce((b,x)=>b+x.sets.length,0),0),vol=inWk.reduce((a,w)=>a+w.ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0),0),prs=inWk.reduce((a,w)=>a+(w.prs||[]).length,0);
-  $('trTiles').innerHTML=`<div class="tile"><div class="eyebrow">Workouts</div><div class="v c-p">${inWk.length}<small> this week</small></div><div class="d">${S.workouts.length} all time</div></div>
+  $('trTiles').innerHTML=`<div class="tile"><div class="eyebrow">Workouts</div><div class="v c-p">${fWk.length}<small> this week</small></div><div class="d">${burn?`${fmt(burn)} kcal burned`:`${feed.length} all time`}</div></div>
     <div class="tile"><div class="eyebrow">Hard sets</div><div class="v">${sets}</div><div class="d">this week</div></div>
     <div class="tile"><div class="eyebrow">Volume</div><div class="v">${vol>=10000?r1(vol/1000)+'k':fmt(vol)}<small> lb</small></div><div class="d">weight × reps, this week</div></div>
     <div class="tile"><div class="eyebrow">New PRs</div><div class="v" style="color:var(--carb)">${prs}</div><div class="d">estimated 1-rep max</div></div>`;
-  $('trSub').textContent=inWk.length?`${inWk.length} workout${inWk.length>1?'s':''} this week`:'Lifts and workouts';
+  $('trSub').textContent=fWk.length?`${fWk.length} workout${fWk.length>1?'s':''} this week`:'Lifts and workouts';
   // muscle sets
   const cnt={};inWk.forEach(w=>w.ex.forEach(x=>{const m=musOf(x.n);cnt[m]=(cnt[m]||0)+x.sets.length}));
   const max=Math.max(24,...Object.values(cnt));
@@ -2213,9 +2383,16 @@ function renderTrain(){
   $('exChart').innerHTML=cur?exChart(cur):'';
   $('exNote').textContent=cur?'':'Finish a workout with weight and reps to see your strength trend. Estimated 1-rep max uses the Epley formula: weight × (1 + reps ÷ 30).';
   // history
-  renderDevWorkouts();
-  $('hist').innerHTML=S.workouts.length?S.workouts.slice(0,12).map((w,i)=>{const v=w.ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0);
-    return `<li><button data-wk="${i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}</b><span class="r">${fmt(v)} lb<br><span class="dim">${fmtDur(w.end-w.start)}</span></span><span class="s">${niceDate(w.date,{weekday:'short',month:'short',day:'numeric'})} · ${w.ex.length} exercises · ${w.ex.reduce((a,x)=>a+x.sets.length,0)} sets</span></button></li>`}).join(''):'<li class="note">No workouts yet. Start one above.</li>';
+  const dfmt=k=>niceDate(k,{weekday:'short',month:'short',day:'numeric'});
+  $('hist').innerHTML=feed.length?feed.slice(0,15).map(x=>{
+    if(x.log){const w=x.log,d=x.dev,v=w.ex.reduce((b,y)=>b+y.sets.reduce((c,s2)=>c+setVol(s2),0),0);
+      return `<li><button data-wk="${x.i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}${d?`<span class="wb">${esc(d.src)}</span>`:''}</b><span class="r">${fmt(v)} lb<br><span class="dim">${d&&d.strain!=null?`strain ${d.strain}`:fmtDur(w.end-w.start)}</span></span><span class="s">${dfmt(w.date)} · ${w.ex.length} exercises · ${w.ex.reduce((a2,y)=>a2+y.sets.length,0)} sets${d&&d.kcal?` · ${fmt(d.kcal)} kcal`:''}</span></button></li>`}
+    const d=x.dev;return `<li><button data-devwk="${esc(d.id)}"><b>${esc(d.name)}<span class="wb">${esc(d.src)}</span></b><span class="r">${d.kcal!=null?fmt(d.kcal)+' kcal':''}${d.strain!=null?`<br><span class="dim">strain ${d.strain}</span>`:''}</span><span class="s">${dfmt(d.date)}${d.min?` · ${d.min} min`:''}${d.avgHr?` · ${d.avgHr} bpm avg`:''}</span></button></li>`}).join('')
+    :'<li class="note">No workouts yet. Start one above, or connect WHOOP or Garmin in Profile → Connections and your sessions appear here on their own.</li>';
+  const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
+  $('trRows').innerHTML=grow({pg:'strength',ic:'chart',c:'--carb',t:'Strength progress',s:'Estimated 1-rep max for each lift',v:lifts?`${lifts} lifts`:''})
+    +grow({pg:'muscle',ic:'bars',c:'--good',t:'Sets per muscle',s:'Are you training enough this week?',v:`${sets} sets`})
+    +grow({act:'templates',ic:'list',c:'--pro',t:'Workout templates',s:'Edit, delete or restore',v:String(S.templates.length)});
 }
 function exChart(name){
   const pts=[];S.workouts.slice().reverse().forEach(w=>{const ex=w.ex.find(x=>x.n===name);if(!ex)return;const b=Math.max(0,...ex.sets.map(s=>e1rm(s.w,s.r)));if(b)pts.push([w.date,b,ex.sets.reduce((a,s)=>e1rm(s.w,s.r)>=e1rm(a.w,a.r)?s:a,ex.sets[0])])});
@@ -2235,18 +2412,18 @@ function exChart(name){
 $('exSel').onchange=e=>{S.exSel=e.target.value;renderTrain()};
 $('tplGrid').onclick=e=>{const b=e.target.closest('[data-tpl]');if(!b)return;const i=+b.dataset.tpl;
   const t=i>=0?S.templates[i]:{name:'Workout',ex:[]};startWorkout(t.name,t.ex)};
-$('hist').onclick=e=>{const b=e.target.closest('[data-wk]');if(b)openWorkout(+b.dataset.wk)};
-$('tplEdit').onclick=openTemplates;
+$('hist').onclick=e=>{const b=e.target.closest('[data-wk]');if(b)return openWorkout(+b.dataset.wk);const d=e.target.closest('[data-devwk]');if(d)openDevWorkout(d.dataset.devwk)};
+$('trSync').onclick=()=>syncDevices(true);
 
-function startWorkout(name,exNames,prefill){
+function startWorkout(name,exNames,prefill,dev){
   if(S.active){toast('Finish or discard your current workout first');setView('train');return}
-  S.active={id:'w'+uid(),name,date:todayKey(),start:Date.now(),ex:exNames.map(n=>{const last=lastFor(n);const k=prefill&&prefill[n]||last;return {n,sets:(k&&k.length?k:[{},{},{}]).map(()=>({w:'',r:'',done:false}))}})};
+  S.active={id:'w'+uid(),name,date:dev?dev.date:todayKey(),start:Date.now(),...(dev?{devId:dev.id,wStart:dev.start?Date.parse(dev.start):null,wEnd:dev.start&&dev.min?Date.parse(dev.start)+dev.min*60000:null}:{}),ex:exNames.map(n=>{const last=lastFor(n);const k=prefill&&prefill[n]||last;return {n,sets:(k&&k.length?k:[{},{},{}]).map(()=>({w:'',r:'',done:false}))}})};
   save();setView('train');
 }
 function saveActive(){clearTimeout(saveActive.t);saveActive.t=setTimeout(save,400)}
 function renderActive(){
   const a=S.active;
-  $('trainActive').innerHTML=`<div class="wk-bar"><input id="wkName" value="${esc(a.name)}" aria-label="Workout name"><span class="wk-time" id="wkTime">${clock(Date.now()-a.start)}</span><button class="primary" id="wkFinish" style="padding:9px 16px">Finish</button></div>
+  $('trainActive').innerHTML=`<div class="wk-bar"><input id="wkName" value="${esc(a.name)}" aria-label="Workout name"><span class="wk-time" id="wkTime">${a.wStart?(a.orig?'Editing':'From watch'):clock(Date.now()-a.start)}</span><button class="primary" id="wkFinish" style="padding:9px 16px">Finish</button></div>
   ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id)||[];return `<div class="card ex-card"><div class="ex-h"><h3>${esc(x.n)}</h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>
     <table class="sets"><thead><tr><th>Set</th><th>Last</th><th>lb</th><th>Reps</th><th></th></tr></thead><tbody>${x.sets.map((s,j)=>{const p=prev[j];return `<tr class="${s.done?'done':''}"><td class="setn">${j+1}</td><td class="prev">${p?`${p.w}×${p.r}`:'—'}</td><td><input type="number" inputmode="decimal" data-w="${i}.${j}" value="${esc(s.w)}" placeholder="${p?esc(p.w):''}" aria-label="Weight, set ${j+1}"></td><td><input type="number" inputmode="numeric" data-r="${i}.${j}" value="${esc(s.r)}" placeholder="${p?esc(p.r):''}" aria-label="Reps, set ${j+1}"></td><td><button class="chk" data-done="${i}.${j}" aria-pressed="${!!s.done}" aria-label="Mark set ${j+1} done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button></td></tr>`}).join('')}</tbody></table>
     <div class="ex-f"><button class="link" data-addset="${i}">+ Add set</button>${x.sets.length>1?`<button class="link" data-rmset="${i}" style="color:var(--muted)">Remove last set</button>`:''}</div></div>`}).join('')}
@@ -2266,7 +2443,7 @@ $('trainActive').addEventListener('click',e=>{const a=S.active;if(!a)return;cons
   if(b.id==='wkAddEx')return openExPicker();
   if(b.id==='wkFinish')return finishWorkout();
   if(b.id==='wkTpl'){const n=a.name.trim()||'Workout',ex=a.ex.map(x=>x.n);const i=S.templates.findIndex(t=>t.name.toLowerCase()===n.toLowerCase());if(i>=0)S.templates[i].ex=ex;else S.templates.push({id:'t'+uid(),name:n,ex});save();toast(`Saved template “${esc(n)}”`);return}
-  if(b.id==='wkDiscard'){if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to discard';b.classList.add('armed');return}S.active=null;S.rest=null;save();renderTrain();renderRest();toast('Workout discarded');return}
+  if(b.id==='wkDiscard'){if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to discard';b.classList.add('armed');return}if(a.orig){S.workouts.push(a.orig);S.workouts.sort((x,y)=>y.end-x.end)}S.active=null;S.rest=null;save();renderTrain();renderRest();toast(a.orig?'Changes discarded':'Workout discarded');return}
 });
 function openExPicker(){
   sheet(`<div><div class="eyebrow">Add exercise</div><h3>Search or type your own</h3></div>
@@ -2283,22 +2460,28 @@ function finishWorkout(){
   const a=S.active;
   const ex=a.ex.map(x=>({n:x.n,sets:x.sets.filter(s=>s.done||(+s.r>0)).map(s=>({w:+s.w||0,r:+s.r||0}))})).filter(x=>x.sets.length);
   if(!ex.length){toast('Tick off at least one set, or discard the workout');return}
-  const end=Date.now(),prs=[];
+  const end=a.wEnd||Date.now(),st=a.wStart||a.start,prs=[];
   ex.forEach(x=>{const top=Math.max(...x.sets.map(s=>e1rm(s.w,s.r)));const prev=bestBefore(x.n,end);if(top>0&&prev>0&&top>prev+0.01)prs.push({n:x.n,e:r1(top),prev:r1(prev)})});
-  const wk={id:a.id,name:a.name.trim()||'Workout',date:a.date,start:a.start,end,ex,prs};
-  S.workouts.unshift(wk);S.active=null;S.rest=null;save();renderTrain();renderRest();
+  const wk={id:a.id,name:a.name.trim()||'Workout',date:a.date,start:st,end,ex,prs,...(a.devId?{devId:a.devId}:{})};
+  S.workouts.unshift(wk);S.workouts.sort((x,y)=>y.end-x.end);S.active=null;S.rest=null;save();renderTrain();renderRest();
   const vol=ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0),sets=ex.reduce((b,x)=>b+x.sets.length,0);
   sheet(`<div><div class="eyebrow">Workout complete</div><h3>${esc(wk.name)} done</h3></div>
-    <div class="live"><div style="--c:var(--pro)"><b>${fmtDur(end-a.start)}</b><span>time</span></div><div style="--c:var(--kcal)"><b>${sets}</b><span>sets</span></div><div style="--c:var(--fat)"><b>${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div><div style="--c:var(--carb)"><b>${prs.length}</b><span>new PRs</span></div></div>
+    <div class="live"><div style="--c:var(--pro)"><b>${fmtDur(end-st)}</b><span>time</span></div><div style="--c:var(--kcal)"><b>${sets}</b><span>sets</span></div><div style="--c:var(--fat)"><b>${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div><div style="--c:var(--carb)"><b>${prs.length}</b><span>new PRs</span></div></div>
     ${prs.length?`<ul class="ml-items">${prs.map(p=>`<li><span>${esc(p.n)} <span class="pr">PR</span></span><span class="num">${r0(p.e)} lb est. 1RM <span class="dim">(was ${r0(p.prev)})</span></span></li>`).join('')}</ul>`:''}
     <div class="row" style="justify-content:flex-end"><button class="primary" id="wdOk">Done</button></div>`);
   $('wdOk').onclick=closeSheet;
 }
 function openWorkout(i){
   const w=S.workouts[i];if(!w)return;
+  const dv=w.devId&&((S.dev&&S.dev.workouts)||[]).find(x=>x.id===w.devId);
   sheet(`<div><div class="eyebrow">${niceDate(w.date,{weekday:'long',month:'short',day:'numeric'})} · ${fmtDur(w.end-w.start)}</div><h3>${esc(w.name)}</h3></div>
+    ${dv?`<div class="live"><div style="--c:var(--good)"><b>${dv.strain??'—'}</b><span>${esc(dv.src)} strain</span></div><div style="--c:var(--over)"><b>${dv.kcal!=null?fmt(dv.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--pro)"><b>${dv.avgHr||'—'}</b><span>avg bpm</span></div><div style="--c:var(--fat)"><b>${dv.maxHr||'—'}</b><span>max bpm</span></div></div>`:''}
+    ${w.copied?'<p class="note">Sets were copied from your last session. Tap Edit sets if anything changed.</p>':''}
     ${w.ex.map(x=>`<div><div class="row" style="justify-content:space-between"><b>${esc(x.n)}${(w.prs||[]).some(p=>p.n===x.n)?'<span class="pr">PR</span>':''}</b><span class="mus">${esc(musOf(x.n))}</span></div><div class="num" style="color:var(--muted);font-size:13.5px;margin-top:4px">${x.sets.map(s=>`${s.w}×${s.r}`).join('  ·  ')}</div></div>`).join('')}
-    <div class="row" style="justify-content:space-between"><button class="danger" id="wvDel">Delete</button><div class="row"><button class="ghost" id="wvTpl">Save as template</button><button class="primary" id="wvAgain">Do it again</button></div></div>`);
+    <div class="row" style="justify-content:space-between"><button class="danger" id="wvDel">Delete</button><div class="row"><button class="ghost" id="wvTpl">Save as template</button><button class="ghost" id="wvEdit">Edit sets</button><button class="primary" id="wvAgain">Do it again</button></div></div>`);
+  $('wvEdit').onclick=()=>{if(S.active){toast('Finish your current workout first');return}S.workouts.splice(i,1);
+    S.active={id:w.id,name:w.name,date:w.date,start:Date.now(),wStart:w.start,wEnd:w.end,devId:w.devId,orig:w,ex:w.ex.map(x=>({n:x.n,sets:x.sets.map(s2=>({w:String(s2.w),r:String(s2.r),done:true}))}))};
+    save();closeSheet();setView('train')};
   $('wvAgain').onclick=()=>{closeSheet();startWorkout(w.name,w.ex.map(x=>x.n))};
   $('wvTpl').onclick=()=>{S.templates.push({id:'t'+uid(),name:w.name,ex:w.ex.map(x=>x.n)});save();closeSheet();renderTrain();toast(`Saved template “${esc(w.name)}”`)};
   $('wvDel').onclick=()=>{const b=$('wvDel');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to delete';b.classList.add('armed');return}S.workouts.splice(i,1);save();closeSheet();renderTrain();toast('Workout deleted')};
@@ -2322,7 +2505,7 @@ function renderRest(){
   if(left<=0){S.rest=null;el.remove();toast('Rest is over. Next set!');try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return}
   el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button aria-label="Skip rest">Skip</button>`;
 }
-setInterval(()=>{if(S.active){const t=$('wkTime');if(t)t.textContent=clock(Date.now()-S.active.start)}if(S.rest)renderRest()},1000);
+setInterval(()=>{if(S.active&&!S.active.wStart){const t=$('wkTime');if(t)t.textContent=clock(Date.now()-S.active.start)}if(S.rest)renderRest()},1000);
 
 /* ================= HEALTH (WHOOP / Garmin / Apple Watch via Apple Health) ================= */
 const H_FIELDS=[['recovery','Recovery','%','var(--good)'],['sleep','Sleep','h','var(--kcal)'],['sleepScore','Sleep score','','var(--kcal)'],['hrv','HRV','ms','var(--fat)'],['rhr','Resting HR','bpm','var(--pro)'],['strain','Strain','','var(--carb)'],['bodyBattery','Body Battery','','var(--good)'],['steps','Steps','','var(--carb)'],['active','Active energy','kcal','var(--over)']];
@@ -2406,7 +2589,7 @@ weight=[Weight]</div>
   $('hgOk').onclick=closeSheet;
 }
 
-$('profBtn').onclick=openProfile;$('hSync').onclick=()=>{const c=syncCfg();if(c.url&&c.uid)syncDevices(true);else syncHealth()};$('hEdit').onclick=openHealthEdit;$('hHow').onclick=openSetupChooser;
+$('profBtn').onclick=()=>openPage('me');$('hSync').onclick=()=>{const c=syncCfg();if(c.url&&c.uid)syncDevices(true);else syncHealth()};$('hEdit').onclick=openHealthEdit;$('hHow').onclick=openSetupChooser;
 function renderJust(){
   const el=$('justAdded');if(!el)return;const j=S.just;
   const list=j&&j.k===S.day?(S.days[S.day]||[]).filter(e=>j.ids.includes(e.id)):[];
@@ -2443,10 +2626,10 @@ async function api(path,opt={}){
 let syncing=false;
 async function syncDevices(force){
   const c=syncCfg();if(!c.url||!c.uid||syncing)return;
-  if(!force&&c.last&&Date.now()-c.last<15*60000)return;
+  if(!force&&((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<5*60000)))return;
   syncing=true;setConnStatus('Syncing…');
   try{
-    const d=await api(`/api/sync?days=${c.last?14:45}${force?'&force=1':''}`);
+    const d=await api(`/api/sync?days=${c.last?14:45}&force=1`);
     mergeDevice(d);c.last=Date.now();c.err=(d.errors||[]).join(' · ');c.st={whoop:!!d.whoop,garmin:!!d.garmin};syncSave(c);
     setConnStatus('');if(force)toast('Synced WHOOP & Garmin');
   }catch(e){c.err=e.message;syncSave(c);setConnStatus('');if(force)toast(esc(e.message))}
@@ -2520,17 +2703,59 @@ function openSyncGuide(){
   $('sgOk').onclick=closeSheet;
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices(false)});
-function renderDevWorkouts(){
-  const el=$('devWk');if(!el)return;const ws=(S.dev&&S.dev.workouts)||[];
-  $('devWkCard').hidden=!ws.length;
-  el.innerHTML=ws.slice(0,10).map(w=>`<li><button data-devwk="${esc(w.id)}"><b>${esc(w.name)} <span class="mus">${esc(w.src)}</span></b><span class="r">${w.kcal!=null?fmt(w.kcal)+' kcal':''}${w.strain!=null?`<br><span class="dim">strain ${w.strain}</span>`:w.avgHr?`<br><span class="dim">${w.avgHr} bpm avg</span>`:''}</span><span class="s">${niceDate(w.date,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.reps?` · ${w.reps} reps`:''}</span></button></li>`).join('');
+/* ---- watch workouts in Train ---- */
+function devList(){return (S.dev&&S.dev.workouts)||[]}
+function autoLink(){
+  let ch=false;const used=new Set(S.workouts.map(w=>w.devId).filter(Boolean));
+  S.workouts.forEach(w=>{if(w.devId)return;const d=devList().find(x=>!used.has(x.id)&&x.date===w.date&&x.start&&Math.abs(Date.parse(x.start)-w.start)<90*60000);if(d){w.devId=d.id;used.add(d.id);ch=true}});
+  if(ch)save();
 }
-$('devWk')&&$('devWk').addEventListener('click',e=>{const b=e.target.closest('[data-devwk]');if(!b)return;const w=S.dev.workouts.find(x=>x.id===b.dataset.devwk);if(!w)return;
-  sheet(`<div><div class="eyebrow">${esc(w.src)} · ${niceDate(w.date,{weekday:'long',month:'short',day:'numeric'})}</div><h3>${esc(w.name)}</h3></div>
-    <div class="live"><div style="--c:var(--pro)"><b>${w.min??'—'}</b><span>minutes</span></div><div style="--c:var(--over)"><b>${w.kcal!=null?fmt(w.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--carb)"><b>${w.strain??(w.avgHr||'—')}</b><span>${w.strain!=null?'strain':'avg bpm'}</span></div><div style="--c:var(--fat)"><b>${w.maxHr||'—'}</b><span>max bpm</span></div></div>
-    <p class="note">Your watch records time, heart rate and calories. To track weights and reps for this session, log the sets in Syncope.</p>
-    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Log sets for this</button></div>`);
-  $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();startWorkout(w.name,[])};});
+function trainFeed(){
+  autoLink();const dev=devList(),by=Object.fromEntries(dev.map(d=>[d.id,d])),linked=new Set(S.workouts.map(w=>w.devId).filter(Boolean));
+  return [...S.workouts.map((w,i)=>({t:w.start||parseKey(w.date).getTime(),date:w.date,log:w,i,dev:w.devId?by[w.devId]:null})),
+    ...dev.filter(d=>!linked.has(d.id)).map(d=>({t:d.start?Date.parse(d.start):parseKey(d.date).getTime(),date:d.date,dev:d}))].sort((a,b)=>b.t-a.t);
+}
+function recentLogged(n){const seen=new Set(),out=[];S.workouts.forEach(w=>{const k=w.name.toLowerCase();if(!seen.has(k)&&out.length<n){seen.add(k);out.push(w)}});return out}
+function quickCopy(src,d){
+  const st=d.start?Date.parse(d.start):Date.now(),en=st+(d.min||60)*60000;
+  S.workouts.push({id:'w'+uid(),name:src.name,date:d.date,start:st,end:en,ex:src.ex.map(x=>({n:x.n,sets:x.sets.map(z=>({...z}))})),prs:[],devId:d.id,copied:true});
+  S.workouts.sort((a,b)=>b.end-a.end);save();renderTrain();toast(`Logged ${esc(src.name)} with last session's sets`);
+}
+function whenStr(d){const t=d.start?new Date(d.start):null,k=todayKey();return (d.date===k?'Today':d.date===addDays(k,-1)?'Yesterday':niceDate(d.date,{weekday:'long'}))+(t?' · '+t.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'')}
+function renderWatchNow(){
+  const el=$('wNow');if(!el)return;const skip=new Set((S.dev&&S.dev.skip)||[]),linked=new Set(S.workouts.map(w=>w.devId).filter(Boolean)),cut=addDays(todayKey(),-2);
+  const d=devList().find(x=>x.date>=cut&&!linked.has(x.id)&&!skip.has(x.id));
+  if(!d){el.hidden=true;el.innerHTML='';return}
+  const rec=recentLogged(2),f=trainFuel(d.date);
+  el.hidden=false;el.dataset.id=d.id;
+  el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${esc(d.src)}</span><span>${esc(whenStr(d))}</span></div>
+    <h2>${esc(d.name)}</h2>
+    <div class="live"><div style="--c:var(--pro)"><b>${d.min??'—'}</b><span>minutes</span></div><div style="--c:var(--good)"><b>${d.strain??'—'}</b><span>strain</span></div><div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div></div>
+    ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
+    <p class="note" style="margin:0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Syncope what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p>
+    <div class="wn-acts">${rec.map((w,j)=>`<button class="chip ${j?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button></div>`;
+}
+$('wNow').addEventListener('click',e=>{const id=$('wNow').dataset.id,d=devList().find(x=>x.id===id);if(!d)return;
+  const c=e.target.closest('[data-wcopy]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.wcopy);if(src)quickCopy(src,d);return}
+  if(e.target.closest('[data-wpick]'))return pickLiftFor(d);
+  if(e.target.closest('[data-wskip]')){S.dev.skip=[...(S.dev.skip||[]),d.id].slice(-100);save();renderTrain();toast('Kept as a watch session')}});
+function pickLiftFor(d){
+  const rec=recentLogged(6);
+  sheet(`<div><div class="eyebrow">${esc(d.src)} · ${esc(whenStr(d))}</div><h3>What did you train?</h3><p class="note">“Same as last” copies every set and weight in one tap. A template opens the workout so you can enter today's numbers.</p></div>
+    ${rec.length?`<div class="glabel" style="margin:0">Same as last time</div><div class="glist">${rec.map(w=>`<button class="gr" data-pc="${esc(w.id)}"><span class="gi" style="--c:var(--good)">${GI.copy}</span><span class="gt"><b>${esc(w.name)}</b><span>${esc(w.ex.map(x=>x.n).join(' · '))}</span></span><span class="gv">${niceDate(w.date,{month:'short',day:'numeric'})}</span>${CHEV}</button>`).join('')}</div>`:''}
+    <div class="glabel" style="margin:0">Enter today's numbers</div><div class="glist">${S.templates.map((t,i)=>`<button class="gr" data-pt="${i}"><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></span><span></span>${CHEV}</button>`).join('')}<button class="gr" data-pt="-1"><span class="gi" style="--c:var(--muted)">${GI.plus}</span><span class="gt"><b>Empty workout</b><span>Add exercises as you go</span></span><span></span>${CHEV}</button></div>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="pkX">Cancel</button></div>`);
+  $('pkX').onclick=closeSheet;
+  $('sheetRoot').querySelector('.sheet').addEventListener('click',e=>{const c=e.target.closest('[data-pc]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.pc);closeSheet();if(src)quickCopy(src,d);return}
+    const t=e.target.closest('[data-pt]');if(t){const i=+t.dataset.pt,tp=i>=0?S.templates[i]:{name:d.name,ex:[]};closeSheet();startWorkout(tp.name,tp.ex,null,d)}});
+}
+function openDevWorkout(id){const w=devList().find(x=>x.id===id);if(!w)return;
+  sheet(`<div><div class="eyebrow">${esc(w.src)} · ${esc(whenStr(w))}</div><h3>${esc(w.name)}</h3></div>
+    <div class="live"><div style="--c:var(--pro)"><b>${w.min??'—'}</b><span>minutes</span></div><div style="--c:var(--over)"><b>${w.kcal!=null?fmt(w.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--good)"><b>${w.strain??(w.avgHr||'—')}</b><span>${w.strain!=null?'strain':'avg bpm'}</span></div><div style="--c:var(--fat)"><b>${w.maxHr||'—'}</b><span>max bpm</span></div></div>
+    <p class="note">Your watch recorded time, heart rate and calories. Add the lifts to track sets, weights and strength progress for this session.</p>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Add the lifts</button></div>`);
+  $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();pickLiftFor(w)};
+}
 function recoveryTable(keys){
   const rows=keys.map(k=>[k,hv(k)]).filter(([,h])=>['sleep','recovery','hrv','rhr','steps'].some(x=>h[x]!=null));
   if(!rows.length)return '<p class="note">Connect WHOOP or Garmin (Plan → Connections), or sync from Apple Health on Today, to see sleep and recovery here.</p>';
@@ -2541,14 +2766,14 @@ function openSetupChooser(){
   sheet(`<div><div class="eyebrow">Recovery &amp; activity</div><h3>How should data come in?</h3></div>
     <div class="choice"><button type="button" id="scAuto" style="--c:var(--good)"><i></i><div><b>Automatic: WHOOP &amp; Garmin</b><span>Everything, including Recovery, HRV, strain, Body Battery and sleep score. Syncs on its own.</span></div></button>
     <button type="button" id="scShort" style="--c:var(--kcal)"><i></i><div><b>Apple Health Shortcut</b><span>Works with Apple Watch too. Fewer metrics and one tap each morning.</span></div></button></div>`);
-  $('scAuto').onclick=()=>{closeSheet();setView('plan');setTimeout(()=>$('connCard').scrollIntoView({behavior:'smooth',block:'start'}),120)};
+  $('scAuto').onclick=()=>{closeSheet();openPage('conn')};
   $('scShort').onclick=()=>{openHealthGuide()};
 }
 /* ---------- start ---------- */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-setView(location.hash.slice(1)||'today'); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);
+applyPrefs(); setView(location.hash.slice(1)||'today'); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);
 if(!storageOK){$('saved').textContent='Not saving — storage blocked';$('saved').style.color='var(--over)'}
 document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&S.view==='today'){e.preventDefault();input.focus()}});
 let lastDay=todayKey();
