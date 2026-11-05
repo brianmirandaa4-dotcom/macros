@@ -534,7 +534,7 @@ function publicView(r, forSelf) {
     if (on('nutrition')) Object.assign(o, { k: x.k, p: x.p, c: x.c, f: x.f, gk: x.gk, gp: x.gp, gc: x.gc, gf: x.gf, n: x.n });
     if (on('steps')) o.steps = x.steps;
     if (on('recovery')) Object.assign(o, { sleep: x.sleep, rec: x.rec, hrv: x.hrv, rhr: x.rhr, strain: x.strain });
-    if (on('weight')) o.w = x.w;
+    if (on('weight')) o.w = x.w; if (forSelf || sh.water !== false) Object.assign(o, { ho: x.ho, ht: x.ht, na: x.na });
     return o;
   });
   const detail = { daily, foods: on('foods') ? (dt.foods || []) : null, wks: on('workouts') ? (dt.wks || []) : null, tpls: (forSelf || sh.templates !== false) ? (dt.tpls || []) : null, plan: on('nutrition') ? dt.plan : null, shares: Object.fromEntries(SHARE_KEYS.map(k => [k, k === 'templates' ? sh[k] !== false : !!sh[k]])) };
@@ -588,7 +588,7 @@ async function social(action, req, url, user, env, cors) {
     const D = body.detail || {}, num = (v, hi) => v == null || v === '' ? null : clampN(v, -1e5, hi);
     me.detail = {
       daily: (Array.isArray(D.daily) ? D.daily : []).slice(0, 7).map(x => ({ d: cleanStr(x.d, 10), k: num(x.k, 2e4), p: num(x.p, 2e3), c: num(x.c, 3e3), f: num(x.f, 2e3), gk: num(x.gk, 2e4), gp: num(x.gp, 2e3), gc: num(x.gc, 3e3), gf: num(x.gf, 2e3), n: num(x.n, 500),
-        steps: num(x.steps, 2e5), sleep: num(x.sleep, 24), rec: num(x.rec, 100), hrv: num(x.hrv, 400), rhr: num(x.rhr, 250), strain: num(x.strain, 21), w: num(x.w, 1500) })),
+        steps: num(x.steps, 2e5), sleep: num(x.sleep, 24), rec: num(x.rec, 100), hrv: num(x.hrv, 400), rhr: num(x.rhr, 250), strain: num(x.strain, 21), w: num(x.w, 1500), ho: num(x.ho, 2000), ht: num(x.ht, 2000), na: num(x.na, 2e4) })),
       foods: (Array.isArray(D.foods) ? D.foods : []).slice(0, 40).map(x => ({ n: cleanStr(x.n, 40), a: cleanStr(x.a, 24), m: cleanStr(x.m, 10), k: num(x.k, 5e3), p: num(x.p, 500), c: num(x.c, 800), f: num(x.f, 500) })),
       wks: (Array.isArray(D.wks) ? D.wks : []).slice(0, 10).map(x => ({ name: cleanStr(x.name, 40), d: cleanStr(x.d, 10), min: num(x.min, 600), sets: num(x.sets, 300), vol: num(x.vol, 1e6), prs: num(x.prs, 50), kcal: num(x.kcal, 5e3), strain: num(x.strain, 21), src: cleanStr(x.src, 10),
         ex: (Array.isArray(x.ex) ? x.ex : []).slice(0, 12).map(e => ({ n: cleanStr(e.n, 40), top: cleanStr(e.top, 20), sets: num(e.sets, 50) })) })),

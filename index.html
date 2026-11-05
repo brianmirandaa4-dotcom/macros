@@ -849,6 +849,7 @@ details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:c
 .fp-foods{display:flex;flex-direction:column;gap:14px}.fp-meal b{font-family:var(--f-display)}
 .fp-f{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--line)}.fp-f:last-child{border-bottom:0}
 .fp-f i{color:var(--muted);font-style:normal;font-size:12px}.fp-f em{font-style:normal;font-size:12px}
+.fp-hyd{display:flex;flex-direction:column;gap:10px}.fp-hyd .fp-m span svg{width:15px;height:15px;vertical-align:-2px;color:var(--fat)}.fp-hb{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.fp-hb div{display:flex;flex-direction:column;align-items:center;gap:4px}.fp-hb i{display:block;width:100%;max-width:26px;height:46px;border-radius:7px;background:var(--surface-2);position:relative;overflow:hidden}.fp-hb u{position:absolute;left:0;right:0;bottom:0;border-radius:7px}.fp-hb span{font-size:11px;color:var(--muted)}
 .fp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fp-tiles .tile{padding:12px}.fp-tiles .v{font-size:20px}
 .fp-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:120px;margin-bottom:14px}
 .fb{display:flex;flex-direction:column;align-items:center;gap:6px}.fb span{font-size:11px;color:var(--muted)}
@@ -2355,7 +2356,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.29';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.30';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4571,7 +4572,7 @@ function editSoc(){const c=socCfg();
 function myDetail(){
   const tk=todayKey(),daily=[];
   for(let i=6;i>=0;i--){const d=addDays(tk,-i),t=dayTotals(d),g=goalsFor(d),h=hv(d);
-    daily.push({d,k:r0(t.k),p:r0(t.p),c:r0(t.c),f:r0(t.f),gk:goalKcal(g),gp:r0(g.p),gc:r0(g.c),gf:r0(g.f),n:t.n,steps:h.steps??null,sleep:h.sleep??null,rec:h.recovery??null,hrv:h.hrv??null,rhr:h.rhr??null,strain:h.strain??null,w:S.weights[d]??null})}
+    daily.push({d,k:r0(t.k),p:r0(t.p),c:r0(t.c),f:r0(t.f),gk:goalKcal(g),gp:r0(g.p),gc:r0(g.c),gf:r0(g.f),n:t.n,steps:h.steps??null,sleep:h.sleep??null,rec:h.recovery??null,hrv:h.hrv??null,rhr:h.rhr??null,strain:h.strain??null,w:S.weights[d]??null,...(()=>{const hd=hydDay(d),hp=hydPlan(d);return {ho:hd.oz?r0(hd.oz):(d===tk?0:null),ht:r0(hp.oz.total),na:hd.na?r0(hd.na):null}})()})}
   const foods=(S.days[tk]||[]).slice(0,40).map(e=>({n:e.n,a:e.a,m:e.meal||'snack',k:r0(e.k),p:r0(e.p),c:r0(e.c),f:r0(e.f)}));
   const wks=trainFeed().filter(x=>x.date>=addDays(tk,-6)).slice(0,10).map(x=>{const w=x.log,d=x.dev;
     return {name:w?w.name:d.name,d:x.date,min:w?Math.round((w.end-w.start)/60000):d.min,sets:w?w.ex.reduce((a,y)=>a+y.sets.length,0):null,vol:w?r0(w.ex.reduce((a,y)=>a+y.sets.reduce((b,z)=>b+setVol(z),0),0)):null,prs:w?(w.prs||[]).length:0,kcal:d?d.kcal:null,strain:d?d.strain:null,src:d?d.src:'',
@@ -4607,6 +4608,11 @@ function renderFriendPage(){
   if((sh.recovery||isMe)&&days.some(x=>x.rec!=null||x.sleep!=null)){const r=days.slice().reverse().find(x=>x.rec!=null||x.sleep!=null)||{};
     html+=`<div class="glabel">Recovery & sleep</div><div class="fp-tiles">${[['Recovery',r.rec!=null?r.rec+'%':'—','--good'],['Sleep',r.sleep!=null?r.sleep+'h':'—','--kcal'],['HRV',r.hrv??'—','--fat'],['Resting HR',r.rhr??'—','--pro'],['Strain',r.strain??'—','--carb'],['Steps',today.steps!=null?fmt(today.steps):'—','--good']].map(([l,v,c2])=>`<div class="tile" style="--c:var(${c2})"><div class="eyebrow">${l}</div><div class="v" style="color:var(${c2})">${v}</div></div>`).join('')}</div>`}
   else if(!isMe&&!sh.recovery)html+=locked('Recovery & sleep','Recovery & sleep');
+  if(days.some(x=>x.ht!=null)){const hx=today.ht!=null?today:days.slice().reverse().find(x=>x.ht!=null),ho=hx.ho||0,ht=hx.ht||1,pc=Math.min(100,ho/ht*100),isT=hx.d===tk,who=isMe?'You':esc(F.name.split(' ')[0]);
+    html+=`<div class="glabel">Hydration</div><div class="card fp-hyd"><div class="fp-m" style="--c:var(--fat)"><div class="row" style="justify-content:space-between"><span>${GI.drop} ${isT?'Today':niceDate(hx.d,{weekday:'short',day:'numeric'})}</span><b class="num">${fmt(ho)}<small> / ${fmt(ht)} fl oz</small></b></div><i><u style="width:${pc}%"></u></i></div>
+      <p class="note" style="margin:0">${ho>=ht?`${who} hit the water goal${hx.na?` · ${fmt(hx.na)} mg sodium from electrolytes`:''}`:ho?`${fmt(ht-ho)} fl oz to go${hx.na?` · ${fmt(hx.na)} mg sodium from electrolytes`:''}`:`No water logged ${isT?'yet today':'that day'}.`}</p>
+      <div class="fp-hb">${days.map(x=>{const v=x.ht?Math.min(1,(x.ho||0)/x.ht):0;return `<div title="${x.d}: ${fmt(x.ho||0)} / ${fmt(x.ht||0)} fl oz"><i><u style="height:${v*100}%;background:${v>=1?'var(--good)':'var(--fat)'}"></u></i><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`}).join('')}</div>
+      <p class="note" style="margin:0">${days.filter(x=>x.ht&&(x.ho||0)>=x.ht).length} of ${days.filter(x=>x.ht!=null).length} days on target this week</p></div>`}
   if(sh.nutrition||sh.steps||sh.recovery||isMe){const mx=Math.max(1,...days.map(x=>Math.max(x.k||0,x.gk||0)));
     html+=`<div class="glabel">Last 7 days</div><div class="card"><div class="fp-bars">${days.map(x=>`<div class="fb" title="${x.d}"><div class="fb-c"><i class="g" style="bottom:${(x.gk||0)/mx*100}%"></i><u style="height:${(x.k||0)/mx*100}%;background:${x.k>x.gk*1.1?'var(--over)':x.k>=x.gk*.9?'var(--good)':'var(--kcal)'}"></u></div><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`).join('')}</div>
       <table class="dtable fp-t"><thead><tr><th>Day</th>${sh.nutrition||isMe?'<th>kcal</th><th style="color:var(--pro)">P</th>':''}${sh.steps||isMe?'<th>Steps</th>':''}${sh.recovery||isMe?'<th style="color:var(--good)">Rec</th><th>Sleep</th>':''}</tr></thead><tbody>${days.slice().reverse().map(x=>`<tr><td>${niceDate(x.d,{weekday:'short',day:'numeric'})}</td>${sh.nutrition||isMe?`<td>${x.k!=null&&x.n?fmt(x.k):'—'}</td><td>${x.p!=null&&x.n?x.p:'—'}</td>`:''}${sh.steps||isMe?`<td>${x.steps!=null?fmt(x.steps):'—'}</td>`:''}${sh.recovery||isMe?`<td>${x.rec!=null?x.rec+'%':'—'}</td><td>${x.sleep!=null?x.sleep+'h':'—'}</td>`:''}</tr>`).join('')}</tbody></table></div>`}
