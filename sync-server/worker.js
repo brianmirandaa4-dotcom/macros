@@ -19,8 +19,53 @@ const OURA_SCOPES = 'personal daily heartrate workout spo2Daily';
 const GARMIN_API = 'https://personal.connectapi.garmin.com';
 const GARMIN_TOKEN_PATH = '/personalapitoken-service/personal-api/personal-api-key/token';
 
+// Storage. With a D1 database bound as DB (free tier: 100,000 writes a day, versus KV's 1,000),
+// everything lives in one SQLite table. The first request copies the old KV data over once.
+// Without DB it falls back to the KV namespace, so nothing breaks either way.
+function withStore(env) {
+  if (!env.DB) return env;
+  const db = env.DB, kv = env.MACROS_KV, now = () => Math.floor(Date.now() / 1000);
+  let ready = null;
+  const init = () => ready || (ready = (async () => {
+    await db.prepare('CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT NOT NULL, exp INTEGER)').run();
+    const done = await db.prepare('SELECT v FROM kv WHERE k = ?').bind('__moved').first();
+    if (!done && kv) {
+      let cursor, rows = [];
+      do {
+        const l = await kv.list({ cursor });
+        for (const key of l.keys) { const v = await kv.get(key.name); if (v != null) rows.push(db.prepare('INSERT OR IGNORE INTO kv (k, v, exp) VALUES (?, ?, ?)').bind(key.name, v, key.expiration || null)); }
+        cursor = l.list_complete ? null : l.cursor;
+      } while (cursor);
+      rows.push(db.prepare('INSERT OR REPLACE INTO kv (k, v, exp) VALUES (?, ?, NULL)').bind('__moved', String(Date.now())));
+      await db.batch(rows);
+    }
+  })().catch((e) => { ready = null; throw e; }));
+  const st = {
+    async get(k, type) {
+      await init();
+      const r = await db.prepare('SELECT v FROM kv WHERE k = ? AND (exp IS NULL OR exp > ?)').bind(k, now()).first();
+      if (!r) return null;
+      return type === 'json' ? JSON.parse(r.v) : r.v;
+    },
+    async put(k, v, opt) {
+      await init();
+      const exp = opt && opt.expirationTtl ? now() + opt.expirationTtl : null;
+      await db.prepare('INSERT OR REPLACE INTO kv (k, v, exp) VALUES (?, ?, ?)').bind(k, String(v), exp).run();
+    },
+    async delete(k) { await init(); await db.prepare('DELETE FROM kv WHERE k = ?').bind(k).run(); },
+    async list(o) {
+      await init();
+      const p = (o && o.prefix) || '';
+      const r = await db.prepare("SELECT k FROM kv WHERE k >= ? AND k < ? AND (exp IS NULL OR exp > ?) ORDER BY k").bind(p, p + '\uffff', now()).all();
+      return { keys: (r.results || []).map((x) => ({ name: x.k })), list_complete: true };
+    },
+  };
+  return { ...env, MACROS_KV: st };
+}
+
 export default {
   async fetch(req, env, ctx) {
+    env = withStore(env);
     const url = new URL(req.url);
     const cors = corsHeaders(req, env);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
@@ -62,9 +107,9 @@ export default {
         const days = Math.min(60, Math.max(1, +url.searchParams.get('days') || 14));
         const force = url.searchParams.get('force') === '1';
         const cached = await env.MACROS_KV.get('cache:' + user.id, 'json');
-        if (!force && cached && cached.days >= days && Date.now() - cached.at < 20 * 60 * 1000) return json(cached, 200, cors);
+        if (cached && cached.days >= days && Date.now() - cached.at < (force ? 2 : 20) * 60 * 1000) return json(cached, 200, cors);
         const data = await syncUser(user, env, days);
-        ctx.waitUntil(env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data)));
+        if (cacheChanged(cached, data)) ctx.waitUntil(env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data)));
         return json(data, 200, cors);
       }
       if (p.startsWith('/api/social/')) return social(p.slice(12), req, url, user, env, cors);
@@ -80,6 +125,7 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
+    env = withStore(env);
     // Keep every connected account fresh and pre-load the last 14 days.
     let cursor;
     do {
@@ -89,7 +135,8 @@ export default {
         if (!user || (!user.whoop && !user.garmin && !user.oura)) continue;
         try {
           const data = await syncUser(user, env, 14);
-          await env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data));
+          const old = await env.MACROS_KV.get('cache:' + user.id, 'json');
+          if (cacheChanged(old, data)) await env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data));
         } catch (e) { /* keep going for other users */ }
       }
       cursor = list.list_complete ? null : list.cursor;
@@ -131,6 +178,9 @@ async function authUser(req, env) {
   if (!user || user.h !== await sha(m[2])) return null;
   return user;
 }
+// Free KV tier allows ~1,000 writes a day, so only write when the data really changed.
+const sansAt = (d) => { if (!d) return ''; const { at, ...rest } = d; return JSON.stringify(rest); };
+const cacheChanged = (old, data) => !old || old.days < data.days || sansAt(old) !== sansAt(data) || Date.now() - (old.at || 0) > 6 * 3600 * 1000;
 async function saveUser(env, user) { await env.MACROS_KV.put('user:' + user.id, JSON.stringify(user)); }
 function status(user) {
   return { whoop: !!user.whoop?.refresh, garmin: !!user.garmin?.key, whoopSince: user.whoop?.since || null, garminSince: user.garmin?.since || null, oura: !!user.oura?.refresh, ouraSince: user.oura?.since || null };
@@ -454,8 +504,11 @@ const clampN = (v, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.
 const cleanStr = (v, n) => String(v ?? '').replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, n);
 // Profile picture: a built-in character id, or a small square JPEG (data URL, under ~24 KB).
 const cleanAv = (v) => typeof v === 'string' && (/^[a-z]{2,14}$/.test(v) || (/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v) && v.length < 24000)) ? v : null;
-async function socGet(env, uid) { return env.MACROS_KV.get('soc:' + uid, 'json'); }
-async function socPut(env, rec) { rec.updated = Date.now(); await env.MACROS_KV.put('soc:' + rec.uid, JSON.stringify(rec)); }
+// Remember what each record looked like when read, so unchanged records are never re-written.
+const SOC_SEEN = new WeakMap();
+const socSig = (r) => { const { updated, ...rest } = r; return JSON.stringify(rest); };
+async function socGet(env, uid) { const r = await env.MACROS_KV.get('soc:' + uid, 'json'); if (r) SOC_SEEN.set(r, socSig(r)); return r; }
+async function socPut(env, rec) { if (SOC_SEEN.get(rec) === socSig(rec)) return; rec.updated = Date.now(); await env.MACROS_KV.put('soc:' + rec.uid, JSON.stringify(rec)); SOC_SEEN.set(rec, socSig(rec)); }
 async function phoneKey(env, raw) {
   let d = String(raw || '').replace(/\D/g, ''); if (d.length === 10) d = '1' + d; if (d.length < 8 || d.length > 15) return null;
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.PHONE_PEPPER || env.WHOOP_CLIENT_SECRET || 'syncope'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);

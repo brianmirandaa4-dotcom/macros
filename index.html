@@ -1906,7 +1906,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.17';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.18';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3703,9 +3703,12 @@ function myWeek(){
 async function socApi(path,body){let c;try{c=await ensureSync()}catch(e){throw new Error(niceErr(e,'Syncope Friends'))}let r;try{r=await fetch(c.url+'/api/social/'+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined})}catch(e){throw new Error(niceErr(e,'Syncope Friends'))}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Couldn’t reach Syncope Friends.');return j}
 let socT=null;
-function socSchedule(ms=15000){const c=socCfg();if(!c.on)return;clearTimeout(socT);socT=setTimeout(socPush,ms)}
-async function socPush(force){const c=socCfg();if(!c.on)return;if(!force&&c.lastPush&&Date.now()-c.lastPush<3*60000)return socSchedule(3*60000-(Date.now()-c.lastPush)+500);
-  try{const {stats,events}=myWeek();await socApi('stats',{stats,events,detail:myDetail(),av:myAv()});const n=socCfg();n.lastPush=Date.now();socSave(n)}catch(e){}}
+function socSchedule(ms=60000){const c=socCfg();if(!c.on)return;clearTimeout(socT);socT=setTimeout(socPush,ms)}
+// Leaderboard pushes: at most every 15 min, and never when nothing changed (keeps the free server tier comfortable).
+async function socPush(force){const c=socCfg();if(!c.on)return;const GAP=15*60000;if(!force&&c.lastPush&&Date.now()-c.lastPush<GAP)return socSchedule(GAP-(Date.now()-c.lastPush)+500);
+  try{const {stats,events}=myWeek(),body={stats,events,detail:myDetail(),av:myAv()},sig=String(hashStr(JSON.stringify(body)));
+    if(sig===c.pushSig&&c.lastPush&&Date.now()-c.lastPush<6*36e5){const n=socCfg();n.lastPush=Date.now();socSave(n);return}
+    await socApi('stats',body);const n=socCfg();n.lastPush=Date.now();n.pushSig=sig;socSave(n)}catch(e){}}
 async function socBoard(){const c=socCfg();if(!c.on)return null;try{const b=await socApi('board');const n=socCfg();n.board=b;n.boardAt=Date.now();n.code=b.me.code;n.username=b.me.username;n.phoneLast4=b.me.phoneLast4;try{const ws=weekStart(todayKey()),mine=myWeek().stats.score,sc=[mine,...(b.friends||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0)];if(sc.length>1)n.weekSnap={ws,pts:mine,n:sc.length,rank:1+sc.slice(1).filter(x=>x>mine).length}}catch(e){}socSave(n);return b}catch(e){return c.board||null}}
 const avPic=av=>{if(typeof av!=='string'||!av)return '';if(/^data:image\/jpeg;base64,/.test(av))return `<img src="${av}" alt="">`;const a=AVT.find(x=>x.id===av);return a?a.svg:''};
 const myAv=()=>{const P=S.profile||{};return P.photoSm||P.photo||(P.avatar&&AVT.some(x=>x.id===P.avatar)?P.avatar:null)};
@@ -4890,10 +4893,10 @@ async function api(path,opt={}){
 let syncing=false;
 async function syncDevices(force){
   const c=syncCfg();if(!c.url||!c.uid||syncing)return;
-  if(!force&&((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<5*60000)))return;
+  if(!force&&((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<15*60000)))return;
   syncing=true;setConnStatus('Syncing…');document.documentElement.classList.add('syncing');if(S.view==='today')renderTodayRows();
   try{
-    const d=await api(`/api/sync?days=${c.last?14:45}&force=1`);
+    const d=await api(`/api/sync?days=${c.last?14:45}${force?'&force=1':''}`);
     mergeDevice(d);c.last=Date.now();c.err=(d.errors||[]).join(' · ');c.st={...(c.st||{}),whoop:!!d.whoop,garmin:!!d.garmin,oura:!!d.oura};syncSave(c);
     setConnStatus('');if(force)toast('Synced your devices');
   }catch(e){c.err=e.message;syncSave(c);setConnStatus('');if(force)toast(esc(e.message))}
@@ -4968,7 +4971,7 @@ function openSyncGuide(){
   $('sgOk').onclick=closeSheet;
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices(false)});
-setInterval(()=>{if(document.visibilityState==='visible')syncDevices(false)},5*60000);
+setInterval(()=>{if(document.visibilityState==='visible')syncDevices(false)},15*60000);
 /* ---- watch workouts in Train ---- */
 function devList(){return (S.dev&&S.dev.workouts)||[]}
 function autoLink(){
