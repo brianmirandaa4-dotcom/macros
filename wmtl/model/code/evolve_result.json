@@ -1,0 +1,1199 @@
+{
+ "pass_yds": {
+  "kept": [
+   "Starter flag",
+   "Career rush yds / g",
+   "Team pass volume",
+   "QB downgrade (\u2212)",
+   "Volume vs baseline",
+   "Implied team total",
+   "Opp dropbacks faced",
+   "Game total vs usual",
+   "Expected pass rate",
+   "H2H production",
+   "Own QB quality",
+   "Recent target share (weighted)",
+   "Recent carry share (weighted)",
+   "QB carries / game",
+   "Team rush volume",
+   "Baseline reliability",
+   "Implied pts vs usual",
+   "Opp yds / dropback",
+   "Opp TDs to position",
+   "Depth rank",
+   "Home / rest / roof",
+   "Opp rush TDs allowed",
+   "Recent form"
+  ],
+  "w": [
+   1.5489922892465295,
+   0.19597260068549444,
+   -0.17649527271419901,
+   -0.07463199096908338,
+   -0.012530454422484774,
+   0.09832030440970398,
+   0.07393715701232093,
+   0.11264996532673083,
+   -0.07137824641744926,
+   -0.09273898156849016,
+   -0.07908448664551626,
+   0.13366503775649904,
+   -0.1605838378403518,
+   0.15459532991122796,
+   -0.0580607658605123,
+   0.0800973982946197,
+   -0.04903809566068247,
+   0.12222717379711645,
+   -0.0834197301208871,
+   -0.14222250933518663,
+   0.02779270117907173,
+   -0.05783583280413605,
+   0.05710127570819618
+  ],
+  "b": -0.36141334724650565,
+  "lam": 0.003,
+  "sp": 0.5907589259996537,
+  "cv_err": [
+   1.0106234182034204,
+   0.642880595995846
+  ],
+  "wf": {
+   "2025": {
+    "n": 596,
+    "rho_new": 0.501,
+    "rho_slate": 0.366,
+    "rho_gbm": 0.521,
+    "mse_new": 0.7054,
+    "mse_slate": 0.9481,
+    "mse_null": 1.2505,
+    "n_kept": 19
+   },
+   "2026": {
+    "n": 256,
+    "rho_new": 0.412,
+    "rho_slate": 0.325,
+    "rho_gbm": 0.404,
+    "mse_new": 0.9194,
+    "mse_slate": 1.1459,
+    "mse_null": 1.2446,
+    "n_kept": 21
+   }
+  },
+  "meta": {
+   "Starter flag": {
+    "fam": "A",
+    "how": "He is the QB taking the snaps (ESPN depth chart / box score)",
+    "src": "New"
+   },
+   "Career rush yds / g": {
+    "fam": "B",
+    "how": "Career rushing yards per game vs baseline",
+    "src": "Slate"
+   },
+   "Team pass volume": {
+    "fam": "D",
+    "how": "Team dropbacks per game, season to date",
+    "src": "New"
+   },
+   "QB downgrade (\u2212)": {
+    "fam": "D",
+    "how": "Today's QB quality minus the usual starter's (0 if same QB)",
+    "src": "Slate"
+   },
+   "Volume vs baseline": {
+    "fam": "A",
+    "how": "Recent weighted touches + targets vs his season rate",
+    "src": "New"
+   },
+   "Implied team total": {
+    "fam": "D",
+    "how": "DraftKings spread and total \u2192 points the market expects his team to score",
+    "src": "New"
+   },
+   "Opp dropbacks faced": {
+    "fam": "C",
+    "how": "Opp QB dropbacks faced / game vs league",
+    "src": "Slate"
+   },
+   "Game total vs usual": {
+    "fam": "D",
+    "how": "Game total \u2212 both teams' usual scoring",
+    "src": "Slate"
+   },
+   "Expected pass rate": {
+    "fam": "D",
+    "how": "Point spread: underdogs pass more, favorites run more",
+    "src": "New"
+   },
+   "H2H production": {
+    "fam": "E",
+    "how": "His passing_yards vs this opponent (last 3 seasons) vs his career, shrunk n/(n+3)",
+    "src": "Slate"
+   },
+   "Own QB quality": {
+    "fam": "D",
+    "how": "His career passing EPA per dropback (shrunk)",
+    "src": "Slate"
+   },
+   "Recent target share (weighted)": {
+    "fam": "A",
+    "how": "Target share, last ~4 games weighted toward the latest",
+    "src": "New"
+   },
+   "Recent carry share (weighted)": {
+    "fam": "A",
+    "how": "Carry share, last ~4 games weighted toward the latest",
+    "src": "New"
+   },
+   "QB carries / game": {
+    "fam": "A",
+    "how": "QB carries per game, shrunk",
+    "src": "Slate"
+   },
+   "Team rush volume": {
+    "fam": "D",
+    "how": "Team carries per game, season to date",
+    "src": "New"
+   },
+   "Baseline reliability": {
+    "fam": "E",
+    "how": "Fewer games this season = noisier baseline (1/(games+1))",
+    "src": "Slate"
+   },
+   "Implied pts vs usual": {
+    "fam": "D",
+    "how": "Market implied team points \u2212 team average",
+    "src": "Slate"
+   },
+   "Opp yds / dropback": {
+    "fam": "C",
+    "how": "Opp yards per dropback allowed vs league",
+    "src": "Slate"
+   },
+   "Opp TDs to position": {
+    "fam": "C",
+    "how": "Opp TDs allowed to his position / game vs league",
+    "src": "Slate"
+   },
+   "Depth rank": {
+    "fam": "A",
+    "how": "Rank at his position (1 = top), negative",
+    "src": "Slate"
+   },
+   "Home / rest / roof": {
+    "fam": "D",
+    "how": "Home + (rest\u22127)/7 + 0.5\u00b7dome",
+    "src": "Slate"
+   },
+   "Opp rush TDs allowed": {
+    "fam": "C",
+    "how": "Opp rushing TDs allowed / game",
+    "src": "Slate"
+   },
+   "Recent form": {
+    "fam": "B",
+    "how": "Last game yards vs baseline (log ratio)",
+    "src": "Slate"
+   }
+  },
+  "pool": 58,
+  "mu": [
+   0.9016018306636155,
+   -0.0515158641566623,
+   35.93441569241532,
+   -0.003268991143510314,
+   -0.03532836331065925,
+   22.518537804591265,
+   -0.001957500588186701,
+   -0.1553509074921301,
+   -0.15429879045439687,
+   -0.009737439881755374,
+   0.009394344897292833,
+   0.0004070217662405761,
+   0.12862038169927326,
+   3.3460136935455775,
+   26.646682891898337,
+   0.26610984816280836,
+   -0.015729066346097935,
+   -0.0015656471879659899,
+   -0.021554629575054676,
+   1.1500490356325597,
+   0.4998365478914678,
+   -0.03402376171368746,
+   -0.17554605659585282
+  ],
+  "sd": [
+   0.2978522613774049,
+   0.1893273015506765,
+   5.288698432692067,
+   0.05878957166706213,
+   0.3348205483870967,
+   4.674079518501591,
+   0.06643079912090945,
+   4.560260415689754,
+   4.401520249527044,
+   0.08712403201692565,
+   0.07117763613433864,
+   0.001964910986285458,
+   0.0766764219044692,
+   2.549770571841773,
+   4.433145922603688,
+   0.25850456149966267,
+   2.9569575790499614,
+   0.058774698543117995,
+   0.21828002749582803,
+   0.36436902998379667,
+   0.4999999732834075,
+   0.26603916431819385,
+   0.5251300529345456
+  ]
+ },
+ "qb_rush": {
+  "kept": [
+   "Yards / carry",
+   "Depth rank",
+   "Meetings count",
+   "Opp QB carries allowed",
+   "Experience",
+   "H2H efficiency",
+   "Recent form",
+   "3-game volume",
+   "Dropback share",
+   "Home / rest / roof",
+   "Career rush yds / g",
+   "Game total vs usual",
+   "Yards / attempt",
+   "Completion %",
+   "Trailing script"
+  ],
+  "w": [
+   -0.13989749632205628,
+   -0.2132802277895871,
+   -0.08820373089052871,
+   0.06793694121516293,
+   -0.10108027628349252,
+   0.06874920545074402,
+   0.09814011417120272,
+   -0.13532597838555668,
+   0.07561970995149891,
+   0.05145308261236356,
+   0.09641522072284278,
+   0.058075456927344504,
+   0.07377798388877145,
+   -0.050519688384582324,
+   0.02936288687179185
+  ],
+  "b": -0.22948028338211876,
+  "lam": 0.03,
+  "sp": 0.4548425784566066,
+  "cv_err": [
+   0.9992015612956774,
+   0.9571015410479539
+  ],
+  "wf": {
+   "2025": {
+    "n": 596,
+    "rho_new": 0.128,
+    "rho_slate": 0.118,
+    "rho_gbm": 0.15,
+    "mse_new": 1.0054,
+    "mse_slate": 1.0033,
+    "mse_null": 1.02,
+    "n_kept": 20
+   },
+   "2026": {
+    "n": 256,
+    "rho_new": 0.252,
+    "rho_slate": 0.264,
+    "rho_gbm": 0.219,
+    "mse_new": 0.9424,
+    "mse_slate": 0.9278,
+    "mse_null": 0.9897,
+    "n_kept": 16
+   }
+  },
+  "meta": {
+   "Yards / carry": {
+    "fam": "B",
+    "how": "QB yards per carry, shrunk 60 carries",
+    "src": "Slate"
+   },
+   "Depth rank": {
+    "fam": "A",
+    "how": "Rank at his position (1 = top), negative",
+    "src": "Slate"
+   },
+   "Meetings count": {
+    "fam": "E",
+    "how": "Number of prior meetings (familiarity), capped at 6",
+    "src": "Slate"
+   },
+   "Opp QB carries allowed": {
+    "fam": "C",
+    "how": "Opp QB carries allowed / game vs league",
+    "src": "Slate"
+   },
+   "Experience": {
+    "fam": "E",
+    "how": "Career games played (log)",
+    "src": "Slate"
+   },
+   "H2H efficiency": {
+    "fam": "E",
+    "how": "rushing_yards per carries vs this opponent vs career, shrunk",
+    "src": "Slate"
+   },
+   "Recent form": {
+    "fam": "B",
+    "how": "Last game rush yards vs baseline",
+    "src": "Slate"
+   },
+   "3-game volume": {
+    "fam": "A",
+    "how": "opps per game over last 3 vs season average",
+    "src": "Slate"
+   },
+   "Dropback share": {
+    "fam": "A",
+    "how": "His share of team dropbacks",
+    "src": "Slate"
+   },
+   "Home / rest / roof": {
+    "fam": "D",
+    "how": "Home + (rest\u22127)/7 + 0.5\u00b7dome",
+    "src": "Slate"
+   },
+   "Career rush yds / g": {
+    "fam": "B",
+    "how": "Career rushing yards per game vs baseline",
+    "src": "Slate"
+   },
+   "Game total vs usual": {
+    "fam": "D",
+    "how": "Game total \u2212 both teams' usual scoring",
+    "src": "Slate"
+   },
+   "Yards / attempt": {
+    "fam": "B",
+    "how": "Yards per attempt vs league, shrunk 100 att",
+    "src": "Slate"
+   },
+   "Completion %": {
+    "fam": "B",
+    "how": "Completions \u00f7 attempts, shrunk",
+    "src": "Slate"
+   },
+   "Trailing script": {
+    "fam": "D",
+    "how": "Usual margin \u2212 expected margin",
+    "src": "Slate"
+   }
+  },
+  "pool": 57,
+  "mu": [
+   0.0015279220042147253,
+   1.1500490356325597,
+   1.055573716900948,
+   -0.00867767231833184,
+   1.443104772797712,
+   -0.0022148715904019038,
+   -0.09341628686639619,
+   3.625749155497442,
+   0.8239881793114899,
+   0.4998365478914678,
+   0.01294489610806871,
+   -0.1553509074921301,
+   0.007013586352269771,
+   0.001060748871215501,
+   -0.12154500815010795
+  ],
+  "sd": [
+   0.018107863578903077,
+   0.36436902998379667,
+   1.6740380977852716,
+   0.1365858602293367,
+   1.0186407700957556,
+   0.08596761188550683,
+   0.3923587551911476,
+   2.4513882374216998,
+   0.32361046237159324,
+   0.4999999732834075,
+   0.09907321048803869,
+   4.560260415689754,
+   0.052105840284532384,
+   0.029569545383719104,
+   4.893538993443542
+  ]
+ },
+ "rush_yds": {
+  "kept": [
+   "Depth rank",
+   "Big-run rate",
+   "Recent form",
+   "Team rush volume",
+   "Opp yds to RBs",
+   "Experience",
+   "Baseline reliability",
+   "Expected opportunities",
+   "Usage trend (carries)",
+   "Vacated carries",
+   "3-game form",
+   "Team pass volume",
+   "Leading script",
+   "Season TDs / g",
+   "Recent carry share (weighted)",
+   "Pace vs usual"
+  ],
+  "w": [
+   -0.4171439503806232,
+   -0.1523129482594599,
+   0.1356885166688158,
+   -0.22959258310005898,
+   0.12553665068148648,
+   -0.09297429355779492,
+   -0.16963099098090648,
+   -0.12681788582339013,
+   0.07795499936026769,
+   0.14610450619489992,
+   0.0908452636122385,
+   -0.11439455845114661,
+   0.06923066939093234,
+   0.05916271532659976,
+   -0.07967619727283554,
+   0.0502140586535568
+  ],
+  "b": -0.2820692503370437,
+  "lam": 0.003,
+  "sp": 0.6356212923470184,
+  "cv_err": [
+   0.9948516835087818,
+   0.9010151778683749
+  ],
+  "wf": {
+   "2025": {
+    "n": 1156,
+    "rho_new": 0.297,
+    "rho_slate": 0.277,
+    "rho_gbm": 0.31,
+    "mse_new": 0.9022,
+    "mse_slate": 0.9167,
+    "mse_null": 1.0017,
+    "n_kept": 19
+   },
+   "2026": {
+    "n": 496,
+    "rho_new": 0.264,
+    "rho_slate": 0.238,
+    "rho_gbm": 0.296,
+    "mse_new": 0.8444,
+    "mse_slate": 0.8568,
+    "mse_null": 0.9224,
+    "n_kept": 19
+   }
+  },
+  "meta": {
+   "Depth rank": {
+    "fam": "A",
+    "how": "Rank among team RBs (1 = lead back), negative",
+    "src": "Slate"
+   },
+   "Big-run rate": {
+    "fam": "B",
+    "how": "Share of his past games with a 20+ yard run",
+    "src": "New"
+   },
+   "Recent form": {
+    "fam": "B",
+    "how": "Last game yards vs baseline (log ratio)",
+    "src": "Slate"
+   },
+   "Team rush volume": {
+    "fam": "D",
+    "how": "Team carries per game, season to date",
+    "src": "New"
+   },
+   "Opp yds to RBs": {
+    "fam": "C",
+    "how": "Opp RB rushing yards allowed / game vs league",
+    "src": "Slate"
+   },
+   "Experience": {
+    "fam": "E",
+    "how": "Career games played (log)",
+    "src": "Slate"
+   },
+   "Baseline reliability": {
+    "fam": "E",
+    "how": "Fewer games this season = noisier baseline (1/(games+1))",
+    "src": "Slate"
+   },
+   "Expected opportunities": {
+    "fam": "A",
+    "how": "Season target share \u00d7 team targets + carry share \u00d7 team carries",
+    "src": "New"
+   },
+   "Usage trend (carries)": {
+    "fam": "A",
+    "how": "Carry share last 3 games minus season share",
+    "src": "New"
+   },
+   "Vacated carries": {
+    "fam": "A",
+    "how": "RB teammates out: their carries \u00f7 team carries",
+    "src": "Slate"
+   },
+   "3-game form": {
+    "fam": "B",
+    "how": "Average rushing yards over his last 3 games vs his baseline (log ratio)",
+    "src": "Slate"
+   },
+   "Team pass volume": {
+    "fam": "D",
+    "how": "Team dropbacks per game, season to date",
+    "src": "New"
+   },
+   "Leading script": {
+    "fam": "D",
+    "how": "Expected margin \u2212 usual margin (leaders run more)",
+    "src": "Slate"
+   },
+   "Season TDs / g": {
+    "fam": "B",
+    "how": "This season TDs per game",
+    "src": "Slate"
+   },
+   "Recent carry share (weighted)": {
+    "fam": "A",
+    "how": "Carry share, last ~4 games weighted toward the latest",
+    "src": "New"
+   },
+   "Pace vs usual": {
+    "fam": "D",
+    "how": "Avg of own + opp-faced plays/game \u2212 own",
+    "src": "Slate"
+   }
+  },
+  "pool": 44,
+  "mu": [
+   1.6766966475878986,
+   0.17532953252732564,
+   -0.15360023210440574,
+   26.99409716396313,
+   -0.009309553460777659,
+   0.8982025072653438,
+   0.24750599124847536,
+   11.201330788544613,
+   0.006460100700770896,
+   0.030849177704580788,
+   -0.05579784003088884,
+   35.645627460108294,
+   0.08200183912571474,
+   0.3725826899388939,
+   0.35541871604020486,
+   -0.0018644343568875418
+  ],
+  "sd": [
+   0.7296802324190893,
+   0.14679740588079562,
+   0.5540335103800683,
+   4.355129355976329,
+   0.1474783649084615,
+   0.8901700715665207,
+   0.24389053909811567,
+   6.826329288964808,
+   0.07891479347409365,
+   0.10406483870516206,
+   0.3155891543207686,
+   5.2289591763001715,
+   5.009661141543168,
+   0.377173010430889,
+   0.2007624666005237,
+   0.07129072292224414
+  ]
+ },
+ "rec_yds": {
+  "kept": [
+   "Depth rank",
+   "Experience",
+   "Yards / target",
+   "Baseline reliability",
+   "Big-game rate",
+   "Recent carry share (weighted)",
+   "Yards / opportunity",
+   "Career yds / g",
+   "3-game form",
+   "Opp catches to position",
+   "Receiving TD rate",
+   "Vacated targets",
+   "Recent target share (weighted)",
+   "Implied team total",
+   "Total vs usual",
+   "Opp yds / target",
+   "Opp dropbacks faced",
+   "QB quality",
+   "Usage trend (targets)",
+   "H2H volume",
+   "Opp red-zone D"
+  ],
+  "w": [
+   -0.16541923122223415,
+   -0.10565452187473671,
+   -0.007657836219803334,
+   -0.0897947337424677,
+   -0.13002503739896487,
+   -0.22706098003965416,
+   -0.19820292320605148,
+   0.12115513523802136,
+   0.05303894888778246,
+   0.030973691145086128,
+   0.07134228659681904,
+   0.09517277814694614,
+   0.08426572172500672,
+   0.03177249591960065,
+   0.05003946315075137,
+   0.04383571604105107,
+   0.031953044164758686,
+   0.025685592650694773,
+   0.03369074388508353,
+   -0.013118828557508993,
+   0.009600826359570384
+  ],
+  "b": -0.3149028863405206,
+  "lam": 0.003,
+  "sp": 0.649498065724744,
+  "cv_err": [
+   1.0069034283775842,
+   0.9742961279766079
+  ],
+  "wf": {
+   "2025": {
+    "n": 3902,
+    "rho_new": 0.159,
+    "rho_slate": 0.12,
+    "rho_gbm": 0.181,
+    "mse_new": 0.9479,
+    "mse_slate": 0.9553,
+    "mse_null": 0.9704,
+    "n_kept": 20
+   },
+   "2026": {
+    "n": 1658,
+    "rho_new": 0.198,
+    "rho_slate": 0.135,
+    "rho_gbm": 0.169,
+    "mse_new": 1.0162,
+    "mse_slate": 1.0403,
+    "mse_null": 1.0612,
+    "n_kept": 21
+   }
+  },
+  "meta": {
+   "Depth rank": {
+    "fam": "A",
+    "how": "Rank among team pass-catchers at his position, negative",
+    "src": "Slate"
+   },
+   "Experience": {
+    "fam": "E",
+    "how": "Career games played (log)",
+    "src": "Slate"
+   },
+   "Yards / target": {
+    "fam": "B",
+    "how": "Yards per target vs league, shrunk 40 targets",
+    "src": "Slate"
+   },
+   "Baseline reliability": {
+    "fam": "E",
+    "how": "Fewer games this season = noisier baseline (1/(games+1))",
+    "src": "Slate"
+   },
+   "Big-game rate": {
+    "fam": "B",
+    "how": "Share of his past games with a 20+ yard catch",
+    "src": "New"
+   },
+   "Recent carry share (weighted)": {
+    "fam": "A",
+    "how": "Carry share, last ~4 games weighted toward the latest",
+    "src": "New"
+   },
+   "Yards / opportunity": {
+    "fam": "B",
+    "how": "Scrimmage yards per carry + target",
+    "src": "Slate"
+   },
+   "Career yds / g": {
+    "fam": "B",
+    "how": "Career receiving yards per game vs baseline",
+    "src": "Slate"
+   },
+   "3-game form": {
+    "fam": "B",
+    "how": "Average td over his last 3 games vs his baseline (log ratio)",
+    "src": "Slate"
+   },
+   "Opp catches to position": {
+    "fam": "C",
+    "how": "Opp receptions allowed to his position / game vs league",
+    "src": "Slate"
+   },
+   "Receiving TD rate": {
+    "fam": "B",
+    "how": "Receiving TDs per target",
+    "src": "Slate"
+   },
+   "Vacated targets": {
+    "fam": "A",
+    "how": "Same-position teammates out: their targets \u00f7 team targets",
+    "src": "Slate"
+   },
+   "Recent target share (weighted)": {
+    "fam": "A",
+    "how": "Target share, last ~4 games weighted toward the latest",
+    "src": "New"
+   },
+   "Implied team total": {
+    "fam": "D",
+    "how": "DraftKings spread and total \u2192 points the market expects his team to score",
+    "src": "New"
+   },
+   "Total vs usual": {
+    "fam": "D",
+    "how": "Game total \u2212 both teams' usual scoring",
+    "src": "Slate"
+   },
+   "Opp yds / target": {
+    "fam": "C",
+    "how": "Opp yards per target allowed to his position vs league",
+    "src": "Slate"
+   },
+   "Opp dropbacks faced": {
+    "fam": "C",
+    "how": "Opp dropbacks faced per game vs league",
+    "src": "Slate"
+   },
+   "QB quality": {
+    "fam": "D",
+    "how": "Today's QB: career passing EPA per dropback (shrunk)",
+    "src": "Slate"
+   },
+   "Usage trend (targets)": {
+    "fam": "A",
+    "how": "Target share last 3 games minus season share",
+    "src": "New"
+   },
+   "H2H volume": {
+    "fam": "E",
+    "how": "His targets vs this opponent vs career, shrunk",
+    "src": "Slate"
+   },
+   "Opp red-zone D": {
+    "fam": "C",
+    "how": "Share of points opp allows as TDs",
+    "src": "Slate"
+   }
+  },
+  "pool": 55,
+  "mu": [
+   2.0379062243469024,
+   1.057298200065554,
+   0.003851982322800061,
+   0.24663780904821325,
+   0.27729864606419113,
+   0.09134199752541856,
+   6.972073219801174,
+   0.016526285222257135,
+   -0.06776208291810214,
+   -0.008052349081367817,
+   0.04533168371897869,
+   0.010832177054858125,
+   0.12777939990687995,
+   22.392286202551716,
+   -0.19621048065202862,
+   -0.004963335414201921,
+   -0.002073026268656917,
+   0.00801559081754915,
+   0.0025021450108837595,
+   -0.007680115529799523,
+   -0.009861549411187026
+  ],
+  "sd": [
+   1.0913477077022578,
+   0.9311071976453379,
+   0.04133978046795129,
+   0.24246056113264475,
+   0.20671017642724757,
+   0.18726243868842254,
+   2.103014365770029,
+   0.14690112968656194,
+   0.30435407163914235,
+   0.13139100874073517,
+   0.041254047074774314,
+   0.03876226723928001,
+   0.07632547598033147,
+   4.6112149167846175,
+   4.5927249314830165,
+   0.07256311302916069,
+   0.06639014118721188,
+   0.06874961931163516,
+   0.030888895309401823,
+   0.08026869934627898,
+   0.10431483336103485
+  ]
+ },
+ "rec": {
+  "kept": [
+   "3-game form",
+   "Depth rank",
+   "Experience",
+   "Opp catches to position",
+   "Baseline reliability",
+   "Expected opportunities",
+   "Catch rate",
+   "Yards / target",
+   "Recent form",
+   "Target share",
+   "Team pass volume",
+   "Vacated targets",
+   "Receiving TD rate",
+   "QB downgrade (\u2212)",
+   "Recent carry share (weighted)",
+   "Opp completion % allowed",
+   "Opp dropbacks faced",
+   "Opp plays faced",
+   "Volume vs baseline",
+   "Big-game rate",
+   "Last meeting",
+   "H2H volume"
+  ],
+  "w": [
+   0.06654498748639147,
+   -0.17466742497565305,
+   -0.08687812567003833,
+   0.04900151254081311,
+   -0.10530437492189973,
+   -0.06098643278280981,
+   -0.08158066763466805,
+   0.059639654415181854,
+   0.05958142461627047,
+   -0.05521738700327579,
+   -0.058753915735891914,
+   0.09787695018362293,
+   0.052324924044503375,
+   0.046654812622678454,
+   -0.0745707274214013,
+   0.04727547467551982,
+   0.038561024995839195,
+   -0.01888111896675052,
+   0.05785244019891702,
+   -0.03728193025851885,
+   0.020248880005283774,
+   -0.012353910553464553
+  ],
+  "b": -0.2724689583205202,
+  "lam": 0.01,
+  "sp": 0.5420823772472062,
+  "cv_err": [
+   1.0059173130645849,
+   0.9766114673737659
+  ],
+  "wf": {
+   "2025": {
+    "n": 3902,
+    "rho_new": 0.16,
+    "rho_slate": 0.134,
+    "rho_gbm": 0.172,
+    "mse_new": 0.9263,
+    "mse_slate": 0.9336,
+    "mse_null": 0.9502,
+    "n_kept": 19
+   },
+   "2026": {
+    "n": 1658,
+    "rho_new": 0.19,
+    "rho_slate": 0.174,
+    "rho_gbm": 0.185,
+    "mse_new": 1.0151,
+    "mse_slate": 1.0192,
+    "mse_null": 1.0516,
+    "n_kept": 22
+   }
+  },
+  "meta": {
+   "3-game form": {
+    "fam": "B",
+    "how": "Average td over his last 3 games vs his baseline (log ratio)",
+    "src": "Slate"
+   },
+   "Depth rank": {
+    "fam": "A",
+    "how": "Rank among team pass-catchers at his position, negative",
+    "src": "Slate"
+   },
+   "Experience": {
+    "fam": "E",
+    "how": "Career games played (log)",
+    "src": "Slate"
+   },
+   "Opp catches to position": {
+    "fam": "C",
+    "how": "Opp receptions allowed to his position / game vs league",
+    "src": "Slate"
+   },
+   "Baseline reliability": {
+    "fam": "E",
+    "how": "Fewer games this season = noisier baseline (1/(games+1))",
+    "src": "Slate"
+   },
+   "Expected opportunities": {
+    "fam": "A",
+    "how": "Season target share \u00d7 team targets + carry share \u00d7 team carries",
+    "src": "New"
+   },
+   "Catch rate": {
+    "fam": "B",
+    "how": "Receptions \u00f7 targets, shrunk to position",
+    "src": "Slate"
+   },
+   "Yards / target": {
+    "fam": "B",
+    "how": "Yards per target vs league, shrunk 40 targets",
+    "src": "Slate"
+   },
+   "Recent form": {
+    "fam": "B",
+    "how": "Last game catches vs baseline (log ratio)",
+    "src": "Slate"
+   },
+   "Target share": {
+    "fam": "A",
+    "how": "Share of team targets, season to date",
+    "src": "Slate"
+   },
+   "Team pass volume": {
+    "fam": "D",
+    "how": "Team dropbacks per game, season to date",
+    "src": "New"
+   },
+   "Vacated targets": {
+    "fam": "A",
+    "how": "Same-position teammates out: their targets \u00f7 team targets",
+    "src": "Slate"
+   },
+   "Receiving TD rate": {
+    "fam": "B",
+    "how": "Receiving TDs per target",
+    "src": "Slate"
+   },
+   "QB downgrade (\u2212)": {
+    "fam": "D",
+    "how": "Today's QB quality minus the usual starter's (0 if same QB)",
+    "src": "Slate"
+   },
+   "Recent carry share (weighted)": {
+    "fam": "A",
+    "how": "Carry share, last ~4 games weighted toward the latest",
+    "src": "New"
+   },
+   "Opp completion % allowed": {
+    "fam": "C",
+    "how": "Opp completions \u00f7 dropbacks faced",
+    "src": "Slate"
+   },
+   "Opp dropbacks faced": {
+    "fam": "C",
+    "how": "Opp dropbacks faced per game vs league",
+    "src": "Slate"
+   },
+   "Opp plays faced": {
+    "fam": "C",
+    "how": "Opponent plays faced per game vs league (pace)",
+    "src": "New"
+   },
+   "Volume vs baseline": {
+    "fam": "A",
+    "how": "Recent weighted touches + targets vs his season rate",
+    "src": "New"
+   },
+   "Big-game rate": {
+    "fam": "B",
+    "how": "Share of his past games with a 20+ yard catch",
+    "src": "New"
+   },
+   "Last meeting": {
+    "fam": "E",
+    "how": "Last meeting receptions vs career average, \u00d70.5",
+    "src": "Slate"
+   },
+   "H2H volume": {
+    "fam": "E",
+    "how": "His targets vs this opponent vs career, shrunk",
+    "src": "Slate"
+   }
+  },
+  "pool": 55,
+  "mu": [
+   -0.044952780476256234,
+   2.0379062243469024,
+   1.057298200065554,
+   -0.008052349081367817,
+   0.24663780904821325,
+   6.1489277384997285,
+   0.0008655997062434524,
+   0.003851982322800061,
+   -0.12489148681806052,
+   0.1293821989626228,
+   36.19105050971683,
+   0.010832177054858125,
+   0.04533168371897869,
+   -0.002503196645293921,
+   0.09134199752541856,
+   -0.0022261729440524007,
+   -0.002073026268656917,
+   -0.0004952894853610973,
+   -0.0357838934718789,
+   0.27729864606419113,
+   -0.04414279046417743,
+   -0.007680115529799523
+  ],
+  "sd": [
+   0.24975116366636071,
+   1.0913477077022578,
+   0.9311071976453379,
+   0.13139100874073517,
+   0.24246056113264475,
+   5.339378953403551,
+   0.024468807655174226,
+   0.04133978046795129,
+   0.47703498796882005,
+   0.07434367674814771,
+   5.129350480134572,
+   0.03876226723928001,
+   0.041254047074774314,
+   0.05889226764843159,
+   0.18726243868842254,
+   0.03704184345072428,
+   0.06639014118721188,
+   0.03163048847944158,
+   0.3914378698612584,
+   0.20671017642724757,
+   0.35889619798025524,
+   0.08026869934627898
+  ]
+ },
+ "kick": {
+  "kept": [
+   "His points / g",
+   "Implied team total",
+   "Script",
+   "Implied points \u00d7 kicker share",
+   "Opp XP tries allowed",
+   "FG share of points",
+   "Implied pts vs usual",
+   "3-game form"
+  ],
+  "w": [
+   -0.37412830522649415,
+   0.10915461699646942,
+   -0.15935601935672003,
+   -0.23065492484946176,
+   0.07165347729451052,
+   -0.1064686228664069,
+   0.10785238389167659,
+   0.020109564673754927
+  ],
+  "b": -0.17687554718011975,
+  "lam": 0.003,
+  "sp": 0.4550364083767062,
+  "cv_err": [
+   1.0002375653645537,
+   0.9251644572694971
+  ],
+  "wf": {
+   "2025": {
+    "n": 528,
+    "rho_new": 0.184,
+    "rho_slate": 0.189,
+    "rho_gbm": 0.145,
+    "mse_new": 0.9182,
+    "mse_slate": 0.9187,
+    "mse_null": 0.9627,
+    "n_kept": 9
+   },
+   "2026": {
+    "n": 239,
+    "rho_new": 0.186,
+    "rho_slate": 0.15,
+    "rho_gbm": 0.116,
+    "mse_new": 0.923,
+    "mse_slate": 0.9449,
+    "mse_null": 0.9778,
+    "n_kept": 9
+   }
+  },
+  "meta": {
+   "His points / g": {
+    "fam": "A",
+    "how": "His kicking points per game, shrunk",
+    "src": "Slate"
+   },
+   "Implied team total": {
+    "fam": "D",
+    "how": "DraftKings spread and total \u2192 points the market expects his team to score",
+    "src": "New"
+   },
+   "Script": {
+    "fam": "D",
+    "how": "Expected margin (favorites kick more)",
+    "src": "Slate"
+   },
+   "Implied points \u00d7 kicker share": {
+    "fam": "D",
+    "how": "Market-implied team points \u00d7 his share of team points (research: team points is the top kicker input)",
+    "src": "New"
+   },
+   "Opp XP tries allowed": {
+    "fam": "C",
+    "how": "Opp extra points allowed / game",
+    "src": "Slate"
+   },
+   "FG share of points": {
+    "fam": "A",
+    "how": "Share of team points from FGs",
+    "src": "Slate"
+   },
+   "Implied pts vs usual": {
+    "fam": "D",
+    "how": "Market implied team points \u2212 team average",
+    "src": "Slate"
+   },
+   "3-game form": {
+    "fam": "B",
+    "how": "Average kpts over his last 3 games vs his baseline (log ratio)",
+    "src": "Slate"
+   }
+  },
+  "pool": 30,
+  "mu": [
+   7.355286093548412,
+   22.447029012288255,
+   -0.02947456614855567,
+   7.3818960674680225,
+   -0.016698598982552947,
+   0.6943853371350016,
+   -0.0917637839606205,
+   -0.017258403640179547
+  ],
+  "sd": [
+   1.8000207641797998,
+   4.640767074445219,
+   5.099092250592089,
+   1.8421683052773317,
+   0.18564791894741475,
+   0.09702682589018209,
+   3.13486811524553,
+   0.17325486405288323
+  ]
+ }
+}

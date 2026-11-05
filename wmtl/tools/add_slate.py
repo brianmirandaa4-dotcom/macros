@@ -51,7 +51,7 @@ json.dump(d, open(os.path.join(a.data, rel), 'w'), separators=(',', ':'), ensure
 ip = os.path.join(a.data, 'index.json'); idx = json.load(open(ip))
 ks = sorted(g['kick_utc'] for g in d['games']); priced = [p for p in d['props'] if p.get('odds') is not None]
 row = dict(id=sid, sport=sport, path='data/' + rel, label=meta['label'], date=meta.get('date'), date_label=meta.get('date_label'), week=meta.get('week'), start_utc=ks[0], end_utc=ks[-1],
-           n_games=len(d['games']), n_props=len(d['props']), priced=len(priced), bets=sum(p['tier'] == 'bet' for p in d['props']), watch=sum(p['tier'] == 'live' for p in d['props']),
+           n_games=len(d['games']), n_props=len(d['props']), priced=len(priced), lines=sum(1 for p in d['props'] if p.get('line') is not None), bets=sum(p['tier'] == 'bet' for p in d['props']), watch=sum(p['tier'] == 'live' for p in d['props']),
            leans=sum(p['tier'] == 'lean' for p in d['props']), model_version=meta.get('model_version'), generated_et=meta.get('generated_et'), prices_et=meta.get('prices_et'), results=dict(status=d['results'].get('status', 'pending')))
 idx['slates'] = [s for s in idx['slates'] if s['id'] != sid] + [row]
 idx['upcoming'] = [u for u in idx.get('upcoming', []) if not (u['sport'] == sport and u['label'] == meta['label'])]

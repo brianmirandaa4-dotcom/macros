@@ -255,8 +255,11 @@ def mkprof(sport, key, h, fallback_name, team):
                 history='found' if h else 'not_found')
 for sport in SPORTS_ON:
     P = {}
-    for s in [x for x in slates if x['sport'] == sport]:
-        d = json.load(open(f'{OUT}/{s["path"][5:]}'))
+    import glob
+    paths = [f'{OUT}/{x["path"][5:]}' for x in slates if x['sport'] == sport]
+    paths += [p for p in sorted(glob.glob(f'{OUT}/{sport.lower()}/*.json')) if p not in paths and not p.endswith('results-2026.json')]   # model runs added by add_slate.py
+    for path in paths:
+        d = json.load(open(path))
         for p in d['props']:
             if p['pkey'] in P: continue
             P[p['pkey']] = mkprof(sport, p['pkey'], hist_for(sport, p['pkey']), p['player'], p['team'])
@@ -276,7 +279,7 @@ for sport in SPORTS_ON:
 nxt = None
 UP = f'{RAW}/espn/upcoming.json'   # ESPN scoreboard for the next week, pulled with the box scores
 if os.path.exists(UP):
-    u = json.load(open(UP)); nxt = dict(sport=u['sport'], label=u['label'], first=u['first'], games=u['games'], note='On the schedule. The model has not been run for this week yet, so there are no picks.')
+    u = json.load(open(UP)); nxt = dict(sport=u['sport'], label=u['label'], first=u['first'], games=u['games'], note='Thursday (JAX @ BAL) is modeled. Sunday and Monday games have not been run yet, so they have no picks.')
 index = dict(schema='wmtl.index.v1', built_utc=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), brand='whomadethisline', slates=slates,
              players={s: f'data/players/{s.lower()}.json' for s in SPORTS_ON}, results={'NFL': 'data/nfl/results-2026.json'},
              sports=dict(NFL=dict(status='live')),

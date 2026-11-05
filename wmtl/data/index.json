@@ -1,6 +1,6 @@
 {
  "schema": "wmtl.index.v1",
- "built_utc": "2026-11-05T17:22Z",
+ "built_utc": "2026-11-05T18:13Z",
  "brand": "whomadethisline",
  "slates": [
   {
@@ -181,6 +181,30 @@
      }
     ]
    }
+  },
+  {
+   "id": "nfl-2026-wk09-thu",
+   "sport": "NFL",
+   "path": "data/nfl/2026-wk09-thu.json",
+   "label": "Week 9 · Thursday",
+   "date": "2026-11-05",
+   "date_label": "Thu Nov 5 · JAX @ BAL",
+   "week": 9,
+   "start_utc": "2026-11-06T01:15:00.000Z",
+   "end_utc": "2026-11-06T01:15:00.000Z",
+   "n_games": 1,
+   "n_props": 37,
+   "priced": 0,
+   "lines": 37,
+   "bets": 0,
+   "watch": 0,
+   "leans": 13,
+   "model_version": "v3.0 · ESPN rebuild (questions kept or cut out of sample)",
+   "generated_et": "Thu Nov 5, 1:13 PM ET",
+   "prices_et": "DraftKings lines and openers via ESPN, Thu Nov 5 early afternoon ET · prices not posted",
+   "results": {
+    "status": "pending"
+   }
   }
  ],
  "players": {
@@ -200,7 +224,7 @@
    "label": "Week 9",
    "first": "2026-11-06T01:15:00Z",
    "games": 15,
-   "note": "On the schedule. The model has not been run for this week yet, so there are no picks."
+   "note": "Thursday (JAX @ BAL) is modeled. Sunday and Monday games have not been run yet, so they have no picks."
   }
  ]
 }

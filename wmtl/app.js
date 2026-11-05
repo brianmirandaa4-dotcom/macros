@@ -113,7 +113,7 @@ async function render(){ const m = $('#main'); const v = S.tab;
 /* ================================================================ lobby */
 function sportSummaries(){ return SPORTS.map(sp => { const ss = INDEX.slates.filter(s => s.sport === sp).sort((a, b) => a.start_utc < b.start_utc ? 1 : -1); const s = ss[0]; const meta = (INDEX.sports || {})[sp] || {};
   if(!s) return {key: sp, sport: sp, built: false, title: meta.status === 'offseason' ? 'Offseason' : 'Not built yet', sub: meta.status === 'offseason' ? 'No slate exported' : 'No model yet', when: '', bets: 0, watch: 0, games: 0, priced: 0};
-  const st = slateStatus(s); return {key: sp, sport: sp, built: true, id: s.id, title: s.label, sub: `${s.n_games} games · ${s.priced} priced`, when: st.k === 'up' ? st.word : st.k === 'live' ? 'Live now' : 'Final', bets: s.bets, watch: s.watch, games: s.n_games, priced: s.priced}; }); }
+  const st = slateStatus(s); return {key: sp, sport: sp, built: true, id: s.id, title: s.label, sub: `${s.n_games} game${s.n_games === 1 ? '' : 's'} · ${s.priced ? s.priced + ' priced' : (s.lines || 0) + ' lines'}`, when: st.k === 'up' ? st.word : st.k === 'live' ? 'Live now' : 'Final', bets: s.bets, watch: s.watch, games: s.n_games, priced: s.priced}; }); }
 function viewLobby(){ const sums = sportSummaries(); const ss = INDEX.slates.slice().sort((a, b) => a.start_utc < b.start_utc ? 1 : -1);
   const up = (INDEX.upcoming || []).map(u => { const cd = countdown(u.first); return `<div class="sl off" style="--c:${SPORTHEX[u.sport]}"><div class="t">${esc(u.sport)} ${esc(u.label)}</div><div class="w">${cd ? `First game in <span class="cd">${cd}</span> · ` : ''}${u.games} games. ${esc(u.note)}</div><div class="cnt"><span class="sp" style="--c:${SPORTHEX[u.sport]}">${esc(u.sport)}</span></div></div>`; }).join('');
   const off = SPORTS.filter(sp => !INDEX.slates.some(s => s.sport === sp)).map(sp => { const m = (INDEX.sports || {})[sp] || {}; return `<div class="sl off"><div class="t">${sp} · ${m.status === 'offseason' ? 'Offseason' : 'Not built yet'}</div><div class="w">${esc(m.note || 'Not available')}</div><div class="cnt"><span class="sp" style="--c:${SPORTHEX[sp]}">${sp}</span></div></div>`; }).join('');
@@ -132,7 +132,7 @@ function room2d(sums){ return `<div class="room2d" id="room2d"><div class="table
 function slateCard(s){ const st = slateStatus(s); const r = s.results || {};
   return `<button class="sl tap" data-slate="${esc(s.id)}" style="--c:${SPORTHEX[s.sport]}"><div><span class="sp" style="--c:${SPORTHEX[s.sport]}">${s.sport}${s.imported ? ' · imported' : ''}</span><div class="t" style="margin-top:8px">${esc(s.label)}</div></div>
     <div class="cnt">${s.bets ? `<span class="pill pill-bet">${s.bets} bet${s.bets > 1 ? 's' : ''}</span>` : `<span class="pill pill-pass">No bets</span>`}${s.watch ? `<span class="pill pill-live">${s.watch} live</span>` : ''}</div>
-    <div class="w">${esc(s.date_label || '')} · ${s.n_games} games · ${s.priced} priced · <span class="${st.k === 'up' ? 'cd' : ''}">${esc(st.word)}</span>${r.status === 'graded' && r.bets && (r.bets.w + r.bets.l) ? ` · bets ${r.bets.w}–${r.bets.l}` : ''}</div></button>`; }
+    <div class="w">${esc(s.date_label || '')} · ${s.n_games} game${s.n_games === 1 ? '' : 's'} · ${s.priced ? s.priced + ' priced' : (s.lines ? s.lines + ' lines, no prices' : '0 priced')} · <span class="${st.k === 'up' ? 'cd' : ''}">${esc(st.word)}</span>${r.status === 'graded' && r.bets && (r.bets.w + r.bets.l) ? ` · bets ${r.bets.w}–${r.bets.l}` : ''}</div></button>`; }
 function wireLobby(){ const m = $('#main');
   $$('[data-slate]', m).forEach(b => b.onclick = () => setSlate(b.dataset.slate, 'card'));
   $$('[data-sport]', m).forEach(b => b.onclick = () => openSport(b.dataset.sport));
@@ -155,7 +155,7 @@ function windowSeg(d, cur, key, count){ const W = d.meta.windows || []; if(W.len
   return `<div class="seg" role="group" aria-label="Betting window" data-seg="${key}"><button data-w="all" aria-pressed="${cur === 'all'}">All${count ? `<span class="n">${count('all')}</span>` : ''}</button>${W.map(w => `<button data-w="${esc(w)}" aria-pressed="${cur === w}">${esc(w)}${count ? `<span class="n">${count(w)}</span>` : ''}</button>`).join('')}</div>`; }
 function funnelHTML(F){ if(!F || !F.length) return ''; const mx = Math.max(1, F[0].n); return `<div class="funnel">${F.map(f => `<div class="fr ${f.n ? '' : 'zero'}"><div><div class="l">${esc(f.step)}</div><div class="bar"><span style="width:${Math.max(f.n ? 2 : 0, f.n / mx * 100)}%"></span></div></div><div class="n">${f.n.toLocaleString()}</div></div>`).join('')}</div>`; }
 function noBetReason(F){ if(!F || !F.length) return 'The model did not export its rule funnel for this slate.'; const z = F.findIndex(f => f.n === 0); if(z < 0) return 'Every bet that cleared the rules was capped by the exposure limits.'; const f = F[z];
-  return `${F[0].n.toLocaleString()} props were priced. None made it past “${f.step.toLowerCase()}”${f.note ? ` (${f.note})` : ''}.`; }
+  return `Of ${F[0].n.toLocaleString()} ${F[0].step.replace(/^Props? /, 'props ').replace(/^Priced props/, 'priced props')}, none made it past “${f.step.toLowerCase()}”${f.note ? `: ${f.note}` : ''}.`; }
 function ticket(p, d){ const r = resultOf(d, p); const sp = d.sport.toLowerCase();
   const res = r && r.result ? (r.result === 'won' ? '<span class="pill pill-edge">Won</span>' : r.result === 'lost' ? '<span class="pill pill-loss">Lost</span>' : `<span class="pill pill-fair">${esc(r.result === 'push' ? 'Push' : 'Void')}</span>`) + (isNum(r.actual) ? ` <span>Final <b class="num">${ln(r.actual)}</b></span>` : '') : `<span>25D <b class="num">${sg(p.score25, 1)}</b></span>`;
   return `<button class="betcard tap" data-prop="${esc(p.id)}" style="--c:var(--${sp})">
@@ -222,7 +222,7 @@ function pvlStrip(p){ const lo0 = p.range80 && p.range80[0], hi0 = p.range80 && 
 function propRow(p, d){ const o = p.opener; const r = resultOf(d, p); const os = o ? o[p.side === 'under' ? 'under' : 'over'] : null;
   return `<button class="row tap" data-prop="${esc(p.id)}"><div style="min-width:0"><div class="nm">${esc(p.player)}</div><div class="mt">${teamOpp(p)} · ${esc(selText(p))}</div></div>
     <div class="rt">${scoreChip(p)}<span>proj ${ln(p.projection)}</span></div>
-    <div class="pl">${pvlStrip(p)}<div style="display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:8px">${isNum(p.line) ? `<span class="price">${ln(p.line)} ${od(p.odds)} <b>${esc(p.book || '')}</b></span>` : `<span class="na b13">No line posted</span>`}
+    <div class="pl">${pvlStrip(p)}<div style="display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:8px">${isNum(p.line) ? `<span class="price">${ln(p.line)} ${isNum(p.odds) ? od(p.odds) + ' ' : ''}<b>${esc(p.book || '')}</b>${isNum(p.odds) ? '' : ' <span class="na" style="font-family:var(--f-ui)">· no price</span>'}</span>` : `<span class="na b13">No line posted</span>`}
       <span class="openbig">Open <b>${o && isNum(o.line) ? ln(o.line) + (isNum(os) ? ' ' + od(os) : '') : o && isNum(o.over) ? od(o.over) : 'n/a'}</b></span>${resultTag(r)}</div></div></button>`; }
 function viewProps(d){ const mks = marketsOf(d); if(!S.props.mk || !mks.includes(S.props.mk)) S.props.mk = mks[0]; const mk = S.props.mk;
   const all = d.props.filter(p => p.market === mk); const mode = S.props.mode;
@@ -356,7 +356,8 @@ function rulesList(p){ const L = p.lights || {}; const rows = [['card', `Report 
   return `<div class="checks">${rows.map(([k, t]) => `<div class="ck"><i class="${L[k] === true ? 'ok' : L[k] === false ? 'no' : 'na'}">${L[k] === true ? '✓' : L[k] === false ? '✕' : '–'}</i><div>${esc(t)}</div></div>`).join('')}</div>`; }
 function tierTag(p){ return p.tier === 'bet' ? '<span class="tag edge">Bet · passes both keys</span>' : p.tier === 'live' ? '<span class="tag live">Live watch</span>' : p.tier === 'lean' ? '<span class="tag">Information only</span>' : p.tier === 'check' ? '<span class="tag">Check news</span>' : '<span class="tag">Pass</span>'; }
 async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p) return; const r = resultOf(d, p); const av = p.availability || {}; const o = p.opener;
-  const pOver = isNum(p.p) ? (p.side === 'under' ? 1 - p.p : p.p) : null, pUnder = isNum(pOver) ? 1 - pOver : null; const rawOver = isNum(p.p_raw) ? (p.side === 'under' ? 1 - p.p_raw : p.p_raw) : null;
+  const pm = isNum(p.p) ? p.p : isNum(p.p_raw) ? p.p_raw : null; const modelOnly = !isNum(p.p) && isNum(p.p_raw);
+  const pOver = isNum(pm) ? (p.side === 'under' ? 1 - pm : pm) : null, pUnder = isNum(pOver) ? 1 - pOver : null; const rawOver = isNum(p.p_raw) ? (p.side === 'under' ? 1 - p.p_raw : p.p_raw) : null;
   const yes = p.market === 'atd' || p.market === 'qb_atd'; const sp = d.sport.toLowerCase();
   const offers = (p.offers || []).filter(x => x.book); const bestDec = (k) => Math.max(...offers.filter(x => isNum(x[k]) && x.line === p.line).map(x => decOdds(x[k])), -1);
   const inj = await injuryFor(d.sport, p.pkey); const info = slateInfo(d.id) || {}; const upcoming = slateStatus(info).k !== 'final';
@@ -369,18 +370,19 @@ async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p)
       <p>${teamOpp(p)} · ${esc(p.market_label)}</p></div>
     <div class="rchero">
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${tierPill}${resPill}${isNum(r && r.actual) ? `<span class="t2 b15">Final <b class="num" style="color:var(--t1)">${ln(r.actual)}</b></span>` : ''}</div>
-      <div class="rc-top">${ringSVG(p.p, p.break_even, 132)}<div style="min-width:0"><div class="rc-sel">${esc(selText(p))}</div>
-        <div class="rc-px">${isNum(p.odds) ? `<span class="num">${od(p.odds)}</span><b>${esc(p.book || '')}</b>` : '<span class="na">No price posted</span>'}</div></div></div>
-      ${isNum(p.p) ? Charts.meter({p: p.p, be: isNum(p.break_even) ? p.break_even : null, label: isNum(p.break_even) ? `Price needs ${pc(p.break_even, 1)}` : 'Model chance'}) : ''}
+      <div class="rc-top">${ringSVG(pm, p.break_even, 132)}<div style="min-width:0"><div class="rc-sel">${esc(selText(p))}</div>
+        <div class="rc-px">${isNum(p.odds) ? `<span class="num">${od(p.odds)}</span><b>${esc(p.book || '')}</b>` : `<span>${isNum(p.line) ? `Line <b class="num" style="color:var(--t1)">${ln(p.line)}</b> at <b>${esc(p.book || '')}</b> · ` : ''}<span class="na">price not posted</span></span>`}</div></div></div>
+      ${isNum(pm) ? Charts.meter({p: pm, be: isNum(p.break_even) ? p.break_even : null, label: isNum(p.break_even) ? `Price needs ${pc(p.break_even, 1)}` : modelOnly ? 'Model chance, before the market check' : 'Model chance'}) : ''}
       <div class="rc-nums"><div><span class="label">Projection</span><span class="num">${ln(p.projection)}</span></div><div><span class="label">Edge</span><span class="num" style="color:${isNum(p.edge_pts) && p.edge_pts >= 5 ? 'var(--edge)' : isNum(p.edge_pts) && p.edge_pts < 0 ? 'var(--loss)' : 'var(--t1)'}">${sg(p.edge_pts)}</span></div><div><span class="label">25D</span><span class="num" style="color:${cardKind(p) === 'strong' ? 'var(--edge)' : cardKind(p) === 'weak' ? 'var(--loss)' : 'var(--t1)'}">${sg(p.score25, 2)}</span></div></div>
-      ${isNum(p.p) ? `<div class="lossline">${lossLine(p.p)}${isNum(p.pctile) ? ` · report card beats ${Math.round(p.pctile * 100)}% of history` : ''}</div>` : ''}
+      ${isNum(pm) ? `<div class="lossline">${lossLine(pm)}${isNum(p.pctile) ? ` · report card beats ${Math.round(p.pctile * 100)}% of history` : ''}</div>` : ''}
     </div>
-    ${Q.length ? `<section class="sec"><div class="hd"><h2>The 25 answers</h2><span class="sub">tap a spoke</span></div>
+    ${modelOnly && !yes ? `<section class="sec"><div class="hd"><h2>Check a price</h2><span class="sub">DraftKings price not on ESPN</span></div><div class="calc"><div class="fgrid"><div class="fld"><label for="pc-odds">Price you see on the ${p.side === 'under' ? 'under' : 'over'} ${ln(p.line)}</label><input id="pc-odds" inputmode="numeric" type="text" placeholder="−115"></div><div class="fld"><label>Model chance</label><input value="${pc(pm, 1)}" disabled></div></div><div id="pc-out" class="b15 t2">Enter a price to see what it needs.</div><p class="note" style="margin:0">This compares the price with the model's own replays only. The model's market check needs both sides' prices, so a prop priced here can't become a bet on the card.</p></div></section>` : ''}
+    ${Q.length ? `<section class="sec"><div class="hd"><h2>The ${Q.length} answers</h2><span class="sub">tap a spoke</span></div>
       <div class="fp"><div class="fp-wrap">${Charts.fingerprint({q25: Q, score: isNum(p.score25) ? p.score25 : 0, size: 320})}</div>
         <div class="fp-tip" id="fp-tip">Longer green spokes push him past his normal game. Red spokes pull him short.</div>
         <div class="fp-legend"><span><i style="background:var(--edge)"></i>pushes up</span><span><i style="background:var(--loss)"></i>pulls down</span></div></div>
       <div class="group pad">${famBars(p)}</div>
-      <details class="group pad"><summary class="link" style="list-style:none;cursor:pointer;padding:0;min-height:0">All 25, sorted by impact</summary><div style="margin-top:12px">${q25Bars(d, p)}</div></details></section>` : ''}
+      <details class="group pad"><summary class="link" style="list-style:none;cursor:pointer;padding:0;min-height:0">All ${Q.length}, sorted by impact</summary><div style="margin-top:12px">${q25Bars(d, p)}</div></details></section>` : ''}
     <section class="sec"><div class="hd"><h2>Projection</h2><span class="sub m">${ln(p.projection)}${p.range80 && isNum(p.range80[0]) ? ` · 80% ${ln(p.range80[0])}–${ln(p.range80[1])}` : ''}</span></div>
       <div class="group pad" id="dens">${p.hist ? '' : `<p class="sub" style="margin:0">The replay distribution was not exported for this prop.</p>`}</div>
       ${!yes && isNum(pOver) ? `<div class="group pad sides"><div class="side"><div class="l"><span>Over ${ln(p.line)}</span><b>${pc(pOver)}</b></div><div class="bar"><span style="width:${pOver * 100}%;background:${p.side !== 'under' ? 'var(--t1)' : 'var(--pass)'}"></span></div></div>
@@ -403,7 +405,8 @@ async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p)
   pushSheet(`${p.player} · ${selText(p)}`, html, el => { bindTaps(el, d); const gl = $('[data-golive]', el); if(gl) gl.onclick = () => openLive(d, p.id);
     $('[data-logp]', el).onclick = () => logBet(d, p); $('[data-share]', el).onclick = () => shareProp(d, p);
     const dn = $('#dens', el); if(dn && p.hist) requestAnimationFrame(() => { dn.innerHTML = histSVG(p, r && r.actual, dn.clientWidth - 32); });
-    wireFingerprint($('.ch-fp', el), Q, $('#fp-tip', el)); }); }
+    wireFingerprint($('.ch-fp', el), Q, $('#fp-tip', el));
+    const pci = $('#pc-odds', el); if(pci) pci.oninput = () => { const o = Number(String(pci.value).replace('−', '-').trim()); const out = $('#pc-out', el); if(!isNum(o) || Math.abs(o) < 100){ out.textContent = 'Enter a price like −115 or +105.'; return; } const be = am2p(o), e = (pm - be) * 100; out.innerHTML = `${od(o)} needs <b class="num" style="color:var(--t1)">${pc(be, 1)}</b>. Model chance ${pc(pm, 1)}: <b class="num" style="color:${e >= 0 ? 'var(--edge)' : 'var(--loss)'}">${sg(e, 1)}</b> pts before the market check.`; }; }); }
 function q25Named(d, p){ const key = p.q25_key || p.market; const C = (d.meta.cards || {})[key]; if(!p.q25 || !C) return [];
   const nm = {}; C.ids.forEach((id, i) => nm[id] = C.names[i]); return p.q25.filter(q => isNum(q[2])).map(([id, x, c]) => [id, nm[id] || id, c]).sort((a, b) => a[0] < b[0] ? -1 : 1); }
 function wireFingerprint(svg, Q, tip){ if(!svg || !Q.length || !tip) return; const sp = $$('line.spoke', svg);
