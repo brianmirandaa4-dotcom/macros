@@ -403,6 +403,19 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 .tpl b{font:700 15px var(--f-display)}
 .tpl span{font-size:12px;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .tpl.empty{border-style:dashed;background:none;justify-content:center}
+.tpl-top{display:flex;align-items:center;gap:5px;flex-wrap:wrap;overflow:visible!important;-webkit-line-clamp:unset!important}
+.tpl-n{font-style:normal;width:20px;height:20px;border-radius:6px;background:var(--surface);color:var(--muted);display:inline-grid;place-items:center;font:700 11px/1 var(--f-num);flex:none}
+.tpl-d{font-style:normal;font-size:10.5px;font-weight:700;color:var(--kcal);padding:2px 6px;border-radius:6px;background:color-mix(in srgb,var(--kcal) 14%,transparent)}
+.tpl-up{font-style:normal;font-size:10.5px;font-weight:800;color:#0B0C10;background:var(--good);padding:2px 7px;border-radius:6px}
+.tpl.next{border-color:color-mix(in srgb,var(--good) 60%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 9%,var(--surface-2)),var(--surface-2))}
+.tpl.next .tpl-n{background:var(--good);color:#0B0C10}
+.tord{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tord li{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 6px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2);transition:transform var(--t-base) var(--ease-out),box-shadow var(--t-base)}
+.tord li.drag{transition:none;z-index:2;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.45);border-color:var(--kcal)}
+.tord-h{border:0;background:none;color:var(--muted);font-size:20px;width:34px;height:40px;touch-action:none;cursor:grab;flex:none}
+.tord-t{flex:1;min-width:0;display:flex;flex-direction:column}.tord-t b{font:700 14.5px var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tord-t span{font-size:12px;color:var(--muted)}
+.tord select{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:7px 6px;font-size:13px;flex:none;max-width:92px}
+.tord-a{display:flex;flex-direction:column;flex:none}.tord-a .link{padding:2px 6px;font-size:15px}.tord-a .link:disabled{opacity:.25}
 .wk-bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);z-index:5;background:var(--surface);border:1px solid color-mix(in srgb,var(--pro) 45%,var(--line));border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .wk-bar input{flex:1;min-width:120px;background:none;border:0;font:700 18px var(--f-display);color:var(--fg);padding:4px 0}
 .wk-bar input:focus{outline:none;border-bottom:1px dashed var(--line)}
@@ -1031,7 +1044,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
         <div class="tip" id="tip-train" hidden></div>
         <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
-          <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div><button class="pill-btn" data-pg="progs" type="button">Programs</button></div>
+          <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="tplOrder" type="button">Order &amp; days</button><button class="pill-btn" data-pg="progs" type="button">Programs</button></div></div>
           <div class="tpl-grid" id="tplGrid"></div>
         </div>
         <div class="tiles" id="trTiles"></div>
@@ -1574,7 +1587,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.7';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.8';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3685,7 +3698,9 @@ function renderTrain(){
   if(!S.tplSeeded){S.templates=DEF_TPL.map(([n,x])=>({id:'t'+uid(),name:n,ex:x.split('|')}));S.tplSeeded=true;save()}
   const act=!!S.active;$('trainHome').hidden=act;$('trainActive').hidden=!act;
   if(act)return renderActive();
-  $('tplGrid').innerHTML=S.templates.map((t,i)=>`<button class="tpl" data-tpl="${i}">${t.zone?`<i class="zone" style="--c:var(${ZONE[t.zone].c})">${ZONE[t.zone].l.split(' ')[0]}</i>`:''}<b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></button>`).join('')+`<button class="tpl empty" data-tpl="-1"><b>+ Empty workout</b><span>Add exercises as you go</span></button>`;
+  const nx=tplNext();
+  $('tplGrid').innerHTML=S.templates.map((t,i)=>{const isN=nx&&nx.i===i;return `<button class="tpl${isN?' next':''}" data-tpl="${i}"><span class="tpl-top"><i class="tpl-n">${i+1}</i>${t.day!=null?`<i class="tpl-d">${DOW[t.day]}</i>`:''}${isN?`<i class="tpl-up">${nx.done?'Done today ✓':nx.why==='today'?'Today':'Up next'}</i>`:''}</span>${t.zone?`<i class="zone" style="--c:var(${ZONE[t.zone].c})">${ZONE[t.zone].l.split(' ')[0]}</i>`:''}<b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></button>`}).join('')+`<button class="tpl empty" data-tpl="-1"><b>+ Empty workout</b><span>Add exercises as you go</span></button>`;
+  if(nx&&nx.i>0)requestAnimationFrame(()=>{const g=$('tplGrid'),c=g&&g.children[nx.i];if(g&&c&&g.scrollWidth>g.clientWidth)g.scrollLeft=c.offsetLeft-g.offsetLeft-4});
   // week stats
   const ws=weekStart(todayKey()),inWk=S.workouts.filter(w=>w.date>=ws),feed=trainFeed(),fWk=feed.filter(x=>x.date>=ws),burn=fWk.reduce((a,x)=>a+((x.dev&&x.dev.kcal)||0),0);
   renderWatchNow();renderTip('train');const cs=syncCfg();$('trSync').hidden=!(cs.url&&cs.uid);
@@ -3732,6 +3747,7 @@ function exChart(name){
   return s+'</svg>';
 }
 $('exSel').onchange=e=>{S.exSel=e.target.value;renderTrain()};
+$('tplOrder').onclick=openTplOrder;
 $('tplGrid').onclick=e=>{const b=e.target.closest('[data-tpl]');if(!b)return;const i=+b.dataset.tpl;
   const t=i>=0?S.templates[i]:{name:'Workout',ex:[]};startWorkout(t.name,t.ex);if(i<0&&S.active&&!S.active.ex.length)setTimeout(()=>openExPicker({eyebrow:'New workout',onDone:addExercises}),120)};
 $('hist').onclick=e=>{const b=e.target.closest('[data-wk]');if(b)return openWorkout(+b.dataset.wk);const d=e.target.closest('[data-devwk]');if(d)openDevWorkout(d.dataset.devwk)};
@@ -3872,13 +3888,44 @@ function openWorkout(i){
   $('wvTpl').onclick=()=>{closeSheet();editTemplate({name:w.name,ex:w.ex.map(x=>x.n),i:-1});toast('Starts with every lift from this workout. Add more, then Save')};
   $('wvDel').onclick=()=>{const gone=S.workouts.splice(i,1)[0];save();closeSheet();renderTrain();toast(`Deleted ${esc(gone.name)}`,()=>{S.workouts.push(gone);S.workouts.sort((x,y)=>y.end-x.end);save();renderTrain()})};
 }
+/* Template order & weekdays: the list order is your rotation; a weekday pins a template to that day. */
+function tplNext(){const T=S.templates;if(!T.length)return null;const tk=todayKey(),wd=parseKey(tk).getDay();
+  const doneToday=new Set(S.workouts.filter(w=>w.date===tk).map(w=>String(w.name||'').toLowerCase()));
+  const di=T.findIndex(t=>t.day===wd);if(di>=0)return {i:di,why:'today',done:doneToday.has(T[di].name.toLowerCase())};
+  if(T.some(t=>t.day!=null)&&!T.some(t=>t.day==null))return null;
+  const names=T.map(t=>t.name.toLowerCase()),last=S.workouts.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))||(b.start||0)-(a.start||0)).find(w=>names.includes(String(w.name||'').toLowerCase()));
+  if(!last)return {i:0,why:'next'};const li=names.indexOf(String(last.name).toLowerCase());
+  if(last.date===tk)return {i:li,why:'next',done:true};
+  let j=(li+1)%T.length;for(let k=0;k<T.length&&T[j].day!=null;k++)j=(j+1)%T.length;return {i:j,why:'next'}}
+function openTplOrder(){const T=S.templates,wkMon=!(S.prefs&&S.prefs.wkSun),days=wkMon?[1,2,3,4,5,6,0]:[0,1,2,3,4,5,6];
+  sheet(`<div><div class="eyebrow">Your training week</div><h3>Order &amp; days</h3><p class="note">Drag <b>≡</b> to put templates in the order you do them. Set a day to pin a template to that weekday. Train then puts today's workout up front, or the next one in your rotation.</p></div>
+    <ul class="tord" id="tOrd">${T.map((t,i)=>`<li data-i="${i}"><button class="tord-h" type="button" aria-label="Drag to reorder ${esc(t.name)}">≡</button><i class="tpl-n">${i+1}</i><span class="tord-t"><b>${esc(t.name)}</b><span>${t.ex.length} exercises</span></span>
+      <select data-day="${i}" aria-label="Day for ${esc(t.name)}"><option value="">Any day</option>${days.map(d=>`<option value="${d}"${t.day===d?' selected':''}>${DOW[d]}</option>`).join('')}</select>
+      <span class="tord-a"><button class="link" type="button" data-mv="${i}" data-d="-1" aria-label="Move up"${i?'':' disabled'}>↑</button><button class="link" type="button" data-mv="${i}" data-d="1" aria-label="Move down"${i<T.length-1?'':' disabled'}>↓</button></span></li>`).join('')||'<li class="note">No templates yet.</li>'}</ul>
+    <div class="row" style="justify-content:space-between"><button class="ghost" id="tOrdSort" type="button">Sort by weekday</button><button class="primary" id="tOrdOk">Done</button></div>`,{nofocus:true});
+  const L=$('tOrd'),commit=()=>{save();renderTrain()};
+  const move=(from,to)=>{if(to<0||to>=T.length||from===to)return;const [x]=T.splice(from,1);T.splice(to,0,x);commit();openTplOrder()};
+  L.onclick=e=>{const b=e.target.closest('[data-mv]');if(b){const i=+b.dataset.mv;move(i,i+ +b.dataset.d)}};
+  L.onchange=e=>{const sel=e.target.closest('[data-day]');if(!sel)return;const i=+sel.dataset.day,v=sel.value;
+    if(v===''){delete T[i].day}else{const d=+v,o=T.findIndex((t,j)=>j!==i&&t.day===d);if(o>=0){delete T[o].day;toast(`${esc(T[o].name)} moved off ${DOW[d]}`)}T[i].day=d}commit();openTplOrder()};
+  $('tOrdSort').onclick=()=>{const rank=d=>d==null?99:days.indexOf(d);const st=T.map((t,i)=>[t,i]).sort((a,b)=>rank(a[0].day)-rank(b[0].day)||a[1]-b[1]).map(x=>x[0]);T.splice(0,T.length,...st);commit();openTplOrder();toast('Sorted by weekday')};
+  $('tOrdOk').onclick=closeSheet;
+  // drag by the handle (touch or mouse)
+  L.querySelectorAll('.tord-h').forEach(h=>h.addEventListener('pointerdown',ev=>{const li=h.closest('li'),from=+li.dataset.i,items=[...L.children],H=li.getBoundingClientRect().height+8,y0=ev.clientY;let to=from;
+    ev.preventDefault();h.setPointerCapture(ev.pointerId);li.classList.add('drag');
+    const mv=e=>{const dy=e.clientY-y0;li.style.transform=`translateY(${dy}px)`;to=Math.max(0,Math.min(items.length-1,from+Math.round(dy/H)));
+      items.forEach((it,j)=>{if(it===li)return;let sh=0;if(from<to&&j>from&&j<=to)sh=-H;if(from>to&&j<from&&j>=to)sh=H;it.style.transform=sh?`translateY(${sh}px)`:''})};
+    const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);items.forEach(it=>it.style.transform='');li.classList.remove('drag');if(to!==from){try{navigator.vibrate&&navigator.vibrate(10)}catch(e){}move(from,to)}};
+    h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)}));
+}
 function openTemplates(){
   sheet(`<div><div class="eyebrow">Templates</div><h3>Your workout templates</h3></div>
     <div class="glist">${S.templates.map((t,i)=>`<button class="gr" type="button" data-tedit="${i}"><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(t.name)}</b><span>${t.from?`From ${esc(t.from.split(' ')[0])} · `:''}${esc(t.ex.join(' · ')||'No exercises')}</span></span><span class="gv">${t.ex.length}</span>${CHEV}</button>`).join('')}
       <button class="gr" type="button" data-tedit="-1"><span class="gi" style="--c:var(--good)">${GI.plus}</span><span class="gt"><b>New template</b><span>Name it and pick the lifts</span></span><span></span>${CHEV}</button>
+      <button class="gr" type="button" data-tord><span class="gi" style="--c:var(--kcal)">${GI.list}</span><span class="gt"><b>Order &amp; days</b><span>Put them in the order you train, pin weekdays</span></span><span></span>${CHEV}</button>
       <button class="gr" type="button" data-ftb><span class="gi" style="--c:var(--good)">${GI.user}</span><span class="gt"><b>Copy from a friend</b><span>Browse your friends’ templates</span></span><span></span>${CHEV}</button></div>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="tRestore">Restore starter templates</button><button class="primary" id="tDone">Done</button></div>`,{nofocus:true});
-  $('sheetRoot').querySelector('.glist').onclick=e=>{if(e.target.closest('[data-ftb]')){closeSheet();openPage('ftpl');return}const b=e.target.closest('[data-tedit]');if(!b)return;const i=+b.dataset.tedit;editTemplate(i>=0?{...S.templates[i],ex:S.templates[i].ex.slice(),i}:{name:'',ex:[],i:-1})};
+  $('sheetRoot').querySelector('.glist').onclick=e=>{if(e.target.closest('[data-ftb]')){closeSheet();openPage('ftpl');return}if(e.target.closest('[data-tord]')){openTplOrder();return}const b=e.target.closest('[data-tedit]');if(!b)return;const i=+b.dataset.tedit;editTemplate(i>=0?{...S.templates[i],ex:S.templates[i].ex.slice(),i}:{name:'',ex:[],i:-1})};
   $('tRestore').onclick=()=>{const have=new Set(S.templates.map(t=>t.name.toLowerCase()));DEF_TPL.forEach(([n,x])=>{if(!have.has(n.toLowerCase()))S.templates.push({id:'t'+uid(),name:n,ex:x.split('|')})});save();openTemplates();renderTrain()};
   $('tDone').onclick=closeSheet;
 }
@@ -3895,7 +3942,7 @@ function editTemplate(d){
   if($('teDup'))$('teDup').onclick=()=>{keep();editTemplate({name:`${d.name.trim()||'Workout'} copy`,ex:d.ex.slice(),i:-1});toast('Copied. Add or remove lifts, rename it, then Save')};
   if($('teDel'))$('teDel').onclick=()=>{const gone=S.templates.splice(d.i,1)[0];save();renderTrain();openTemplates();toast(`Deleted “${esc(gone.name)}”`,()=>{S.templates.splice(d.i,0,gone);save();renderTrain();openTemplates()})};
   $('teOk').onclick=()=>{const n=$('teN').value.trim();if(!n){$('teN').focus();return}if(!d.ex.length){toast('Add at least one exercise');return}
-    const t={id:d.id||'t'+uid(),name:n,ex:d.ex};if(d.i>=0)S.templates[d.i]=t;else S.templates.push(t);save();renderTrain();openTemplates();toast(`Saved “${esc(n)}”`)};
+    const t={...(d.i>=0?S.templates[d.i]:{}),id:d.id||'t'+uid(),name:n,ex:d.ex};if(d.i>=0)S.templates[d.i]=t;else S.templates.push(t);save();renderTrain();openTemplates();toast(`Saved “${esc(n)}”`)};
 }
 /* rest timer */
 function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};renderRest()}
