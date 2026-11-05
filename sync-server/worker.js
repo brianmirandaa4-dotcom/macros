@@ -406,9 +406,9 @@ function byCalendarDate(json) {
     if (!o || depth > 6) return;
     if (Array.isArray(o)) { o.forEach(x => walk(x, depth + 1)); return; }
     if (typeof o !== 'object') return;
-    const cd = o.calendarDate || o.summaryDate;
+    const cd = o.calendarDate || o.summaryDate || o.calendarDateString || (typeof o.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.date) ? o.date : null);
     if (typeof cd === 'string' && /^\d{4}-\d{2}-\d{2}/.test(cd)) { const k = cd.slice(0, 10); out[k] = Object.assign(out[k] || {}, o); }
-    for (const v of Object.values(o)) if (v && typeof v === 'object') walk(v, depth + 1);
+    for (const [kk, v] of Object.entries(o)) if (v && typeof v === 'object') { if (/^\d{4}-\d{2}-\d{2}$/.test(kk) && !Array.isArray(v)) out[kk] = Object.assign(out[kk] || {}, v); walk(v, depth + 1); }
   })(json, 0);
   return out;
 }
@@ -428,13 +428,13 @@ async function syncGarmin(user, env, days) {
   const end = new Date(), start = new Date(Date.now() - (days - 1) * 864e5);
   const sd = isoDate(start), ed = isoDate(end);
   const safe = (p) => p.catch(e => ({ __error: String(e.message || e) }));
-  const [sum, slp, hrv, bb, acts, wt] = await Promise.all([
+  const mid = new Date(Math.min(end.getTime(), start.getTime() + 27 * 864e5)), sd2 = isoDate(new Date(mid.getTime() + 864e5)), yd = isoDate(new Date(Date.now() - 864e5)); const [sum, slp, hrv, bb, acts, wt, st1, st2, hr0, hr1] = await Promise.all([
     safe(gget(tok, '/usersummary-service/v2/dailysummaries', { startDate: sd, endDate: ed })),
     safe(gget(tok, '/sleep-service/sleep/dailySleepSummariesByDate', { startDate: sd, endDate: ed })),
     safe(gget(tok, `/hrv-service/hrv/daily/${sd}/${ed}`)),
     safe(gget(tok, '/wellness-service/wellness/bodyBattery/reports/daily', { startDate: sd, endDate: ed })),
     safe(gget(tok, '/activitylist-service/activities/search/activities', { start: 0, limit: 40, startDate: sd, endDate: ed })),
-    safe(gget(tok, `/weight-service/weight/range/${sd}/${ed}`, { includeAll: 'true' })),
+    safe(gget(tok, `/weight-service/weight/range/${sd}/${ed}`, { includeAll: 'true' })), safe(gget(tok, `/usersummary-service/stats/steps/daily/${sd}/${isoDate(mid)}`)), sd2 <= ed ? safe(gget(tok, `/usersummary-service/stats/steps/daily/${sd2}/${ed}`)) : Promise.resolve(null), safe(gget(tok, '/wellness-service/wellness/dailyHeartRate', { date: ed })), safe(gget(tok, '/wellness-service/wellness/dailyHeartRate', { date: yd })),
   ]);
   const byDay = {}, d = (k) => (byDay[k] = byDay[k] || {});
   for (const [k, o] of Object.entries(byCalendarDate(sum))) Object.assign(d(k), {
@@ -448,13 +448,13 @@ async function syncGarmin(user, env, days) {
   }
   for (const [k, o] of Object.entries(byCalendarDate(hrv))) Object.assign(d(k), { hrv: pick(o, ['lastNightAvg', 'lastNight', 'hrvValue', 'weeklyAvg']), hrvStatus: typeof o.status === 'string' ? o.status : undefined });
   for (const [k, o] of Object.entries(byCalendarDate(bb))) { const v = pick(o, ['charged', 'highest', 'bodyBatteryHighestValue', 'max']); if (v != null && d(k).bodyBattery == null) d(k).bodyBattery = v; }
-  for (const [k, o] of Object.entries(byCalendarDate(wt))) { const g = pick(o, ['weight']); if (g) d(k).weightLb = r1(g > 1000 ? g / 453.592 : g / 0.4536); }
+  for (const [k, o] of Object.entries(byCalendarDate(wt))) { const g = pick(o, ['weight']); if (g) d(k).weightLb = r1(g > 1000 ? g / 453.592 : g / 0.4536); } for (const s of [st1, st2]) for (const [k, o] of Object.entries(byCalendarDate(s))) { const v = pick(o, ['totalSteps', 'steps', 'stepCount']); if (v != null && d(k).steps == null) d(k).steps = Math.round(v); } for (const [day, h] of [[ed, hr0], [yd, hr1]]) { const v = h && !h.__error ? pick(h, ['restingHeartRate', 'restingHeartRateValue']) : undefined; if (v && d(day).rhr == null) d(day).rhr = v; }
   const list = Array.isArray(acts) ? acts : (acts && (acts.activityList || acts.activities)) || [];
   const workouts = list.map(a => ({ src: 'Garmin', id: 'garmin-' + a.activityId, date: String(a.startTimeLocal || a.startTimeGMT || '').slice(0, 10),
     name: a.activityName || titleCase(a.activityType && a.activityType.typeKey || 'Activity'), type: a.activityType && a.activityType.typeKey || null,
     start: a.startTimeLocal || null, min: a.duration ? Math.round(a.duration / 60) : null, kcal: a.calories ? Math.round(a.calories) : null,
     avgHr: a.averageHR || null, maxHr: a.maxHR || null, sets: a.totalSets || a.activeSets || null, reps: a.totalReps || null })).filter(w => /^\d{4}-\d{2}-\d{2}$/.test(w.date));
-  const errors = Object.entries({ summaries: sum, sleep: slp, hrv, bodyBattery: bb, activities: acts, weight: wt }).filter(([, v]) => v && v.__error).map(([k, v]) => k + ': ' + v.__error);
+  const errors = Object.entries({ summaries: sum, sleep: slp, hrv, bodyBattery: bb, activities: acts, weight: wt, steps: st1 }).filter(([, v]) => v && v.__error).map(([k, v]) => k + ': ' + v.__error);
   return { days: clean(byDay), workouts, errors };
 }
 
