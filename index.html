@@ -805,6 +805,34 @@ html.scrolled .top{border-bottom-color:var(--line)!important}
 .page.scrolled .page-t{opacity:1;transform:none}
 .page-big{font:800 32px/1.1 var(--f-display);letter-spacing:-.015em;margin:2px 4px -4px}
 @media (prefers-reduced-motion:reduce){:root{--t-fast:0ms;--t-base:0ms;--t-slow:0ms}}
+
+/* ===== Batch B: Today hero ===== */
+.hero.v2{display:flex;flex-direction:column;gap:18px;padding:20px}
+.hv-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hv-l{min-width:0}
+.hv-big{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.hv-big b{font:800 56px/1 var(--f-display);letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--fg)}
+.hv-big small{font:700 15px var(--f-body);color:var(--muted);letter-spacing:.02em}
+.hv-big.over b{color:var(--over)}
+.hv-sub{font-size:13.5px;color:var(--muted);margin-top:6px}
+.hero.v2 .gauge{width:112px;max-width:112px;flex:none;margin:0}
+.hero.v2 .gauge .c{flex-direction:row;align-items:center;justify-content:center;gap:1px;inset:0}
+.hero.v2 .gauge .c b{font:800 24px var(--f-num)}.hero.v2 .gauge .c span{font:700 12px var(--f-body);color:var(--muted)}
+.hv-mac{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.hm{background:var(--surface-2);border-radius:14px;padding:11px 12px 10px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.hm-n{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.hm-n::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--c)}
+.hm-v{display:flex;align-items:baseline;gap:3px;white-space:nowrap}.hm-v b{font:700 21px/1 var(--f-num);color:var(--c)}.hm-v span{font-size:11px;color:var(--muted)}
+.hm .bar{height:5px}.hm-o{font-size:11.5px;color:var(--subtle)}
+.hv-pills{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.hv-pills:empty{display:none}
+@media (min-width:781px){.hv-big b{font-size:64px}.hero.v2 .gauge{width:150px;max-width:150px}}
+.coach{gap:10px}
+.coach-tg{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:0;text-align:left;color:var(--fg)}
+.coach-tg .coach-h{flex:1}.chev2{width:20px;height:20px;color:var(--subtle);transition:transform var(--t-base) var(--ease-out)}
+.coach-tg[aria-expanded="true"] .chev2{transform:rotate(180deg)}
+.coach-next{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:1px solid color-mix(in srgb,var(--kcal) 45%,transparent);background:color-mix(in srgb,var(--kcal) 8%,var(--surface-2));border-radius:13px;padding:11px 12px;color:var(--fg);font-size:14px}
+.coach-next .dim{display:block;font-size:12.5px;color:var(--muted)}
+.todo{animation:viewin var(--t-base) var(--ease-out)}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -841,11 +869,9 @@ html.scrolled .top{border-bottom-color:var(--line)!important}
       <button class="icon-btn" id="dNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
 
-    <div class="tip" id="tip-today" hidden></div>
-    <div class="card hero" id="hero"></div>
+    <div class="card hero v2" id="hero"></div>
     <div class="card prep-card" id="prepCard" hidden></div>
     <div class="card coach" id="coach" hidden></div>
-    <div class="card idea-card" id="ideasCard" hidden></div>
 
     <div class="card composer">
       <div class="row" style="justify-content:space-between">
@@ -866,6 +892,8 @@ html.scrolled .top{border-bottom-color:var(--line)!important}
       <div class="recent" id="recent"></div>
     </div>
 
+    <div class="tip" id="tip-today" hidden></div>
+    <div class="card idea-card" id="ideasCard" hidden></div>
     <div class="meals" id="meals"></div>
 
     <div class="glist" id="todayRows"></div>
@@ -1425,7 +1453,7 @@ function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){retu
 function snapshot(key){try{const cur=localStorage.getItem(LS);if(cur&&cur.length>20)localStorage.setItem(key,cur)}catch(e){}}
 function load(){try{try{const pv=localStorage.getItem('macros.appver');if(pv!==APP_VER){snapshot(LS+'.update');localStorage.setItem('macros.appver',APP_VER)}}catch(e){}
   const j=readStore();if(j){S.days=j.days||{};if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.dev=j.dev||{days:{},workouts:[]};S.prefs=j.prefs||{};S.customLifts=j.customLifts||[];S.favLifts=j.favLifts||[];S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
-function save(){if(typeof socSchedule==='function')socSchedule();
+function save(){saveVer++;if(typeof socSchedule==='function')socSchedule();
   if(loadBlocked)return;
   try{const cur=localStorage.getItem(LS);if(cur&&!wipeOK){const had=(cur.match(/"id":/g)||[]).length,now=Object.values(S.days).reduce((a,l)=>a+l.length,0)+S.workouts.length;if(had>20&&now===0)return}}catch(e){}
   try{const t=+localStorage.getItem(LS+'.safeAt')||0;if(Date.now()-t>12*36e5){snapshot(LS+'.safe');localStorage.setItem(LS+'.safeAt',String(Date.now()))}}catch(e){}
@@ -1538,30 +1566,47 @@ function renderAll(){renderView();renderRecent();if(typeof pgStack!=='undefined'
 function renderView(){({today:renderToday,week:renderWeek,month:renderMonth,friends:openFriends,foods:renderFoods,plan:renderPlan,train:renderTrain})[S.view]()}
 
 /* ---------- TODAY ---------- */
+
+/* ---- hero motion: ring sweeps and numbers count to their new values ---- */
+const RM=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+let heroPrev={k:null,arcs:[],nums:{}};
+function countTo(el,from,to,ms=520){if(RM()||from===to||from==null){el.textContent=fmt(to);return}const t0=performance.now();
+  const step=now=>{const x=Math.min(1,(now-t0)/ms),e=1-Math.pow(1-x,3);el.textContent=fmt(from+(to-from)*e);if(x<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+function animateHero(k){const H=$('hero');const same=heroPrev.k===k;
+  H.querySelectorAll('[data-cu]').forEach(el=>{const key=el.dataset.cu,to=+el.dataset.v;countTo(el,same?heroPrev.nums[key]:(RM()?to:0),to,same?520:700);heroPrev.nums[key]=to});
+  const arcs=[...H.querySelectorAll('.gauge circle[data-arc]')];
+  arcs.forEach((c,i)=>{const to=c.getAttribute('stroke-dasharray'),toOff=c.getAttribute('stroke-dashoffset')||'0';if(RM())return;
+    const pr=same&&heroPrev.arcs[i]?heroPrev.arcs[i]:{da:'0 999',off:toOff};c.style.transition='none';c.setAttribute('stroke-dasharray',pr.da);c.setAttribute('stroke-dashoffset',pr.off);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.transition=`stroke-dasharray ${same?520:800}ms var(--ease-out),stroke-dashoffset ${same?520:800}ms var(--ease-out)`;c.setAttribute('stroke-dasharray',to);c.setAttribute('stroke-dashoffset',toOff)}))});
+  heroPrev.arcs=arcs.map(c=>({da:c.getAttribute('data-da')||c.getAttribute('stroke-dasharray'),off:c.getAttribute('stroke-dashoffset')||'0'}));heroPrev.k=k}
 function gaugeSVG(t,goal){
   const R=84,C=2*Math.PI*R,gap=t.k>0?3:0;
   const kp=t.p*4,kc=t.c*4,kf=t.f*9,sum=kp+kc+kf||1,filled=goal?Math.min(t.k/goal,1):0;
   const segs=(kp+kc+kf)>0?[[kp/sum,'var(--pro)'],[kc/sum,'var(--carb)'],[kf/sum,'var(--fat)']]:[[1,'var(--kcal)']];
   let off=0,arcs='';
-  segs.forEach(([fr,col])=>{const len=fr*filled*C;if(len>0.5)arcs+=`<circle cx="100" cy="100" r="${R}" fill="none" stroke="${col}" stroke-width="16" stroke-dasharray="${Math.max(len-gap,.1)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 100 100)"/>`;off+=len});
+  segs.forEach(([fr,col])=>{const len=fr*filled*C;if(len>0.5)arcs+=`<circle data-arc data-da="${Math.max(len-gap,.1)} ${C}" cx="100" cy="100" r="${R}" fill="none" stroke="${col}" stroke-width="16" stroke-linecap="round" stroke-dasharray="${Math.max(len-gap,.1)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 100 100)"/>`;off+=len});
   let over='';if(t.k>goal&&goal){const fr=Math.min((t.k-goal)/goal,1),C2=2*Math.PI*96;over=`<circle cx="100" cy="100" r="96" fill="none" stroke="var(--over)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${fr*C2} ${C2}" transform="rotate(-90 100 100)"/>`}
   let ticks='';for(let i=0;i<20;i++){const a=i/20*2*Math.PI-Math.PI/2,a1=104,a2=i%5===0?110:107;ticks+=`<line x1="${100+a1*Math.cos(a)}" y1="${100+a1*Math.sin(a)}" x2="${100+a2*Math.cos(a)}" y2="${100+a2*Math.sin(a)}" stroke="var(--faint)" stroke-width="${i%5===0?1.6:1}"/>`}
   return `<svg viewBox="-14 -14 228 228" role="img" aria-label="${fmt(t.k)} of ${fmt(goal)} calories"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${arcs}${over}${ticks}</svg>`;
 }
-function renderToday(){renderCheckin();renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();
+function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack.length-1]:null;if(pgOpen==='checkin')renderCheckin();if(pgOpen==='health')renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();
   const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk;
   $('dTitle').textContent=niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   const diff=Math.round((parseKey(k)-parseKey(tk))/864e5);
   $('dSub').textContent=isToday?(firstName()?`${greet()}, ${firstName()}`:'Today'):diff===-1?'Yesterday':diff===1?'Tomorrow':diff<0?`${-diff} days ago`:`In ${diff} days`;
   $('dToday').hidden=isToday; $('dPick').value=k;
   const left=gk-t.k;
-  const ch=(lab,v,goal,col)=>{const pct=goal?v/goal:0,rem=goal-v;
-    return `<div class="ch" style="--c:var(${col})"><div class="nm">${lab}</div><div class="val num"><b>${r0(v)}</b><span> / ${r0(goal)} g</span></div><div class="bar ${pct>1?'over':''}"><i style="width:${Math.min(pct,1)*100}%"></i></div><div class="left">${rem>=0?`${r0(rem)} g to go`:`${r0(-rem)} g over`} · ${r0(pct*100)}%</div></div>`};
-  const kp=t.p*4,kc=t.c*4,kf=t.f*9,s=kp+kc+kf;
-  $('hero').innerHTML=`<div class="gauge ${left<0?'over':''}">${gaugeSVG(t,gk)}<div class="c"><div class="big">${fmt(Math.abs(left))}</div><div class="lab">${left<0?'kcal over':'kcal left'}</div><div class="of num">${fmt(t.k)} / ${fmt(gk)} eaten</div></div></div>
-    <div class="channels">${ch('Protein',t.p,g.p,'--pro')}${ch('Carbs',t.c,g.c,'--carb')}${ch('Fat',t.f,g.f,'--fat')}
-    <div class="split">${s?`<span><i style="background:var(--pro)"></i>${r0(kp/s*100)}% protein</span><span><i style="background:var(--carb)"></i>${r0(kc/s*100)}% carbs</span><span><i style="background:var(--fat)"></i>${r0(kf/s*100)}% fat</span>`:`<span>Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate below.</span>`}
-    ${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · training</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of} · ${g.ph}`}</button>`:g.starter?`<span>Using starter targets.</span><button class="pill-btn" style="padding:3px 10px" data-goto="plan">Build your plan</button>`:''}</div></div>`;
+  const pct=gk?Math.round(t.k/gk*100):0,over=left<0;
+  const mac=(key,lab,v,goal,col)=>{const rem=goal-v,p2=goal?Math.min(v/goal,1):0;
+    return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b data-cu="${key}" data-v="${r0(Math.abs(rem))}">${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':'over'}</span></div><div class="bar ${v>goal?'over':''}"><i style="width:${p2*100}%"></i></div><div class="hm-o num">${r0(v)} / ${r0(goal)}</div></div>`};
+  $('hero').innerHTML=`<div class="hv-top"><div class="hv-l"><div class="eyebrow">${over?(isToday?'Over today':'Over that day'):(isToday?'Left today':'Left that day')}</div>
+      <div class="hv-big ${over?'over':''}"><b class="num" data-cu="left" data-v="${Math.abs(left)}">${fmt(Math.abs(left))}</b><small>kcal</small></div>
+      <div class="hv-sub num">${fmt(t.k)} eaten of ${fmt(gk)}</div></div>
+      <div class="gauge ${over?'over':''}">${gaugeSVG(t,gk)}<div class="c"><b class="num" data-cu="pct" data-v="${pct}">${pct}</b><span>%</span></div></div></div>
+    <div class="hv-mac">${mac('p','Protein',t.p,g.p,'--pro')}${mac('c','Carbs',t.c,g.c,'--carb')}${mac('f','Fat',t.f,g.f,'--fat')}</div>
+    <div class="hv-pills">${!t.k?`<span class="note" style="margin:0">Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate below.</span>`:''}
+    ${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · training</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of}`}</button>`:g.starter?`<button class="plan-pill" data-goto="plan">Starter targets · build your plan</button>`:''}</div>`;
+  animateHero(k);
   $('mealPick').innerHTML=MEALS.map(([m,l])=>`<button type="button" class="chip" data-meal="${m}" aria-pressed="${S.mealSel===m}">${l}</button>`).join('');
   const list=S.days[k]||[], prev=S.days[addDays(k,-1)]||[];
   $('meals').innerHTML=MEALS.map(([m,l])=>{
@@ -2625,8 +2670,8 @@ function ideaTarget(mode){
   const share=mode==='day'?1:slot==='snack'?Math.min(1,.5/n):1/n;
   return {R,T:{p:R.p*share,c:R.c*share,f:R.f*share},n,slot,left};
 }
-function mealIdeas(mode,slot){const {T}=ideaTarget(mode);const s=SLOT_OF[slot]||'l';
-  return IDEAS.filter(i=>i.slots.includes(s)).map(i=>fitIdea(i,T)).sort((a,b)=>b.fit-a.fit)}
+const _miC={};function mealIdeas(mode,slot){const {T}=ideaTarget(mode);const s=SLOT_OF[slot]||'l',key=s+'|'+r0(T.p)+'|'+r0(T.c)+'|'+r0(T.f);if(_miC[key])return _miC[key];
+  return _miC[key]=IDEAS.filter(i=>i.slots.includes(s)).map(i=>fitIdea(i,T)).sort((a,b)=>b.fit-a.fit)}
 function fmtQ(e){return e.a}
 function renderIdeasCard(){
   const el=$('ideasCard');if(!el)return;const g=goalsFor(S.day),t=dayTotals(S.day);
@@ -2946,10 +2991,11 @@ function renderCoach(){
   const done=items.filter(i=>i.done).length,f=mode==='setup'?0:done/items.length,next=items.findIndex(i=>!i.done);
   const head=mode==='setup'?`<div class="coach-h"><span class="tip" style="margin:0;padding:0;border:0;background:none"><span class="tic" style="width:46px;height:46px;font-size:20px">${items.length}</span></span><div><h2>Let's get you set up</h2><p>${items.length} quick step${items.length>1?'s':''} so your targets fit you.</p></div></div>`
     :`<div class="coach-h">${ringSVG(f,f>=1?'var(--good)':'var(--kcal)')}<div><h2>${f>=1?'Day complete':next===0?'Start your day':'Your day'}</h2><p>${f>=1?'Everything done. See you tomorrow.':`${done} of ${items.length} done. Next: ${items[next].t.toLowerCase()}.`}</p></div></div>`;
-  el.innerHTML=head+`<ul class="todo">${items.map((it,i)=>`<li><button type="button" data-cg="${i}" class="${it.done?'done':''} ${i===next?'next':''}"><span class="ck">${it.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span><b>${it.t}</b><span class="s">${it.s}</span></span>${it.done?'':i===next?`<span class="go2">${it.cta}</span>`:CHEV}</button></li>`).join('')}</ul>
-    ${mode==='setup'?'<button class="coach-x" data-cx="setup">Skip setup for now</button>':''}`;
+  const open=S.coachOpen||mode==='setup';
+  el.innerHTML=(mode==='setup'?head:`<button type="button" class="coach-tg" data-ctg aria-expanded="${!!open}">${head}<svg class="chev2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>`)+(open?'':(next>=0?`<button type="button" class="coach-next" data-cg="${next}"><span>Next: <b>${items[next].t}</b> <span class="dim">${items[next].s}</span></span><span class="go2">${items[next].cta}</span></button>`:''))+(open?`<ul class="todo">${items.map((it,i)=>`<li><button type="button" data-cg="${i}" class="${it.done?'done':''} ${i===next?'next':''}"><span class="ck">${it.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span><b>${it.t}</b><span class="s">${it.s}</span></span>${it.done?'':i===next?`<span class="go2">${it.cta}</span>`:CHEV}</button></li>`).join('')}</ul>
+    </ul>`:'')+`${mode==='setup'?'<button class="coach-x" data-cx="setup">Skip setup for now</button>':''}`;
 }
-$('coach').addEventListener('click',e=>{const b=e.target.closest('[data-cg]');if(b){const f=coachGo[+b.dataset.cg];if(f)f();return}if(e.target.closest('[data-cx]')){S.prefs.skipSetup=true;save();renderToday()}});
+$('coach').addEventListener('click',e=>{if(e.target.closest('[data-ctg]')){S.coachOpen=!S.coachOpen;renderCoach();return}const b=e.target.closest('[data-cg]');if(b){const f=coachGo[+b.dataset.cg];if(f)f();return}if(e.target.closest('[data-cx]')){S.prefs.skipSetup=true;save();renderToday()}});
 function renderTodayRows(){
   const el=$('todayRows');if(!el)return;const k=S.day,h=hv(k),c=S.checkins[k],cfg=syncCfg();
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
@@ -3157,7 +3203,7 @@ function renderTrain(){
   const sel=$('exSel');const cur=S.exSel&&names.includes(S.exSel)?S.exSel:names[0];
   sel.innerHTML=names.length?names.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):'<option>No lifts yet</option>';
   sel.disabled=!names.length;
-  $('exChart').innerHTML=cur?exChart(cur):'';
+  if(typeof pgStack!=='undefined'&&pgStack[pgStack.length-1]==='strength')$('exChart').innerHTML=cur?exChart(cur):'';
   $('exNote').textContent=cur?'':'Finish a workout with weight and reps to see your strength trend. Estimated 1-rep max uses the Epley formula: weight × (1 + reps ÷ 30).';
   // history
   const dfmt=k=>niceDate(k,{weekday:'short',month:'short',day:'numeric'});
@@ -3561,7 +3607,9 @@ function autoLink(){
   S.workouts.forEach(w=>{if(w.devId)return;const d=devList().find(x=>!used.has(x.id)&&x.date===w.date&&x.start&&Math.abs(Date.parse(x.start)-w.start)<90*60000);if(d){w.devId=d.id;used.add(d.id);ch=true}});
   if(ch)save();
 }
-function trainFeed(){
+var _tf=null,_tfv=-1,saveVer=saveVer||0;
+function trainFeed(){if(_tf&&_tfv===saveVer)return _tf;_tf=trainFeedRaw();_tfv=saveVer;return _tf}
+function trainFeedRaw(){
   autoLink();const dev=devList(),by=Object.fromEntries(dev.map(d=>[d.id,d])),linked=new Set(S.workouts.map(w=>w.devId).filter(Boolean));
   return [...S.workouts.map((w,i)=>({t:w.start||parseKey(w.date).getTime(),date:w.date,log:w,i,dev:w.devId?by[w.devId]:null})),
     ...dev.filter(d=>!linked.has(d.id)).map(d=>({t:d.start?Date.parse(d.start):parseKey(d.date).getTime(),date:d.date,dev:d}))].sort((a,b)=>b.t-a.t);
