@@ -845,6 +845,29 @@ html.kb main{padding-bottom:24px}
 .sheet{max-height:calc(var(--vvh,100vh) - 24px)}
 .sheet.tall{height:min(calc(var(--vvh,90dvh) - 24px),820px)}
 .ex-f{flex-wrap:wrap;gap:6px 14px}
+
+/* ===== Batch D ===== */
+.toast.reward{white-space:normal;min-width:min(300px,90vw);max-width:min(92vw,400px);background:linear-gradient(135deg,color-mix(in srgb,var(--good) 22%,var(--surface-2)),var(--surface-2));color:var(--fg);border:1px solid color-mix(in srgb,var(--good) 50%,transparent);box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 6px color-mix(in srgb,var(--good) 8%,transparent);display:flex;align-items:center;gap:12px;padding:12px 18px 12px 12px;white-space:normal;animation:rwin var(--t-slow) var(--ease-spring) both}
+.rw-ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:color-mix(in srgb,var(--good) 20%,transparent);flex:none}
+.rw-t b{display:block;font:700 15px var(--f-display)}.rw-t small{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
+@keyframes rwin{from{opacity:0;transform:translate(-50%,-10px) scale(.92)}}
+.done-hd{display:flex;align-items:center;gap:14px}
+.done-badge{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;background:color-mix(in srgb,var(--carb) 18%,var(--surface-2));border:1px solid color-mix(in srgb,var(--carb) 45%,transparent);animation:pop var(--t-slow) var(--ease-spring) both}
+.skel-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.skel{display:flex;flex-direction:column;gap:7px;padding:12px;border-radius:12px;background:var(--surface-2)}
+.skel i,.skel-line{display:block;height:11px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05));background-size:200% 100%;animation:shim 1.2s linear infinite}
+.skel i:first-child{width:70%}.skel i:last-child{width:40%}.skel-line{width:150px;height:10px;margin-top:3px}
+@keyframes shim{to{background-position:-200% 0}}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:22px 12px;list-style:none}
+.empty .gi{width:48px;height:48px;border-radius:15px}.empty .gi svg{width:24px;height:24px}
+.empty b{font:700 16px var(--f-display)}.empty p{margin:0;color:var(--muted);font-size:13.5px;max-width:300px;line-height:1.5}.empty .primary{margin-top:6px}
+.hist li:has(.empty){list-style:none}
+.wk-res{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;border-color:color-mix(in srgb,var(--carb) 45%,var(--line));background:radial-gradient(300px 160px at 0% 0%,color-mix(in srgb,var(--carb) 14%,transparent),transparent 70%),var(--surface)}
+.wk-res h2{margin:2px 0 4px;font:800 20px/1.15 var(--f-display)}.wk-medal{font-size:40px;line-height:1;text-align:center;animation:pop var(--t-slow) var(--ease-spring) both}
+.ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:14;width:38px;height:38px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);opacity:0;transform:translate(-50%,0);transition:opacity var(--t-fast);pointer-events:none;box-shadow:var(--elev-2)}
+.ptr svg{width:18px;height:18px}.ptr.ready{color:var(--kcal)}.ptr.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.skel i,.skel-line{animation:none}}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -1610,7 +1633,7 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
   const left=gk-t.k;
   const pct=gk?Math.round(t.k/gk*100):0,over=left<0;
   const mac=(key,lab,v,goal,col)=>{const rem=goal-v,p2=goal?Math.min(v/goal,1):0;
-    return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b data-cu="${key}" data-v="${r0(Math.abs(rem))}">${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':'over'}</span></div><div class="bar ${v>goal?'over':''}"><i style="width:${p2*100}%"></i></div><div class="hm-o num">${r0(v)} / ${r0(goal)}</div></div>`};
+    return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b data-cu="${key}" data-v="${r0(Math.abs(rem))}">${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':key==='p'?'extra':'over'}</span></div><div class="bar ${v>goal&&key!=='p'?'over':''}"><i style="width:${p2*100}%"></i></div><div class="hm-o num">${r0(v)} / ${r0(goal)}</div></div>`};
   $('hero').innerHTML=`<div class="hv-top"><div class="hv-l"><div class="eyebrow">${over?(isToday?'Over today':'Over that day'):(isToday?'Left today':'Left that day')}</div>
       <div class="hv-big ${over?'over':''}"><b class="num" data-cu="left" data-v="${Math.abs(left)}">${fmt(Math.abs(left))}</b><small>kcal</small></div>
       <div class="hv-sub num">${fmt(t.k)} eaten of ${fmt(gk)}</div></div>
@@ -1644,7 +1667,7 @@ $('meals').addEventListener('click',e=>{
 });
 
 function addEntries(entries,k=S.day,meal=S.mealSel){
-  if(!entries.length)return;
+  if(!entries.length)return;const _before=dayTotals(k);setTimeout(()=>checkRewards(k,_before),0);
   entries.forEach(e=>e.meal=meal);
   const ids=entries.map(e=>e.id),kc=entries.reduce((a,e)=>a+e.k,0);
   S.just={k,ids};
@@ -1857,7 +1880,7 @@ function openMeal(i){
   $('mlPlus').onclick=()=>{qi.value=r1((+qi.value||0)+.5);qi.oninput()};
   draw();wireChips('mlMeal',m=>meal=m);
   $('mlCancel').onclick=closeSheet;
-  let armed=false;$('mlDel').onclick=()=>{if(!armed){armed=true;$('mlDel').textContent='Tap again to delete';$('mlDel').classList.add('armed');return}S.meals.splice(i,1);save();closeSheet();renderAll();toast(`Deleted ${esc(ml.name)}`)};
+  $('mlDel').onclick=()=>{const gone=S.meals.splice(i,1)[0];save();closeSheet();renderAll();toast(`Deleted ${esc(ml.name)}`,()=>{S.meals.splice(i,0,gone);save();renderAll()})};
   $('mlOk').onclick=()=>{closeSheet();addEntries(mealEntries(ml,q||1),S.day,meal)};
 }
 let toastT;
@@ -2288,7 +2311,7 @@ function renderWeights(){
   $('wList').innerHTML=ks.length?`<ul class="journal">${shown.map(k=>{const c=S.checkins[k]||{},w=S.weights[k],a=wAvg(k);
     return `<li><div class="jh"><b>${niceDate(k,{weekday:'short',month:'short',day:'numeric'})}</b>${w!=null?`<span class="num">${r1(w)} lb</span>`:''}${a!=null&&w!=null?`<span class="dim num">avg ${r1(a)}</span>`:''}<button class="link" data-open="${k}">Open day</button><button class="link danger-link" data-wdel="${k}">Remove</button></div>
       ${RATE.some(([r])=>c[r])?`<div class="jr">${RATE.filter(([r])=>c[r]).map(([r,l])=>`<span class="jchip"><i style="width:${c[r]*20}%"></i>${l} ${c[r]}/5</span>`).join('')}</div>`:''}
-      ${c.note?`<p class="jn">${esc(c.note)}</p>`:''}</li>`}).join('')}</ul>${ks.length>10&&!S.ciAll?`<button class="pill-btn" id="ciMore">Show all ${ks.length} check-ins</button>`:''}`:'<p class="note">No check-ins yet. Log your weight and how you feel from the Today page.</p>';
+      ${c.note?`<p class="jn">${esc(c.note)}</p>`:''}</li>`}).join('')}</ul>${ks.length>10&&!S.ciAll?`<button class="pill-btn" id="ciMore">Show all ${ks.length} check-ins</button>`:''}`:emptyState('scale','--carb','No weigh-ins yet','Type your weight above. A few mornings a week is plenty, since the 7-day average is what counts.');
   const m=$('ciMore');if(m)m.onclick=()=>{S.ciAll=true;renderWeights()};
 }
 $('wList').addEventListener('click',e=>{
@@ -2402,9 +2425,9 @@ function openPhoto(file){
   $('phGo').onclick=async()=>{
     if(scanned){const on=items.filter(i=>i.on);closeSheet();addEntries(on.map(i=>{const e=mk(i.n,`${r0(i.g*i.sc)} g · photo`,i.g*i.sc,i.k*i.sc,i.p*i.sc,i.c*i.sc,i.f*i.sc,'photo');return e}),S.day,meal);return}
     const note=($('phNote')||{}).value||'';
-    $('phGo').disabled=true;$('phStatus').className='status';$('phStatus').textContent='Scanning with Claude…';
+    $('phGo').disabled=true;$('phStatus').className='status';$('phStatus').textContent='Claude is reading your plate…';$('phBody').insertAdjacentHTML('beforeend',`<div class="skel-list">${'<div class="skel"><i></i><i></i></div>'.repeat(3)}</div>`);
     try{items=(await scanImage(dataUrl,note)).map(i=>({...i,sc:1}));scanned=true;$('phStatus').textContent=items.length?'Check the amounts, untick anything wrong, then add.':'';drawItems()}
-    catch(e){$('phStatus').className='status err';$('phStatus').textContent=e.msg||'Scan failed. Try again.';$('phGo').disabled=false}
+    catch(e){$('phStatus').className='status err';$('phStatus').textContent=e.msg||niceErr(e,'Claude');$('phGo').disabled=false;const sk=$('phBody').querySelector('.skel-list');if(sk)sk.remove()}
   };
 }
 $('photoBtn').onclick=()=>$('photoIn').click();
@@ -2789,13 +2812,13 @@ function myWeek(){
   const sk=streak();if([3,5,7,10,14,21,30,50,75,100,150,200,365].includes(sk))ev.push({id:'s:'+tk,type:'streak',date:tk,t:Date.now(),n:sk});
   if(stats.wchg!=null&&Math.abs(stats.wchg)>=.5)ev.push({id:'wt:'+ws,type:'weight',date:tk,t:T(tk),n:stats.wchg});
   ev.sort((a,b)=>b.t-a.t);return {stats,events:ev.slice(0,20),dp}}
-async function socApi(path,body){const c=await ensureSync();const r=await fetch(c.url+'/api/social/'+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
+async function socApi(path,body){let c;try{c=await ensureSync()}catch(e){throw new Error(niceErr(e,'Syncope Friends'))}let r;try{r=await fetch(c.url+'/api/social/'+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined})}catch(e){throw new Error(niceErr(e,'Syncope Friends'))}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Couldn’t reach Syncope Friends.');return j}
 let socT=null;
 function socSchedule(ms=15000){const c=socCfg();if(!c.on)return;clearTimeout(socT);socT=setTimeout(socPush,ms)}
 async function socPush(force){const c=socCfg();if(!c.on)return;if(!force&&c.lastPush&&Date.now()-c.lastPush<3*60000)return socSchedule(3*60000-(Date.now()-c.lastPush)+500);
   try{const {stats,events}=myWeek();await socApi('stats',{stats,events,detail:myDetail()});const n=socCfg();n.lastPush=Date.now();socSave(n)}catch(e){}}
-async function socBoard(){const c=socCfg();if(!c.on)return null;try{const b=await socApi('board');const n=socCfg();n.board=b;n.boardAt=Date.now();n.code=b.me.code;n.username=b.me.username;n.phoneLast4=b.me.phoneLast4;socSave(n);return b}catch(e){return c.board||null}}
+async function socBoard(){const c=socCfg();if(!c.on)return null;try{const b=await socApi('board');const n=socCfg();n.board=b;n.boardAt=Date.now();n.code=b.me.code;n.username=b.me.username;n.phoneLast4=b.me.phoneLast4;try{const ws=weekStart(todayKey()),mine=myWeek().stats.score,sc=[mine,...(b.friends||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0)];if(sc.length>1)n.weekSnap={ws,pts:mine,n:sc.length,rank:1+sc.slice(1).filter(x=>x>mine).length}}catch(e){}socSave(n);return b}catch(e){return c.board||null}}
 const AV=(n,c,sz=40)=>`<span class="fav" style="--c:${esc(c||'#C7B6FF')};width:${sz}px;height:${sz}px;font-size:${sz*.38}px">${esc(initials(n))}</span>`;
 const METRICS=[['score','Points','pts'],['workouts','Workouts',''],['protein','Protein days','/7'],['steps','Steps',''],['streak','Streak','d']];
 function evText(e){switch(e.type){case 'workout':return `finished <b>${esc(e.s)}</b>${e.n?` · ${e.n} PR${e.n>1?'s':''} 🏆`:''}`;case 'protein':return 'hit their protein goal';case 'day':return 'nailed their calories <i>and</i> protein';
@@ -2822,6 +2845,7 @@ function renderFriends(){
         await socBoard();renderFriends();toast('You’re in. Invite your friends!')}
       catch(e){$('frErr').className='status err';$('frErr').textContent=e.message}};
     return}
+  if(!c.board){el.innerHTML=`<div class="card"><div class="skel-list">${'<div class="skel"><i></i><i></i></div>'.repeat(4)}</div></div>`;return}
   const b=c.board,me=b&&b.me,frs=(b&&b.friends)||[],reqs=(b&&b.reqs)||[],ws=weekStart(todayKey()),left=6-Math.round((parseKey(todayKey())-parseKey(ws))/864e5);
   const mine=myWeek();const meRow={uid:'me',name:c.name||'You',color:c.color,stats:{...mine.stats},me:true};
   const all=[meRow,...frs.map(f=>({...f,stats:f.stats&&f.stats.week===ws?f.stats:{week:ws,score:0}}))];
@@ -2832,7 +2856,9 @@ function renderFriends(){
   const feed=[...mine.events.map(e=>({...e,who:meRow,cheers:((me&&me.events)||[]).find(x=>x.id===e.id)?.cheers||[]})),...frs.flatMap(f=>(f.events||[]).map(e=>({...e,who:f})))].sort((a,b2)=>b2.t-a.t).slice(0,25);
   const cheered=new Set(c.cheered||[]);
   const needUp=c.share&&c.share.nutrition===undefined;
-  el.innerHTML=(needUp?`<div class="card fr-req"><div class="eyebrow" style="color:var(--good)">New</div><b style="font-size:16px">Let friends tap your profile</b><p class="note" style="margin:0">Share your daily calories, macros and recovery so friends can see them on your profile. You can change this anytime under Privacy.</p><div class="row" style="gap:8px"><button class="primary" id="frUp">Share calories & recovery</button><button class="ghost" id="frUpNo">Not now</button></div></div>`:'')+`<div class="card fr-week"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Week of ${niceDate(ws,{month:'short',day:'numeric'})}</div><h2>${frs.length?`You're #${sorted.findIndex(r=>r.me)+1} of ${all.length}`:'Your week'}</h2><p class="note" style="margin:2px 0 0">${left>0?`${left} day${left>1?'s':''} left · resets Monday`:'Last day, finish strong'}</p></div><b class="fr-pts">${fmt(mine.stats.score)}<small>pts</small></b></div>
+  const ws0=weekStart(todayKey()),snap=c.weekSnap,showRes=snap&&snap.ws<ws0&&c.resultSeen!==snap.ws;
+  const resCard=showRes?`<div class="card wk-res"><span class="wk-medal">${snap.rank===1?'🥇':snap.rank===2?'🥈':snap.rank===3?'🥉':'🏁'}</span><div><div class="eyebrow">Last week's result</div><h2>${snap.rank===1?'You won the week':`You finished #${snap.rank} of ${snap.n}`}</h2><p class="note" style="margin:0">${fmt(snap.pts)} points. A fresh week starts now, and everyone is back to zero.</p></div><button class="link" id="resX" aria-label="Dismiss">✕</button></div>`:'';
+  el.innerHTML=resCard+(needUp?`<div class="card fr-req"><div class="eyebrow" style="color:var(--good)">New</div><b style="font-size:16px">Let friends tap your profile</b><p class="note" style="margin:0">Share your daily calories, macros and recovery so friends can see them on your profile. You can change this anytime under Privacy.</p><div class="row" style="gap:8px"><button class="primary" id="frUp">Share calories & recovery</button><button class="ghost" id="frUpNo">Not now</button></div></div>`:'')+`<div class="card fr-week"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Week of ${niceDate(ws,{month:'short',day:'numeric'})}</div><h2>${frs.length?`You're #${sorted.findIndex(r=>r.me)+1} of ${all.length}`:'Your week'}</h2><p class="note" style="margin:2px 0 0">${left>0?`${left} day${left>1?'s':''} left · resets Monday`:'Last day, finish strong'}</p></div><b class="fr-pts">${fmt(mine.stats.score)}<small>pts</small></b></div>
       <div class="xp-f">${METRICS.map(([k,l])=>`<button type="button" class="chip" data-fm="${k}" aria-pressed="${met===k}">${l}</button>`).join('')}</div>
       ${frs.length?`<div class="podium">${order.map(i=>{const r=pod[i];return `<div class="pd p${i+1}" data-fp="${r.me?'me':esc(r.uid)}" role="button">${AV(r.name,r.color,i===0?62:50)}<b>${esc(r.me?'You':r.name.split(' ')[0])}</b><span>${fv(r)}${met==='score'?' pts':''}</span><i>${i+1}</i></div>`}).join('')}</div>
       <ol class="lb">${sorted.map((r,i)=>`<li class="${r.me?'me':''}" data-fp="${r.me?'me':esc(r.uid)}" role="button" tabindex="0"><span class="rk">${i+1}</span>${AV(r.name,r.color,34)}<span class="ln"><b>${esc(r.me?'You':r.name)}${r.username&&!r.me?` <i class="un">@${esc(r.username)}</i>`:''}</b><span>${r.stats.streak!=null?`🔥 ${r.stats.streak}-day streak`:''}${r.stats.workouts!=null?` · ${r.stats.workouts} workouts`:''}</span></span><b class="lv">${fv(r)}</b>${r.me?'':`<button class="link fr-rm" data-rm="${esc(r.uid)}" aria-label="Remove ${esc(r.name)}">⋯</button>`}</li>`).join('')}</ol>`
@@ -2856,6 +2882,7 @@ $('frBody').addEventListener('click',async e=>{
   if(e.target.closest('#frShareBtn')){const c=socCfg(),url=location.origin+location.pathname+'#join='+c.code,text=`Compete with me on Syncope${c.username?` (I'm @${c.username})`:''}. Tap the link to add me:`;
     try{if(navigator.share){await navigator.share({title:'Join me on Syncope',text,url});return}}catch(err){if(err&&err.name==='AbortError')return}
     try{await navigator.clipboard.writeText(text+' '+url);toast('Invite link copied')}catch(err){toast('Your code is '+esc(c.code))}return}
+  if(e.target.closest('#resX')){const c=socCfg();c.resultSeen=(c.weekSnap||{}).ws;socSave(c);renderFriends();return}
   if(e.target.closest('#frUp')||e.target.closest('#frUpNo')){const yes=!!e.target.closest('#frUp');const c=socCfg();c.share={...c.share,nutrition:yes,recovery:yes,foods:false};socSave(c);try{await socApi('profile',{name:c.name,color:c.color,share:c.share});await socPush(true);await socBoard()}catch(err){toast(esc(err.message))}renderFriends();if(yes)toast('Friends can now see your calories & recovery');return}
   if(e.target.closest('#frAddBtn'))return addFriend($('frAdd').value.trim());
   if(e.target.closest('#frPick')){try{const cs=await navigator.contacts.select(['tel','name'],{multiple:false});const t=cs&&cs[0]&&cs[0].tel&&cs[0].tel[0];if(t){$('frAdd').value=t;addFriend(t)}}catch(err){}return}
@@ -2971,6 +2998,26 @@ function openMealAdd(m){const l=mealName(m),q=quickItems();
   const upd=()=>{const kb=Math.max(0,innerHeight-vv.height-vv.offsetTop);R.style.setProperty('--vvh',vv.height+'px');R.style.setProperty('--vvt',vv.offsetTop+'px');R.classList.toggle('kb',kb>120)};
   vv.addEventListener('resize',upd);vv.addEventListener('scroll',upd);upd();
   document.addEventListener('focusin',e=>{const t=e.target;if(!t.matches||!t.matches('input:not([type=checkbox]):not([type=file]),textarea'))return;setTimeout(()=>{try{t.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}},320)});})();
+
+function emptyState(ic,c,title,sub,btn,act){return `<div class="empty"><span class="gi" style="--c:var(${c})">${GI[ic]||''}</span><b>${title}</b><p>${sub}</p>${btn?`<button class="primary" type="button" data-ga="${act}">${btn}</button>`:''}</div>`}
+GACT.weighNow=()=>{closePages();openWeigh()};GACT.startNow=()=>{closePages();openStart()};GACT.goToday=()=>{closePages();setView('today');setTimeout(()=>$('foodIn').focus(),250)};
+/* ---- 8. reward moments ---- */
+function reward(icon,title,sub){const r=$('toastRoot');clearTimeout(toastT);
+  r.innerHTML=`<div class="toast reward" role="status"><span class="rw-ic">${icon}</span><span class="rw-t"><b>${title}</b>${sub?`<small>${sub}</small>`:''}</span></div>`;
+  try{navigator.vibrate&&navigator.vibrate(18)}catch(e){}toastT=setTimeout(()=>r.innerHTML='',3200)}
+function rewardOnce(key){S.prefs.rw=S.prefs.rw||{};const d=todayKey();if(S.prefs.rw.d!==d)S.prefs.rw={d};if(S.prefs.rw[key])return false;S.prefs.rw[key]=1;return true}
+function checkRewards(k,before){if(k!==todayKey())return;const g=goalsFor(k),t=dayTotals(k);
+  if(before.p<g.p*.9&&t.p>=g.p*.9&&rewardOnce('protein'))setTimeout(()=>reward('💪','Protein goal hit',`${r0(t.p)} g of ${r0(g.p)} g. That's what keeps the muscle.`),900);}
+
+/* ---- pull to refresh (Today, Train, Friends) ---- */
+(()=>{const ind=document.createElement('div');ind.className='ptr';ind.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>';document.body.appendChild(ind);
+  let y0=null,dy=0,busy=false;const ok=()=>['today','train','friends'].includes(S.view)&&!pgStack.length&&!$('sheetRoot').innerHTML&&scrollY<=0&&!S.active;
+  addEventListener('touchstart',e=>{if(!busy&&ok()){y0=e.touches[0].clientY;dy=0}else y0=null},{passive:true});
+  addEventListener('touchmove',e=>{if(y0==null)return;dy=e.touches[0].clientY-y0;if(dy<=0||scrollY>0){ind.style.opacity=0;return}const d=Math.min(90,dy*.5);ind.style.opacity=Math.min(1,d/60);ind.style.transform=`translate(-50%,${d}px) rotate(${d*4}deg)`;ind.classList.toggle('ready',d>=60)},{passive:true});
+  addEventListener('touchend',async()=>{if(y0==null)return;const go=dy*.5>=60;y0=null;if(!go){ind.style.opacity=0;ind.style.transform='translate(-50%,0)';return}
+    busy=true;ind.classList.add('spin');ind.style.transform='translate(-50%,56px)';
+    try{const c=syncCfg();if(c.url&&c.uid)await syncDevices(true);if(socCfg().on){await socPush(true);await socBoard()}renderAll()}catch(e){}
+    ind.classList.remove('spin','ready');ind.style.opacity=0;ind.style.transform='translate(-50%,0)';busy=false},{passive:true});})();
 /* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
 function openAdd(){
   const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
@@ -3039,7 +3086,7 @@ function renderTodayRows(){
   const el=$('todayRows');if(!el)return;const k=S.day,h=hv(k),c=S.checkins[k],cfg=syncCfg();
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
-  el.innerHTML=friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:hs||((cfg.st&&(cfg.st.whoop||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
+  el.innerHTML=friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
     +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
 const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like “2 eggs and toast”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
@@ -3243,14 +3290,14 @@ function renderTrain(){
   sel.innerHTML=names.length?names.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):'<option>No lifts yet</option>';
   sel.disabled=!names.length;
   if(typeof pgStack!=='undefined'&&pgStack[pgStack.length-1]==='strength')$('exChart').innerHTML=cur?exChart(cur):'';
-  $('exNote').textContent=cur?'':'Finish a workout with weight and reps to see your strength trend. Estimated 1-rep max uses the Epley formula: weight × (1 + reps ÷ 30).';
+  $('exNote').innerHTML=cur?'':emptyState('chart','--carb','Your strength curve starts here','Finish a workout with weights and reps and your estimated 1-rep max for each lift is charted.','Start a workout','startNow');if(false)$('exNote').textContent=cur?'':'Finish a workout with weight and reps to see your strength trend. Estimated 1-rep max uses the Epley formula: weight × (1 + reps ÷ 30).';
   // history
   const dfmt=k=>niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   $('hist').innerHTML=feed.length?feed.slice(0,15).map(x=>{
     if(x.log){const w=x.log,d=x.dev,v=w.ex.reduce((b,y)=>b+y.sets.reduce((c,s2)=>c+setVol(s2),0),0);
       return `<li><button data-wk="${x.i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}${d?`<span class="wb">${esc(d.src)}</span>`:''}</b><span class="r">${fmt(v)} lb<br><span class="dim">${d&&d.strain!=null?`strain ${d.strain}`:fmtDur(w.end-w.start)}</span></span><span class="s">${dfmt(w.date)} · ${w.ex.length} exercises · ${w.ex.reduce((a2,y)=>a2+y.sets.length,0)} sets${d&&d.kcal?` · ${fmt(d.kcal)} kcal`:''}</span></button></li>`}
     const d=x.dev;return `<li><button data-devwk="${esc(d.id)}"><b>${esc(d.name)}<span class="wb">${esc(d.src)}</span></b><span class="r">${d.kcal!=null?fmt(d.kcal)+' kcal':''}${d.strain!=null?`<br><span class="dim">strain ${d.strain}</span>`:''}</span><span class="s">${dfmt(d.date)}${d.min?` · ${d.min} min`:''}${d.avgHr?` · ${d.avgHr} bpm avg`:''}</span></button></li>`}).join('')
-    :'<li class="note">No workouts yet. Start one above, or connect WHOOP or Garmin in Profile → Connections and your sessions appear here on their own.</li>';
+    :`<li>${emptyState('dumbbell','--pro','No workouts yet','Start one from a template above. WHOOP and Garmin sessions show up here on their own.','Start a workout','startNow')}</li>`;
   const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
   $('trRows').innerHTML=grow({pg:'strength',ic:'chart',c:'--carb',t:'Strength progress',s:'Estimated 1-rep max for each lift',v:lifts?`${lifts} lifts`:''})
     +grow({pg:'muscle',ic:'bars',c:'--good',t:'Sets per muscle',s:'Are you training enough this week?',v:`${sets} sets`})
@@ -3387,7 +3434,7 @@ function finishWorkout(){
   const wk={id:a.id,name:a.name.trim()||'Workout',date:a.date,start:st,end,ex,prs,...(a.devId?{devId:a.devId}:{})};
   S.workouts.unshift(wk);S.workouts.sort((x,y)=>y.end-x.end);S.active=null;S.rest=null;save();renderTrain();renderRest();
   const vol=ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0),sets=ex.reduce((b,x)=>b+x.sets.length,0);
-  sheet(`<div><div class="eyebrow">Workout complete</div><h3>${esc(wk.name)} done</h3></div>
+  sheet(`<div class="done-hd"><span class="done-badge">${prs.length?'🏆':'✓'}</span><div><div class="eyebrow">Workout complete</div><h3>${prs.length?`${prs.length} new personal record${prs.length>1?'s':''}`:`${esc(wk.name)} done`}</h3></div></div>
     <div class="live"><div style="--c:var(--pro)"><b>${fmtDur(end-st)}</b><span>time</span></div><div style="--c:var(--kcal)"><b>${sets}</b><span>sets</span></div><div style="--c:var(--fat)"><b>${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div><div style="--c:var(--carb)"><b>${prs.length}</b><span>new PRs</span></div></div>
     ${prs.length?`<ul class="ml-items">${prs.map(p=>`<li><span>${esc(p.n)} <span class="pr">PR</span></span><span class="num">${r0(p.e)} lb est. 1RM <span class="dim">(was ${r0(p.prev)})</span></span></li>`).join('')}</ul>`:''}
     <div class="row" style="justify-content:flex-end"><button class="primary" id="wdOk">Done</button></div>`);
@@ -3406,7 +3453,7 @@ function openWorkout(i){
     save();closeSheet();setView('train')};
   $('wvAgain').onclick=()=>{closeSheet();startWorkout(w.name,w.ex.map(x=>x.n))};
   $('wvTpl').onclick=()=>{S.templates.push({id:'t'+uid(),name:w.name,ex:w.ex.map(x=>x.n)});save();closeSheet();renderTrain();toast(`Saved template “${esc(w.name)}”`)};
-  $('wvDel').onclick=()=>{const b=$('wvDel');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to delete';b.classList.add('armed');return}S.workouts.splice(i,1);save();closeSheet();renderTrain();toast('Workout deleted')};
+  $('wvDel').onclick=()=>{const gone=S.workouts.splice(i,1)[0];save();closeSheet();renderTrain();toast(`Deleted ${esc(gone.name)}`,()=>{S.workouts.push(gone);S.workouts.sort((x,y)=>y.end-x.end);save();renderTrain()})};
 }
 function openTemplates(){
   sheet(`<div><div class="eyebrow">Templates</div><h3>Your workout templates</h3></div>
@@ -3427,7 +3474,7 @@ function editTemplate(d){
   $('teL').onclick=e=>{const u=e.target.closest('[data-up]'),r=e.target.closest('[data-rm]');keep();if(u){const j=+u.dataset.up;[d.ex[j-1],d.ex[j]]=[d.ex[j],d.ex[j-1]];editTemplate(d)}if(r){d.ex.splice(+r.dataset.rm,1);editTemplate(d)}};
   $('teAdd').onclick=()=>{keep();openExPicker({eyebrow:d.name||'Template',title:'Add exercises',onDone:ns=>{ns.forEach(n=>{if(!d.ex.includes(n))d.ex.push(n)});editTemplate(d)}})};
   $('teX').onclick=openTemplates;
-  if($('teDel'))$('teDel').onclick=()=>{const b=$('teDel');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to delete';return}S.templates.splice(d.i,1);save();renderTrain();openTemplates()};
+  if($('teDel'))$('teDel').onclick=()=>{const gone=S.templates.splice(d.i,1)[0];save();renderTrain();openTemplates();toast(`Deleted “${esc(gone.name)}”`,()=>{S.templates.splice(d.i,0,gone);save();renderTrain();openTemplates()})};
   $('teOk').onclick=()=>{const n=$('teN').value.trim();if(!n){$('teN').focus();return}if(!d.ex.length){toast('Add at least one exercise');return}
     const t={id:d.id||'t'+uid(),name:n,ex:d.ex};if(d.i>=0)S.templates[d.i]=t;else S.templates.push(t);save();renderTrain();openTemplates();toast(`Saved “${esc(n)}”`)};
 }
@@ -3553,9 +3600,10 @@ async function connectWhoop(){
 }
 function syncCfg(){try{return JSON.parse(localStorage.getItem(SYK)||'null')||{}}catch(e){return {}}}
 function syncSave(c){try{localStorage.setItem(SYK,JSON.stringify(c))}catch(e){}}
+function niceErr(e,what){const m=String(e&&e.message||e||'');if(!navigator.onLine)return `You're offline. ${what} will update when you're back online.`;if(/Failed to fetch|NetworkError|Load failed|TypeError/i.test(m))return `Couldn't reach ${what} right now. Check your connection and try again.`;return m}
 async function api(path,opt={}){
   const c=syncCfg();if(!c.url)throw new Error('No sync server yet.');
-  const r=await fetch(c.url+path,{...opt,headers:{...(opt.headers||{}),...(c.uid?{Authorization:`Bearer ${c.uid}.${c.token}`}:{}),...(opt.body?{'Content-Type':'application/json'}:{})}});
+  let r;try{r=await fetch(c.url+path,{...opt,headers:{...(opt.headers||{}),...(c.uid?{Authorization:`Bearer ${c.uid}.${c.token}`}:{}),...(opt.body?{'Content-Type':'application/json'}:{})}})}catch(e){throw new Error(niceErr(e,'WHOOP & Garmin'))}
   const j=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(j.error||`Sync server error (${r.status})`);
   return j;
@@ -3564,13 +3612,13 @@ let syncing=false;
 async function syncDevices(force){
   const c=syncCfg();if(!c.url||!c.uid||syncing)return;
   if(!force&&((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<5*60000)))return;
-  syncing=true;setConnStatus('Syncing…');
+  syncing=true;setConnStatus('Syncing…');document.documentElement.classList.add('syncing');if(S.view==='today')renderTodayRows();
   try{
     const d=await api(`/api/sync?days=${c.last?14:45}&force=1`);
     mergeDevice(d);c.last=Date.now();c.err=(d.errors||[]).join(' · ');c.st={whoop:!!d.whoop,garmin:!!d.garmin};syncSave(c);
     setConnStatus('');if(force)toast('Synced WHOOP & Garmin');
   }catch(e){c.err=e.message;syncSave(c);setConnStatus('');if(force)toast(esc(e.message))}
-  syncing=false;renderAll();
+  syncing=false;document.documentElement.classList.remove('syncing');renderAll();
 }
 function mergeDevice(d){
   S.dev=S.dev||{days:{},workouts:[]};
