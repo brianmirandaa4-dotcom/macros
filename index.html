@@ -436,6 +436,21 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 .ex-card{padding:0;overflow:hidden}
 .ex-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
 .ex-h h3{margin:0;font:700 16px var(--f-display);flex:1;min-width:0}
+.ex-grip{flex:none;width:30px;height:38px;margin:-8px -4px -8px -8px;padding:0;border:0;background:none;display:grid;grid-template-columns:repeat(2,5px);gap:4px 5px;place-content:center;touch-action:none;cursor:grab;border-radius:10px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ex-grip i{width:5px;height:5px;border-radius:50%;background:var(--muted);opacity:.7}
+.ex-grip:active i{background:var(--kcal);opacity:1}
+.ex-dn{display:none;font:600 12px var(--f-body,inherit);color:var(--muted);margin-top:2px}
+#trainActive.reo .ex-card>:not(.ex-h){display:none}
+#trainActive.reo .ex-card .ex-h{border-bottom:0}
+#trainActive.reo .ex-h .link,#trainActive.reo .ex-h .mus{display:none}
+#trainActive.reo .ex-dn{display:block}
+#trainActive.reo>:not(.ex-card):not(.wk-bar){visibility:hidden}
+#trainActive.reo .ex-card{transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+#trainActive.reo .ex-card.drag{transition:box-shadow .2s;z-index:5;position:relative;box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 0 2px var(--kcal);transform-origin:center}
+#trainActive.reo .ex-card.drag .ex-grip i{background:var(--kcal);opacity:1}
+.ex-card.dropped{animation:exDrop .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes exDrop{0%{box-shadow:0 0 0 2px var(--kcal)}100%{box-shadow:0 0 0 2px transparent}}
+
 .mus{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);border-radius:6px;padding:3px 7px}
 .sets{width:100%;border-collapse:collapse}
 .sets th{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--subtle);font-weight:700;padding:8px 6px;text-align:center}
@@ -2356,7 +2371,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.33';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.35';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -5359,13 +5374,44 @@ function saveActive(){clearTimeout(saveActive.t);saveActive.t=setTimeout(save,40
 function renderActive(){
   const a=S.active;a.ex.forEach(x=>{if(isCardio(x.n)&&!x.cardio)toCardio(x);else if(!isCardio(x.n)&&x.cardio){delete x.cardio;if(!x.sets||!x.sets.length)x.sets=[{w:'',r:'',done:false},{w:'',r:'',done:false},{w:'',r:'',done:false}]}});
   $('trainActive').innerHTML=`<div class="wk-bar"><input id="wkName" value="${esc(a.name)}" aria-label="Workout name"><span class="wk-time" id="wkTime">${a.wStart?(a.orig?'Editing':'From watch'):clock(Date.now()-a.start)}</span><button class="primary" id="wkFinish" style="padding:9px 16px">Finish</button></div>
-  ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id,scOf(a))||[];return `<div class="card ex-card"><div class="ex-h"><h3>${esc(x.n)}</h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exswap="${i}">Swap</button><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>${(o=>`<div class="ex-np">${noteBtn(o,!!exNote(noteHome(a),x.n),`data-exnote="${i}"`)}<div class="ex-note"${o?'':' hidden'}><textarea data-exnt="${i}" rows="3" placeholder="Cues, tips, seat height, grip… anything for ${esc(x.n)}">${esc(exNote(noteHome(a),x.n))}</textarea><small>${a.tid&&S.templates.some(t=>t.id===a.tid)?`Saved in your “${esc((S.templates.find(t=>t.id===a.tid)||{}).name)}” template`:'Saved with this workout. Tap “Save as template” to keep them.'}</small></div></div>`)(NOTE_OPEN.has('w:'+noteKey(x.n)))}${x.tg?`<div class="tgt"><span>Target <b>${x.tg.s} × ${esc(x.tg.r)}</b></span><span>${a.zone?ZONE[a.zone].l+` · `:``}rest ${restLbl((a.restSec)||S.restSec||120)} · stop 1–2 reps short</span></div>`:''}${(()=>{const pv=lastFor(x.n,a.id)||[];const top=x.tg?topRep(x.tg.r):10;if(pv.length<2||!pv.every(z=>+z.r>=top&&+z.w>0)||x.sets.every(z=>z.done))return '';const nw=+pv[0].w+(+pv[0].w>=100?5:2.5);return `<div class="bump-row"><span>You hit ${top}+ reps on every set last time. Time to add weight.</span><button class="link bump" type="button" data-bump="${i}|${nw}">Try ${nw} lb</button></div>`})()}
+  ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id,scOf(a))||[];const dn=x.cardio?0:x.sets.filter(z=>z.done).length;return `<div class="card ex-card" data-exi="${i}"><div class="ex-h"><button type="button" class="ex-grip" data-grip="${i}" aria-label="Hold and drag to move ${esc(x.n)}"><i></i><i></i><i></i><i></i><i></i><i></i></button><h3>${esc(x.n)}<small class="ex-dn">${x.cardio?"Cardio":`${dn}/${x.sets.length} sets`}</small></h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exswap="${i}">Swap</button><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>${(o=>`<div class="ex-np">${noteBtn(o,!!exNote(noteHome(a),x.n),`data-exnote="${i}"`)}<div class="ex-note"${o?'':' hidden'}><textarea data-exnt="${i}" rows="3" placeholder="Cues, tips, seat height, grip… anything for ${esc(x.n)}">${esc(exNote(noteHome(a),x.n))}</textarea><small>${a.tid&&S.templates.some(t=>t.id===a.tid)?`Saved in your “${esc((S.templates.find(t=>t.id===a.tid)||{}).name)}” template`:'Saved with this workout. Tap “Save as template” to keep them.'}</small></div></div>`)(NOTE_OPEN.has('w:'+noteKey(x.n)))}${x.tg?`<div class="tgt"><span>Target <b>${x.tg.s} × ${esc(x.tg.r)}</b></span><span>${a.zone?ZONE[a.zone].l+` · `:``}rest ${restLbl((a.restSec)||S.restSec||120)} · stop 1–2 reps short</span></div>`:''}${(()=>{const pv=lastFor(x.n,a.id)||[];const top=x.tg?topRep(x.tg.r):10;if(pv.length<2||!pv.every(z=>+z.r>=top&&+z.w>0)||x.sets.every(z=>z.done))return '';const nw=+pv[0].w+(+pv[0].w>=100?5:2.5);return `<div class="bump-row"><span>You hit ${top}+ reps on every set last time. Time to add weight.</span><button class="link bump" type="button" data-bump="${i}|${nw}">Try ${nw} lb</button></div>`})()}
     ${x.cardio?cardioCard(x,i)+'</div>':`<table class="sets"><thead><tr><th>Set</th><th>Last</th><th>lb</th><th>Reps</th><th></th></tr></thead><tbody>${x.sets.map((s,j)=>{const p=prev[j];return `<tr class="${s.done?'done':''}"><td class="setn">${j+1}</td><td class="prev">${p?`${p.w}×${p.r}`:'—'}</td><td><input type="number" inputmode="decimal" class="${s.pf&&!s.done?'pf':''}" data-w="${i}.${j}" value="${esc(s.w)}" placeholder="${p?esc(p.w):''}" aria-label="Weight, set ${j+1}"></td><td><input type="number" inputmode="numeric" class="${s.pf&&!s.done?'pf':''}" data-r="${i}.${j}" value="${esc(s.r)}" placeholder="${p?esc(p.r):x.tg?lowRep(x.tg.r)||'':''}" aria-label="Reps, set ${j+1}"></td><td><button class="chk" data-done="${i}.${j}" aria-pressed="${!!s.done}" aria-label="Mark set ${j+1} done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button></td></tr>`}).join('')}</tbody></table>
     <div class="ex-f"><button class="link" data-addset="${i}">+ Add set</button>${x.sets.some(z=>!z.done)&&prev.length?`<button class="link" data-allset="${i}">✓ Log all like last time</button>`:''}${x.sets.length>1?`<button class="link" data-rmset="${i}" style="color:var(--muted)">Remove last set</button>`:''}</div></div>`}`}).join('')}
   <button class="ghost" id="wkAddEx" style="padding:14px">+ Add exercise</button>
   <div class="row" style="justify-content:space-between"><button class="danger" id="wkDiscard">Discard workout</button><button class="ghost" id="wkTpl">Save as template</button></div>`;
   renderRest();
 }
+/* ---- drag to reorder exercises: hold the ⋮⋮ grip, every card folds to its title, drag, let go ---- */
+(()=>{const root=$('trainActive');let D=null;
+  const cards=()=>[...root.querySelectorAll('.ex-card')];
+  root.addEventListener('pointerdown',e=>{const g=e.target.closest('[data-grip]');if(!g||!S.active||D)return;e.preventDefault();
+    const el=g.closest('.ex-card'),from=+g.dataset.grip,r0=el.getBoundingClientRect(),off=e.clientY-r0.top;
+    try{document.activeElement&&document.activeElement.blur()}catch(_){}
+    root.style.minHeight=root.offsetHeight+'px';root.classList.add('reo'); // hold the page height so the scroll can line the card up with your finger
+    // keep the grabbed card right under your finger after everything folds up
+    const r1=el.getBoundingClientRect(),want=e.clientY-Math.min(off,r1.height-6);window.scrollTo({top:scrollY+r1.top-want,behavior:"instant"});
+    const d=want-el.getBoundingClientRect().top;if(Math.abs(d)>1)root.style.transform=`translateY(${d}px)`; // page can't scroll that far: nudge the list instead
+
+    const cs=cards(),rects=cs.map(c=>c.getBoundingClientRect()),gap=cs.length>1?rects[1].top-rects[0].bottom:10,h=rects[from].height+gap;
+    el.classList.add('drag');try{g.setPointerCapture(e.pointerId)}catch(_){}
+    D={el,from,to:from,y0:e.clientY,cs,mids:rects.map(r=>r.top+r.height/2),h,id:e.pointerId,g};
+    el.style.transform='scale(1.02)'});
+  const move=e=>{if(!D||e.pointerId!==D.id)return;e.preventDefault();
+    const dy=e.clientY-D.y0;D.el.style.transform=`translateY(${dy}px) scale(1.02)`;
+    const c=D.mids[D.from]+dy;let to=D.from;
+    D.mids.forEach((m,i)=>{if(i<D.from&&c<m)to=Math.min(to,i);if(i>D.from&&c>m)to=Math.max(to,i)});
+    if(to!==D.to){D.to=to;D.cs.forEach((x,i)=>{if(i===D.from)return;const s=D.from<to&&i>D.from&&i<=to?-D.h:D.from>to&&i<D.from&&i>=to?D.h:0;x.style.transform=s?`translateY(${s}px)`:''})}};
+  const end=e=>{if(!D||(e&&e.pointerId!==D.id))return;const {from,to,el}=D,a=S.active;
+    // glide into the open slot, then unfold
+    const slot=D.mids[to]-D.mids[from];el.style.transition='transform .16s cubic-bezier(.2,.8,.2,1)';el.style.transform=`translateY(${to===from?0:(to>from?D.cs.slice(from+1,to+1).reduce((s,x)=>s+x.getBoundingClientRect().height,0)+(to-from)*(D.h-el.getBoundingClientRect().height):-(D.cs.slice(to,from).reduce((s,x)=>s+x.getBoundingClientRect().height,0)+(from-to)*(D.h-el.getBoundingClientRect().height)))}px)`;
+    D=null;
+    setTimeout(()=>{if(a&&to!==from){const [m]=a.ex.splice(from,1);a.ex.splice(to,0,m);save()}
+      root.classList.remove('reo');root.style.minHeight='';root.style.transform='';renderActive();
+      const nc=root.querySelector(`.ex-card[data-exi="${to}"]`);if(nc){const r=nc.getBoundingClientRect();if(r.top<70||r.top>innerHeight-160)window.scrollBy({top:r.top-90,behavior:'smooth'});nc.classList.add('dropped');setTimeout(()=>nc.classList.remove('dropped'),500)}},170)};
+  root.addEventListener('pointermove',move,{passive:false});root.addEventListener('pointerup',end);root.addEventListener('pointercancel',end);
+  root.addEventListener('touchmove',e=>{if(D)e.preventDefault()},{passive:false});
+  root.addEventListener('contextmenu',e=>{if(e.target.closest('[data-grip]'))e.preventDefault()});
+})();
 // notes live in the workout's template when it has one, otherwise on the workout itself
 const noteHome=a=>(a&&a.tid&&S.templates.find(t=>t.id===a.tid))||a;
 $('trainActive').addEventListener('input',e=>{const t=e.target,a=S.active;if(!a)return;
@@ -5658,7 +5704,7 @@ function rsRelease(){clearTimeout(rsT2);clearTimeout(rsT3);const el=rsEl;
   if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}
   try{if(restAC&&restAC.state==='running'&&!(restLockOn()&&restAudio))restAC.suspend()}catch(e){}
   sessType('ambient')}
-function rsFire(id){id=id||restSoundId();if(id==='none')return;const el=rsElement(id);restBeeped=Date.now();
+function rsFire(id){restBuzz();id=id||restSoundId();if(id==='none')return;const el=rsElement(id);restBeeped=Date.now();
   if(id==='custom'&&!RS_CUSTOM)rsLoadCustom();
   const C=id==='custom'?RS_CUSTOM:null,lead=C?C.lead||0:0,dur=C?C.sec:rsDur();
   const back=()=>rsRelease();
@@ -5675,7 +5721,15 @@ function playRestSound(id,atMs){id=id||restSoundId();if(id==='none'){rsCancel();
   if(!atMs){rsCancel();rsUnlock();setTimeout(()=>rsFire(id),60);return}
   const ms=atMs-Date.now();if(ms<=0){rsFire(id);return}rsT1=setTimeout(()=>rsFire(id),ms)}
 function restBeep(){playRestSound()}
-function restBuzz(){try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
+/* Vibrate at rest end. Android: the Vibration API. iPhone (iOS 18+): Safari has no vibrate(), but toggling a
+   hidden "switch" checkbox fires the system haptic tap, so we tap it a few times for a buzz-buzz-buzz. Works with
+   the ringer off; needs "System Haptics" on (Settings → Sounds & Haptics) and Syncope open on screen. */
+let hapEl=null,lastBuzz=0;
+function hapTap(){try{if(!hapEl){hapEl=document.createElement('label');hapEl.setAttribute('aria-hidden','true');hapEl.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+  const i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');i.tabIndex=-1;hapEl.appendChild(i);document.body.appendChild(hapEl)}hapEl.click()}catch(e){}}
+function restBuzz(){if(Date.now()-lastBuzz<1500)return;lastBuzz=Date.now();
+  try{if(navigator.vibrate&&navigator.vibrate([180,90,180,90,260]))return}catch(e){}
+  [0,130,260,520,650,780].forEach(t=>setTimeout(hapTap,t))}
 async function rsTail(sr){const id=restSoundId();if(id==='none')return new Float32Array(0);if(id==='custom'){await rsLoadCustom();if(RS_CUSTOM){const b=RS_CUSTOM.buf;
     try{const oc=new (window.OfflineAudioContext||window.webkitOfflineAudioContext)(1,Math.ceil(b.duration*sr)+1,sr),src=oc.createBufferSource();src.buffer=b;src.connect(oc.destination);src.start();const r=await oc.startRendering();return r.getChannelData(0)}catch(e){}}}
   return synthSound(id==='custom'?'beep':id,sr)}
