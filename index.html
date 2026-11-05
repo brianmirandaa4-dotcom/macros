@@ -3879,7 +3879,8 @@ function openSetupChooser(){
   $('scShort').onclick=()=>{openHealthGuide()};
 }
 /* ---------- start ---------- */
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+try{if(sessionStorage.getItem('syncope.updated')){sessionStorage.removeItem('syncope.updated');setTimeout(()=>toast('Syncope updated to the latest version'),1200)}}catch(e){}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>{document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})});setInterval(()=>reg.update().catch(()=>{}),30*60000)}).catch(()=>{});let hadCtl=!!navigator.serviceWorker.controller,reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadCtl){hadCtl=true;return}if(reloaded)return;reloaded=true;try{sessionStorage.setItem('syncope.updated','1')}catch(e){}location.reload()})})}
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 const jm=location.hash.match(/^#join=([A-Za-z0-9]{4,10})/);if(jm){try{localStorage.setItem('syncope.join',jm[1].toUpperCase())}catch(e){}try{history.replaceState(null,'','#friends')}catch(e){}}
