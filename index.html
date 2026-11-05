@@ -1940,7 +1940,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.25';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.26';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3197,6 +3197,8 @@ function renderPrefs(){
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}
       ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Your music keeps playing and dips while it sounds.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">${v==='none'?'🔇':'▶'} ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
+      <div class="gopts">${[['dip','Dip my music'],['pause','Pause music for the sound']].map(([v,l])=>`<button type="button" class="chip" data-pk="alertStyle" data-pv="${v}" aria-pressed="${alertStyle()===v}">${l}</button>`).join('')}<button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
+      <p class="note" style="padding:0 14px;margin:0">Can’t hear it? Flip off the silent switch on the side of your iPhone, or pick “Pause music for the sound”.</p>
       <div class="rs-up"><button type="button" class="ghost" id="rsUp">${cm?'Replace your sound':'＋ Upload your own sound'}</button>${cm?'<button type="button" class="link" id="rsDel" style="color:var(--over)">Remove</button>':''}<input type="file" id="rsIn" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden><span class="note" id="rsSt">${cm?`${esc(cm.name)} · ${r1(cm.sec)} s`:'Any short clip (MP3, M4A, WAV): a hype line, a horn, your coach. It plays at full quality and its real length.'}</span></div>`})()}</div>
     <div class="glabel">Look</div><div class="glist">
       ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="acc-grid">${ACCENTS.map(([v,l])=>`<button type="button" class="acc" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}" aria-label="${l}" title="${l}" style="--c:${v}"><i></i><span>${l}</span></button>`).join('')}</div>
@@ -3217,9 +3219,11 @@ function renderPrefs(){
       if(!c){if(prev)localStorage.setItem(RS_KEY,prev);else localStorage.removeItem(RS_KEY);st.textContent='That file type isn’t supported here. Try an MP3, M4A or WAV.';return}
       const j=JSON.parse(localStorage.getItem(RS_KEY));j.sec=r1(c.sec);localStorage.setItem(RS_KEY,JSON.stringify(j));
       S.prefs.restSound='custom';save();playRestSound('custom');renderPrefs();toast(`Rest-over sound set to “${esc(j.name)}”`)}}
+  if($('rsTest'))$('rsTest').onclick=()=>{rsUnlock();toast('Playing in 3 seconds…');playRestSound(null,Date.now()+3000)};
   if($('rsDel'))$('rsDel').onclick=()=>{try{localStorage.removeItem(RS_KEY)}catch(e){}RS_CUSTOM=null;if(S.prefs.restSound==='custom')S.prefs.restSound='beep';save();renderPrefs()};
   el.onclick=e=>{const b=e.target.closest('[data-pk]');if(!b)return;const k=b.dataset.pk,v=b.dataset.pv;
     if(k==='restSound'){S.prefs.restSound=v;save();playRestSound(v);renderPrefs();return}
+    if(k==='alertStyle'){S.prefs.alertStyle=v;save();renderPrefs();return}
     if(k==='restSec')S.restSec=+v;else if(k==='fuelPct'){if(v==='auto')delete S.prefs.fuelPct;else S.prefs.fuelPct=+v}else if(k==='wkSun')S.prefs.wkSun=v==='1';else if(k==='accent')S.prefs.accent=v;
     save();applyPrefs();renderPrefs()};
 }
@@ -5179,13 +5183,32 @@ async function rsLoadCustom(){if(RS_CUSTOM||!rsCustomStored())return RS_CUSTOM;t
 function rsBuffer(ac,id=restSoundId()){if(id==='none')return null;if(id==='custom'&&RS_CUSTOM)return RS_CUSTOM.buf;const d=synthSound(id==='custom'?'beep':id,ac.sampleRate),b=ac.createBuffer(1,d.length,ac.sampleRate);b.getChannelData(0).set(d);return b}
 function rsDur(){const id=restSoundId();return id==='none'?0:id==='custom'&&RS_CUSTOM?RS_CUSTOM.sec:({beep:.42,chime:1.2,bell:1.9,whistle:.8,horn:.95,rise:.75,drum:1.05}[id]||.5)}
 // Play now, or at an exact moment on the audio clock. Music is ducked just before and restored right after.
-let rsSrc=null,rsT1=0,rsT2=0;
-function rsCancel(){clearTimeout(rsT1);clearTimeout(rsT2);if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}sessType('ambient')}
-function playRestSound(id,atMs){const ac=restCtx();if(!ac)return;id=id||restSoundId();if(id==='none')return;
-  const go=()=>{try{rsCancel();const b=rsBuffer(ac,id);if(!b)return;const wait=Math.max(0,((atMs||Date.now())-Date.now())/1000),src=ac.createBufferSource();src.buffer=b;src.connect(ac.destination);
-    const dur=b.duration;rsT1=setTimeout(()=>sessType('transient'),Math.max(0,wait*1000-150));src.start(ac.currentTime+wait);rsSrc=src;
-    src.onended=()=>{if(rsSrc===src)rsSrc=null;rsT2=setTimeout(()=>sessType('ambient'),250)};restBeeped=atMs||Date.now()}catch(e){}};
+/* The alert plays through an <audio> element that gets "unlocked" when you tick off the set (iPhone only lets
+   web apps play sound later if it was started from a tap). Your own clip plays from the original file, untouched.
+   Just before it plays, the audio session switches to "transient" (dips your music) or "transient-solo" (pauses it
+   for the clip and resumes it after); then it goes back to "ambient" so the music comes back up. */
+let rsSrc=null,rsT1=0,rsT2=0,rsT3=0,rsEl=null,rsElKey='';
+const alertStyle=()=>((S.prefs||{}).alertStyle)||'dip';
+function rsWavUrl(id){const sr=44100,d=synthSound(id,sr),n=d.length,buf=new ArrayBuffer(44+n*2),dv=new DataView(buf),w=(o,t)=>{for(let i=0;i<t.length;i++)dv.setUint8(o+i,t.charCodeAt(i))};
+  w(0,'RIFF');dv.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,'data');dv.setUint32(40,n*2,true);
+  for(let i=0;i<n;i++)dv.setInt16(44+i*2,Math.round(32767*Math.max(-1,Math.min(1,d[i]))),true);return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+function rsElement(id=restSoundId()){if(id==='none')return null;let src;if(id==='custom'){try{src=JSON.parse(localStorage.getItem(RS_KEY)).data}catch(e){id='beep'}}
+  const key=id+'|'+(src?src.length:0);if(rsEl&&rsElKey===key)return rsEl;if(rsEl&&rsEl._u)URL.revokeObjectURL(rsEl._u);
+  const el=new Audio();if(!src){src=rsWavUrl(id);el._u=src}el.src=src;el.preload='auto';el.setAttribute('playsinline','');rsEl=el;rsElKey=key;return el}
+// call from a tap: lets the element play later without a tap
+function rsUnlock(){const el=rsElement();if(!el)return;sessType('ambient');try{el.muted=true;const p=el.play();if(p&&p.then)p.then(()=>{el.pause();el.currentTime=0;el.muted=false}).catch(()=>{el.muted=false});else{el.pause();el.muted=false}}catch(e){el.muted=false}}
+function rsCancel(){clearTimeout(rsT1);clearTimeout(rsT2);clearTimeout(rsT3);if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}if(rsEl&&!rsEl.paused&&!rsEl.muted){try{rsEl.pause()}catch(e){}}sessType('ambient')}
+function rsFire(id){id=id||restSoundId();if(id==='none')return;const el=rsElement(id);restBeeped=Date.now();
+  const back=()=>{clearTimeout(rsT2);rsT2=setTimeout(()=>sessType('ambient'),300)};
+  sessType(alertStyle()==='pause'?'transient-solo':'transient');
+  if(el){try{el.muted=false;el.currentTime=0;el.onended=back;const p=el.play();if(p&&p.catch)p.catch(()=>{webAudioNow(id);back()});return}catch(e){}}
+  webAudioNow(id);back()}
+function webAudioNow(id){const ac=restCtx();if(!ac)return;const go=()=>{try{const b=rsBuffer(ac,id);if(!b)return;const src=ac.createBufferSource();src.buffer=b;src.connect(ac.destination);src.start();rsSrc=src}catch(e){}};
   if(id==='custom'&&!RS_CUSTOM)rsLoadCustom().then(go);else go()}
+// play now (preview) or exactly at a time (rest end)
+function playRestSound(id,atMs){id=id||restSoundId();if(id==='none'){rsCancel();return}clearTimeout(rsT1);
+  if(!atMs){rsCancel();rsUnlock();setTimeout(()=>rsFire(id),60);return}
+  const ms=atMs-Date.now();if(ms<=0){rsFire(id);return}rsT1=setTimeout(()=>rsFire(id),ms)}
 function restBeep(){playRestSound()}
 function restBuzz(){try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
 async function rsTail(sr){const id=restSoundId();if(id==='none')return new Float32Array(0);if(id==='custom'){await rsLoadCustom();if(RS_CUSTOM){const b=RS_CUSTOM.buf;
@@ -5209,7 +5232,7 @@ async function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;c
 async function restWakeOn(){try{if(!restWake&&navigator.wakeLock&&document.visibilityState==='visible'){restWake=await navigator.wakeLock.request('screen');restWake.addEventListener('release',()=>{restWake=null})}}catch(e){}}
 function restWakeOff(){try{restWake&&restWake.release()}catch(e){}restWake=null}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){sessType(restAudio?'playback':'ambient');if(S.rest){restWakeOn();if(S.rest.end-Date.now()>300)restArm();renderRest()}}});
-function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else playRestSound(null,S.rest.end)}
+function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else{rsUnlock();playRestSound(null,S.rest.end)}}
 function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();if(restSoundId()==='custom')rsLoadCustom();restArm();restLockStart();restWakeOn();renderRest()}
 function renderRest(){
   let el=$('restBar');
@@ -5223,7 +5246,7 @@ function renderRest(){
   const left=S.rest.end-Date.now();
   if(left<=0){const end=S.rest.end,late=Date.now()-end;S.rest=null;el.remove();restWakeOff();
     const au=restAudio,playing=au&&!au.paused&&!au.ended;restBuzz();
-    if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&restBeeped!==end&&!rsSrc)restBeep();restLockStop()}
+    if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&Math.abs(restBeeped-end)>1500)restBeep();restLockStop()}
     toast('Rest is over. Next set!');return}
   el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
 }
