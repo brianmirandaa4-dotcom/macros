@@ -6,7 +6,8 @@
 Play probability matches the CFB model's map: Out 0, Doubtful .25, Questionable .6, Probable .9.
 When a player's p drops, the model's existing vacated-volume step (factor A4 + sim redistribution, mostly within the
 same position, weighted by usage) hands his share to the teammates at his spot. Backups move only through that step.
-CFB: ESPN publishes no current college injury report (its feed returns 3 stale 2020 rows), so CFB gets none."""
+CFB: ESPN publishes no current college injury report (its feed returns 3 stale 2020 rows), so CFB is the one
+exception: it keeps the model's covers.com injury pull (code/cfb/today_rows.py), approved by Brian 2026-11-05."""
 import json, os, sys, csv
 RAW, OUT = sys.argv[1], sys.argv[2]
 D = json.load(open(f'{RAW}/espn/injuries.json'))
@@ -29,6 +30,6 @@ for sp, k in (('NFL', 'nfl'), ('NBA', 'nba')):
             if pos in DEF and status in ('Out', 'Doubtful', 'Injured Reserve'):
                 do.setdefault(AB['NFL'].get(team, team), []).append(f"{name} ({'IR' if status == 'Injured Reserve' else status})")
         json.dump(do, open(f'{OUT}/model/nfl_def_out.json', 'w'), indent=1)
-app['cfb'] = {'ts': None, 'source': 'ESPN', 'by_id': {}, 'note': 'ESPN publishes no current college football injury report.'}
+app['cfb'] = {'ts': None, 'source': 'covers.com', 'by_id': {}, 'note': 'ESPN publishes no current college football injury report, so college injuries come from covers.com.'}
 os.makedirs(f'{OUT}/data', exist_ok=True); json.dump(app, open(f'{OUT}/data/injuries.json', 'w'), separators=(',', ':'))
 for k in ('nfl', 'nba'): print(k, sum(1 for _ in open(f'{OUT}/model/{k}_avail.csv')) - 1, 'availability rows;', len(app[k]['by_id']), 'ids for the app')

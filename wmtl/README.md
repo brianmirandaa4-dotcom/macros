@@ -60,3 +60,6 @@ To refresh after games: open espn.com in the browser, run `tools/espn_pull.js` i
 Every pick shows its loss rate. The results page keeps every bad night. Parlays show the true combined chance. Bet only what you can afford to lose; **1-800-GAMBLER** is free and confidential, any time.
 
 three.js r149 (MIT) ships locally in `vendor/`; there are no CDN calls.
+
+### Injuries
+NFL and NBA injuries come from ESPN's injury reports (tools/espn_injuries.py). College football is the one exception: ESPN has no current college injury report, so CFB injuries come from covers.com. When a player is out or doubtful, the model hands his usage to the teammates at his position before it simulates.
