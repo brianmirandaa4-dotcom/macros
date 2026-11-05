@@ -475,6 +475,7 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 .rp-st.low{color:var(--over);background:color-mix(in srgb,var(--over) 15%,transparent)}.rp-st.low-ish{color:var(--carb)}.rp-st.ok{color:var(--kcal)}.rp-st.good{color:var(--good)}.rp-foot{padding:0 4px 20px}
 .lk-top{display:grid;gap:8px;margin-top:10px}.lk-no{opacity:.4;text-decoration:line-through;cursor:default}.lk-more{border-style:dashed;color:var(--kcal)}
 .av-l li{align-items:flex-start;gap:10px}.av-l li>span{display:grid;gap:6px}.av-w{display:flex;flex-wrap:wrap;gap:6px}.chip.sm{padding:4px 9px;font-size:11.5px}
+.ol-ai{width:100%;padding:12px;border-style:dashed}
 .rs-up{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:4px 14px 12px}.rs-up .note{flex-basis:100%;margin:0}
 .rest .rest-lk{padding:5px 8px;font-size:13px}.rest .rest-lk[aria-pressed="true"]{border-color:var(--pro);background:color-mix(in srgb,var(--pro) 18%,var(--surface))}
 .mus-bars{display:flex;flex-direction:column;gap:10px}
@@ -1087,12 +1088,12 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 
     <div class="card composer">
       <div class="row" style="justify-content:space-between">
-        <h2>What did you eat?</h2>
+        <h2>What did you consume?</h2>
         <div class="meals-pick" id="mealPick" role="group" aria-label="Meal"></div>
       </div>
       <div class="inrow" id="addForm">
         <div class="inbox">
-          <input id="foodIn" type="text" enterkeyhint="done" placeholder="e.g. 2 eggs, 1 banana" aria-label="Foods eaten" aria-autocomplete="list" aria-controls="sugg">
+          <input id="foodIn" type="text" enterkeyhint="done" placeholder="e.g. 2 eggs, a banana, an orange crush" aria-label="What you ate or drank" aria-autocomplete="list" aria-controls="sugg">
           <ul class="sugg" id="sugg" role="listbox" hidden></ul>
         </div>
         <button class="cam" type="button" id="photoBtn" aria-label="Scan a photo of your food" title="Scan a photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button><input type="file" id="photoIn" accept="image/*" hidden>
@@ -2133,6 +2134,199 @@ unsweetened almond milk;12.5;0.4;0.4;1.0;cup=240
 tomato juice|v8;18.8;0.8;3.8;0.0;cup=240
 grapefruit juice;40.0;0.4;9.6;0.0;cup=240
 pineapple juice;55.0;0.4;13.3;0.0;cup=240
+#More cocktails & shots
+orange crush|ocean city orange crush|fresh orange crush;122.6;0.3;11.5;0.0;drink=237
+grapefruit crush;120.0;0.1;11.0;0.0;drink=237
+lemon crush;133.0;0.1;14.9;0.0;drink=237
+watermelon crush;116.2;0.3;10.1;0.0;drink=237
+lime crush;133.7;0.1;15.2;0.0;drink=237
+cranberry crush;126.4;0.0;12.8;0.0;drink=237
+bushwacker|bushwhacker;254.4;1.8;29.5;7.9;drink=266
+painkiller;135.7;0.5;15.2;1.7;drink=237
+rum runner;152.6;0.3;20.0;0.0;drink=237
+bahama mama;132.6;0.2;19.1;0.0;drink=207
+planter's punch|planters punch;115.9;0.3;14.5;0.0;drink=222
+zombie;168.5;0.1;13.7;0.0;drink=177
+scorpion bowl|scorpion;139.9;0.3;17.5;0.5;drink=192
+jungle bird;141.8;0.1;13.5;0.0;drink=140
+mudslide;298.4;1.3;18.4;13.1;drink=118
+frozen mudslide;232.6;2.3;24.8;7.5;drink=222
+grasshopper;365.2;0.7;32.5;12.4;drink=89
+brandy alexander;286.0;0.6;14.3;10.6;drink=104
+golden cadillac;303.2;0.7;24.6;12.4;drink=89
+kamikaze;195.3;0.1;11.5;0.0;drink=89
+kamikaze shot;192.3;0.1;13.1;0.0;shot=52
+lemon drop shot;154.6;0.1;8.3;0.0;shot=52
+washington apple shot|washington apple;170.2;0.0;15.0;0.0;shot=67
+green tea shot|irish green tea shot;163.7;0.0;15.4;0.0;shot=74
+white tea shot;163.7;0.0;15.4;0.0;shot=74
+baby guinness;312.4;0.6;44.6;3.0;shot=37
+buttery nipple;284.0;1.5;25.4;7.6;shot=44
+lemon drop martini;175.4;0.1;11.9;0.0;drink=118
+irish car bomb|car bomb;58.5;0.4;3.9;0.6;drink=384
+jager bomb|jagerbomb|jägerbomb;95.6;0.0;14.6;0.0;drink=163
+vegas bomb;76.4;0.0;12.1;0.0;drink=177
+pickleback;111.6;0.0;0.5;0.0;drink=89
+snakebite;44.0;0.2;7.4;0.0;drink=473
+boilermaker;60.1;0.3;3.0;0.0;drink=399
+tequila sour;134.2;2.6;8.9;0.0;drink=140
+pisco sour;134.2;2.6;8.9;0.0;drink=140
+whiskey smash;165.0;0.1;10.9;0.0;drink=104
+gold rush;175.1;0.1;13.8;0.0;drink=104
+penicillin;175.1;0.1;13.8;0.0;drink=104
+paper plane;146.2;0.1;11.1;0.0;drink=89
+last word;186.8;0.1;15.7;0.0;drink=89
+aviation;179.5;0.1;9.0;0.0;drink=104
+corpse reviver|corpse reviver no 2;160.6;0.1;11.8;0.0;drink=89
+clover club;147.5;3.1;11.2;0.0;drink=118
+bee's knees|bees knees;175.1;0.1;13.8;0.0;drink=104
+southside;156.4;0.1;11.1;0.0;drink=111
+gimlet;165.7;0.1;11.3;0.0;drink=104
+vesper;201.4;0.0;0.5;0.0;drink=104
+gibson;198.9;0.0;0.6;0.0;drink=89
+french martini;149.7;0.1;11.0;0.0;drink=104
+pornstar martini|passion fruit martini;118.7;0.2;8.3;0.0;drink=163
+lychee martini;188.8;0.0;11.7;0.0;drink=89
+chocolate martini;278.1;1.0;23.7;3.9;drink=118
+pineapple martini;137.2;0.2;8.8;0.0;drink=126
+watermelon martini;128.5;0.3;8.2;0.0;drink=133
+dirty shirley;89.2;0.0;12.3;0.0;drink=237
+shirley temple;47.7;0.0;12.6;0.0;drink=251
+roy rogers;54.1;0.0;14.2;0.0;drink=251
+tequila sunset;108.2;0.5;13.1;0.0;drink=177
+el diablo;105.1;0.0;9.7;0.0;drink=163
+mexican mule|tequila mule;93.6;0.0;6.9;0.0;drink=192
+kentucky mule|bourbon mule;93.6;0.0;6.9;0.0;drink=192
+irish mule;93.6;0.0;6.9;0.0;drink=192
+gin mule;93.6;0.0;6.9;0.0;drink=192
+mezcal margarita;196.1;0.1;16.2;0.0;drink=133
+cadillac margarita|top shelf margarita;196.1;0.1;16.2;0.0;drink=133
+tommy's margarita;160.4;0.1;10.2;0.0;drink=104
+strawberry margarita;131.2;0.2;14.3;0.0;drink=177
+mango margarita;138.9;0.2;15.5;0.0;drink=170
+blue margarita;189.4;0.1;17.0;0.0;drink=118
+jumbo margarita|large margarita|fishbowl margarita;153.0;0.1;19.0;0.0;drink=340
+margarita pitcher glass|bar margarita;155.4;0.0;20.7;0.0;drink=185
+pina colada frozen|frozen pina colada;220.2;0.8;26.5;5.1;drink=237
+lava flow;173.3;0.6;19.7;3.4;drink=237
+miami vice;166.6;0.5;19.2;2.7;drink=222
+blue lagoon;125.2;0.0;12.6;0.0;drink=192
+adios mf|adios;135.5;0.0;14.0;0.0;drink=192
+long beach iced tea;153.0;0.0;12.2;0.0;drink=177
+tokyo tea|japanese slipper;154.8;0.0;13.0;0.0;drink=192
+electric lemonade;128.8;0.0;15.2;0.0;drink=177
+trash can|trashcan;126.6;0.0;11.0;0.0;drink=207
+fuzzy navel;98.1;0.5;15.5;0.0;drink=163
+hairy navel;106.5;0.5;11.9;0.0;drink=177
+woo woo;124.4;0.0;14.1;0.0;drink=148
+bay breeze;99.6;0.1;10.1;0.0;drink=163
+sea breeze;94.7;0.1;8.9;0.0;drink=163
+madras;97.1;0.2;9.3;0.0;drink=163
+greyhound;99.2;0.2;6.5;0.0;drink=177
+salty dog;99.2;0.2;6.5;0.0;drink=177
+harvey wallbanger;105.1;0.5;9.4;0.0;drink=177
+alabama slammer;131.5;0.4;15.1;0.0;drink=148
+godfather;264.9;0.0;19.2;0.0;shot=67
+godmother;264.9;0.0;19.2;0.0;shot=67
+rusty nail;222.0;0.0;7.9;0.0;shot=67
+sazerac;211.1;0.0;4.9;0.0;shot=67
+boulevardier;199.8;0.0;11.4;0.0;drink=96
+americano cocktail;94.7;0.0;9.3;0.0;drink=177
+negroni sbagliato|sbagliato;153.3;0.0;13.1;0.0;drink=89
+hugo spritz;82.6;0.0;5.5;0.0;drink=207
+limoncello spritz;80.1;0.0;7.7;0.0;drink=192
+st germain spritz|elderflower spritz;96.0;0.0;8.0;0.0;drink=192
+kir royale;95.3;0.0;5.2;0.0;drink=163
+champagne cocktail;85.3;0.0;4.0;0.0;drink=155
+pimm's cup|pimms cup;78.7;0.0;11.9;0.0;drink=177
+sangria pitcher glass|red sangria;101.9;0.1;9.6;0.0;drink=222
+white sangria;99.8;0.0;9.4;0.0;drink=207
+frosé|frose;82.4;0.1;9.2;0.0;drink=237
+wine slushie;80.3;0.1;9.2;0.0;drink=237
+mojito pitcher glass|pitcher mojito;80.1;0.1;8.1;0.0;drink=192
+strawberry mojito;70.7;0.1;6.9;0.0;drink=214
+coconut mojito;83.0;0.1;10.2;0.0;drink=192
+caipirinha;156.4;0.1;11.1;0.0;drink=111
+caipiroska;156.4;0.1;11.1;0.0;drink=111
+cuba libre with lime;82.8;0.0;8.1;0.0;drink=244
+captain and coke;75.7;0.0;8.7;0.0;drink=222
+malibu bay breeze;98.7;0.1;16.5;0.0;drink=163
+malibu pineapple|malibu and pineapple;97.4;0.2;16.0;0.0;drink=163
+vodka sprite|vodka 7up;77.1;0.0;8.7;0.0;drink=222
+vodka tonic;71.4;0.0;7.3;0.0;drink=222
+vodka pineapple;98.4;0.2;9.6;0.0;drink=163
+vodka orange juice;86.4;0.5;8.6;0.0;drink=192
+vodka grapefruit;81.2;0.3;7.5;0.0;drink=192
+vodka water|vodka water lime;43.3;0.0;0.0;0.0;drink=222
+gin and soda;43.3;0.0;0.0;0.0;drink=222
+whiskey ginger|jameson ginger;70.3;0.0;7.3;0.0;drink=222
+whiskey coke;75.7;0.0;8.7;0.0;drink=222
+whiskey soda|highball;54.1;0.0;0.0;0.0;drink=237
+crown and coke;75.7;0.0;8.7;0.0;drink=222
+fireball and cider|fireball cider;85.9;0.0;13.9;0.0;drink=222
+tequila and sprite|tequila sprite;77.1;0.0;8.7;0.0;drink=222
+tequila pineapple;98.4;0.2;9.6;0.0;drink=163
+tequila grapefruit;88.5;0.2;7.1;0.0;drink=163
+rum punch;112.1;0.3;12.4;0.0;drink=207
+jungle juice;76.5;0.2;10.5;0.0;drink=281
+hunch punch|party punch;76.5;0.0;9.9;0.0;drink=251
+spiked lemonade;76.8;0.0;8.9;0.0;drink=222
+spiked arnold palmer|john daly;74.9;0.0;8.3;0.0;drink=222
+sweet tea vodka|sweet tea and vodka;73.0;0.0;7.6;0.0;drink=222
+southern peach;98.3;0.0;8.6;0.0;drink=177
+transfusion;78.9;0.0;6.8;0.0;drink=177
+bloody maria;71.6;0.7;3.4;0.0;drink=170
+caesar cocktail|bloody caesar;71.7;0.7;3.4;0.0;drink=170
+red beer;27.9;0.5;2.4;0.0;drink=473
+beermosa;42.8;0.5;6.0;0.0;drink=355
+black velvet;60.9;0.2;2.7;0.0;drink=355
+irish coffee spiked;85.3;0.2;3.2;4.1;drink=266
+carajillo;133.8;0.0;22.1;0.0;drink=104
+espresso martini double|double espresso martini;151.2;0.0;13.5;0.0;drink=163
+white claw slushie;96.4;0.0;10.9;0.0;drink=177
+frozen rum runner;152.6;0.3;20.0;0.0;drink=237
+orange creamsicle|creamsicle;130.7;0.8;10.3;2.0;drink=177
+birthday cake shot;285.7;0.0;25.4;0.0;shot=44
+mind eraser;131.0;0.0;12.7;0.0;drink=118
+b-52|b52;320.1;1.0;36.1;5.1;shot=44
+slippery nipple;284.0;1.5;25.4;7.6;shot=44
+duck fart;285.2;1.0;23.7;5.1;shot=44
+mind bender|jolly rancher shot;168.6;0.0;23.6;0.0;shot=59
+red headed slut|redheaded shot;174.7;0.0;21.8;0.0;shot=67
+starburst shot|pink starburst;124.3;0.3;10.4;0.0;shot=59
+sex on the beach shot;147.3;0.2;11.7;0.0;shot=67
+fireball shot;240.1;0.0;23.7;0.0;shot=44
+tequila shot;216.4;0.0;0.0;0.0;shot=44
+whiskey shot;216.4;0.0;0.0;0.0;shot=44
+double shot|double;216.4;0.0;0.0;0.0;shot=89
+rumchata shot|cinnamon toast crunch shot;277.3;0.0;27.1;3.4;shot=44
+chocolate cake shot;297.6;0.0;30.4;0.0;shot=44
+three wise men;216.4;0.0;0.0;0.0;shot=44
+mezcal paloma;83.7;0.1;7.6;0.0;drink=237
+spicy paloma;83.7;0.1;7.6;0.0;drink=237
+batanga;82.8;0.0;8.1;0.0;drink=244
+el presidente;198.3;0.0;7.2;0.0;shot=77
+hemingway daiquiri;154.7;0.1;7.3;0.0;drink=118
+banana daiquiri;176.3;0.1;12.8;0.0;drink=118
+mango daiquiri;121.1;0.2;11.1;0.0;drink=163
+blue hawaii;132.7;0.2;14.9;0.0;drink=185
+mai tai trader vic|trader vic mai tai;199.7;0.1;14.8;0.5;drink=111
+navy grog;141.0;0.1;11.0;0.0;drink=192
+singapore sling;118.8;0.2;14.2;0.0;drink=209
+tom and jerry;100.5;3.7;6.1;1.9;drink=207
+eggnog rum|rum eggnog;153.7;2.0;8.8;7.9;drink=222
+hot buttered rum;224.2;0.3;10.6;5.7;drink=96
+spiked cider|hot spiked cider;81.2;0.0;9.2;0.0;drink=222
+spiked hot chocolate|peppermint hot chocolate;116.1;2.5;12.4;2.4;drink=266
+mulled cider spiked;81.2;0.0;9.2;0.0;drink=222
+cranberry mimosa;73.3;0.0;6.2;0.0;drink=177
+grand mimosa;89.2;0.2;7.5;0.0;drink=192
+peach bellini|frozen bellini;91.3;0.1;6.7;0.0;drink=163
+rossini;65.4;0.1;4.1;0.0;drink=177
+espresso tonic spiked;62.9;0.0;5.0;0.0;drink=222
+ranch water spicy|spicy ranch water;51.1;0.0;1.0;0.0;drink=266
+vodka redbull sugar free|vodka red bull sugar free;34.2;0.0;0.0;0.0;drink=281
+skinny bitch|vodka soda lime;42.8;0.0;0.3;0.0;drink=229
 `;
 
 let CAT='Protein';
@@ -2161,7 +2355,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.28';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.29';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2207,15 +2401,18 @@ const per=x=>x.sg?`${fmt(x.k*x.sg/100)} kcal per ${esc(x.sn||'serving')} (${r0(x
 const macroLine=x=>{const m=x.sg?x.sg/100:1;return `<span style="color:var(--pro)">${r0(x.p*m)}P</span> <span style="color:var(--carb)">${r0(x.c*m)}C</span> <span style="color:var(--fat)">${r0(x.f*m)}F</span>`};
 /* the search sheet. o.mode: 'log' (from the food box), 'save' (Foods tab), 'pick' (favourites) */
 function openOnline(q,o={}){let res=[],busy=false,loc=[];
-  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches Syncope's library and 6,500 USDA foods stored on your phone. Works offline.</p></div>
+  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches 870+ Syncope foods and drinks plus 6,500 USDA foods, offline. Not there? Ask Claude for anything else.</p></div>
     <div class="inrow"><div class="inbox"><input id="olQ" type="search" value="${esc(q)}" placeholder="e.g. banana bread, lamb chop, burrito" autocomplete="off" autocapitalize="off"></div><button class="go" type="button" id="olGo">Search</button></div>
     ${o.mode==='pick'?`<div class="field"><label>Use it as my</label><div class="wn-acts" id="olG">${LIKE_GROUPS.map(([g,l,c],i)=>`<button type="button" class="chip" data-g="${g}" aria-pressed="${(o.g||'p')===g}" style="--c:var(${c})">${l.replace('Healthy ','').replace(/s$/,'')}</button>`).join('')}</div></div>`:''}
     <ul class="ol-list" id="olL">${loc.map((f,i)=>`<li><button type="button" data-ol="l${i}"><span class="ol-n"><b>${esc(cap(f.name))}</b><span>${f.custom?'My foods':'Syncope library'} · ${fmt(servKcal(f))} kcal per ${esc(servLabel(f))}</span></span><span class="ol-m num">${macroLine({p:f.p*f.units[f.def]/100,c:f.c*f.units[f.def]/100,f:f.f*f.units[f.def]/100})}</span></button></li>`).join('')}
-      ${busy?`<li class="note ol-busy">Searching…</li>`:res.map((x,i)=>`<li><button type="button" data-ol="o${i}"><span class="ol-n"><b>${esc(x.name)}</b><span>${x.brand?esc(x.brand)+' · ':''}${per(x)}</span></span><span class="ol-m num">${macroLine(x)}</span></button></li>`).join('')}
-      ${!busy&&!res.length&&!loc.length?`<li class="note">No matches. Try fewer or different words, or add it from the label.</li>`:''}</ul>
+      ${busy?`<li class="note ol-busy">Searching…</li>`:res.map((x,i)=>`<li><button type="button" data-ol="o${i}"><span class="ol-n"><b>${esc(x.name)}</b><span>${x.src==='Claude'?'✨ Claude estimate · ':''}${x.brand?esc(x.brand)+' · ':''}${per(x)}${x.note?' · '+esc(x.note):''}</span></span><span class="ol-m num">${macroLine(x)}</span></button></li>`).join('')}
+      ${!busy&&!res.length&&!loc.length?`<li class="note">${o.ai?'':'Not in the library. '}Try fewer words, ask Claude below, or add it from the label.</li>`:''}</ul>
+    ${q&&q.length>=2&&!busy?`<button class="ghost ol-ai" type="button" id="olAi">${o.aiBusy?'Asking Claude…':`✨ Ask Claude about “${esc(q)}”`}</button><div class="status" id="olAiSt">${esc(o.aiErr||'')}</div>`:''}
     <div class="row" style="justify-content:space-between"><button class="link" type="button" id="olMan">Enter from a label instead</button><button class="ghost" type="button" id="olX">${o.mode==='pick'?'Back':'Close'}</button></div>`,{nofocus:true});
     const run=async()=>{q=$('olQ').value.trim();if(q.length<2)return;loc=localSearch(q);busy=true;res=[];draw();res=await foodSearch(q).catch(()=>[]);busy=false;if($('olL'))draw()};
     $('olGo').onclick=run;$('olQ').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();run()}};
+    if($('olAi'))$('olAi').onclick=async()=>{if(o.aiBusy)return;q=$('olQ').value.trim()||q;o.aiBusy=true;o.aiErr='';draw();
+      try{const x=await aiFood(q);o.ai=true;res=[x,...res.filter(y=>y.src!=='Claude')];if(!AI.key)throw 0}catch(e){o.aiErr=e&&e.msg||'Claude lookup failed.'}o.aiBusy=false;if($('olL'))draw()};
     if($('olG'))$('olG').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;o.g=b.dataset.g;$('olG').querySelectorAll('[data-g]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};
     $('olX').onclick=()=>{closeSheet();o.onClose&&o.onClose()};
     $('olMan').onclick=()=>{closeSheet();openManual(q,true)};
@@ -2300,7 +2497,7 @@ function parseItem(raw){
   const extra=name.replace(alias,' ').split(' ').filter(w=>w&&!FILLER.has(w)&&!/^\d/.test(w));
   if(qty==null)qty=1;
   if(food.custom&&!unit){const c=S.custom.find(x=>x.id===food.id),sw=c&&servWord(c);if(sw&&toks.some(t=>wSim(t,sw)))qty=qty/servCount(c)}
-  return {raw,ok:true,sure:extra.length<=1,e:entryFor(food,qty,unit,alias)};
+  return {raw,ok:true,sure:extra.length===0||(extra.length===1&&food.custom),e:entryFor(food,qty,unit,alias)};
 }
 function entryFor(food,qty,unit,alias){
   const fu=food.units; let u=unit,grams;
@@ -2377,7 +2574,7 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
       <div class="hv-sub num">${fmt(t.k)} eaten of ${fmt(gk)}</div></div>
       <div class="gauge ${over?'over':''}">${gaugeSVG(t,gk)}<div class="c"><b class="num" data-cu="pct" data-v="${pct}">${pct}</b><span>%</span></div></div></div>
     <div class="hv-mac">${mac('p','Protein',t.p,g.p,'--pro')}${mac('c','Carbs',t.c,g.c,'--carb')}${mac('f','Fat',t.f,g.f,'--fat')}</div>
-    <div class="hv-pills">${!t.k?`<span class="note" style="margin:0">Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate below.</span>`:''}
+    <div class="hv-pills">${!t.k?`<span class="note" style="margin:0">Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate or drank below.</span>`:''}
     ${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · training</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of}`}</button>`:g.starter?`<button class="plan-pill" data-goto="plan">Starter targets · build your plan</button>`:''}</div>`;
   animateHero(k);
   $('mealPick').innerHTML=MEALS.map(([m,l])=>`<button type="button" class="chip" data-meal="${m}" aria-pressed="${S.mealSel===m}">${l}</button>`).join('');
@@ -3143,6 +3340,16 @@ async function shrinkImage(file){
   if(dataUrl){const m=dataUrl.match(/^data:(image\/(jpeg|png|webp|gif));base64,/i);if(m&&file.size<3.7e6)return dataUrl}
   throw new Error('decode');
 }
+// Text-only Claude lookup: any food or drink that isn't in the library (house cocktails, regional dishes, restaurant items)
+async function aiFood(q){if(!AI.key)throw {msg:'Add your Anthropic key on the Plan page under Photo scanning to ask Claude.'};let r;
+  try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:AI.model||'claude-sonnet-5-5',max_tokens:500,messages:[{role:'user',content:`Give typical nutrition for one standard serving of: "${String(q).replace(/"/g,"'").slice(0,120)}". It may be a food, a drink, a cocktail (use a typical bar recipe and pour, e.g. an Orange Crush is 2 oz orange vodka, 1 oz triple sec, 3 oz fresh orange juice, splash of lemon-lime soda), a regional or restaurant item, or a brand. For alcoholic drinks, kcal must include alcohol (7 kcal per gram of alcohol).
+Reply with only JSON: {"name": "Orange Crush", "serving": "1 drink", "serving_grams": 237, "kcal": 290, "protein": 0.5, "carbs": 27, "fat": 0, "alcohol_g": 22, "note": "2 oz vodka, 1 oz triple sec, 3 oz OJ, splash of Sprite"}. If it isn't a real food or drink, reply {}.`}]})})}
+  catch(e){throw {msg:'No connection. Asking Claude needs internet; the built-in library works offline.'}}
+  if(!r.ok)throw {msg:r.status===401?'Your API key was rejected. Check it on the Plan page.':`Claude lookup failed (${r.status}).`};
+  const j=await r.json(),t=(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''),a=t.indexOf('{'),b=t.lastIndexOf('}');const o=a>=0?JSON.parse(t.slice(a,b+1)):{};
+  const g=+o.serving_grams;if(!(o.kcal>=0)||!(g>0))throw {msg:'Claude didn’t recognize that. Try different words.'};
+  return {src:'Claude',brand:'',name:cap(String(o.name||q).slice(0,60)),k:o.kcal/g*100,p:(+o.protein||0)/g*100,c:(+o.carbs||0)/g*100,f:(+o.fat||0)/g*100,sg:g,sn:String(o.serving||'serving').toLowerCase().replace(/^1\s+/,'').slice(0,24),note:o.note?String(o.note).slice(0,140):''}}
 async function aiAsk(dataUrl,prompt,maxTok=1500){
   let r;
   try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
@@ -4841,7 +5048,7 @@ function renderTodayRows(){
     +grow({pg:'cook',ic:'book',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
     +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
-const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like “2 eggs and toast”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
+const TIPS={today:['Welcome to Syncope','Type what you ate or drank in plain words, like “2 eggs and toast” or “2 orange crushes”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
   train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
   week:['Progress','Your week at a glance. Tap any day to open it. Switch to Month at the top.'],month:['Month view','Each square is a day, colored by how close you were to your calories. Tap one to open it.'],
   friends:['Friends','Earn points every day for logging, protein, training and steps. Share your code so friends can add you. You choose what they can see.'],
