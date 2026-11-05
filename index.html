@@ -473,6 +473,8 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 .rp-months{margin-bottom:12px}.rp-hd h2{margin:2px 0 12px}.rp-l{margin:0;padding-left:18px;display:grid;gap:12px}.rp-l li{display:grid;gap:3px}.rp-l span{color:var(--muted);font-size:14px;line-height:1.45}
 .rp-m td{vertical-align:middle}.rp-st{font:700 10.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--surface-2)}
 .rp-st.low{color:var(--over);background:color-mix(in srgb,var(--over) 15%,transparent)}.rp-st.low-ish{color:var(--carb)}.rp-st.ok{color:var(--kcal)}.rp-st.good{color:var(--good)}.rp-foot{padding:0 4px 20px}
+.lk-top{display:grid;gap:8px;margin-top:10px}.lk-no{opacity:.4;text-decoration:line-through;cursor:default}.lk-more{border-style:dashed;color:var(--kcal)}
+.av-l li{align-items:flex-start;gap:10px}.av-l li>span{display:grid;gap:6px}.av-w{display:flex;flex-wrap:wrap;gap:6px}.chip.sm{padding:4px 9px;font-size:11.5px}
 .rs-up{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:4px 14px 12px}.rs-up .note{flex-basis:100%;margin:0}
 .rest .rest-lk{padding:5px 8px;font-size:13px}.rest .rest-lk[aria-pressed="true"]{border-color:var(--pro);background:color-mix(in srgb,var(--pro) 18%,var(--surface))}
 .mus-bars{display:flex;flex-direction:column;gap:10px}
@@ -1938,7 +1940,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.23';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.24';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3584,7 +3586,7 @@ function ideaTarget(mode){
   return {R,T,n,slot,left,fuel:ft?fs.mode:'reg',fs};
 }
 const _miC={};function mealIdeas(mode,slot){const {T,fuel}=ideaTarget(mode);const s=SLOT_OF[slot]||'l',tg=fuel==='pre'?'P':fuel==='post'?'R':null,key=(tg||s)+'|'+r0(T.p)+'|'+r0(T.c)+'|'+r0(T.f);if(_miC[key])return _miC[key];
-  return _miC[key]=IDEAS.filter(i=>tg?i.slots.includes(tg):i.slots.includes(s)).map(i=>fitIdea(i,T)).sort((a,b)=>b.fit-a.fit)}
+  return _miC[key]=IDEAS.filter(i=>tg?i.slots.includes(tg):i.slots.includes(s)).map(i=>fitIdea(i,T)).filter(r=>!avoidRecipe(r)).sort((a,b)=>b.fit-a.fit)}
 function fmtQ(e){return e.a}
 /* ================= COOKBOOK: recipes built from your favourite foods, sized to your targets ================= */
 // key | label | food in the database | group (p protein, c carb, f fat, v veg, fr fruit) | unit | default | min | max | bought-per-eaten | aisle | how it cooks | meals (b l d)
@@ -3670,8 +3672,55 @@ const LIKE_DEF={p:['chicken','eggs','yogurt','salmon','beef','shrimp'],c:['rice'
 const XDEF={p:[150,80,300,'Meat & seafood','ld'],c:[150,60,350,'Grains & pasta','bld'],f:[20,10,45,'Pantry','bld'],v:[100,100,100,'Produce','bld'],fr:[120,60,240,'Produce','b']};
 function ingX(){const X=(S.profile&&S.profile.likesX)||{};Object.entries(X).forEach(([k,x])=>{if(ING[k]||!XDEF[x.g])return;const [d,lo,hi,aisle,slots]=XDEF[x.g];
   ING[k]={k,n:x.n,food:x.food,g:x.g,u:'g',d,lo,hi,raw:1,aisle:x.g==='p'?'Other':aisle,cook:'any',slots,custom:true}})}
-function likes(){ingX();const L=(S.profile&&S.profile.likes)||{};const out={},custom=!!(S.profile&&S.profile.likes);LIKE_GROUPS.forEach(([g])=>{const v=(L[g]||[]).filter(k=>ING[k]);out[g]=v.length?v:LIKE_DEF[g]});out.custom=custom;return out}
-const grp=(ks,f)=>ks.map(k=>ING[k]).filter(x=>x&&(!f||f(x)));
+function likes(){ingX();const L=(S.profile&&S.profile.likes)||{};const out={},custom=!!(S.profile&&S.profile.likes);LIKE_GROUPS.forEach(([g])=>{const v=(L[g]||[]).filter(k=>ING[k]);out[g]=(v.length?v:LIKE_DEF[g]).filter(k=>ING[k]&&!avoidHit(ING[k].n+' '+ING[k].food))});out.custom=custom;return out}
+const grp=(ks,f)=>ks.map(k=>ING[k]).filter(x=>x&&(!f||f(x))&&!avoidHit(x.n+' '+x.food));
+/* Foods you avoid: allergies, diets and specific foods. Anything that matches never shows up in recipes, meal ideas or prep. */
+const AV_TAGS=[['peanut','Peanuts','allergy',/peanut/],['treenut','Tree nuts','allergy',/almond|walnut|cashew|pecan|pistachio|hazelnut|macadamia|brazil nut|pine nut|praline|nutella|\bnut butter|mixed nuts|trail mix/],
+  ['dairy','Milk & dairy','allergy',/milk(?<!(coconut|almond|oat|soy|rice|cashew) milk)|cheese|yogurt|yoghurt|(?<!(peanut|almond|nut|seed|apple|cashew|sunflower|cocoa|shea) )butter(?!nut)|cream(?! of tartar)|whey|casein|parfait|feta|mozzarella|cheddar|parmesan|ricotta|cottage|ghee|latte|queso|ice cream/],['egg','Eggs','allergy',/\beggs?\b|egg white|omelet|frittata|mayo|aioli|quiche|scramble/],
+  ['fish','Fish','allergy',/fish|salmon|tuna|cod\b|tilapia|trout|sardine|anchov|halibut|mahi|bass\b|snapper|swordfish|catfish|haddock|pollock|caesar/],['shellfish','Shellfish','allergy',/shrimp|prawn|crab|lobster|scallop|clam|mussel|oyster|crawfish|calamari|squid/],
+  ['soy','Soy','allergy',/\bsoy|tofu|tempeh|edamame|teriyaki|miso|tamari/],['gluten','Wheat / gluten','allergy',/wheat|bread|pasta|spaghetti|penne|macaroni|tortilla(?!.*corn)|flour|bagel|muffin|couscous|noodle(?!.*rice)|granola|cracker|pretzel|pizza|bun\b|wrap\b|cereal|barley|\brye|seitan|toast|waffle|pancake|croissant|cookie|cake|beer/],
+  ['sesame','Sesame','allergy',/sesame|tahini|hummus/],
+  ['veg','Vegetarian','diet',/chicken|beef|steak|pork|turkey|lamb|bacon|ham\b|sausage|pepperoni|salami|prosciutto|jerky|veal|venison|bison|duck|meatball|burger(?!.*veggie)|hot dog|brisket|ribs|fish|salmon|tuna|cod\b|tilapia|trout|shrimp|crab|lobster|scallop|sardine|anchov|gelatin/],
+  ['vegan','Vegan','diet',null],['pesc','Pescatarian','diet',/chicken|beef|steak|pork|turkey|lamb|bacon|ham\b|sausage|pepperoni|salami|prosciutto|jerky|veal|venison|bison|duck|meatball|burger(?!.*veggie)|hot dog|brisket|ribs/],
+  ['pork','No pork','diet',/pork|bacon|ham\b|prosciutto|pepperoni|salami|chorizo|sausage|carnitas|pancetta/],['red','No red meat','diet',/beef|steak|pork|lamb|veal|venison|bison|burger(?!.*(veggie|turkey|chicken))|brisket|ribs|bacon|ham\b|meatball|jerky/]];
+const AV_WHY=[['allergy','Allergy'],['stomach','Upsets my stomach'],['dislike','Don’t like it'],['never','Don’t eat it']];
+const avoidCfg=()=>{const A=(S.profile&&S.profile.avoid)||{};return {tags:A.tags||[],foods:A.foods||[]}};
+let _avSig='',_avRx=null;
+function avoidHit(text){const A=avoidCfg(),sig=A.tags.join(',')+'|'+A.foods.map(f=>f.n).join(',');if(!A.tags.length&&!A.foods.length)return false;
+  if(sig!==_avSig){_avSig=sig;const rx=[];A.tags.forEach(t=>{if(t==='vegan')['veg','dairy','egg'].forEach(x=>{const d=AV_TAGS.find(y=>y[0]===x);rx.push(d[3])});const d=AV_TAGS.find(y=>y[0]===t);if(d&&d[3])rx.push(d[3])});
+    if(A.tags.includes('vegan'))rx.push(/honey/);A.foods.forEach(f=>{const w=String(f.n).toLowerCase().trim();if(w)rx.push(new RegExp('\\b'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/s$/,'')+'(s|es)?\\b'))});_avRx=rx}
+  const t=String(text||'').toLowerCase();return _avRx.some(r=>r.test(t))}
+const avoidRecipe=r=>avoidHit([r.name,...(r.parts||[]).map(p=>p.x?p.x.n+' '+p.x.food:''),...(r.ing||[]).map(i=>(i.food||'')+' '+(i._x?i._x.n:'')),...(r.entries||[]).map(e=>e.n),r.sauce&&SAUCE[r.sauce]?SAUCE[r.sauce].join(' '):''].join(' | '));
+// More favourites to browse: pulled from the built-in food library, sorted into the five groups
+const XTRA_CATS={p:['Protein','Meat & seafood','Dairy','More dairy'],c:['Grains','Grains & pasta','Starches & veg','Vegetables & sides','Bakery & desserts','Breakfast','Beans & nuts','Beans, nuts & seeds'],f:['Beans & nuts','Beans, nuts & seeds','Sauces & spreads','More sauces','Dairy','More dairy'],v:['Starches & veg','Vegetables & sides'],fr:['Fruit','More fruit']};
+let _xtra=null;
+function xtraFavs(){if(_xtra)return _xtra;const have=new Set(Object.values(ING).map(x=>x.food.toLowerCase()).concat(Object.values(ING).map(x=>x.n.toLowerCase())));const out={p:[],c:[],f:[],v:[],fr:[]},seen=new Set();
+  const SKIP=/premier|collagen|buffalo|acai|banana bread|muffin|vinaigrette|half and half|heavy cream|mayo|fruit cup|pickle|kimchi|sauerkraut|cereal\b|protein powder|sauce|syrup|dressing|juice|soda|pie|cake|cookie|candy|chips|fries|shake|smoothie|latte|bar\b|pudding|ice cream|donut|frosting|jam|jelly|ketchup|mustard|gravy|soup|pizza|burger|sandwich|nugget|whipped|creamer|cereal bar/;
+  BUILTIN.forEach(fd=>{const n=fd.name.toLowerCase();if(have.has(n)||seen.has(n)||SKIP.test(n)||fd.k<=0)return;const P=fd.p*4/fd.k,C=fd.c*4/fd.k,F=fd.f*9/fd.k;
+    const put=g=>{if(XTRA_CATS[g].includes(fd.cat)){out[g].push({k:'x'+fd.id.replace(/[^a-z0-9]/gi,''),n:cap(fd.name),food:fd.aliases[0],g});seen.add(n);return true}return false};
+    if(fd.cat==='Fruit'||fd.cat==='More fruit'){put('fr');return}
+    if(P>=.42&&fd.p>=8&&put('p'))return;
+    if(F>=.6&&fd.f>=10&&!/oil spray/.test(n)&&put('f'))return;
+    if(fd.k<70&&C>=.4&&put('v'))return;
+    if(C>=.6&&fd.k>=60&&put('c'))return});
+  Object.values(out).forEach(a=>a.sort((x,y)=>x.n.localeCompare(y.n)));return _xtra=out}
+function openAvoid(back){const A=avoidCfg(),tags=new Set(A.tags),foods=A.foods.map(f=>({...f}));
+  const draw=()=>{sheet(`<div><div class="eyebrow">Your favourites</div><h3>Foods I avoid</h3><p class="note">Anything here never shows up in your recipes, meal ideas or meal prep.</p></div>
+    <div class="field"><label>Allergies</label><div class="wn-acts" id="avA">${AV_TAGS.filter(t=>t[2]==='allergy').map(([k,l])=>`<button type="button" class="chip" data-av="${k}" aria-pressed="${tags.has(k)}">${l}</button>`).join('')}</div></div>
+    <div class="field"><label>I don’t eat</label><div class="wn-acts" id="avD">${AV_TAGS.filter(t=>t[2]==='diet').map(([k,l])=>`<button type="button" class="chip" data-av="${k}" aria-pressed="${tags.has(k)}">${l}</button>`).join('')}</div></div>
+    <div class="field"><label for="avIn">Specific foods</label><div class="inrow"><div class="inbox"><input id="avIn" type="text" placeholder="e.g. mushrooms, cilantro, beans" autocomplete="off"></div><button class="go" type="button" id="avAdd">Add</button></div>
+      <ul class="ml-items av-l">${foods.map((f,i)=>`<li><span><b>${esc(cap(f.n))}</b><span class="av-w">${AV_WHY.map(([w,l])=>`<button type="button" class="chip sm" data-why="${i}|${w}" aria-pressed="${f.why===w}">${l}</button>`).join('')}</span></span><button class="link" type="button" data-avrm="${i}" aria-label="Remove ${esc(f.n)}" style="color:var(--muted)">✕</button></li>`).join('')||'<li class="note">Nothing yet. Type a food and tap Add.</li>'}</ul></div>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" type="button" id="avX">Cancel</button><button class="primary" type="button" id="avOk">Save</button></div>`,{nofocus:true});
+    const root=$('sheetRoot').querySelector('.sheet');
+    root.onclick=e=>{const t=e.target.closest('[data-av]');if(t){const k=t.dataset.av,on=!tags.has(k);on?tags.add(k):tags.delete(k);t.setAttribute('aria-pressed',String(on));return}
+      const w=e.target.closest('[data-why]');if(w){const [i,why]=w.dataset.why.split('|');foods[+i].why=why;draw();return}
+      const r=e.target.closest('[data-avrm]');if(r){foods.splice(+r.dataset.avrm,1);draw();return}};
+    const add=()=>{const raw=$('avIn').value;raw.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean).forEach(n=>{if(!foods.some(f=>f.n===n))foods.push({n,why:'dislike'})});draw();setTimeout(()=>$('avIn')&&$('avIn').focus(),30)};
+    $('avAdd').onclick=add;$('avIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
+    $('avX').onclick=()=>back?back():closeSheet();
+    $('avOk').onclick=()=>{S.profile.avoid={tags:[...tags],foods};save();_avSig='';Object.keys(_miC).forEach(k=>delete _miC[k]);cookSeed=0;if(typeof renderCook==='function')renderCook();toast(tags.size||foods.length?'Saved. Recipes skip those foods now':'Saved');back?back():closeSheet()}};
+  draw()}
+
 const rot=(a,i)=>a.length?a[((i%a.length)+a.length)%a.length]:null;
 const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const sing=s=>s.replace(/ies$/,'y').replace(/([^s])s$/,'$1');
@@ -3749,7 +3798,7 @@ function fitRecipe(m,T){const ing=m.parts.map(p=>({food:p.x.food,role:p.role==='
     if(i.unit==='g'){i.q=e.g;return}const mm=String(e.a).match(/^([0-9]+)?(¼|½|¾|\.[0-9]+)?/);let v=mm&&mm[1]?+mm[1]:0;const fr=mm&&mm[2];if(fr)v+=fr==='¼'?.25:fr==='½'?.5:fr==='¾'?.75:+('0'+fr);i.q=v||i.d});
   return {...m,fit:r.fit,got:r.got,entries:r.entries,ing:ing.filter(i=>i.q>0),min:FMT_MIN[m.fmt]||20}}
 function cookList(slot,seed){seed=(seed||0)+(slot==='dinner'?3:0);const g=goalsFor(todayKey()),T=mealTargets(slot,g);const seen=new Set();
-  const all=buildMeals(slot,seed).filter(m=>{const k=m.name.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).map(m=>fitRecipe(m,T)).filter(r=>r.entries.length);
+  const all=buildMeals(slot,seed).filter(m=>{const k=m.name.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).map(m=>fitRecipe(m,T)).filter(r=>r.entries.length&&!avoidRecipe(r));
   // keep variety: no more than two recipes from the same format in a row
   const PREF={lunch:{wrap:.1,salad:.1,bowl:.06,tacos:.02},dinner:{sheetpan:.1,pasta:.06,stirfry:.06,tacos:.05,bowl:.03}}[slot]||{};
   const jit=r=>(hashStr(r.name+'|'+seed+'|'+slot)%1000)/1000*.12;
@@ -3828,15 +3877,21 @@ function renderCook(){const el=$('pg-cook');if(!el)return;const L=likes();if(!co
     if(e.target.closest('#ckLikes,#ckLikes1')){openLikes();return}
     const c=e.target.closest('[data-ck]');if(c)openRecipe(el._list[+c.dataset.ck],cookSlot)}}
 GACT.ckLikes=()=>openLikes();
+const LK_OPEN=new Set();
 function openLikes(pre){ingX();const cur=(S.profile&&S.profile.likes)||{},sel=pre||{};if(!pre)LIKE_GROUPS.forEach(([g])=>sel[g]=new Set((cur[g]&&cur[g].length?cur[g]:LIKE_DEF[g])));
-  sheet(`<div><div class="eyebrow">Your favourites</div><h3>What do you like to eat?</h3><p class="note">Tap everything you enjoy. More picks means more variety. Recipes, portions and grocery lists are built from these.</p><button class="ghost ol-more" type="button" id="lkAny">＋ Add any food (6,500+ to choose from)</button></div>
-    ${LIKE_GROUPS.map(([g,l,c])=>`<div class="field"><label style="color:var(${c})">${l}</label><div class="wn-acts" data-lg="${g}">${Object.values(ING).filter(x=>x.g===g).map(x=>`<button type="button" class="chip" data-lk="${x.k}" aria-pressed="${sel[g].has(x.k)}">${esc(x.n)}</button>`).join('')}</div></div>`).join('')}
+  sheet(`<div><div class="eyebrow">Your favourites</div><h3>What do you like to eat?</h3><p class="note">Tap everything you enjoy. More picks means more variety. Recipes, portions and grocery lists are built from these.</p><div class="lk-top"><button class="ghost ol-more" type="button" id="lkAny">＋ Search any food (6,500+)</button><button class="ghost ol-more lk-av" type="button" id="lkAv">🚫 Allergies & foods I avoid${(n=>n?` · ${n}`:'')(avoidCfg().tags.length+avoidCfg().foods.length)}</button></div></div>
+    ${LIKE_GROUPS.map(([g,l,c])=>{const xs=xtraFavs()[g].filter(x=>!ING[x.k]),open=LK_OPEN.has(g),av=x=>avoidHit(x.n+' '+x.food),chip=x=>av(x)?`<button type="button" class="chip lk-no" disabled title="On your avoid list">${esc(x.n)}</button>`:`<button type="button" class="chip" data-lk="${x.k}" aria-pressed="${sel[g].has(x.k)}">${esc(x.n)}</button>`;
+      return `<div class="field"><label style="color:var(${c})">${l}</label><div class="wn-acts" data-lg="${g}">${Object.values(ING).filter(x=>x.g===g).map(chip).join('')}
+        ${xs.length?`${(open?xs:xs.slice(0,14)).map(x=>chip(x)).join('')}${xs.length>14?`<button type="button" class="chip lk-more" data-lkmore="${g}">${open?'Show fewer':`+ ${xs.length-14} more ${l.toLowerCase()}`}</button>`:''}`:''}</div></div>`}).join('')}
     <div class="row" style="justify-content:flex-end"><button class="ghost" type="button" id="lkX">Cancel</button><button class="primary" type="button" id="lkOk">Save favourites</button></div>`,{nofocus:true});
-  $('sheetRoot').querySelector('.sheet').onclick=e=>{const b=e.target.closest('[data-lk]');if(!b)return;const g=b.closest('[data-lg]').dataset.lg;const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));on?sel[g].add(b.dataset.lk):sel[g].delete(b.dataset.lk)};
+  $('sheetRoot').querySelector('.sheet').onclick=e=>{const m=e.target.closest('[data-lkmore]');if(m){const g=m.dataset.lkmore;LK_OPEN.has(g)?LK_OPEN.delete(g):LK_OPEN.add(g);const y=$('sheetRoot').querySelector('.sheet').scrollTop;openLikes(sel);requestAnimationFrame(()=>{const sh=$('sheetRoot').querySelector('.sheet');if(sh)sh.scrollTop=y});return}
+    const b=e.target.closest('[data-lk]');if(!b)return;const g=b.closest('[data-lg]').dataset.lg;const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));on?sel[g].add(b.dataset.lk):sel[g].delete(b.dataset.lk)};
+  $('lkAv').onclick=()=>openAvoid(()=>openLikes(sel));
   $('lkX').onclick=closeSheet;
   $('lkAny').onclick=()=>openOnline('',{mode:'pick',onClose:()=>openLikes(sel),onPick:(fd,g)=>{const k='x'+String(fd.id).replace(/[^a-z0-9]/gi,'');S.profile.likesX=S.profile.likesX||{};
     S.profile.likesX[k]={n:cap(fd.name),food:fd.aliases?fd.aliases[0]:fd.name.toLowerCase(),g};delete ING[k];ingX();Object.values(sel).forEach(set=>set.delete(k));sel[g].add(k);save();openLikes(sel);toast(`Added ${esc(cap(fd.name))}`)}});
-  $('lkOk').onclick=()=>{if(!sel.p.size||!sel.c.size){toast('Pick at least one protein and one carb');return}S.profile.likes=Object.fromEntries(LIKE_GROUPS.map(([g])=>[g,[...sel[g]]]));save();closeSheet();cookSeed=0;renderCook();toast('Saved. Recipes rebuilt from your favourites')}}
+  $('lkOk').onclick=()=>{const XF=xtraFavs();LIKE_GROUPS.forEach(([g])=>sel[g].forEach(k=>{if(ING[k])return;const x=XF[g].find(y=>y.k===k);if(x){S.profile.likesX=S.profile.likesX||{};S.profile.likesX[k]={n:x.n,food:x.food,g}}}));ingX();
+    if(!sel.p.size||!sel.c.size){toast('Pick at least one protein and one carb');return}S.profile.likes=Object.fromEntries(LIKE_GROUPS.map(([g])=>[g,[...sel[g]]]));save();closeSheet();cookSeed=0;renderCook();toast('Saved. Recipes rebuilt from your favourites')}}
 function openRecipe(r,slot){let sv=1;const draw=()=>{const gr=gradeMeal(slot,r.entries,goalsFor(todayKey())),gl=groceryList(r,sv),k=r.got.p*4+r.got.c*4+r.got.f*9;
   sheet(`<div class="rc-ph" style='background-image:url("https://images.unsplash.com/${recipePhoto(r,slot)}?w=700&q=62&auto=format&fit=crop")'></div>
     <div><div class="eyebrow">${mealName(slot)} · ${r.min} min · per serving</div><h3>${esc(r.name)}</h3></div>
@@ -3910,7 +3965,7 @@ const PREP=PREP_SRC.split('\n').map(l=>{const [name,sv,min,ing,steps]=l.split('|
 function prepServing(r){const es=r.ing.map(i=>ingEntry({food:i.food,unit:i.unit},i.q)).filter(Boolean),t=sumEntries(es);return {k:t.k/r.sv,p:t.p/r.sv,c:t.c/r.sv,f:t.f/r.sv}}
 setTimeout(()=>{const bad=[...IDEAS.flatMap(i=>i.ing),...PREP.flatMap(r=>r.ing)].filter(i=>!ingFood(i.food)||!ingEntry({food:i.food,unit:i.unit},1)).map(i=>i.food+':'+i.unit);if(bad.length)console.warn('SYNCOPE_MISSING',[...new Set(bad)].join(','))},0);
 function weekNo(k){const d=parseKey(weekStart(k));return Math.floor(d.getTime()/(7*864e5))}
-function weekPrep(k=todayKey()){const w=weekNo(k),n=PREP.length,out=[];for(let i=0;out.length<3;i++){const r=PREP[(w*3+i*5)%n];if(!out.includes(r))out.push(r)}return out}
+function weekPrep(k=todayKey()){const w=weekNo(k),ok=PREP.filter(r=>!avoidHit(r.name+' '+r.ing.map(x=>x.food).join(' '))),n=ok.length,out=[];if(!n)return [];for(let i=0;out.length<Math.min(3,n)&&i<200;i++){const r=ok[(w*3+i*5)%n];if(!out.includes(r))out.push(r)}return out}
 function renderPrep(){
   const k=todayKey(),rs=weekPrep(k),g=goalsFor(k),wk=weekStart(k);
   const groc={};rs.forEach(r=>r.ing.forEach(i=>{const key=i.food+'|'+i.unit;groc[key]=(groc[key]||0)+i.q}));
