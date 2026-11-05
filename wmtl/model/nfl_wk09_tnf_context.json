@@ -1,0 +1,24 @@
+{
+ "schema": "wmtl.context.v1",
+ "game": "JAX @ BAL, Thu Nov 5 2026, 8:15 PM ET (NFL Week 9)",
+ "source": "ESPN only: injuries https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries (pulled 2026-11-05 17:26Z); depth charts https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/teams/{33,30}/depthcharts",
+ "qb": {"BAL": "Joe Fagnano", "JAX": "Trevor Lawrence"},
+ "qb_branch": {},
+ "avail_overrides": [
+  {"name": "Lamar Jackson", "team": "BAL", "pos": "QB", "p": 0.0, "status": "Out", "why": "ESPN: bound for IR with a right thumb injury, out indefinitely; Fagnano named the Week 9 starter"},
+  {"name": "Tyler Huntley", "team": "BAL", "pos": "QB", "p": 0.0, "status": "Out", "why": "ESPN: Out, season-ending turf toe"},
+  {"name": "Jacoby Brissett", "team": "BAL", "pos": "QB", "p": 0.0, "status": "Not available", "why": "ESPN: trade not finalized in time; expected from Week 10"},
+  {"name": "Tyler Loop", "team": "BAL", "pos": "K", "p": 0.0, "status": "Injured Reserve", "why": "ESPN: placed on IR (groin) Tue 11/3; ESPN depth chart still lists him, which is stale"}
+ ],
+ "starters": {
+  "BAL": {"QB": ["Joe Fagnano", "Kedon Slovis"], "RB": ["Derrick Henry", "Justice Hill", "Rasheen Ali"], "WR": ["Zay Flowers", "Devontez Walker", "Rashod Bateman", "LaJohntay Wester"], "TE": ["Mark Andrews", "Josh Cuevas"], "K": ["Not settled on ESPN: Loop on IR; ESPN note says Jake Moody is on track to be elevated from the practice squad"]},
+  "JAX": {"QB": ["Trevor Lawrence", "Quinn Ewers"], "RB": ["Bhayshul Tuten (Questionable, ankle)", "Chris Rodriguez Jr.", "LeQuint Allen Jr."], "WR": ["Parker Washington", "Josh Cameron", "Jakobi Meyers", "Travis Hunter"], "TE": ["Brenton Strange", "Nate Boerkircher"], "K": ["Cam Little"]}
+ },
+ "questionable": [
+  {"name": "Bhayshul Tuten", "team": "JAX", "pos": "RB", "p": 0.6, "why": "ESPN: Questionable (ankle/foot)"},
+  {"name": "Travon Walker", "team": "JAX", "pos": "DE", "p": 0.6, "why": "ESPN: Questionable (ribs)"},
+  {"name": "Nate Wiggins", "team": "BAL", "pos": "CB", "p": 0.6, "why": "ESPN: Questionable (illness)"}
+ ],
+ "def_out": {"BAL": ["Jaylinn Hawkins (Out)"], "JAX": ["Eric Murray (IR)", "DaVon Hamilton (IR)"]},
+ "model_rules": "Do not hand-edit the 25 questions or their weights. They already include the quarterback questions (own QB quality, QB change vs his usual starter) and the vacated-volume question; their weights come only from history. Fagnano at QB and Lamar/Huntley at 0 move every Ravens pass catcher's card through those questions, and the vacated-volume step re-spreads the QB snaps and any missing starters' share."
+}
