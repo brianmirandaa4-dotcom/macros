@@ -74,7 +74,8 @@ def espn_load(sport):
     BY = {}
     for aid, h in H.items(): BY.setdefault(norm(h['name']), []).append(h)
     return H, BY, FIN
-ESPN = {sp: espn_load(sp) for sp in ('NFL', 'NBA', 'CFB')}
+SPORTS_ON = ('NFL',)   # NFL only for now; add 'NBA', 'CFB' back here (and their slates below) to bring a sport back
+ESPN = {sp: espn_load(sp) for sp in SPORTS_ON}
 # ------------------------------------------------------------------ slates v1 -> v2
 def window(sport, g):
     if sport != 'NFL': return g['slate']
@@ -226,9 +227,6 @@ def convert(sport, src, sid, label):
 
 slates = [
     convert('NFL', f'{SRC}/nfl_slate-data.json', 'nfl-2026-wk08', 'Week 8'),
-    convert('NBA', f'{SRC}/nba_slate-data.json', 'nba-2026-11-02', 'Mon Nov 2'),
-    convert('CFB', f'{SRC}/cfb8_slate-data.json', 'cfb-2026-wk08', 'Week 8 Saturday'),
-    convert('CFB', f'{SRC}/cfb7_slate-data.json', 'cfb-2026-wk07', 'Week 7 Saturday'),
 ]
 
 # ------------------------------------------------------------------ NFL season results (weeks 1-7 as published) -> results file; add every graded row to player history
@@ -255,7 +253,7 @@ def mkprof(sport, key, h, fallback_name, team):
     g2 = [{k: v for k, v in g.items() if v is not None and k not in ('gid',)} for g in games]
     return dict(eid=(h or {}).get('id'), name=h['name'] if h else fallback_name, team=(h['team'] if h else team), pos=(h or {}).get('pos'), color=col, games=g2, model=ap,
                 history='found' if h else 'not_found')
-for sport in ('NFL', 'NBA', 'CFB'):
+for sport in SPORTS_ON:
     P = {}
     for s in [x for x in slates if x['sport'] == sport]:
         d = json.load(open(f'{OUT}/{s["path"][5:]}'))
@@ -280,10 +278,8 @@ UP = f'{RAW}/espn/upcoming.json'   # ESPN scoreboard for the next week, pulled w
 if os.path.exists(UP):
     u = json.load(open(UP)); nxt = dict(sport=u['sport'], label=u['label'], first=u['first'], games=u['games'], note='On the schedule. The model has not been run for this week yet, so there are no picks.')
 index = dict(schema='wmtl.index.v1', built_utc=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), brand='whomadethisline', slates=slates,
-             players={s: f'data/players/{s.lower()}.json' for s in ('NFL', 'NBA', 'CFB')}, results={'NFL': 'data/nfl/results-2026.json'},
-             sports=dict(NFL=dict(status='live'), CFB=dict(status='live'), NBA=dict(status='live'),
-                         MLB=dict(status='offseason', note='One board exists (NLCS Game 3, Oct 14) as a PDF only. It was never exported as data, so it is not in the app. The season is over.'),
-                         NHL=dict(status='not_built', note='No NHL model exists yet. Nothing here is a pick.')),
+             players={s: f'data/players/{s.lower()}.json' for s in SPORTS_ON}, results={'NFL': 'data/nfl/results-2026.json'},
+             sports=dict(NFL=dict(status='live')),
              upcoming=[nxt] if nxt else [])
 json.dump(index, open(f'{OUT}/index.json', 'w'), indent=1, ensure_ascii=False)
 for s in slates: print(s['id'], s['n_props'], 'priced', s['priced'], 'bets', s['bets'], 'results', s['results'])

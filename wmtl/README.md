@@ -61,5 +61,8 @@ Every pick shows its loss rate. The results page keeps every bad night. Parlays 
 
 three.js r149 (MIT) ships locally in `vendor/`; there are no CDN calls.
 
+### Sports
+NFL only for now. Other sports come back when their models are added: list them in `SPORTS_ON` in tools/build_data.py and `SPORTS` in app.js.
+
 ### Injuries
-NFL and NBA injuries come from ESPN's injury reports (tools/espn_injuries.py). College football is the one exception: ESPN has no current college injury report, so CFB injuries come from covers.com. When a player is out or doubtful, the model hands his usage to the teammates at his position before it simulates.
+NFL injuries come from ESPN's injury report (tools/espn_injuries.py). When a player is out or doubtful, the model hands his usage to the teammates at his position before it simulates.

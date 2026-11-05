@@ -19,7 +19,7 @@ const od = o => isNum(o) ? (o > 0 ? '+' : '−') + Math.abs(Math.round(o)) : '�
 const am2p = o => o > 0 ? 100 / (o + 100) : -o / (-o + 100);
 const decOdds = o => o > 0 ? 1 + o / 100 : 1 + 100 / -o;
 const money = (x, d = 0) => isNum(x) ? (x < 0 ? '−$' : '$') + Math.abs(x).toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '—';
-const SPORTS = ['NFL', 'CFB', 'NBA', 'NHL', 'MLB'];
+const SPORTS = ['NFL'];   // NFL only for now; add sports back here when their models are in
 const SPORTC = {NFL: 'var(--nfl)', CFB: 'var(--cfb)', NBA: 'var(--nba)', NHL: 'var(--nhl)', MLB: 'var(--mlb)'};
 const SPORTHEX = {NFL: '#6E9BF0', CFB: '#B596EA', NBA: '#EC9455', NHL: '#8FD0EE', MLB: '#63C7B2'};
 const FAM = {A: 'Role', B: 'Form', C: 'Matchup', D: 'Game setup', E: 'History'};
