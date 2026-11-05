@@ -3465,8 +3465,8 @@ $('trainActive').addEventListener('input',e=>{const t=e.target,a=S.active;if(!a)
   if(t.id==='wkName'){a.name=t.value;saveActive();return}
   const k=t.dataset.w||t.dataset.r;if(!k)return;const [i,j]=k.split('.').map(Number);a.ex[i].sets[j][t.dataset.w?'w':'r']=t.value;delete a.ex[i].sets[j].pf;t.closest('tr')&&t.closest('tr').querySelectorAll('.pf').forEach(x=>x.classList.remove('pf'));saveActive()});
 $('trainActive').addEventListener('click',e=>{const a=S.active;if(!a)return;const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.allset!=null){const x=a.ex[+b.dataset.allset],prev=lastFor(x.n,a.id)||[];x.sets.forEach((z,j)=>{const p=prev[j]||prev[prev.length-1];if(!z.done&&p){if(z.w==='')z.w=String(p.w);if(z.r==='')z.r=String(p.r);if(z.r!=='')z.done=true}});save();renderActive();startRest();return}
-  if(b.dataset.bump!=null){const [i,w]=b.dataset.bump.split('|');a.ex[+i].sets.forEach(z=>{if(!z.done)z.w=w});save();renderActive();return}
+  if(b.dataset.allset!=null){const x=a.ex[+b.dataset.allset],prev=lastFor(x.n,a.id)||[];x.sets.forEach((z,j)=>{const p=prev[j]||prev[prev.length-1];if(!z.done&&p){delete z.pf;if(z.w==='')z.w=String(p.w);if(z.r==='')z.r=String(p.r);if(z.r!=='')z.done=true}});save();renderActive();startRest();return}
+  if(b.dataset.bump!=null){const [i,w]=b.dataset.bump.split('|');a.ex[+i].sets.forEach(z=>{if(!z.done){z.w=w;delete z.pf}});save();renderActive();return}
   if(b.dataset.done){const [i,j]=b.dataset.done.split('.').map(Number),s=a.ex[i].sets[j],prev=(lastFor(a.ex[i].n,a.id)||[])[j];
     if(!s.done){delete s.pf;if(s.w===''&&prev)s.w=String(prev.w);if(s.r===''&&prev)s.r=String(prev.r);if(s.r===''){toast('Enter reps first');return}s.done=true;startRest()}else s.done=false;save();renderActive();return}
   if(b.dataset.addset!=null){const x=a.ex[+b.dataset.addset];x.sets.push({w:x.sets.length?x.sets[x.sets.length-1].w:'',r:'',done:false});save();renderActive();return}
