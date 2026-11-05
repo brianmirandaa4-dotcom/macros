@@ -1,0 +1,1702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SPAN · ELEG 607</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0D1022">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SPAN">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+/* SPAN — "night reading book": deep ink-blue pages, big rounded type, one chalk color per unit
+   (unit colors follow the chalk on his boards: 8/27 was orange-red). His ink code for SVD work: blue = first r, red = the rest, green = result. */
+:root{
+  color-scheme: dark;
+  --bg:#0D1022; --bg2:#121632; --card:#191E3F; --card2:#21274E; --line:rgba(178,186,255,.13); --line2:rgba(178,186,255,.24);
+  --fg:#F4F2FF; --soft:#CACCEB; --muted:#9295BE; --faint:#5F638E;
+  --unit:#FF8A65; --unit-ink:#2A1208;
+  --ok:#6EE7A8; --ok-bg:rgba(110,231,168,.14); --no:#FF8B8B; --no-bg:rgba(255,139,139,.14); --warn:#FFC857;
+  --blu:#7FB2FF; --red:#FF8BA0; --grn:#6EE7A8;
+  --f-ui: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-text: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-math: "SF Pro Text", -apple-system, system-ui, "Helvetica Neue", Arial, sans-serif;
+  --f-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r-lg:30px; --r-md:22px; --r-sm:14px;
+  --ease: cubic-bezier(.2,.8,.2,1); --t: 200ms;
+  --tab-h: 64px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-text);font-size:19px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--unit);outline-offset:3px;border-radius:12px}
+[hidden]{display:none!important}
+
+/* ── layout ── */
+.app{min-height:100%;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 24px)}
+.page{max-width:760px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));padding-block:20px 12px;display:grid;gap:18px}
+.view-enter{animation:viewIn var(--t) var(--ease)}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}}
+
+.topbar{display:flex;align-items:center;gap:12px;min-height:44px}
+.topbar h1{margin:0;font:800 30px/1.1 var(--f-ui);letter-spacing:-.5px;text-wrap:balance}
+.back{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--card);display:grid;place-items:center;cursor:pointer;font-size:22px}
+.eyebrow{font:700 13px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--unit)}
+.sub{color:var(--muted);font-size:16px;margin:0}
+h2{font:800 23px/1.2 var(--f-ui);margin:4px 0 0;letter-spacing:-.3px;text-wrap:balance}
+h3{font:800 19px/1.25 var(--f-ui);margin:0;text-wrap:balance}
+p{margin:0}
+.lead{font-size:20px;line-height:1.55;color:var(--fg)}
+.small{font-size:15px;color:var(--muted)}
+code,.code{font-family:var(--f-mono);font-size:.88em;background:rgba(255,255,255,.07);border-radius:8px;padding:1px 6px}
+
+/* ── bubbles ── */
+.bubble{background:var(--card);border-radius:var(--r-lg);padding:22px;display:grid;gap:14px;min-width:0}
+.bubble.soft{background:var(--bg2);border:1px solid var(--line)}
+.bubble.tint{background:color-mix(in srgb,var(--unit) 13%,var(--card))}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.spacer{flex:1}
+
+/* ── buttons ── */
+.btn{min-height:52px;padding:0 22px;border-radius:999px;border:0;background:var(--card2);color:var(--fg);font:700 18px var(--f-ui);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:transform 150ms var(--ease),background 150ms}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--unit);color:var(--unit-ink)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line2)}
+.btn.small{min-height:44px;padding:0 16px;font-size:16px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.4;cursor:default}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.07);font:700 13px var(--f-ui);color:var(--soft);white-space:nowrap}
+.chip.unit{background:color-mix(in srgb,var(--unit) 20%,transparent);color:var(--unit)}
+.chip.star{background:rgba(255,200,87,.16);color:var(--warn)}
+.chip.sup{background:rgba(127,178,255,.14);color:var(--blu)}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.no{background:var(--no-bg);color:var(--no)}
+
+/* ── tab bar ── */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(13,16,34,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(6px,env(safe-area-inset-left,0px));padding-right:max(6px,env(safe-area-inset-right,0px))}
+.tabs nav{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--tab-h)}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font:700 12px var(--f-ui);cursor:pointer;min-height:44px;position:relative}
+.tab svg{width:26px;height:26px}
+.tab[aria-current="page"]{color:var(--fg)}
+.tab[aria-current="page"]::after{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--unit)}
+.tab .dot{position:absolute;top:8px;left:calc(50% + 8px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--no);color:#2a0a0a;font:800 11px/18px var(--f-ui)}
+
+/* ── home ── */
+.hello{display:grid;gap:4px}
+.hello h1{font:800 34px/1.05 var(--f-ui);letter-spacing:-.8px;margin:0}
+.count{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.count .big{font:800 44px/1 var(--f-ui);font-variant-numeric:tabular-nums;letter-spacing:-1px;color:var(--unit)}
+.count .big small{font-size:18px;color:var(--soft);font-weight:700;margin-left:4px}
+.queue .big{font:800 48px/1 var(--f-ui);font-variant-numeric:tabular-nums}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 12px;display:grid;gap:2px;text-align:left;cursor:pointer;color:var(--fg);min-height:44px}
+.stat b{font:800 28px/1 var(--f-ui);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted);font-weight:700}
+.rings{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:12px}
+.ringcard{border:0;background:var(--bg2);border-radius:var(--r-md);padding:12px 8px 12px;display:grid;justify-items:center;gap:6px;cursor:pointer;color:var(--fg);min-height:44px}
+.ringcard.locked{opacity:.5;padding:8px 6px}
+.ringcard.locked .ring{width:46px;height:46px}
+.ringcard .rn{font:700 12px var(--f-ui);color:var(--muted);text-align:center;line-height:1.25}
+.ring{width:66px;height:66px}
+.ring circle{fill:none;stroke-width:7}
+.ring .track{stroke:rgba(255,255,255,.08)}
+.ring .val{stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 900ms var(--ease)}
+.ring text{fill:var(--fg);font:800 17px var(--f-ui);text-anchor:middle;dominant-baseline:central}
+
+/* ── lists ── */
+.list{display:grid;gap:10px}
+.li{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;width:100%;text-align:left;border:0;background:var(--card);border-radius:var(--r-md);padding:14px 16px;min-height:64px;cursor:pointer;color:var(--fg)}
+.li .num{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:800 16px var(--f-ui);background:rgba(255,255,255,.06);color:var(--soft)}
+.li.done .num{background:var(--ok-bg);color:var(--ok)}
+.li.next .num{background:var(--unit);color:var(--unit-ink)}
+.li.locked{opacity:.45;cursor:default}
+.li .t{font:800 18px/1.25 var(--f-ui)}
+.li .d{font-size:14px;color:var(--muted)}
+.li .go{color:var(--faint);font-size:22px}
+
+/* ── stone viewer ── */
+.stone-track{display:grid;gap:16px;touch-action:pan-y}
+.stone-in-r{animation:stoneR 240ms var(--ease)}
+.stone-in-l{animation:stoneL 240ms var(--ease)}
+@keyframes stoneR{from{opacity:0;transform:translateX(36px)}}
+@keyframes stoneL{from{opacity:0;transform:translateX(-36px)}}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots i{width:9px;height:9px;border-radius:5px;background:rgba(255,255,255,.14);transition:all 200ms}
+.dots i.seen{background:color-mix(in srgb,var(--unit) 55%,transparent)}
+.dots i.on{width:26px;background:var(--unit)}
+.nick{display:inline-flex;align-items:center;gap:8px;align-self:start;justify-self:start;padding:8px 16px;border-radius:999px;background:color-mix(in srgb,var(--unit) 18%,transparent);color:var(--unit);font:800 16px var(--f-ui)}
+.weird{border-radius:var(--r-md);padding:14px 16px;background:rgba(255,200,87,.10);border:1.5px dashed rgba(255,200,87,.45);color:var(--fg);font-size:17px}
+.mathbox{background:var(--bg2);border-radius:var(--r-md);padding:18px 14px;overflow-x:auto;border:1px solid var(--line)}
+.mathnote{font-size:16px;color:var(--soft)}
+.reveal-steps{display:grid;gap:8px}
+.stepline{padding:12px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);animation:viewIn var(--t) var(--ease);overflow-x:auto}
+.answer{padding:14px 16px;border-radius:var(--r-sm);background:var(--ok-bg);border:1.5px solid color-mix(in srgb,var(--ok) 50%,transparent);overflow-x:auto}
+.answer b{display:block;font:800 12px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--ok);margin-bottom:4px}
+.solid{display:grid;gap:12px;padding:20px;border-radius:var(--r-lg);background:color-mix(in srgb,var(--unit) 12%,var(--card));border:1.5px solid color-mix(in srgb,var(--unit) 40%,transparent);text-align:center}
+.solid h3{font-size:22px}
+.navrow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.src{font:700 13px var(--f-ui);color:var(--faint)}
+
+/* ── questions ── */
+.q{display:grid;gap:12px}
+.qtext{font:700 20px/1.45 var(--f-ui)}
+.opts{display:grid;gap:10px}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;width:100%;min-height:58px;text-align:left;padding:10px 16px;border-radius:var(--r-md);border:2px solid var(--line2);background:rgba(255,255,255,.03);color:var(--fg);font:600 18px/1.35 var(--f-text);cursor:pointer;transition:border-color 150ms,background 150ms,transform 150ms var(--ease)}
+.opt .k{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);font:800 14px var(--f-ui);color:var(--soft)}
+.opt .ot{min-width:0;overflow-x:auto}
+.opt.code .ot{font-family:var(--f-mono);font-size:15.5px}
+.opt:not(:disabled):active{transform:scale(.985)}
+.opt.right{border-color:var(--ok);background:var(--ok-bg);animation:pop 320ms var(--ease)}
+.opt.right .k{background:var(--ok);color:#06210f}
+.opt.wrong{border-color:var(--no);background:var(--no-bg);animation:shake 300ms}
+.opt.dim{opacity:.5}
+.opt:disabled{cursor:default}
+@keyframes pop{40%{transform:scale(1.025)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.feedback{border-radius:var(--r-md);padding:14px 16px;font-size:17px;display:grid;gap:4px;animation:viewIn var(--t) var(--ease)}
+.feedback.ok{background:var(--ok-bg)} .feedback.no{background:var(--no-bg)}
+.feedback b{font:800 16px var(--f-ui)} .feedback.ok b{color:var(--ok)} .feedback.no b{color:var(--no)}
+.burst{position:relative}
+.burst::after{content:"";position:absolute;inset:-6px;border-radius:inherit;border:3px solid var(--ok);opacity:0;animation:ringOut 500ms var(--ease)}
+@keyframes ringOut{0%{opacity:.9;transform:scale(.96)}100%{opacity:0;transform:scale(1.06)}}
+.progress{height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--unit);border-radius:4px;transition:width 300ms var(--ease)}
+pre.jl{margin:0;padding:16px;border-radius:var(--r-md);background:#0A0C1A;border:1px solid var(--line);font:500 15.5px/1.55 var(--f-mono);overflow-x:auto;color:#E8E6FF}
+pre.jl .kw{color:#FF9FC0} pre.jl .nu{color:#FFC98A} pre.jl .cm{color:#7E83B0} pre.jl .st{color:#9EE6B8}
+.hint{padding:12px 14px;border-radius:var(--r-sm);background:rgba(127,178,255,.10);border-left:4px solid var(--blu);animation:viewIn var(--t) var(--ease);overflow-x:auto}
+.hint b{color:var(--blu);font:800 13px var(--f-ui);letter-spacing:.06em;text-transform:uppercase;display:block}
+
+/* ── proof ── */
+.pfgoal{padding:14px 16px;border-radius:var(--r-md);background:var(--bg2);border:1px solid var(--line);overflow-x:auto}
+.pfline{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);border:2px solid transparent;text-align:left;width:100%;color:var(--fg);font:inherit;cursor:pointer}
+.pfline .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);font:800 13px var(--f-ui)}
+.pfline .b{min-width:0;overflow-x:auto;display:block}
+.pfline .why{display:block;margin-top:4px;font:700 14px var(--f-ui);color:var(--unit)}
+.pfline.placed{background:color-mix(in srgb,var(--unit) 10%,transparent);cursor:default}
+.pfline.placed .n{background:var(--unit);color:var(--unit-ink)}
+.pfline.blank{border:2px dashed var(--line2);color:var(--muted);cursor:default}
+.pfline.bad{border-color:var(--no);animation:shake 300ms}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg2);border-radius:999px;padding:4px;gap:4px;border:1px solid var(--line)}
+.seg button{border:0;background:none;min-height:44px;border-radius:999px;font:700 15px var(--f-ui);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card2);color:var(--fg)}
+
+/* ── vault ── */
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:999px;padding:0 18px;min-height:52px;border:1.5px solid var(--line)}
+.search input{flex:1;min-width:0;background:none;border:0;color:var(--fg);font:600 18px var(--f-text);outline:none;min-height:48px}
+.ventry{display:grid;gap:10px}
+.ventry .vh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.vmeta{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:16px}
+.vmeta dt{font:800 13px/1.9 var(--f-ui);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.vmeta dd{margin:0}
+.check{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.check input{width:24px;height:24px;accent-color:var(--unit)}
+
+/* ── math ── */
+math{font-family:var(--f-math);font-size:1.18em;math-style:normal}
+math mi, math mn, math mtext{font-family:var(--f-math)}
+math mi:not([mathvariant]){font-style:italic}
+math mi.op{font-style:normal}
+.mblock{display:block;overflow-x:auto;padding:4px 0}
+.mblock math{font-size:1.22em}
+.m-hl{color:var(--unit)} .m-blu{color:var(--blu)} .m-red{color:var(--red)} .m-grn{color:var(--grn)} .m-acc{color:var(--warn)}
+math .pr{font-weight:700;padding-left:.07em}
+.pfline math,.pfgoal math,.opt math{font-size:1.06em}
+math mtable.bm{--bw:.085em;--bt:.32em;border-left:var(--bw) solid currentColor;border-right:var(--bw) solid currentColor;padding:.12em .32em;margin:0 .12em;
+  background:linear-gradient(currentColor,currentColor) left top/var(--bt) var(--bw) no-repeat,linear-gradient(currentColor,currentColor) left bottom/var(--bt) var(--bw) no-repeat,
+  linear-gradient(currentColor,currentColor) right top/var(--bt) var(--bw) no-repeat,linear-gradient(currentColor,currentColor) right bottom/var(--bt) var(--bw) no-repeat}
+
+/* ── widgets ── */
+.widget{display:grid;gap:12px;background:var(--bg2);border-radius:var(--r-md);padding:14px;border:1px solid var(--line)}
+.widget svg{width:100%;height:auto;max-width:440px;justify-self:center;touch-action:none;user-select:none;-webkit-user-select:none}
+.widget .wcap{font:700 14px var(--f-ui);color:var(--muted)}
+.widget .wout{overflow-x:auto;text-align:center}
+.slider{display:grid;grid-template-columns:44px 1fr 58px;gap:10px;align-items:center;font:800 16px var(--f-ui)}
+.slider input{width:100%;accent-color:var(--unit);height:32px}
+.slider output{text-align:right;font-variant-numeric:tabular-nums}
+.stepper{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border-radius:999px;padding:3px}
+.stepper button{width:44px;height:44px;border-radius:50%;border:0;background:var(--card2);font:800 20px var(--f-ui);cursor:pointer}
+.stepper b{min-width:30px;text-align:center;font:800 18px var(--f-ui);font-variant-numeric:tabular-nums}
+.cells{display:grid;gap:5px;justify-content:center}
+.cell{width:52px;height:46px;border-radius:12px;display:grid;place-items:center;font:800 16px var(--f-ui);font-variant-numeric:tabular-nums;transition:background 200ms}
+.badge-perp{color:var(--ok);font-weight:800}
+svg .gridline{stroke:rgba(178,186,255,.10);stroke-width:1}
+svg .axis{stroke:rgba(178,186,255,.32);stroke-width:1.4}
+svg .warp{stroke:color-mix(in srgb,var(--unit) 35%,transparent);stroke-width:1.2}
+svg .handle{cursor:grab}
+svg text{font:800 15px var(--f-ui)}
+
+/* ── exam ── */
+.timer{font:800 26px var(--f-ui);font-variant-numeric:tabular-nums;color:var(--unit)}
+.score{font:800 64px/1 var(--f-ui);font-variant-numeric:tabular-nums;color:var(--ok)}
+.topicbar{display:grid;grid-template-columns:1fr 70px;gap:10px;align-items:center;font-size:15px}
+textarea{width:100%;min-height:120px;border-radius:var(--r-sm);background:var(--bg2);border:1.5px solid var(--line2);color:var(--fg);font:500 14px var(--f-mono);padding:12px}
+select{min-height:48px;border-radius:14px;background:var(--card2);color:var(--fg);border:1px solid var(--line2);font:700 17px var(--f-ui);padding:0 12px}
+.toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);z-index:40;background:var(--fg);color:var(--bg);padding:12px 20px;border-radius:999px;font:800 16px var(--f-ui);animation:viewIn var(--t) var(--ease);max-width:90vw;text-align:center}
+
+/* ── cheat sheet print preview (white, A4) ── */
+.sheetbox{width:100%;overflow:hidden;position:relative}
+.sheet{background:#fff;color:#111;border-radius:4px;padding:8mm;width:210mm;height:297mm;overflow:hidden;font-size:9pt;line-height:1.3;columns:3;column-gap:4mm;column-fill:balance;box-shadow:0 20px 50px rgba(0,0,0,.4);transform-origin:top left}
+.sheet .sh{font:800 9pt var(--f-ui);margin:0 0 2mm;column-span:all;display:flex;justify-content:space-between;border-bottom:1.5px solid #222;padding-bottom:1mm}
+.sheet .si{break-inside:avoid;border:1px solid #c9cbe0;border-radius:3px;padding:1.3mm 1.6mm;margin:0 0 1.5mm;overflow:hidden}
+.sheet .si b{font-size:8.6pt;display:block}
+.sheet .si .sm{font-size:7.6pt;color:#444}
+.sheet math{font-size:1em;color:#111}
+.sheet .mblock{padding:.5mm 0;overflow:hidden}
+.sheet .mblock math{font-size:.98em}
+.sheet .m-hl,.sheet .m-acc{color:#B3401D}
+.sheetwrap{overflow-x:auto;display:grid;justify-items:center;gap:16px}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+@media (max-width:420px){
+  body{font-size:18px}
+  .qtext{font-size:19px}
+  .hello h1{font-size:30px}
+}
+@media print{
+  @page{size:A4;margin:0}
+  body{background:#fff}
+  body::before,.tabs,.noprint,.topbar{display:none!important}
+  .app{padding:0}
+  .page{max-width:none;padding:0;display:block}
+  .sheetwrap{display:block}
+  .sheetbox{height:auto!important;overflow:visible}
+  .sheet{box-shadow:none;border-radius:0;transform:none!important;page-break-after:always}
+}
+.vecs{display:grid;grid-template-columns:1fr 1fr;gap:12px;justify-items:center}
+.vecs .vc{display:grid;gap:6px;justify-items:center}
+.vecs .vc b.lab{font:800 18px var(--f-ui)}
+
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="tabs" id="tabs"></div>
+<!-- CONTENT: add lectures here -->
+<script id="span-content">
+/* SPAN content. Adding a lecture = adding data here. Math uses a small TeX subset between $…$ (inline) or $$…$$ (display).
+   Inline code uses «…». Every unit lists its sources; anything not from this project is tagged supplemental:true. */
+const R = String.raw;
+
+window.SPAN_DATA = {
+  version: 1,
+  course: {
+    code: "ELEG 607", title: "Matrix & Tensor Methods", prof: "Prof. David Hong", term: "Fall 2026",
+    classTime: "12:45",
+    events: [
+      { date: "2026-11-05", label: "HW6 Quiz" },
+      { date: "2026-11-12", label: "HW7 Quiz" },
+      { date: "2026-12-03", label: "HW8 Quiz" },
+      { date: "2026-12-08", label: "Exam 2" }
+    ]
+  },
+
+  units: [
+    { id: "u1", n: 1, title: "Vectors & matrix moves", short: "Vectors & matrices", hue: "#FF8A65", status: "ready",
+      lectures: ["8/25", "8/27"], hw: "HW1", sources: "8/25 + 8/27 boards, 7 photos, HW1 + solutions",
+      blurb: "Every object is a box of numbers, and every product is a linear combination in disguise." },
+    { id: "u2", n: 2, title: "Linear maps ↔ matrices", hue: "#FFC857", status: "soon", lectures: ["9/08"], hw: "HW2 P1", sources: "9/08 board missing · HW2 known from prep notes" },
+    { id: "u3", n: 3, title: "Inverse problems, diagonal systems", hue: "#FF7EB6", status: "soon", lectures: ["9/10", "9/15"], hw: "HW2 P2–P6", sources: "9/10 board · 9/15 missing" },
+    { id: "u4", n: 4, title: "Least squares via the SVD", hue: "#6FB7FF", status: "soon", lectures: ["9/17"], hw: "HW2 P7", sources: "9/17 board" },
+    { id: "u5", n: 5, title: "Subspaces, bases, null space", hue: "#4FD1C5", status: "soon", lectures: ["9/22", "9/24"], hw: "HW5 P1", sources: "9/22, 9/24 boards" },
+    { id: "u6", n: 6, title: "Min-norm, pseudo-inverse, projection", hue: "#7BE38A", status: "soon", lectures: ["9/29"], hw: "HW3 P2, HW4 P1–P2", sources: "9/29 board · HW3 + solutions" },
+    { id: "u7", n: 7, title: "Four fundamental subspaces", hue: "#B79CFF", status: "soon", lectures: ["10/01"], hw: "—", sources: "10/01 board" },
+    { id: "u8", n: 8, title: "Regularization & spotting the SVD", hue: "#F2C14E", status: "soon", lectures: ["10/06"], hw: "HW3, HW4 P3", sources: "10/06 board · HW3 + solutions" },
+    { id: "u9", n: 9, title: "Subspace approximation", hue: "#5B8CFF", status: "soon", lectures: ["10/01", "10/06", "10/08"], hw: "HW4 P5–P6, HW5 P2", sources: "boards · HW4/5 from prep notes" },
+    { id: "u10", n: 10, title: "Affine approximation & PCA", hue: "#5FE3B5", status: "soon", lectures: ["10/13", "10/15"], hw: "HW4 P4, HW5 P3", sources: "boards · HW4/5 from prep notes" },
+    { id: "u11", n: 11, title: "Low-rank approximation", hue: "#FF6B8A", status: "soon", lectures: ["10/15", "10/20"], hw: "HW5 P4", sources: "boards · HW5 from prep notes" },
+    { id: "u12", n: 12, title: "Noise & random matrices", hue: "#9AA3FF", status: "soon", lectures: ["10/29"], hw: "—", sources: "10/29 notes only" }
+  ],
+
+  /* ───────────── UNIT 1 ───────────── */
+  stones: {
+    u1: [
+      { id: "u1s1", title: "Four kinds of boxes", src: "8/25 board",
+        nick: "Boxes of numbers",
+        intuition: "Everything in this course is a box of numbers. One number is a **scalar**. A column of numbers is a **vector**. A grid is a **matrix**. A stack of grids is a **tensor**. He opened the course with tensors you already know: a 3D image (voxels), a video (frames stacked up), a CAD design.",
+        math: R`$$\alpha\in\R\;(\C),\quad x\in\R^{n},\quad A\in\R^{n\times m},\quad \mathcal{X}\in\R^{n\times m\times \ell}$$`,
+        mathNote: "Each step up adds one more direction to index along. ℂ (complex) is allowed everywhere from day one.",
+        example: { q: "A grayscale video has 300 frames, each 480 × 640 pixels. What shape of box holds it?",
+          steps: ["One frame is a grid of pixels: a 480 × 640 matrix.", "Stack 300 of those grids along a new direction (time)."],
+          answer: R`A 3-way tensor in $\R^{480\times 640\times 300}$.` },
+        check: { q: "How many indices do you need to point at one number inside a 3-way tensor?", opts: ["Three", "Two", "One", "Four"], a: 0,
+          why: "One index per direction: row, column, and which slice." } },
+
+      { id: "u1s2", title: "Adding and scaling", src: "8/25 board",
+        nick: "Volume knob",
+        intuition: "Scaling $x$ by $\alpha$ turns every entry's volume up (or down, or flips it) by the same amount: the arrow stretches. Adding two vectors works entry by entry, which is tip-to-tail in a picture.",
+        math: R`$$x+y=\mat{x_1+y_1\\\vdots\\x_n+y_n},\qquad \alpha x=\mat{\alpha x_1\\\vdots\\\alpha x_n}$$`,
+        mathNote: "His properties: x+y = y+x (commute), (x+y)+z = x+(y+z) (associate), β(αx) = (βα)x, α(x+y) = αx+αy, (α+β)x = αx+βx.",
+        example: { q: R`Let $x=\mat{1\\2}$ and $y=\mat{3\\-1}$. Find $2x+y$.`,
+          steps: [R`Turn the volume knob on $x$: $2x=\mat{2\\4}$.`, R`Add entry by entry: $\mat{2+3\\4-1}$.`],
+          answer: R`$2x+y=\mat{5\\3}$` },
+        check: { q: R`What is $3\mat{2\\-1}$?`, opts: [R`$\mat{6\\-3}$`, R`$\mat{5\\2}$`, R`$\mat{6\\3}$`, R`$\mat{-6\\3}$`], a: 0,
+          why: "The knob multiplies every entry by 3, signs included." } },
+
+      { id: "u1s3", title: "Linear combinations and span", src: "8/27 board",
+        nick: "Recipe",
+        intuition: "Put the two moves together and you get a **recipe**: take α scoops of $x$ and β scoops of $y$. That mix, $\alpha x+\beta y$, is a **linear combination**. The **span** is every dish you can cook from those ingredients.",
+        visual: "columns",
+        math: R`$$z=\alpha x+\beta y,\qquad \op{span}(x,y)=\{\alpha x+\beta y:\ \alpha,\beta\in\R\ \text{or}\ \C\}$$`,
+        example: { q: R`Write $\mat{3\\2}$ as a recipe of $x=\mat{1\\0}$ and $y=\mat{1\\1}$.`,
+          steps: [R`The second entry only comes from $y$, so we need $\beta=2$.`, R`Then $2y=\mat{2\\2}$ and we still need $\mat{1\\0}$, which is $1\cdot x$.`],
+          answer: R`$\mat{3\\2}=1\cdot x+2\cdot y$` },
+        check: { q: R`What is $\op{span}\left(\mat{1\\2},\mat{2\\4}\right)$ in $\R^2$?`, opts: ["A line through the origin", "All of ℝ²", "Just the two points", "A line that misses the origin"], a: 0,
+          why: "The second ingredient is 2× the first, so every recipe lands on the same line through 0." } },
+
+      { id: "u1s4", title: "The inner product", src: "8/27 board",
+        nick: "Match score",
+        intuition: "The inner product multiplies two vectors slot by slot and adds it all up into one number: a **match score**. On complex vectors the second vector gets conjugated.",
+        weird: R`**Weird rule:** the conjugate lands on the **second** slot. $\langle x,y\rangle=y'x$ conjugates $y$, not $x$.`,
+        math: R`$$\langle x,y\rangle=x_1y_1^{*}+\cdots+x_ny_n^{*}=y'x$$`,
+        example: { q: R`Compute $\langle x,y\rangle$ for $x=\mat{1\\2\\3}$, $y=\mat{4\\0\\-1}$.`,
+          steps: [R`Slot by slot: $1\cdot 4,\ 2\cdot 0,\ 3\cdot(-1)$.`, R`Add: $4+0-3$.`],
+          answer: R`$\langle x,y\rangle=1$` },
+        check: { q: R`For $x=\mat{i\\1}$ and $y=\mat{1\\i}$, what is $\langle x,y\rangle=x_1y_1^*+x_2y_2^*$?`, opts: ["0", "2i", "2", "−2i"], a: 0,
+          why: R`$i\cdot 1+1\cdot(-i)=i-i=0$. Conjugating $y_2=i$ gives $-i$.` } },
+
+      { id: "u1s5", title: "Norm: the length", src: "8/27 board",
+        nick: "Measuring tape",
+        intuition: "The match score of a vector with itself is its length squared. Take the square root and you have the **ℓ₂ norm**.",
+        math: R`$$\norm{x}=\sqrt{|x_1|^2+\cdots+|x_n|^2}=\sqrt{\langle x,x\rangle}$$`,
+        mathNote: "His three properties: ① ‖x‖ ≥ 0, and ‖x‖ = 0 only when x = 0. ② ‖αx‖ = |α|‖x‖. ③ ‖x+y‖ ≤ ‖x‖+‖y‖ (triangle).",
+        example: { q: R`Find $\norm{x}$ for $x=\mat{3i\\4}$.`,
+          steps: [R`Use $|x_k|^2$, not $x_k^2$: $|3i|^2=9$, $|4|^2=16$.`, R`$\sqrt{9+16}$.`],
+          answer: R`$\norm{x}=5$` },
+        check: { q: R`If $\norm{x}=3$, what is $\norm{-2x}$?`, opts: ["6", "−6", "3", "9"], a: 0,
+          why: "Property ②: the knob's size |−2| = 2 comes out, never a sign." } },
+
+      { id: "u1s6", title: "Angle, perpendicular, Cauchy–Schwarz", src: "8/27 board",
+        nick: "Shadow",
+        intuition: "Divide the match score by both lengths and you get the cosine of the angle between the arrows. Zero match score means **perpendicular** (orthogonal). Since a cosine lives in [−1, 1], the match score can never beat the product of the lengths.",
+        visual: "angle",
+        math: R`$$\cos\theta=\frac{\langle x,y\rangle}{\norm{x}\norm{y}},\qquad |\langle x,y\rangle|\le\norm{x}\norm{y}$$`,
+        mathNote: "Ratio = 1: same direction. Ratio = −1: opposite directions. ⟨x,y⟩ = 0 ⇔ x ⊥ y.",
+        example: { q: R`Find the angle between $x=\mat{1\\0}$ and $y=\mat{1\\1}$.`,
+          steps: [R`$\langle x,y\rangle=1$, $\norm{x}=1$, $\norm{y}=\sqrt2$.`, R`$\cos\theta=1/\sqrt2$.`],
+          answer: "θ = 45°" },
+        check: { q: R`Are $\mat{1\\2}$ and $\mat{2\\-1}$ perpendicular?`, opts: ["Yes, match score is 0", "No, match score is 4", "No, match score is 3", "Yes, both have length √5"], a: 0,
+          why: R`$1\cdot2+2\cdot(-1)=0$. Equal lengths say nothing about the angle.` } },
+
+      { id: "u1s7", title: "The outer product", src: "8/27 board · HW1",
+        nick: "Copy machine",
+        intuition: "The outer product $xy'$ is a **copy machine**: every column is a copy of $x$, scaled by one (conjugated) entry of $y$. So the whole matrix has only one direction in it.",
+        visual: "outer",
+        math: R`$$xy'=\mat{x_1y_1^* & \cdots & x_1y_k^*\\ \vdots & & \vdots\\ x_ny_1^* & \cdots & x_ny_k^*}=\mat{y_1^*x & \cdots & y_k^*x}$$`,
+        example: { q: R`Build $xy'$ for $x=\mat{1\\2}$ and $y=\mat{3\\1\\0}$.`,
+          steps: [R`Column 1 is $3x=\mat{3\\6}$, column 2 is $1x=\mat{1\\2}$, column 3 is $0x$.`],
+          answer: R`$xy'=\mat{3&1&0\\6&2&0}$` },
+        check: { q: R`If $x\in\R^4$ and $y\in\R^2$, what size is $xy'$?`, opts: ["4 × 2", "2 × 4", "1 × 1", "4 × 4"], a: 0,
+          why: "Rows come from x (4 of them), columns from y (2 of them)." } },
+
+      { id: "u1s8", title: "Ax, two ways", src: "8/27 board",
+        nick: "Recipe of columns",
+        intuition: "This is the move he uses all semester. $Ax$ is a **recipe**: the entries of $x$ say how much of each column of $A$ to scoop. The other view: each entry of $Ax$ is the match score of a row of $A$ with $x$. Same answer, two lenses.",
+        visual: "columns",
+        math: R`$$Ax=x_1A_{:,1}+\cdots+x_nA_{:,n}\qquad\text{and}\qquad (Ax)_i=\sum_{j=1}^{n}A_{ij}x_j$$`,
+        mathNote: "His words: \"linear comb of cols\" and \"vector of inner prods w/ rows.\" The sum form is what he calls a contraction.",
+        example: { q: R`Compute $Ax$ for $A=\mat{1&2\\3&4\\5&6}$, $x=\mat{2\\1}$ by columns.`,
+          steps: [R`Two scoops of column 1: $2\mat{1\\3\\5}=\mat{2\\6\\10}$.`, R`One scoop of column 2: $\mat{2\\4\\6}$.`, "Add the scoops."],
+          answer: R`$Ax=\mat{4\\10\\16}$ (rows check: $1\cdot2+2\cdot1=4$ ✓)` },
+        check: { q: R`For $A=\mat{1&0\\0&2\\1&1}$ and $x=\mat{3\\-1}$, what is $Ax$?`, opts: [R`$\mat{3\\-2\\2}$`, R`$\mat{3\\2\\4}$`, R`$\mat{3\\-2\\4}$`, R`$\mat{1\\-2\\2}$`], a: 0,
+          why: R`$3\mat{1\\0\\1}-1\mat{0\\2\\1}=\mat{3\\-2\\2}$.` } },
+
+      { id: "u1s9", title: "Spotlight vectors", src: "HW1 P1",
+        nick: "Spotlight",
+        intuition: "$e_k$ is all zeros except a 1 in slot $k$: a **spotlight** that lights one slot and blacks out the rest. Feed it into the recipe and only column $k$ survives.",
+        visual: "spotlight",
+        weird: R`**Weird rule:** $e_k$ is a **vector**, but $e_ie_j'$ is a **matrix** (a single 1 at position $(i,j)$). Inner order ⇒ number, outer order ⇒ matrix.`,
+        math: R`$$Ae_k=0\cdot A_{:,1}+\cdots+1\cdot A_{:,k}+\cdots+0\cdot A_{:,n}=A_{:,k}$$`,
+        mathNote: R`Then $x'e_k=x_k$ for real $x$ (one entry), $e_k'A=(A'e_k)'$ = row $k$, and $e_i'Ae_j=A_{ij}$ (double spotlight → one number).`,
+        example: { q: R`For $A=\mat{1&2&3\\4&5&6\\7&8&9}$ find $Ae_2$, $e_2'A$, and $e_1'Ae_3$.`,
+          steps: [R`$Ae_2$ keeps column 2: $\mat{2\\5\\8}$.`, R`$e_2'A$ keeps row 2: $\mat{4&5&6}$.`, R`$e_1'Ae_3$: column 3 is $\mat{3\\6\\9}$, then take slot 1.`],
+          answer: R`$Ae_2=\mat{2\\5\\8}$, $e_2'A=\mat{4&5&6}$, $e_1'Ae_3=3$` },
+        check: { q: R`Same $A$. What is $e_3'Ae_1$?`, opts: ["7", "3", "9", "1"], a: 0,
+          why: R`$Ae_1=\mat{1\\4\\7}$, and $e_3'$ picks slot 3: 7 = $A_{31}$.` } },
+
+      { id: "u1s10", title: "The all-ones vector", src: "HW1 P1",
+        nick: "Megaphone",
+        intuition: "$1_n$ is a **megaphone**: it broadcasts the same thing into every slot. In an outer product, the megaphone copies the other vector everywhere.",
+        math: R`$$x1_n'=\mat{x & x & \cdots & x},\qquad 1_nx'=\mat{x'\\\vdots\\x'},\qquad 1_n1_n'=\text{all ones}$$`,
+        example: { q: R`Build $x1_3'$ for $x=\mat{1\\2}$.`, steps: ["Copy machine: each column is 1·x."], answer: R`$x1_3'=\mat{1&1&1\\2&2&2}$` },
+        check: { q: R`For $x=\mat{5\\7}$, what is $1_2x'$?`, opts: [R`$\mat{5&7\\5&7}$`, R`$\mat{5&5\\7&7}$`, R`$\mat{12\\12}$`, R`$\mat{5&0\\0&7}$`], a: 0,
+          why: R`Rows of $1_2x'$ are copies of $x'=\mat{5&7}$.` } },
+
+      { id: "u1s11", title: "Diagonal matrices", src: "HW1 P2",
+        nick: "A volume knob per slot",
+        intuition: "$D=\op{diag}(d_1,\dots,d_n)$ gives every slot its own volume knob. On the **left** it turns rows up and down. On the **right** it turns columns. Memory hook: L for Left-Rows.",
+        math: R`$$Dx=\mat{d_1x_1\\\vdots\\d_nx_n},\qquad DA:\ \text{row } i\times d_i,\qquad AD:\ \text{column } j\times d_j$$`,
+        mathNote: R`Recipe view: column $j$ of $AD$ is $A(d_je_j)=d_jA_{:,j}$.`,
+        example: { q: R`$D=\op{diag}(2,3)$, $A=\mat{1&2\\3&4}$. Find $DA$ and $AD$.`,
+          steps: [R`$DA$: row 1 ×2, row 2 ×3.`, R`$AD$: column 1 ×2, column 2 ×3.`],
+          answer: R`$DA=\mat{2&4\\9&12}$, $AD=\mat{2&6\\6&12}$` },
+        check: { q: R`$D=\op{diag}(2,0,-1)$, $x=\mat{3\\5\\4}$. What is $Dx$?`, opts: [R`$\mat{6\\0\\-4}$`, R`$\mat{6\\5\\-4}$`, R`$\mat{5\\5\\3}$`, R`$\mat{2\\0\\-1}$`], a: 0,
+          why: "Slot by slot: 2·3, 0·5, (−1)·4." } },
+
+      { id: "u1s12", title: "AB, column by column", src: "8/27 board",
+        nick: "Recipe of recipes",
+        intuition: "Column $j$ of $AB$ is $A$ times column $j$ of $B$: another recipe of $A$'s columns. His two board views: entries are match scores (\"outer product of inner prods\"), or the whole thing is a sum of copy-machine pieces (\"inner prod of outer prods\").",
+        weird: R`**Weird rule:** $AB\ne BA$ in general. Order matters.`,
+        math: R`$$(AB)_{:,j}=AB_{:,j},\qquad C_{ij}=\sum_{u=1}^{n}A_{iu}B_{uj},\qquad AB=A_{:,1}B_{1,:}+\cdots+A_{:,n}B_{n,:}$$`,
+        example: { q: R`$A=\mat{1&2\\3&4}$, $B=\mat{5&6\\7&8}$. Find $AB$ as a sum of outer products, then $BA$.`,
+          steps: [R`$A_{:,1}B_{1,:}=\mat{1\\3}\mat{5&6}=\mat{5&6\\15&18}$.`, R`$A_{:,2}B_{2,:}=\mat{2\\4}\mat{7&8}=\mat{14&16\\28&32}$.`, "Add the two pieces. Then do BA the same way."],
+          answer: R`$AB=\mat{19&22\\43&50}$, but $BA=\mat{23&34\\31&46}$` },
+        check: { q: R`Which is always true for matching sizes?`, opts: ["A(BC) = (AB)C", "AB = BA", "(AB)C = A(CB)", "A(B + C) = BA + CA"], a: 0,
+          why: "Associative yes, commutative no. His properties ①–④ on 8/27." } },
+
+      { id: "u1s13", title: "Block matrices", src: "8/27 board · HW1 P4",
+        nick: "Chunky scalars",
+        intuition: "Cut matrices into blocks and multiply them as if each block were a number, keeping the order inside each product. His one warning, underlined three times: sizes must ALL cohere.",
+        math: R`$$\mat{A&B\\C&D}\mat{E&F\\G&H}=\mat{AE+BG & AF+BH\\ CE+DG & CF+DH}$$`,
+        example: { q: R`Expand $\mat{A&B&C}\mat{D\\E\\F}$ (HW1 P4a).`, steps: ["A row of blocks times a column of blocks is a block inner product: pair them up and add."], answer: R`$AD+BE+CF$` },
+        check: { q: R`In the 2×2 block product above, the lower-left block is…`, opts: ["CE + DG", "CE + CG", "EC + GD", "CF + DH"], a: 0,
+          why: "Row 2 of blocks [C D] against column 1 [E; G]. Order stays left-to-right: C·E, D·G." } },
+
+      { id: "u1s14", title: "Conjugate transpose", src: "8/27 board",
+        nick: "Socks and shoes",
+        intuition: "$A'$ flips rows into columns and conjugates every entry. Undoing a product is like taking off socks and shoes: the last thing on comes off first, so the order flips.",
+        weird: R`**Weird rule:** $(\alpha A)'=\alpha^{*}A'$. A scalar coming out of a transpose gets conjugated.`,
+        math: R`$$(A')'=A,\quad(\alpha A)'=\alpha^{*}A',\quad(A+B)'=A'+B',\quad(AB)'=B'A',\quad\mat{A&B\\C&D}'=\mat{A'&C'\\B'&D'}$$`,
+        mathNote: "A = A′ is called symmetric (Hermitian when complex).",
+        example: { q: R`Find $A'$ for $A=\mat{1&i\\2&3}$.`, steps: [R`Swap rows and columns: $\mat{1&2\\i&3}$.`, R`Conjugate every entry: $i\to -i$.`], answer: R`$A'=\mat{1&2\\-i&3}$` },
+        check: { q: R`$(ABC)'$ equals…`, opts: ["C′B′A′", "A′B′C′", "C′A′B′", "B′A′C′"], a: 0,
+          why: "Socks and shoes, applied twice: (ABC)′ = C′(AB)′ = C′B′A′." } },
+
+      { id: "u1s15", title: "The natural coincidence", src: "8/27 board",
+        nick: "Vectors are skinny matrices",
+        intuition: "Treat a vector as a one-column matrix and the products you already know fall out of ordinary matrix multiplication. A row times a column is one number. A column times a row is a whole matrix.",
+        math: R`$$\underbrace{y'x}_{1\times n\ \cdot\ n\times 1}=\langle x,y\rangle,\qquad \underbrace{xy'}_{n\times 1\ \cdot\ 1\times k}=\text{outer product}$$`,
+        example: { q: R`For $x=\mat{1\\2}$, $y=\mat{3\\4}$, find $y'x$ and $xy'$.`, steps: [R`$y'x=3\cdot1+4\cdot2$.`, R`$xy'$: columns $3x$ and $4x$.`], answer: R`$y'x=11$, $xy'=\mat{3&4\\6&8}$` },
+        check: { q: R`For $x=\mat{1\\2\\2}$, what is $x'x$?`, opts: ["9", "5", "3", "a 3 × 3 matrix"], a: 0,
+          why: R`$1+4+4=9$, which is $\norm{x}^2$.` } },
+
+      { id: "u1s16", title: "The SVD as a sum of copy machines", src: "HW1 P3 (Fessler 2.3)",
+        nick: "Row of columns × column of rows",
+        intuition: "HW1's hint: think of $U$ as a row of columns and $V'$ as a column of rows. Then $U\Sigma V'$ is a sum of outer products, one per singular value. This is the shape you meet again on 9/17.",
+        math: R`$$A=U\Sigma V'=\sigma_1U_{:,1}V_{:,1}'+\cdots+\sigma_{\min(M,N)}U_{:,\min(M,N)}V_{:,\min(M,N)}'$$`,
+        mathNote: "At most min(M, N) terms, and only rank(A) of them are nonzero.",
+        example: { q: R`$U=I_2$, $\Sigma=\op{diag}(3,1)$, $V=I_2$. Write $A$ as outer products.`, steps: [R`$\sigma_1U_{:,1}V_{:,1}'=3e_1e_1'$, $\sigma_2U_{:,2}V_{:,2}'=1e_2e_2'$.`], answer: R`$A=3e_1e_1'+e_2e_2'=\mat{3&0\\0&1}$` },
+        check: { q: "A is 3 × 5. At most how many outer products does its SVD sum need?", opts: ["3", "5", "8", "15"], a: 0, why: "min(M, N) = min(3, 5) = 3." } },
+
+      { id: "u1s17", title: "Parenthesize smart", src: "HW1 P5 (Fessler 2.8)",
+        nick: "Never build the big matrix",
+        intuition: "Matrix multiplication is associative, so you get to choose the order. Pick the order that keeps things as numbers for as long as possible.",
+        math: R`$$z\,u'v\,x'y\ \to\ z\big((u'v)(x'y)\big):\quad N+N+1+N=3N+1$$`,
+        mathNote: "Two inner products (N each), one scalar product (1), one scaling of z (N). Building any outer product first costs at least N².",
+        example: { q: "With N = 1000, how many scalar multiplies does the smart order cost?", steps: ["3N + 1 with N = 1000."], answer: "3001" },
+        check: { q: R`How many scalar multiplies does $u'v$ take for $u,v\in\R^N$?`, opts: ["N", "N²", "2N", "1"], a: 0, why: "One multiply per slot, then add." } },
+
+      { id: "u1s18", title: "Linear and conjugate-linear", src: "HW1 P6–P7", star: true,
+        nick: "Which slot wears the conjugate",
+        intuition: "A function is linear when recipes pass straight through it. The inner product $y'x$ is linear in $x$. In $y$ the scalars come out conjugated, because $y$ is the one wearing the transpose.",
+        math: R`$$f(\alpha x+\beta z)=\alpha f(x)+\beta f(z)\quad\text{vs}\quad f(\alpha x+\beta z)=\alpha^{*}f(x)+\beta^{*}f(z)$$`,
+        mathNote: "Full proofs live in Prove It.",
+        example: { q: R`Let $f(x,y)=y'x$. Simplify $f(x,\alpha y)$.`, steps: [R`$f(x,\alpha y)=(\alpha y)'x$.`, R`Transpose rule ②: $(\alpha y)'=\alpha^{*}y'$.`], answer: R`$f(x,\alpha y)=\alpha^{*}y'x=\alpha^{*}f(x,y)$` },
+        check: { q: R`The outer product $xy'$ is…`, opts: ["linear in x, conjugate-linear in y", "conjugate-linear in x, linear in y", "linear in both", "conjugate-linear in both"], a: 0,
+          why: R`Same reason as the inner product: $y$ wears the transpose (HW1 P7).` } }
+    ]
+  },
+
+  drill: {
+    u1: [
+      { id: "u1d1", stone: "u1s8", type: "mcq", q: R`Which view says $Ax$ is a combination of the columns of $A$?`, opts: [R`$Ax=x_1A_{:,1}+\cdots+x_nA_{:,n}$`, R`$Ax=A_{1,:}x_1+\cdots+A_{n,:}x_n$`, R`$Ax=x'A$`, R`$Ax=\sum_i A_{ii}x_i$`], a: 0, why: "Entries of x are the weights on the columns." },
+      { id: "u1d2", stone: "u1s9", type: "mcq", q: R`$Ae_k$ equals…`, opts: ["column k of A", "row k of A", "entry (k, k) of A", "the sum of column k"], a: 0, why: "Spotlight on slot k keeps only column k in the recipe." },
+      { id: "u1d3", stone: "u1s9", type: "mcq", q: R`$e_k'A$ equals…`, opts: ["row k of A", "column k of A", "entry (k, k) of A", "the sum of row k"], a: 0, why: R`$e_k'A=(A'e_k)'$: column k of A′ is row k of A (conjugated, then un-conjugated).` },
+      { id: "u1d4", stone: "u1s9", type: "tf", q: R`$e_ie_j'$ is a vector.`, a: false, why: "Column times row is a matrix: a single 1 at (i, j)." },
+      { id: "u1d5", stone: "u1s9", type: "mcq", q: R`For complex $x$, $x'e_k$ equals…`, opts: [R`$x_k$`, R`$x_k^{*}$`, R`the vector $x_ke_k$`, R`$\norm{x}$`], a: 1, why: R`$x'$ conjugates $x$, so $x'e_k=x_k^{*}$. For real $x$ (as in HW1) that is just $x_k$.` },
+      { id: "u1d6", stone: "u1s10", type: "mcq", q: R`$x1_n'$ is…`, opts: ["x copied into every column", "x′ copied into every row", "the sum of the entries of x", "an n × n all-ones matrix"], a: 0, why: "Copy machine: column j is 1·x." },
+      { id: "u1d7", stone: "u1s10", type: "mcq", q: R`$1_n1_n'$ is…`, opts: ["the n × n all-ones matrix", "the number n", "the identity", "the vector of n ones"], a: 0, why: R`Outer order gives a matrix. (The inner order $1_n'1_n=n$ is the number.)` },
+      { id: "u1d8", stone: "u1s11", type: "mcq", q: R`$D$ diagonal. $DA$ does what to $A$?`, opts: ["scales the rows", "scales the columns", "scales every entry by d₁", "swaps rows and columns"], a: 0, why: "L for Left-Rows (HW1 P2b)." },
+      { id: "u1d9", stone: "u1s11", type: "mcq", q: R`$D$ diagonal. $AD$ does what to $A$?`, opts: ["scales the columns", "scales the rows", "scales every entry by d₁", "transposes A"], a: 0, why: "Right side → columns (HW1 P2c)." },
+      { id: "u1d10", stone: "u1s4", type: "tf", q: R`For complex vectors, $y'x=x'y$.`, a: false, why: R`They are conjugates of each other: $x'y=(y'x)^{*}$.` },
+      { id: "u1d11", stone: "u1s4", type: "mcq", q: R`In $\langle x,y\rangle=x_1y_1^*+\cdots+x_ny_n^*$, which vector gets conjugated?`, opts: ["y, the second slot", "x, the first slot", "both", "neither"], a: 0, why: "His 8/27 board puts the star on the second argument." },
+      { id: "u1d12", stone: "u1s5", type: "mcq", q: R`$\norm{\alpha x}$ equals…`, opts: [R`$|\alpha|\norm{x}$`, R`$\alpha\norm{x}$`, R`$\alpha^2\norm{x}$`, R`$\norm{x}+|\alpha|$`], a: 0, why: "Norm property ②." },
+      { id: "u1d13", stone: "u1s6", type: "tf", q: R`If $\langle x,y\rangle=0$ then $x\perp y$.`, a: true, why: "That is the definition of orthogonal (perpendicular)." },
+      { id: "u1d14", stone: "u1s6", type: "mcq", q: R`Cauchy–Schwarz says…`, opts: [R`$|\langle x,y\rangle|\le\norm{x}\norm{y}$`, R`$\norm{x+y}\le\norm{x}+\norm{y}$`, R`$\langle x,y\rangle\ge 0$`, R`$|\langle x,y\rangle|=\norm{x}\norm{y}$`], a: 0, why: "It comes from −1 ≤ cos θ ≤ 1. The second option is the triangle inequality." },
+      { id: "u1d15", stone: "u1s6", type: "mcq", q: R`$\dfrac{\langle x,y\rangle}{\norm{x}\norm{y}}=-1$ means…`, opts: ["x and y point in opposite directions", "x and y are perpendicular to each other", "x and y point in the same direction", "one of the two vectors is zero"], a: 0, why: "8/27 observation ③." },
+      { id: "u1d16", stone: "u1s7", type: "mcq", q: R`Every column of $xy'$ is…`, opts: ["a scaled copy of x", "a scaled copy of y", "a copy of y′", "a different direction"], a: 0, why: R`Column $j$ is $y_j^{*}x$.` },
+      { id: "u1d17", stone: "u1s12", type: "tf", q: "AB = BA for any square A and B.", a: false, why: "Try A = [1 2; 3 4], B = [5 6; 7 8]: AB ≠ BA." },
+      { id: "u1d18", stone: "u1s12", type: "mcq", q: R`Column $j$ of $AB$ is…`, opts: [R`$AB_{:,j}$`, R`$A_{:,j}B$`, R`$A_{j,:}B_{:,j}$`, R`$B_{:,j}A$`], a: 0, why: "Each column of AB is a recipe of A's columns, with weights from that column of B." },
+      { id: "u1d19", stone: "u1s12", type: "mcq", q: R`$\sum_k A_{:,k}B_{k,:}$ is his…`, opts: ["inner product of outer products", "outer product of inner products", "block transpose", "contraction of a vector"], a: 0, why: "A sum (inner-product shape) of outer products." },
+      { id: "u1d20", stone: "u1s13", type: "first", q: R`First move to expand $\mat{A\\B}\mat{C&D}$?`, opts: ["Treat it as a block outer product", "Transpose both factors first", "Add the blocks together", "Write out every single entry"], a: 0, why: "HW1 P4b: result is [AC AD; BC BD]." },
+      { id: "u1d21", stone: "u1s14", type: "mcq", q: R`$(AB)'$ equals…`, opts: ["B′A′", "A′B′", "BA", "A′B"], a: 0, why: "Socks and shoes." },
+      { id: "u1d22", stone: "u1s14", type: "mcq", q: R`$(\alpha A)'$ equals…`, opts: [R`$\alpha^{*}A'$`, R`$\alpha A'$`, R`$|\alpha|A'$`, R`$\alpha A$`], a: 0, why: "The scalar gets conjugated on the way out." },
+      { id: "u1d23", stone: "u1s14", type: "mcq", q: R`$\mat{A&B\\C&D}'$ equals…`, opts: [R`$\mat{A'&C'\\B'&D'}$`, R`$\mat{A'&B'\\C'&D'}$`, R`$\mat{D'&C'\\B'&A'}$`, R`$\mat{A&C\\B&D}$`], a: 0, why: "Blocks swap positions and each block is transposed (property ⑤)." },
+      { id: "u1d24", stone: "u1s15", type: "mcq", q: R`For $x\in\R^n$, $x'x$ is…`, opts: [R`the number $\norm{x}^2$`, "an n × n matrix", "the vector of squares", "always 1"], a: 0, why: "Row times column is 1 × 1." },
+      { id: "u1d25", stone: "u1s16", type: "mcq", q: R`How many of the outer products in $\sigma_1U_{:,1}V_{:,1}'+\cdots$ are nonzero?`, opts: ["rank(A)", "min(M, N) always", "M", "N"], a: 0, why: "σⱼ = 0 past the rank." },
+      { id: "u1d26", stone: "u1s17", type: "first", q: R`First move to compute $zu'vx'y$ cheaply?`, opts: [R`Group the inner products: $z((u'v)(x'y))$`, R`Build the matrix $zu'$ first`, R`Build the matrix $vx'$ first`, "Multiply strictly left to right"], a: 0, why: "Keep everything a number as long as possible: 3N + 1." },
+      { id: "u1d27", stone: "u1s18", type: "mcq", q: R`For $f(x,y)=y'x$, $f(x,\alpha y+\beta z)=$`, opts: [R`$\alpha^{*}f(x,y)+\beta^{*}f(x,z)$`, R`$\alpha f(x,y)+\beta f(x,z)$`, R`$\alpha^{*}f(x,y)+\beta f(x,z)$`, R`$|\alpha|f(x,y)+|\beta|f(x,z)$`], a: 0, why: "Conjugate-linear in y (HW1 P6)." },
+      { id: "u1d28", stone: "u1s3", type: "tf", q: R`$\mat{5\\1}$ is in $\op{span}\left(\mat{1\\0},\mat{2\\0}\right)$.`, a: false, why: "Every recipe of those two has a 0 in slot 2." },
+      { id: "u1d29", stone: "u1s1", type: "mcq", q: R`$A\in\R^{n\times m}$ has…`, opts: ["n rows and m columns", "m rows and n columns", "n·m rows", "n columns and m rows"], a: 0, why: "Rows first, then columns." },
+      { id: "u1d30", stone: "u1s8", type: "first", q: R`Fastest way to see $A\mat{0\\1\\0}$?`, opts: ["It's a spotlight: read off column 2", "Do all nine row-times-column products", "Transpose A first", "Compute A′A"], a: 0, why: R`$Ae_2=A_{:,2}$.` }
+    ]
+  },
+
+  practice: {
+    u1: [
+      { id: "u1p1", title: "Spotlights on a matrix", src: "HW1 P1(a–d)", stone: "u1s9",
+        q: R`Let $A=\mat{2&-1&0\\5&3&1\\4&0&6}$ and $x=\mat{7\\-2\\9}$. Compute $x'e_3$, $Ae_1$, $e_2'A$, and $e_3'Ae_2$, and say each in words.`,
+        hints: [R`Each $e_k$ is a spotlight on slot $k$.`, R`$Ae_1$ is the recipe "one scoop of column 1, zero of the rest."`, R`$e_3'Ae_2$: first get column 2, then pick its slot 3.`],
+        solution: [R`$x'e_3=x_3=9$ (selects entry 3 of $x$).`, R`$Ae_1=A_{:,1}=\mat{2\\5\\4}$ (selects column 1).`, R`$e_2'A=A_{2,:}=\mat{5&3&1}$ (selects row 2).`, R`$Ae_2=\mat{-1\\3\\0}$, so $e_3'Ae_2=A_{32}=0$ (selects entry (3, 2)).`],
+        answer: R`$9$, $\mat{2\\5\\4}$, $\mat{5&3&1}$, $0$` },
+      { id: "u1p2", title: "One-hot and stuffed matrices", src: "HW1 P1(e–g)", stone: "u1s9",
+        q: R`With $n=3$ and $x=\mat{1\\-4\\2}$, write out $e_2e_3'$, $xe_1'$, and $e_3x'$.`,
+        hints: ["Column times row is a matrix.", R`$xe_1'$: column $j$ is $(e_1)_j\cdot x$, so only column 1 survives.`, R`$e_3x'$ is the transpose of $xe_3'$.`],
+        solution: [R`$e_2e_3'=\mat{0&0&0\\0&0&1\\0&0&0}$ (single 1 at (2, 3)).`, R`$xe_1'=\mat{1&0&0\\-4&0&0\\2&0&0}$ (x in column 1).`, R`$e_3x'=\mat{0&0&0\\0&0&0\\1&-4&2}$ (x′ in row 3).`],
+        answer: "see solution" },
+      { id: "u1p3", title: "The megaphone", src: "HW1 P1(h–j)", stone: "u1s10",
+        q: R`With $x=\mat{3\\-1}$, write $1_21_2'$, $x1_2'$, and $1_2x'$.`,
+        hints: ["The megaphone copies the other vector everywhere.", "x1ₙ′ puts x in every column; 1ₙx′ puts x′ in every row."],
+        solution: [R`$1_21_2'=\mat{1&1\\1&1}$.`, R`$x1_2'=\mat{3&3\\-1&-1}$.`, R`$1_2x'=\mat{3&-1\\3&-1}$.`],
+        answer: "see solution" },
+      { id: "u1p4", title: "Volume knobs on rows and columns", src: "HW1 P2", stone: "u1s11",
+        q: R`$D=\op{diag}(-1,2,0)$, $x=\mat{4\\1\\5}$, $A=\mat{1&2&3\\4&5&6\\7&8&9}$. Find $Dx$, $DA$, $AD$ and describe each.`,
+        hints: [R`$Dx$: slot by slot.`, "Left multiply → rows. Right multiply → columns."],
+        solution: [R`$Dx=\mat{-4\\2\\0}$ (entrywise scaling).`, R`$DA=\mat{-1&-2&-3\\8&10&12\\0&0&0}$ (row $i$ times $d_i$).`, R`$AD=\mat{-1&4&0\\-4&10&0\\-7&16&0}$ (column $j$ times $d_j$).`],
+        answer: "see solution" },
+      { id: "u1p5", title: "Ax as a recipe", src: "8/27 board", stone: "u1s8",
+        q: R`$A=\mat{2&0&1\\-1&3&4}$, $x=\mat{1\\2\\-1}$. Compute $Ax$ by columns, then check it by rows.`,
+        hints: ["Columns: 1 scoop of column 1, 2 of column 2, −1 of column 3.", "Rows: each entry is a row of A matched with x."],
+        solution: [R`Columns: $1\mat{2\\-1}+2\mat{0\\3}-1\mat{1\\4}=\mat{2+0-1\\-1+6-4}$.`, R`$Ax=\mat{1\\1}$.`, R`Rows: $2\cdot1+0\cdot2+1\cdot(-1)=1$ and $-1+6-4=1$ ✓.`],
+        answer: R`$\mat{1\\1}$` },
+      { id: "u1p6", title: "AB two ways, and BA", src: "8/27 board", stone: "u1s12",
+        q: R`$A=\mat{1&-1\\0&2}$, $B=\mat{3&1\\2&0}$. Compute $AB$ as a sum of outer products, then compute $BA$.`,
+        hints: [R`$AB=A_{:,1}B_{1,:}+A_{:,2}B_{2,:}$.`, R`For $BA$ use $B_{:,1}A_{1,:}+B_{:,2}A_{2,:}$.`],
+        solution: [R`$\mat{1\\0}\mat{3&1}=\mat{3&1\\0&0}$ and $\mat{-1\\2}\mat{2&0}=\mat{-2&0\\4&0}$.`, R`$AB=\mat{1&1\\4&0}$.`, R`$BA=\mat{3\\2}\mat{1&-1}+\mat{1\\0}\mat{0&2}=\mat{3&-3\\2&-2}+\mat{0&2\\0&0}=\mat{3&-1\\2&-2}$.`, "AB ≠ BA."],
+        answer: R`$AB=\mat{1&1\\4&0}$, $BA=\mat{3&-1\\2&-2}$` },
+      { id: "u1p7", title: "Complex match score and length", src: "8/27 board", stone: "u1s4",
+        q: R`$x=\mat{1+i\\2}$, $y=\mat{i\\1}$. Compute $\langle x,y\rangle=y'x$, $x'y$, and $\norm{x}$.`,
+        hints: [R`$y'$ conjugates $y$: $y'=\mat{-i&1}$.`, R`$x'y$ is the conjugate of $y'x$.`, R`$\norm{x}^2=|1+i|^2+|2|^2$.`],
+        solution: [R`$y'x=(-i)(1+i)+1\cdot2=-i-i^2+2=3-i$.`, R`$x'y=(3-i)^{*}=3+i$.`, R`$\norm{x}^2=2+4=6$, so $\norm{x}=\sqrt6$.`],
+        answer: R`$3-i$, $3+i$, $\sqrt6$` },
+      { id: "u1p8", title: "SVD as outer products", src: "HW1 P3 (Fessler 2.3)", stone: "u1s16",
+        q: R`$A=U\Sigma V'$ with $U\in\R^{2\times2}$, $\Sigma=\mat{\sigma_1&0&0\\0&\sigma_2&0}$, $V\in\R^{3\times3}$ (so $M=2<N=3$). Write $A$ as a sum of outer products. How many terms?`,
+        hints: [R`Think of $U$ as a row of columns and $V'$ as a column of rows.`, R`$\Sigma V'$ keeps only the first 2 rows of $V'$, scaled by $\sigma_1,\sigma_2$.`],
+        solution: [R`$\Sigma V'=\mat{\sigma_1V_{:,1}'\\\sigma_2V_{:,2}'}$ (the third row of $V'$ is multiplied by a zero column).`, R`$U(\Sigma V')=U_{:,1}\sigma_1V_{:,1}'+U_{:,2}\sigma_2V_{:,2}'$ (inner product of outer products).`, "Two terms = min(M, N); only rank(A) of them are nonzero."],
+        answer: R`$A=\sigma_1U_{:,1}V_{:,1}'+\sigma_2U_{:,2}V_{:,2}'$` },
+      { id: "u1p9", title: "Block products", src: "HW1 P4 (Fessler 2.7)", stone: "u1s13",
+        q: R`Expand (b) $\mat{A\\B}\mat{C&D}$, (c) $A\mat{B&C&D}$, (d) $\mat{A\\B\\C}D$. Name each pattern.`,
+        hints: ["Treat blocks as chunky scalars; keep left-to-right order.", "A column times a row of blocks is a block outer product."],
+        solution: [R`(b) $\mat{AC&AD\\BC&BD}$: block outer product.`, R`(c) $\mat{AB&AC&AD}$: like scaling from the left.`, R`(d) $\mat{AD\\BD\\CD}$: like scaling from the right.`],
+        answer: "see solution" },
+      { id: "u1p10", title: "Cost of a product chain", src: "HW1 P5 (Fessler 2.8)", stone: "u1s17",
+        q: R`For $u,v,x,y,z\in\R^N$, how should you parenthesize $zu'vx'y$, and how many scalar multiplies does it take?`,
+        hints: ["Find the inner products hiding in the chain.", "Count: each inner product, the scalar product, then scaling z."],
+        solution: [R`$z\big((u'v)(x'y)\big)$: two inner products, no matrices formed.`, "N + N + 1 + N = 3N + 1 scalar multiplies."],
+        answer: "3N + 1" }
+    ]
+  },
+
+  proofs: {
+    u1: [
+      { id: "u1pr1", title: "Inner product is linear in x", src: "HW1 P6", star: true,
+        goal: R`Show $f(x,y)=y'x$ is linear in $x$: $f(\alpha x+\beta z,y)=\alpha f(x,y)+\beta f(z,y)$.`,
+        steps: [
+          { line: R`Let $\alpha,\beta\in\C$ and $x,z,y\in\C^n$.`, why: "Name everything arbitrary first" },
+          { line: R`$f(\alpha x+\beta z,y)=y'(\alpha x+\beta z)$`, why: "Definition of f" },
+          { line: R`$=y'(\alpha x)+y'(\beta z)$`, why: "Matrix multiplication distributes" },
+          { line: R`$=\alpha\,y'x+\beta\,y'z$`, why: "Scalars pull out of a product: A(αB) = α(AB)" },
+          { line: R`$=\alpha f(x,y)+\beta f(z,y)$`, why: "Definition of f" }
+        ],
+        whyPool: ["Transpose of a sum", "(αA)′ = α*A′", "Socks and shoes", "Norm property ②"],
+        fillDistract: [R`$=\alpha^{*}y'x+\beta^{*}y'z$`, R`$=x'(\alpha y)+z'(\beta y)$`] },
+      { id: "u1pr2", title: "Inner product is conjugate-linear in y", src: "HW1 P6", star: true,
+        goal: R`Show $f(x,y)=y'x$ is conjugate-linear in $y$: $f(x,\alpha y+\beta z)=\alpha^{*}f(x,y)+\beta^{*}f(x,z)$.`,
+        steps: [
+          { line: R`Let $\alpha,\beta\in\C$ and $x,y,z\in\C^n$.`, why: "Name everything arbitrary first" },
+          { line: R`$f(x,\alpha y+\beta z)=(\alpha y+\beta z)'x$`, why: "Definition of f" },
+          { line: R`$=(\alpha^{*}y'+\beta^{*}z')x$`, why: "Transpose of a sum, then (αA)′ = α*A′" },
+          { line: R`$=\alpha^{*}y'x+\beta^{*}z'x$`, why: "Matrix multiplication distributes" },
+          { line: R`$=\alpha^{*}f(x,y)+\beta^{*}f(x,z)$`, why: "Definition of f" }
+        ],
+        whyPool: ["Socks and shoes", "Scalars pull out of a product: A(αB) = α(AB)", "(A′)′ = A", "Cauchy–Schwarz"],
+        fillDistract: [R`$=(\alpha y'+\beta z')x$`, R`$=x'(\alpha y+\beta z)$`] },
+      { id: "u1pr3", title: "Outer product: linear in x, conjugate-linear in y", src: "HW1 P7", star: true,
+        goal: R`Show $f(x,y)=xy'$ is linear in $x$ and conjugate-linear in $y$.`,
+        steps: [
+          { line: R`$f(\alpha x+\beta z,y)=(\alpha x+\beta z)y'$`, why: "Definition of f" },
+          { line: R`$=\alpha xy'+\beta zy'=\alpha f(x,y)+\beta f(z,y)$`, why: "Distribute, scalars pull out: linear in x" },
+          { line: R`$f(x,\alpha y+\beta z)=x(\alpha y+\beta z)'$`, why: "Definition of f" },
+          { line: R`$=x(\alpha^{*}y'+\beta^{*}z')$`, why: "Transpose of a sum, then (αA)′ = α*A′" },
+          { line: R`$=\alpha^{*}xy'+\beta^{*}xz'=\alpha^{*}f(x,y)+\beta^{*}f(x,z)$`, why: "Distribute, scalars pull out: conjugate-linear in y" }
+        ],
+        whyPool: ["Socks and shoes", "Norm property ③", "(A′)′ = A", "AB = BA"],
+        fillDistract: [R`$=x(\alpha y'+\beta z')$`, R`$=(\alpha^{*}x+\beta^{*}z)y'$`] },
+      { id: "u1pr4", title: "Spotlight on a row, then an entry", src: "HW1 P1(c–d)",
+        goal: R`Show $e_k'A=A_{k,:}$ and $e_i'Ae_j=A_{ij}$ using only $Ae_k=A_{:,k}$.`,
+        steps: [
+          { line: R`$e_k'A=\big((e_k'A)'\big)'$`, why: "(A′)′ = A" },
+          { line: R`$=(A'e_k)'$`, why: "Socks and shoes: (e_k′A)′ = A′e_k" },
+          { line: R`$=\big((A')_{:,k}\big)'=A_{k,:}$`, why: "Spotlight picks a column; column k of A′ is row k of A, flipped back" },
+          { line: R`$e_i'Ae_j=e_i'A_{:,j}$`, why: "Spotlight picks column j" },
+          { line: R`$=A_{ij}$`, why: "Spotlight e_i′ picks slot i" }
+        ],
+        whyPool: ["(αA)′ = α*A′", "Matrix multiplication distributes", "AB = BA", "Cauchy–Schwarz"],
+        fillDistract: [R`$=A'e_k$`, R`$=(e_kA')'$`] },
+      { id: "u1pr5", title: "Ae_k is column k", src: "HW1 P1(b) · 8/27 board",
+        goal: R`Show $Ae_k=A_{:,k}$ with the linear-combination view of $Ax$.`,
+        steps: [
+          { line: R`$Ax=x_1A_{:,1}+\cdots+x_nA_{:,n}$ for any $x$`, why: "Ax is a combination of the columns of A" },
+          { line: R`Take $x=e_k$: its entries are $0$ except a $1$ in slot $k$`, why: "Definition of the spotlight vector" },
+          { line: R`$Ae_k=0\cdot A_{:,1}+\cdots+1\cdot A_{:,k}+\cdots+0\cdot A_{:,n}$`, why: "Plug the weights into the recipe" },
+          { line: R`$=A_{:,k}$`, why: "Zero scoops vanish" }
+        ],
+        whyPool: ["Socks and shoes", "(αA)′ = α*A′", "Norm property ①", "Transpose of a sum"],
+        fillDistract: [R`$Ae_k=e_k'A$`, R`$Ae_k=A_{k,:}$`] },
+      { id: "u1pr6", title: "AD scales the columns", src: "HW1 P2(c)",
+        goal: R`Given $DA$ scales the rows of $A$, show $AD$ scales the columns: $AD=\mat{d_1A_{:,1}&\cdots&d_nA_{:,n}}$.`,
+        steps: [
+          { line: R`$AD=\big((AD)'\big)'$`, why: "(A′)′ = A" },
+          { line: R`$=(D'A')'$`, why: "Socks and shoes" },
+          { line: R`$D'A'$ scales row $i$ of $A'$ by $d_i^{*}$`, why: "D′ = diag(d₁*, …, dₙ*) is diagonal, and a left diagonal scales rows" },
+          { line: R`Transposing back turns rows of $A'$ into columns of $A$ and $d_i^{*}$ into $d_i$`, why: "(αA)′ = α*A′" },
+          { line: R`$AD=\mat{d_1A_{:,1}&\cdots&d_nA_{:,n}}$`, why: "Read off the columns" }
+        ],
+        whyPool: ["AB = BA", "Cauchy–Schwarz", "Matrix multiplication distributes", "Norm property ②"],
+        fillDistract: [R`$=(A'D')'$`, R`$=DA'$`] }
+    ]
+  },
+
+  julia: {
+    u1: [
+      { id: "u1j1", stone: "u1s9", kind: "predict", code: "A = [1 2 3; 4 5 6; 7 8 9]\ne2 = [0, 1, 0]\nA * e2", q: "What does the last line return?",
+        opts: ["[2, 5, 8]", "[4, 5, 6]", "5", "[0, 5, 0]"], a: 0, why: "Spotlight: A·e₂ is column 2." },
+      { id: "u1j2", stone: "u1s9", kind: "predict", code: "A = [1 2 3; 4 5 6; 7 8 9]\nA[2, :]", q: "What comes back?",
+        opts: ["the Vector [4, 5, 6] (a column!)", "the 1×3 row matrix [4 5 6]", "the Vector [2, 5, 8]", "an error"], a: 0, why: "Gotcha: indexing a single row returns a plain Vector. Use A[2:2, :] or A[2, :]' if you need it as a row." },
+      { id: "u1j3", stone: "u1s4", kind: "predict", code: "x = [1+im, 2]\ny = [im, 1]\ny' * x", q: "What does y' * x return?",
+        opts: ["3 - 1im", "3 + 1im", "1 + 3im", "a 2×2 matrix"], a: 0, why: "' is the conjugate transpose, so y is conjugated: (−i)(1+i) + 2 = 3 − i. This is ⟨x, y⟩." },
+      { id: "u1j4", stone: "u1s4", kind: "pick", q: R`Which line computes $\langle x,y\rangle=y'x$ from his definition?`,
+        opts: ["y' * x", "x' * y", "transpose(y) * x", "x * y'"], a: 0, why: "Julia's ' already conjugates. transpose(y) skips the conjugate, x' * y conjugates the wrong vector, and x * y' is an outer product.", codeOpts: true },
+      { id: "u1j5", stone: "u1s10", kind: "predict", code: "x = [1, 2]\nx * ones(3)'", q: "What is the result?",
+        opts: ["[1 1 1; 2 2 2]", "[1 2; 1 2; 1 2]", "[3, 6]", "an error"], a: 0, why: "Copy machine x1₃′: x in every column (a 2×3 matrix)." },
+      { id: "u1j6", stone: "u1s14", kind: "predict", code: "A = [1 im; 2 3]\nA'", q: "What is A'?",
+        opts: ["[1 2; -im 3]", "[1 2; im 3]", "[1 -im; 2 3]", "[1 im; 2 3]"], a: 0, why: "Swap rows and columns, then conjugate. transpose(A) would give [1 2; im 3]." },
+      { id: "u1j7", stone: "u1s12", kind: "pick", q: "Which expression rebuilds A*B as a sum of outer products (real A, B, both 2×2)?",
+        opts: ["sum(A[:, k] * B[k, :]' for k in 1:2)", "sum(A[k, :] * B[:, k]' for k in 1:2)", "sum(A[:, k]' * B[k, :] for k in 1:2)", "sum(A[:, k] * B[:, k]' for k in 1:2)"], a: 0, why: "Column k of A times row k of B. B[k, :] comes back as a Vector, so the ' makes it a row.", codeOpts: true },
+      { id: "u1j8", stone: "u1s11", kind: "predict", code: "using LinearAlgebra\nD = Diagonal([2, 3])\nM = [1 2; 3 4]\nD * M", q: "What is D * M?",
+        opts: ["[2 4; 9 12]", "[2 6; 6 12]", "[2 0; 0 12]", "[3 5; 6 7]"], a: 0, why: "Left diagonal scales rows: row 1 ×2, row 2 ×3." },
+      { id: "u1j9", stone: "u1s1", kind: "predict", code: "A = [1 2; 3 4]\nA[2]", q: "What does A[2] return?",
+        opts: ["3", "2", "[3, 4]", "an error"], a: 0, why: "One index means linear indexing, which runs down columns first (column-major): 1, 3, 2, 4." },
+      { id: "u1j10", stone: "u1s8", kind: "bug", code: "A = randn(3, 3); x = randn(3); y = randn(3)\nA * (x + y) == A * x + A * y", q: "This sometimes prints false. What's the bug?",
+        opts: ["== needs exact equality; rounding needs ≈", "Matrix multiplication isn't linear", "x + y needs a broadcast dot: x .+ y", "randn makes complex numbers here"], a: 0, why: "Linearity holds exactly in math. In floating point the two sides can differ in the last digit, so compare with ≈." },
+      { id: "u1j11", stone: "u1s17", kind: "pick", q: R`Which line computes $zu'vx'y$ with only 3N + 1 multiplies?`,
+        opts: ["z * ((u' * v) * (x' * y))", "(z * u') * (v * x') * y", "z * u' * v * x' * y", "((z * u') * v) * (x' * y)"], a: 0, why: "Group the two inner products so no matrix is ever built.", codeOpts: true },
+      { id: "u1j12", stone: "u1s7", kind: "predict", code: "x = randn(4); y = randn(2)\nsize(x * y')", q: "What is printed?",
+        opts: ["(4, 2)", "(2, 4)", "(1, 1)", "(4,)"], a: 0, why: "Outer product: 4 rows from x, 2 columns from y." },
+      { id: "u1j13", stone: "u1s15", kind: "match", q: "Match: which math does «x' * x» compute?",
+        opts: [R`$\norm{x}^2$`, R`$xx'$`, R`$\norm{x}$`, R`$x_1^2$`], a: 0, why: "Row times column: one number, the squared length." }
+    ]
+  },
+
+  vault: [
+    { id: "v1", unit: "u1", title: "Linear combination", tex: R`$$\alpha x+\beta y$$`, meaning: "A recipe: α scoops of x plus β scoops of y.", when: "Whenever a vector is built from other vectors.", nick: "Recipe", src: "8/27" },
+    { id: "v2", unit: "u1", title: "Span", tex: R`$$\op{span}(x,y)=\{\alpha x+\beta y\}$$`, meaning: "Everything you can cook from the ingredients.", when: "Asking what vectors are reachable.", nick: "Recipe book", src: "8/27" },
+    { id: "v3", unit: "u1", title: "Inner product", tex: R`$$\langle x,y\rangle=\sum_i x_iy_i^{*}=y'x$$`, meaning: "Slot-by-slot match score; the second slot is conjugated.", when: "Angles, lengths, orthogonality, coordinates.", nick: "Match score", src: "8/27", weird: true },
+    { id: "v4", unit: "u1", title: "ℓ₂ norm", tex: R`$$\norm{x}=\sqrt{\langle x,x\rangle}=\sqrt{\textstyle\sum|x_i|^2}$$`, meaning: "Length of the arrow.", when: "Distances and errors; ‖·‖² avoids square roots.", nick: "Measuring tape", src: "8/27" },
+    { id: "v5", unit: "u1", title: "Norm properties", tex: R`$$\norm{x}\ge0,\quad\norm{\alpha x}=|\alpha|\norm{x},\quad\norm{x+y}\le\norm{x}+\norm{y}$$`, meaning: "Nonnegative (zero only for 0), scales by |α|, triangle inequality.", when: "Simplifying or bounding lengths.", nick: "Measuring tape rules", src: "8/27" },
+    { id: "v6", unit: "u1", title: "Angle", tex: R`$$\cos\theta=\frac{\langle x,y\rangle}{\norm{x}\norm{y}}$$`, meaning: "Match score divided by both lengths.", when: "Same direction (1), opposite (−1), perpendicular (0).", nick: "Shadow", src: "8/27" },
+    { id: "v7", unit: "u1", title: "Cauchy–Schwarz", tex: R`$$|\langle x,y\rangle|\le\norm{x}\norm{y}$$`, meaning: "A match score never beats the product of lengths.", when: "Bounding an inner product. Equality iff one is a multiple of the other.", nick: "Shadow is never longer", src: "8/27" },
+    { id: "v8", unit: "u1", title: "Outer product", tex: R`$$xy'=\mat{y_1^{*}x&\cdots&y_k^{*}x},\quad(xy')_{ij}=x_iy_j^{*}$$`, meaning: "Every column is a scaled copy of x: rank one.", when: "Building rank-1 pieces; SVD sums.", nick: "Copy machine", src: "8/27 · HW1" },
+    { id: "v9", unit: "u1", title: "Ax as columns", tex: R`$$Ax=x_1A_{:,1}+\cdots+x_nA_{:,n}$$`, meaning: "Ax is a combination of the columns of A.", when: "Almost always. His default lens.", nick: "Recipe of columns", src: "8/27" },
+    { id: "v10", unit: "u1", title: "Ax as rows", tex: R`$$(Ax)_i=\sum_j A_{ij}x_j=A_{i,:}x$$`, meaning: "Each entry is a row of A matched with x.", when: "Computing one entry; contractions.", nick: "Row match scores", src: "8/27" },
+    { id: "v11", unit: "u1", title: "Spotlight identities", tex: R`$$x'e_k=x_k^{*},\ Ae_k=A_{:,k},\ e_k'A=A_{k,:},\ e_i'Ae_j=A_{ij}$$`, meaning: "eₖ picks a slot, a column, a row, an entry.", when: "Reading off parts of a matrix.", nick: "Spotlight", src: "HW1 P1", weird: true },
+    { id: "v12", unit: "u1", title: "One-hot matrix", tex: R`$$e_ie_j'=\text{single 1 at }(i,j)$$`, meaning: "Outer product of two spotlights.", when: "Building a matrix entry by entry: A = Σ Aᵢⱼ eᵢeⱼ′.", nick: "Single-dot stamp", src: "HW1 P1(e)", weird: true },
+    { id: "v13", unit: "u1", title: "Megaphone identities", tex: R`$$x1_n'=\mat{x&\cdots&x},\ 1_nx'=\mat{x'\\\vdots\\x'},\ 1_n1_n'=\text{all ones}$$`, meaning: "1ₙ copies the other vector into every slot.", when: "Repeating a vector; later, centering data.", nick: "Megaphone", src: "HW1 P1(h–j)" },
+    { id: "v14", unit: "u1", title: "Diagonal scaling", tex: R`$$Dx=\mat{d_ix_i},\quad DA:\ \text{rows}\times d_i,\quad AD:\ \text{cols}\times d_j$$`, meaning: "A volume knob per slot. Left scales rows, right scales columns.", when: "Any diagonal factor, e.g. Σ in the SVD.", nick: "L for Left-Rows", src: "HW1 P2" },
+    { id: "v15", unit: "u1", title: "Matrix product, entries", tex: R`$$C_{ij}=\sum_{u}A_{iu}B_{uj}$$`, meaning: "Outer product of inner products (his contraction form).", when: "Computing one entry of AB.", nick: "Match-score grid", src: "8/27" },
+    { id: "v16", unit: "u1", title: "Matrix product, outer form", tex: R`$$AB=\sum_k A_{:,k}B_{k,:}$$`, meaning: "Inner product of outer products: a sum of rank-1 pieces.", when: "SVD sums, low-rank thinking.", nick: "Stack of copy machines", src: "8/27" },
+    { id: "v17", unit: "u1", title: "Matrix product, columns", tex: R`$$(AB)_{:,j}=AB_{:,j}$$`, meaning: "Each column of AB is a recipe of A's columns.", when: "Seeing the range of AB inside the range of A.", nick: "Recipe of recipes", src: "8/27" },
+    { id: "v18", unit: "u1", title: "Product rules", tex: R`$$AB\ne BA,\quad A(BC)=(AB)C,\quad A(B+C)=AB+AC,\quad AI=IA=A$$`, meaning: "Associative and distributive, never assume commutative.", when: "Regrouping a chain of products.", nick: "Order matters", src: "8/27", weird: true },
+    { id: "v19", unit: "u1", title: "Block multiply", tex: R`$$\mat{A&B\\C&D}\mat{E&F\\G&H}=\mat{AE+BG&AF+BH\\CE+DG&CF+DH}$$`, meaning: "Blocks act like chunky scalars, order kept.", when: "Splitting U into [U₁ U₂] and similar.", nick: "Sizes must ALL cohere", src: "8/27 · HW1 P4" },
+    { id: "v20", unit: "u1", title: "Conjugate transpose rules", tex: R`$$(A')'=A,\ (\alpha A)'=\alpha^{*}A',\ (A+B)'=A'+B',\ (AB)'=B'A'$$`, meaning: "Flip and conjugate. Products reverse order.", when: "Every proof that moves a transpose.", nick: "Socks and shoes", src: "8/27", weird: true },
+    { id: "v21", unit: "u1", title: "Block transpose", tex: R`$$\mat{A&B\\C&D}'=\mat{A'&C'\\B'&D'}$$`, meaning: "Off-diagonal blocks swap places, every block flips.", when: "Transposing [U₁ U₂].", nick: "Flip the board", src: "8/27" },
+    { id: "v22", unit: "u1", title: "Natural coincidence", tex: R`$$y'x=\langle x,y\rangle,\qquad xy'=\text{outer product}$$`, meaning: "Vectors as one-column matrices make both products ordinary matrix multiplication.", when: "Writing inner and outer products compactly.", nick: "Skinny matrices", src: "8/27" },
+    { id: "v23", unit: "u1", title: "SVD as outer products", tex: R`$$U\Sigma V'=\sum_{j=1}^{\min(M,N)}\sigma_jU_{:,j}V_{:,j}'$$`, meaning: "Row of columns × column of rows. Only rank(A) terms are nonzero.", when: "Any time Σ is sandwiched.", nick: "Sum of copy machines", src: "HW1 P3" },
+    { id: "v24", unit: "u1", title: "Cheap parenthesization", tex: R`$$z\big((u'v)(x'y)\big):\ 3N+1$$`, meaning: "Keep things scalars as long as possible.", when: "Cost questions.", nick: "Never build the big matrix", src: "HW1 P5" },
+    { id: "v25", unit: "u1", title: "Linear / conjugate-linear", tex: R`$$f(\alpha x+\beta z)=\alpha f(x)+\beta f(z)\ \ /\ \ \alpha^{*}f(x)+\beta^{*}f(z)$$`, meaning: "y′x and xy′ are linear in x, conjugate-linear in y.", when: "607 proofs.", nick: "Which slot wears the conjugate", src: "HW1 P6–P7", star: true }
+  ],
+
+  extras: [
+    { id: "x1", title: "Hyperspectral imaging: subspace clustering", date: "9/03 part 1", who: "Guest: Richard Breder",
+      body: "Spectra stored as vectors with 100+ wavelength bands. Pairwise cosine similarity builds an adjacency matrix, then a symmetric Laplacian, then k-means on its eigenvectors groups pixels into endmembers (pigments). Tested on an Egyptian blue panel from the National Gallery of Art." },
+    { id: "x2", title: "Tensors for hypergraph signal processing", date: "9/03 part 2", who: "Guest lecture",
+      body: "A hyperedge connects a whole group at once (one paper = all its authors). Two different collaboration histories can collapse to the same simple graph, so group identity is lost. Writing the hypergraph as an array (incidence matrix B, then BB′ or a tensor) keeps it." }
+  ]
+};
+
+</script>
+<script id="span-math">
+/* Tiny TeX-subset → native MathML. No libraries, works offline. */
+const SPANMath = (() => {
+  const SYM = {
+    alpha:"α",beta:"β",gamma:"γ",delta:"δ",epsilon:"ϵ",varepsilon:"ε",eta:"η",theta:"θ",lambda:"λ",mu:"μ",pi:"π",sigma:"σ",tau:"τ",phi:"φ",psi:"ψ",omega:"ω",
+    Sigma:"Σ",Lambda:"Λ",Delta:"Δ",Omega:"Ω",Phi:"Φ",
+    R:"ℝ",C:"ℂ",N:"ℕ"
+  };
+  const OPS = {
+    in:"∈",notin:"∉",cdots:"⋯",ldots:"…",vdots:"⋮",ddots:"⋱",le:"≤",ge:"≥",leq:"≤",geq:"≥",ne:"≠",neq:"≠",perp:"⊥",dagger:"†",ast:"*",star:"∗",
+    cdot:"·",times:"×",to:"→",Rightarrow:"⇒",iff:"⇔",approx:"≈",infty:"∞",forall:"∀",exists:"∃",langle:"⟨",rangle:"⟩",mid:"∣",circ:"∘",
+    subseteq:"⊆",supseteq:"⊇",cup:"∪",cap:"∩",emptyset:"∅",sim:"∼",pm:"±",prime:"′",colon:":",vert:"|","|":"‖",
+    "{":"{","}":"}",";":" ",",":" ",quad:" ",qquad:"  "
+  };
+  const WORDS = new Set(["op","text"]);
+  const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  function tokenize(s){
+    const t=[]; let i=0;
+    while(i<s.length){
+      const c=s[i];
+      if(c==="\\"){
+        let j=i+1;
+        if(/[A-Za-z]/.test(s[j]||"")){ while(j<s.length && /[A-Za-z]/.test(s[j])) j++; t.push({k:"cmd",v:s.slice(i+1,j)}); i=j; }
+        else { t.push({k:"cmd",v:s[j]}); i=j+1; }
+      } else if(/\s/.test(c)){ i++; }
+      else if(/[0-9.]/.test(c)){ let j=i; while(j<s.length && /[0-9.]/.test(s[j])) j++; t.push({k:"num",v:s.slice(i,j)}); i=j; }
+      else { t.push({k:"ch",v:c}); i++; }
+    }
+    return t;
+  }
+
+  function parse(src){
+    const t=tokenize(src); let p=0;
+    const peek=()=>t[p];
+    function group(){ // read {…} or single atom
+      const k=peek(); if(!k) return "";
+      if(k.k==="ch"&&k.v==="{"){ p++; const r=seq(["}"]); p++; return wrap(r); }
+      return atom();
+    }
+    function rawGroup(){ // {plain text}
+      const k=peek(); if(!(k&&k.k==="ch"&&k.v==="{")) return "";
+      p++; let depth=1, out="";
+      while(p<t.length){ const x=t[p++]; if(x.k==="ch"&&x.v==="{") depth++; if(x.k==="ch"&&x.v==="}"){ depth--; if(!depth) break; }
+        out += x.k==="cmd" ? (OPS[x.v]||SYM[x.v]||x.v) : x.v; }
+      return out;
+    }
+    function wrap(arr){ return arr.length===1?arr[0]:`<mrow>${arr.join("")}</mrow>`; }
+    function matrix(){
+      // \mat{a & b \\ c & d}
+      p++; // {
+      const rows=[[[]]]; let depth=0;
+      while(p<t.length){
+        const k=peek();
+        if(k.k==="ch"&&k.v==="}"&&depth===0){ p++; break; }
+        if(k.k==="ch"&&k.v==="&"&&depth===0){ p++; rows[rows.length-1].push([]); continue; }
+        if(k.k==="cmd"&&k.v==="\\"&&depth===0){ p++; rows.push([[]]); continue; }
+        const r=rows[rows.length-1]; r[r.length-1].push(item());
+      }
+      const body=rows.filter(r=>r.some(c=>c.length)).map(r=>`<mtr>${r.map(c=>`<mtd>${wrap(c)||"<mrow></mrow>"}</mtd>`).join("")}</mtr>`).join("");
+      return `<mrow class="bmat"><mtable class="bm" columnspacing="0.8em" rowspacing="0.3em">${body}</mtable></mrow>`;
+    }
+    function atom(){
+      const k=t[p++]; if(!k) return "";
+      if(k.k==="num") return `<mn>${k.v}</mn>`;
+      if(k.k==="ch"){
+        const c=k.v;
+        if(/[A-Za-z]/.test(c)) return `<mi>${c}</mi>`;
+        if(c==="'") return `<mo class="pr" lspace="0" rspace="0">′</mo>`;
+        if(c==="-") return `<mo>−</mo>`;
+        if(c==="*") return `<mo lspace="0" rspace="0">*</mo>`;
+        if(c==="{"){ const r=seq(["}"]); p++; return wrap(r); }
+        if("([".includes(c)) return `<mo stretchy="false">${c}</mo>`;
+        if(")]".includes(c)) return `<mo stretchy="false">${c}</mo>`;
+        if(c==="|") return `<mo stretchy="false">|</mo>`;
+        if(c==="~") return `<mspace width="0.3em"></mspace>`;
+        return `<mo>${esc(c)}</mo>`;
+      }
+      // command
+      const v=k.v;
+      if(v==="frac"){ const a=group(), b=group(); return `<mfrac>${a}${b}</mfrac>`; }
+      if(v==="dfrac"){ const a=group(), b=group(); return `<mstyle displaystyle="true"><mfrac>${a}${b}</mfrac></mstyle>`; }
+      if(v==="sqrt"){ return `<msqrt>${group()}</msqrt>`; }
+      if(v==="mat"){ return matrix(); }
+      if(v==="text"){ return `<mtext>${esc(rawGroup())}</mtext>`; }
+      if(v==="op"){ return `<mi mathvariant="normal" class="op">${esc(rawGroup())}</mi><mo lspace="0" rspace="0.1em">⁡</mo>`; }
+      if(v==="mathcal"){ return `<mi class="cal">${esc(rawGroup())}</mi>`; }
+      if(v==="mathbf"){ return `<mi mathvariant="bold">${esc(rawGroup())}</mi>`; }
+      if(v==="norm"){ return `<mrow><mo stretchy="false">‖</mo>${group()}<mo stretchy="false">‖</mo></mrow>`; }
+      if(v==="abs"){ return `<mrow><mo stretchy="false">|</mo>${group()}<mo stretchy="false">|</mo></mrow>`; }
+      if(v==="hl"||v==="blu"||v==="red"||v==="grn"||v==="acc"){ return `<mrow class="m-${v}">${group()}</mrow>`; }
+      if(v==="underbrace"){ const a=group(); let lab=""; if(peek()&&peek().k==="ch"&&peek().v==="_"){ p++; lab=group(); } return `<munder><munder accentunder="true">${a}<mo stretchy="true">⏟</mo></munder>${lab?`<mstyle scriptlevel="1">${lab}</mstyle>`:"<mrow></mrow>"}</munder>`; }
+      if(v==="argmin"||v==="argmax"||v==="min"||v==="max"){ return {lim:true, html:`<mo movablelimits="false" form="prefix">${v}</mo>`}; }
+      if(v==="sum"){ return {lim:true, html:`<mo largeop="true" movablelimits="false">∑</mo>`}; }
+      if(v==="textstyle"){ return ""; }
+      if(v==="left"||v==="right"||v==="big"||v==="Big"){ const n=t[p++]; const ch=n?(n.k==="cmd"?(OPS[n.v]||n.v):n.v):""; if(ch==="."||!ch) return ""; return `<mo stretchy="true">${esc(ch)}</mo>`; }
+      if(v===",") return `<mspace width="0.17em"></mspace>`;
+      if(v===";") return `<mspace width="0.28em"></mspace>`;
+      if(v===" ") return `<mspace width="0.25em"></mspace>`;
+      if(v==="quad") return `<mspace width="1em"></mspace>`;
+      if(v==="qquad") return `<mspace width="2em"></mspace>`;
+      if(v==="\\") return "";
+      if(SYM[v]) return /[A-Z]/.test(v[0])&&"RCN".includes(v)?`<mi mathvariant="normal">${SYM[v]}</mi>`:(/[A-Z]/.test(v[0])?`<mi mathvariant="normal">${SYM[v]}</mi>`:`<mi>${SYM[v]}</mi>`);
+      if(OPS[v]){
+        const o=OPS[v];
+        if(v==="langle"||v==="rangle") return `<mo stretchy="false">${o}</mo>`;
+        if(v==="|") return `<mo stretchy="false">‖</mo>`;
+        if(v==="dagger"||v==="prime") return `<mo lspace="0" rspace="0">${o}</mo>`;
+        if(v==="{"||v==="}") return `<mo stretchy="false">${o}</mo>`;
+        return `<mo>${o}</mo>`;
+      }
+      return `<mi>${esc(v)}</mi>`;
+    }
+    function item(){
+      let base=atom();
+      let lim=false;
+      if(base&&typeof base==="object"){ lim=true; base=base.html; }
+      let sub=null, sup=null;
+      while(peek()&&peek().k==="ch"&&(peek().v==="_"||peek().v==="^")){
+        const w=t[p++].v; const g=group();
+        if(w==="_") sub=g; else sup=g;
+      }
+      if(lim){
+        if(sub&&sup) return `<munderover>${base}${sub}${sup}</munderover>`;
+        if(sub) return `<munder>${base}${sub}</munder>`;
+        if(sup) return `<mover>${base}${sup}</mover>`;
+        return base;
+      }
+      if(sub&&sup) return `<msubsup>${base||"<mrow></mrow>"}${sub}${sup}</msubsup>`;
+      if(sub) return `<msub>${base||"<mrow></mrow>"}${sub}</msub>`;
+      if(sup) return `<msup>${base||"<mrow></mrow>"}${sup}</msup>`;
+      return base;
+    }
+    function seq(stops){
+      const out=[];
+      while(p<t.length){ const k=peek(); if(k.k==="ch"&&stops.includes(k.v)) break; out.push(item()); }
+      return out;
+    }
+    return seq([]).join("");
+  }
+
+  function tex(src, display){
+    let body;
+    try { body = parse(src); } catch(e){ body = `<mtext>${esc(src)}</mtext>`; }
+    return `<math${display?' display="block"':''}>${body}</math>`;
+  }
+
+  // Rich text: $$…$$ display, $…$ inline, **bold**, «code»
+  function rich(s){
+    if(s==null) return "";
+    s=String(s);
+    let out="", i=0;
+    while(i<s.length){
+      if(s.startsWith("$$",i)){ const j=s.indexOf("$$",i+2); if(j<0){ out+=esc(s.slice(i)); break; } out+=`<span class="mblock">${tex(s.slice(i+2,j),true)}</span>`; i=j+2; continue; }
+      if(s[i]==="$"){ const j=s.indexOf("$",i+1); if(j<0){ out+=esc(s.slice(i)); break; } out+=tex(s.slice(i+1,j),false); i=j+1; continue; }
+      let j=s.indexOf("$",i); if(j<0) j=s.length;
+      let txt=esc(s.slice(i,j));
+      txt=txt.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/«(.+?)»/g,"<code>$1</code>");
+      out+=txt; i=j;
+    }
+    return out;
+  }
+  return { tex, rich, esc };
+})();
+
+</script>
+<script id="span-app">
+/* SPAN app. Rendering + progress. Content lives in SPAN_DATA (data.js). */
+(() => {
+"use strict";
+const D = window.SPAN_DATA;
+const { tex, rich, esc } = SPANMath;
+const KEY = "span.progress.v1";
+const REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const INTERVAL = [0, 1, 2, 4, 7, 14, 30];
+const IN_FRAME = (() => { try { return window.self !== window.top; } catch (e) { return true; } })(); // Claude preview runs in a frame: no print, no downloads // days, by Leitner box
+
+/* ───────── store ───────── */
+const blank = () => ({ v: 1, stones: {}, items: {}, days: [], sheet: [], unlockAll: false, exams: [] });
+let S = blank();
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const dayStr = (d = new Date()) => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return z.toISOString().slice(0, 10); };
+const addDays = (s, n) => { const d = new Date(s + "T12:00:00"); d.setDate(d.getDate() + n); return dayStr(d); };
+function touchDay() { const t = dayStr(); if (!S.days.includes(t)) { S.days.push(t); S.days = S.days.slice(-400); } }
+
+/* ───────── content index ───────── */
+const UNITS = D.units;
+const unitById = id => UNITS.find(u => u.id === id);
+const ITEMS = {}; // key -> {key, kind, unit, ref, label, stone}
+function indexContent() {
+  for (const u of UNITS) {
+    (D.drill[u.id] || []).forEach(x => ITEMS[x.id] = { key: x.id, kind: "drill", unit: u.id, ref: x, stone: x.stone });
+    (D.julia[u.id] || []).forEach(x => ITEMS[x.id] = { key: x.id, kind: "julia", unit: u.id, ref: x, stone: x.stone });
+    (D.practice[u.id] || []).forEach(x => ITEMS[x.id] = { key: x.id, kind: "practice", unit: u.id, ref: x, stone: x.stone });
+    (D.proofs[u.id] || []).forEach(x => ["order", "why", "fill"].forEach(m => ITEMS[x.id + ":" + m] = { key: x.id + ":" + m, kind: "proof", mode: m, unit: u.id, ref: x }));
+  }
+}
+indexContent();
+const stonesOf = uid => (D.stones[uid] || []);
+const stoneById = id => { for (const u of UNITS) { const s = stonesOf(u.id).find(x => x.id === id); if (s) return s; } return null; };
+const itemLabel = it => {
+  if (it.kind === "proof") return `${it.ref.title} · ${({ order: "order the steps", why: "justify", fill: "missing line" })[it.mode]}`;
+  if (it.kind === "practice") return it.ref.title;
+  const st = stoneById(it.stone); return (st ? st.title : "") + (it.kind === "julia" ? " · Julia" : "");
+};
+const topicOf = it => it.kind === "proof" ? "Proofs" : (stoneById(it.stone) || { title: "General" }).title;
+
+/* ───────── spaced repetition ───────── */
+const rec = k => S.items[k] || (S.items[k] = { n: 0, ok: 0, miss: 0, box: 0, due: null, streak: 0, trouble: false, tStreak: 0 });
+function record(k, correct) {
+  const r = rec(k), t = dayStr();
+  r.n++; touchDay();
+  if (correct) {
+    r.ok++; r.streak++; r.box = Math.min(r.box + 1, INTERVAL.length - 1);
+    if (r.trouble) { r.tStreak++; if (r.tStreak >= 3) { r.trouble = false; r.tStreak = 0; r.box = Math.max(r.box, 3); } }
+    r.due = addDays(t, r.trouble ? [1, 2, 4][Math.min(r.tStreak, 2)] : INTERVAL[r.box]);
+  } else {
+    r.miss++; r.streak = 0; r.box = 0; r.due = addDays(t, 1);
+    if (r.miss >= 2) { if (!r.trouble) r.tStreak = 0; r.trouble = true; r.tStreak = 0; }
+  }
+  save();
+}
+const isMastered = k => { const r = S.items[k]; return !!r && r.box >= 2 && !r.trouble; };
+function unitKeys(uid) { return Object.values(ITEMS).filter(i => i.unit === uid).map(i => i.key); }
+function mastery(uid) {
+  const st = stonesOf(uid); const keys = unitKeys(uid);
+  const total = st.length + keys.length; if (!total) return 0;
+  const done = st.filter(s => S.stones[s.id] && S.stones[s.id].solid).length + keys.filter(isMastered).length;
+  return done / total;
+}
+const troubleKeys = () => Object.keys(S.items).filter(k => S.items[k].trouble && ITEMS[k]);
+function reviewQueue(limit = 12) {
+  const t = dayStr();
+  const due = Object.keys(S.items).filter(k => ITEMS[k] && S.items[k].due && S.items[k].due <= t);
+  const trouble = due.filter(k => S.items[k].trouble);
+  const rest = due.filter(k => !S.items[k].trouble).sort((a, b) => S.items[a].box - S.items[b].box);
+  const fresh = Object.values(ITEMS).filter(i => !S.items[i.key] && (i.kind === "proof" ? i.mode === "fill" : true) && (!i.stone || (S.stones[i.stone] && S.stones[i.stone].solid))).map(i => i.key);
+  const q = [...new Set([...trouble, ...rest, ...fresh])];
+  return q.slice(0, limit);
+}
+function streakDays() {
+  const set = new Set(S.days); let n = 0; let d = dayStr();
+  if (!set.has(d)) d = addDays(d, -1);
+  while (set.has(d)) { n++; d = addDays(d, -1); }
+  return n;
+}
+function stoneUnlocked(uid, idx) {
+  if (S.unlockAll || idx === 0) return true;
+  const prev = stonesOf(uid)[idx - 1]; return !!(S.stones[prev.id] && S.stones[prev.id].solid);
+}
+
+/* ───────── tiny helpers ───────── */
+const $ = (sel, el = document) => el.querySelector(sel);
+const app = document.getElementById("app");
+function shuffle(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2200); }
+function countUp(el, to, suffix = "") {
+  if (!el) return; if (REDUCED) { el.textContent = to + suffix; return; }
+  const t0 = performance.now(), dur = 650;
+  const step = now => { const p = Math.min(1, (now - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))) + suffix; if (p < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function ring(pct, color, size = 66) {
+  const r = 28, c = 2 * Math.PI * r;
+  return `<svg class="ring" viewBox="0 0 66 66" width="${size}" height="${size}" aria-hidden="true"><circle class="track" cx="33" cy="33" r="${r}"/><circle class="val" cx="33" cy="33" r="${r}" stroke="${color}" stroke-dasharray="${c}" stroke-dashoffset="${c}" data-off="${c * (1 - pct)}"/><text x="33" y="34">${Math.round(pct * 100)}</text></svg>`;
+}
+function animateRings(root) { requestAnimationFrame(() => requestAnimationFrame(() => root.querySelectorAll(".ring .val").forEach(c => c.style.strokeDashoffset = c.dataset.off))); }
+function setUnitColor(uid) { const u = unitById(uid) || UNITS[0]; document.documentElement.style.setProperty("--unit", u.hue); }
+const ICON = {
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v9h14v-9"/></svg>`,
+  learn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="2.5"/><circle cx="12" cy="11" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M7.8 15.2 10.2 12.8M13.8 9.2l2.4-2.4"/></svg>`,
+  practice: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>`,
+  vault: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>`,
+  more: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>`
+};
+
+/* ───────── router ───────── */
+let nav = { tab: "home", view: "home", p: {} };
+let cleanup = [];
+let keyHandler = null;
+function go(view, p = {}, tab) {
+  nav = { tab: tab || TAB_OF[view] || nav.tab, view, p };
+  try { if (location.hash.slice(1) !== nav.tab) history.replaceState(null, "", "#" + nav.tab); } catch (e) {}
+  render();
+}
+const TAB_OF = { home: "home", learn: "learn", unit: "learn", stone: "learn", practice: "practice", session: "practice", proofs: "practice", proof: "practice", exam: "practice", playground: "practice", vault: "vault", more: "more", trouble: "more", sheet: "more", extras: "more", backup: "more", install: "more", sources: "more" };
+function render() {
+  cleanup.forEach(f => f()); cleanup = []; keyHandler = null;
+  const v = VIEWS[nav.view] || VIEWS.home;
+  setUnitColor(nav.p.unit || "u1");
+  app.innerHTML = `<main class="page view-enter" id="main">${v.html(nav.p)}</main>`;
+  if (v.mount) v.mount(app, nav.p);
+  renderTabs();
+  window.scrollTo(0, 0);
+}
+function renderTabs() {
+  const tabs = [["home", "Today"], ["learn", "Learn"], ["practice", "Practice"], ["vault", "Vault"], ["more", "More"]];
+  const tc = troubleKeys().length;
+  document.getElementById("tabs").innerHTML = `<nav aria-label="Sections">${tabs.map(([id, l]) => `<button class="tab" data-tab="${id}" ${nav.tab === id ? 'aria-current="page"' : ""}>${ICON[id]}<span>${l}</span>${id === "more" && tc ? `<span class="dot">${tc}</span>` : ""}</button>`).join("")}</nav>`;
+}
+document.getElementById("tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) go(b.dataset.tab, {}, b.dataset.tab); });
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-go]"); if (!a) return;
+  e.preventDefault(); const p = a.dataset.p ? JSON.parse(a.dataset.p) : {}; go(a.dataset.go, p);
+});
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input, textarea, select")) return;
+  if (keyHandler) keyHandler(e);
+});
+const goAttr = (view, p) => `data-go="${view}"${p ? ` data-p='${JSON.stringify(p).replace(/'/g, "&#39;")}'` : ""}`;
+const back = (view, p) => `<button class="back" aria-label="Back" ${goAttr(view, p)}>‹</button>`;
+
+/* ───────── countdown ───────── */
+function nextEvent() {
+  const now = new Date(); const [hh, mm] = D.course.classTime.split(":").map(Number);
+  for (const ev of D.course.events) {
+    const t = new Date(ev.date + "T00:00:00"); t.setHours(hh, mm, 0, 0);
+    if (t.getTime() + 80 * 60000 > now.getTime()) return { ...ev, t };
+  }
+  return null;
+}
+function countdownParts(ev) {
+  const ms = ev.t - new Date();
+  if (ms <= 0) return { big: "Now", unit: "", when: "happening now" };
+  const days = Math.floor(ms / 864e5), hrs = Math.floor(ms / 36e5), mins = Math.floor(ms / 6e4) % 60;
+  const sameDay = dayStr(ev.t) === dayStr();
+  const when = sameDay ? `today at ${D.course.classTime}` : ev.t.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" }) + ` · ${D.course.classTime}`;
+  if (hrs < 24) return { big: hrs ? `${hrs}h ${mins}m` : `${mins}m`, unit: "", when };
+  return { big: String(days), unit: days === 1 ? "day" : "days", when };
+}
+
+/* ═════════ VIEWS ═════════ */
+const VIEWS = {};
+
+/* ── Today ── */
+VIEWS.home = {
+  html() {
+    const q = reviewQueue(); const tc = troubleKeys().length; const st = streakDays();
+    const ev = nextEvent(); const cd = ev ? countdownParts(ev) : null;
+    const hr = new Date().getHours(); const greet = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
+    const nextStone = firstOpenStone();
+    const solidCount = Object.values(S.stones).filter(s => s.solid).length;
+    const streakLine = st === 0 ? "Fresh start today. One stone counts." : st === 1 ? "Day 1 of a new run. Nice." : `${st}-day run. Keep it gentle and steady.`;
+    return `
+    <header class="hello"><div class="eyebrow">${esc(D.course.code)} · ${esc(D.course.title)}</div><h1>${greet}, Brian.</h1></header>
+    ${ev ? `<section class="bubble tint count" aria-label="Next quiz or exam"><div class="big" id="cdBig">${esc(cd.big)}${cd.unit ? `<small>${cd.unit}</small>` : ""}</div><div><h3>${esc(ev.label)}</h3><p class="small">${esc(cd.when)}</p>${ev.label.startsWith("HW") ? `<p class="small">Drawn from the homework and class.</p>` : ""}</div></section>` : ""}
+    <section class="bubble queue">
+      <div class="row"><div><div class="eyebrow">Today's review</div><div class="big" id="qN">${q.length}</div><p class="small">${q.length ? `about ${Math.max(2, Math.round(q.length * 1.2))} minutes` : "Nothing due. Lay the next stone."}</p></div><div class="spacer"></div>
+      ${q.length ? `<button class="btn primary" data-act="review">Start review</button>` : nextStone ? `<button class="btn primary" ${goAttr("stone", { unit: nextStone.unit, i: nextStone.i })}>Next stone</button>` : ""}</div>
+      ${nextStone ? `<button class="li next" ${goAttr("stone", { unit: nextStone.unit, i: nextStone.i })}><span class="num">${nextStone.i + 1}</span><span><span class="t">${esc(nextStone.s.title)}</span><br><span class="d">Next stone · ${esc(nextStone.s.nick)}</span></span><span class="go">›</span></button>` : ""}
+    </section>
+    <section class="statrow">
+      <button class="stat" ${goAttr("trouble")}><b id="tN">${tc}</b><span>Trouble Spots</span></button>
+      <button class="stat" ${goAttr("learn")}><b id="sN">${solidCount}</b><span>Stones solid</span></button>
+      <div class="stat" role="group" aria-label="Study run"><b id="dN">${st}</b><span>Day run</span></div>
+    </section>
+    <p class="small" style="text-align:center">${esc(streakLine)}</p>
+    <section class="bubble soft"><h2>Mastery by unit</h2><div class="rings">${UNITS.map(u => `<button class="ringcard ${u.status !== "ready" ? "locked" : ""}" ${goAttr("unit", { unit: u.id })}>${ring(mastery(u.id), u.hue, u.status === "ready" ? 66 : 46)}<span class="rn">${u.n}. ${esc(u.short || u.title)}</span></button>`).join("")}</div></section>`;
+  },
+  mount(root) {
+    animateRings(root);
+    countUp($("#qN"), reviewQueue().length); countUp($("#tN"), troubleKeys().length); countUp($("#dN"), streakDays());
+    countUp($("#sN"), Object.values(S.stones).filter(s => s.solid).length);
+    const b = root.querySelector('[data-act="review"]'); if (b) b.onclick = () => startSession({ keys: reviewQueue(), title: "Today's review", back: ["home"] });
+    const ev = nextEvent(); if (ev) { const id = setInterval(() => { const c = countdownParts(ev); const el = $("#cdBig"); if (el) el.innerHTML = esc(c.big) + (c.unit ? `<small>${c.unit}</small>` : ""); }, 30000); cleanup.push(() => clearInterval(id)); }
+    keyHandler = e => { if (e.key === " " || e.key === "Enter") { const b = root.querySelector(".btn.primary"); if (b) { e.preventDefault(); b.click(); } } };
+  }
+};
+function firstOpenStone() {
+  for (const u of UNITS) { const st = stonesOf(u.id); for (let i = 0; i < st.length; i++) if (!(S.stones[st[i].id] && S.stones[st[i].id].solid)) return { unit: u.id, i, s: st[i] }; }
+  return null;
+}
+
+/* ── Learn: unit list ── */
+VIEWS.learn = {
+  html() {
+    return `<div class="topbar"><h1>Learn</h1></div><p class="sub">Stones in course order. Each one is built from the one before it.</p>
+    <div class="list">${UNITS.map(u => {
+      const ready = u.status === "ready"; const st = stonesOf(u.id); const solid = st.filter(s => S.stones[s.id] && S.stones[s.id].solid).length;
+      return `<button class="li ${ready ? "" : "locked"}" style="--unit:${u.hue}" ${ready ? goAttr("unit", { unit: u.id }) : goAttr("unit", { unit: u.id })}><span class="num" style="background:color-mix(in srgb,${u.hue} 22%,transparent);color:${u.hue}">${u.n}</span><span><span class="t">${esc(u.title)}</span><br><span class="d">${ready ? `${solid} of ${st.length} stones solid · ${esc(u.lectures.join(", "))}` : `Coming next · ${esc(u.lectures.join(", "))}`}</span></span><span class="go">›</span></button>`;
+    }).join("")}
+    <button class="li" ${goAttr("extras")}><span class="num">+</span><span><span class="t">Extras shelf</span><br><span class="d">Guest lectures · never in drills or exams</span></span><span class="go">›</span></button></div>`;
+  }
+};
+
+/* ── Unit page ── */
+VIEWS.unit = {
+  html(p) {
+    const u = unitById(p.unit);
+    if (u.status !== "ready") return `<div class="topbar">${back("learn")}<h1>Unit ${u.n}</h1></div>
+      <section class="bubble"><div class="eyebrow">${esc(u.lectures.join(" · "))}</div><h2>${esc(u.title)}</h2><p class="lead">This unit is mapped but not built yet. It arrives in the next batch.</p>
+      <dl class="vmeta"><dt>Sources</dt><dd>${esc(u.sources)}</dd><dt>Homework</dt><dd>${esc(u.hw)}</dd></dl></section>`;
+    const st = stonesOf(u.id);
+    const pct = mastery(u.id);
+    return `<div class="topbar">${back("learn")}<div><div class="eyebrow">Unit ${u.n} · ${esc(u.lectures.join(", "))}</div><h1>${esc(u.title)}</h1></div></div>
+    <section class="bubble tint row" style="flex-wrap:nowrap">${ring(pct, u.hue, 74)}<div style="min-width:0"><p class="lead">${rich(u.blurb)}</p><p class="small">${esc(u.sources)}</p></div></section>
+    <div class="grid2">
+      <button class="btn" ${goAttr("practice", { unit: u.id })}>Practice this unit</button>
+      <button class="btn ghost" ${goAttr("playground", { unit: u.id })}>Playground</button>
+    </div>
+    <div class="list">${st.map((s, i) => {
+      const solid = S.stones[s.id] && S.stones[s.id].solid; const open = stoneUnlocked(u.id, i);
+      const cls = solid ? "done" : open ? "next" : "locked";
+      return `<button class="li ${cls}" ${open ? goAttr("stone", { unit: u.id, i }) : "disabled"}><span class="num">${solid ? "✓" : i + 1}</span><span><span class="t">${esc(s.title)}</span><br><span class="d">${esc(s.nick)}${s.star ? " · 607" : ""}</span></span><span class="go">${open ? "›" : "·"}</span></button>`;
+    }).join("")}</div>`;
+  },
+  mount(root) { animateRings(root); }
+};
+
+/* ── Stone ── */
+VIEWS.stone = {
+  html(p) {
+    const u = unitById(p.unit), st = stonesOf(p.unit), s = st[p.i];
+    const dots = st.map((x, i) => `<i class="${i === p.i ? "on" : S.stones[x.id] && S.stones[x.id].solid ? "seen" : ""}"></i>`).join("");
+    const solid = S.stones[s.id] && S.stones[s.id].solid;
+    return `<div class="topbar">${back("unit", { unit: p.unit })}<div style="min-width:0"><div class="eyebrow">Stone ${p.i + 1} of ${st.length}</div><div class="dots" aria-hidden="true">${dots}</div></div></div>
+    <article class="stone-track ${p.dir === "l" ? "stone-in-l" : "stone-in-r"}" id="track">
+      <section class="bubble">
+        <span class="nick">${esc(s.nick)}</span>
+        <h2>${esc(s.title)} ${s.star ? `<span class="chip star">607</span>` : ""}</h2>
+        <p class="lead">${rich(s.intuition)}</p>
+        ${s.weird ? `<div class="weird">${rich(s.weird)}</div>` : ""}
+      </section>
+      ${s.visual ? `<section class="bubble soft"><div class="eyebrow">See it</div><div data-widget="${s.visual}"></div></section>` : ""}
+      <section class="bubble soft"><div class="eyebrow">The math</div><div class="mathbox">${rich(s.math)}</div>${s.mathNote ? `<p class="mathnote">${rich(s.mathNote)}</p>` : ""}</section>
+      <section class="bubble soft"><div class="eyebrow">Tiny example</div><p class="qtext">${rich(s.example.q)}</p><div class="reveal-steps" id="steps"></div><button class="btn small ghost" id="stepBtn">Show step 1</button></section>
+      <section class="bubble"><div class="eyebrow">Check</div><div id="check"></div></section>
+      <section class="solid" id="solid" ${solid ? "" : "hidden"}>
+        <h3>Does this feel solid?</h3>
+        <div class="grid2"><button class="btn primary" id="yesSolid">Yes, next stone →</button><button class="btn ghost" id="notYet">Not yet</button></div>
+        <p class="small" id="notYetMsg" hidden>No rush. Walk the example again or play with the picture. This stone will wait for you.</p>
+      </section>
+      <p class="src">Source: ${esc(s.src)}</p>
+      <div class="navrow noprint">${p.i > 0 ? `<button class="btn small ghost" id="prevS">‹ Back</button>` : "<span></span>"}<span></span>${p.i < st.length - 1 && stoneUnlocked(p.unit, p.i + 1) ? `<button class="btn small ghost" id="nextS">Next ›</button>` : "<span></span>"}</div>
+    </article>`;
+  },
+  mount(root, p) {
+    const st = stonesOf(p.unit), s = st[p.i];
+    mountWidgets(root);
+    // example steps
+    let k = 0; const stepsEl = $("#steps"), btn = $("#stepBtn");
+    const showStep = () => {
+      if (k < s.example.steps.length) { stepsEl.insertAdjacentHTML("beforeend", `<div class="stepline">${rich(s.example.steps[k])}</div>`); k++; btn.textContent = k < s.example.steps.length ? `Show step ${k + 1}` : "Show answer"; }
+      else if (k === s.example.steps.length) { stepsEl.insertAdjacentHTML("beforeend", `<div class="answer"><b>Answer</b>${rich(s.example.answer)}</div>`); k++; btn.hidden = true; }
+    };
+    btn.onclick = showStep;
+    // check question
+    const solidEl = $("#solid");
+    const q = mcq($("#check"), { q: s.check.q, opts: s.check.opts, a: s.check.a, why: s.check.why }, ok => { solidEl.hidden = false; solidEl.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "nearest" }); });
+    const goStone = (i, dir) => go("stone", { unit: p.unit, i, dir });
+    $("#yesSolid").onclick = () => { S.stones[s.id] = { solid: true, t: Date.now() }; touchDay(); save(); if (p.i < st.length - 1) goStone(p.i + 1, "r"); else { toast("Unit stones complete. Time to drill."); go("practice", { unit: p.unit }); } };
+    $("#notYet").onclick = () => { $("#notYetMsg").hidden = false; };
+    const prev = $("#prevS"), next = $("#nextS");
+    if (prev) prev.onclick = () => goStone(p.i - 1, "l");
+    if (next) next.onclick = () => goStone(p.i + 1, "r");
+    // swipe
+    const track = $("#track"); let x0 = null, y0 = null;
+    const ps = e => { if (e.target.closest("svg, input, .widget")) return; x0 = e.clientX; y0 = e.clientY; };
+    const pe = e => { if (x0 == null) return; const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6) { if (dx < 0 && next) next.click(); if (dx > 0 && prev) prev.click(); } };
+    track.addEventListener("pointerdown", ps); track.addEventListener("pointerup", pe);
+    keyHandler = e => {
+      if (e.key === "ArrowRight" && next) next.click();
+      else if (e.key === "ArrowLeft" && prev) prev.click();
+      else if (e.key === " " && !btn.hidden) { e.preventDefault(); showStep(); }
+      else if (/^[1-4]$/.test(e.key)) q.pick(+e.key - 1);
+      else if (e.key === "Enter" && !solidEl.hidden) $("#yesSolid").click();
+    };
+  }
+};
+
+/* ── MCQ component ── */
+function mcq(el, item, onDone, opts = {}) {
+  const isTF = item.type === "tf";
+  const options = isTF ? ["True", "False"] : item.opts;
+  const answer = isTF ? (item.a ? 0 : 1) : item.a;
+  const order = isTF ? [0, 1] : shuffle(options.map((_, i) => i));
+  const codeCls = item.codeOpts ? "code" : "";
+  el.innerHTML = `<div class="q">${item.code ? `<pre class="jl">${hlJulia(item.code)}</pre>` : ""}<p class="qtext">${rich(item.q)}</p>
+    <div class="opts">${order.map((oi, j) => `<button class="opt ${codeCls}" data-j="${j}"><span class="k">${j + 1}</span><span class="ot">${item.codeOpts ? esc(options[oi]) : rich(options[oi])}</span></button>`).join("")}</div><div class="fb"></div></div>`;
+  let done = false;
+  const pick = j => {
+    if (done || j >= order.length) return; done = true;
+    const chosen = order[j], ok = chosen === answer;
+    el.querySelectorAll(".opt").forEach((b, jj) => { b.disabled = true; const oi = order[jj]; if (oi === answer) b.classList.add("right"); else if (jj === j) b.classList.add("wrong"); else b.classList.add("dim"); });
+    if (!opts.silent) el.querySelector(".fb").innerHTML = `<div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? pickCheer() : "Not quite."}</b><span>${rich(item.why || "")}</span></div>`;
+    if (ok && !opts.silent) { const r = el.querySelector(".opt.right"); r.classList.add("burst"); }
+    onDone && onDone(ok, chosen, options);
+  };
+  el.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(+b.dataset.j));
+  return { pick, get done() { return done; } };
+}
+const CHEERS = ["That's it.", "Solid.", "Yes, exactly.", "Nailed it.", "Right on.", "Clean."];
+const pickCheer = () => CHEERS[Math.floor(Math.random() * CHEERS.length)];
+function hlJulia(code) {
+  return esc(code).split("\n").map(line => {
+    const ci = line.indexOf("#"); let body = ci >= 0 ? line.slice(0, ci) : line, cm = ci >= 0 ? line.slice(ci) : "";
+    body = body.replace(/\b(using|function|end|for|in|return|im)\b/g, '<span class="kw">$1</span>').replace(/(?<![A-Za-z_])(\d+(?:\.\d+)?)/g, '<span class="nu">$1</span>');
+    return body + (cm ? `<span class="cm">${cm}</span>` : "");
+  }).join("\n");
+}
+
+/* ── Practice hub ── */
+VIEWS.practice = {
+  html(p) {
+    const uid = p.unit || "u1"; const u = unitById(uid);
+    const ready = UNITS.filter(x => x.status === "ready");
+    const nd = (D.drill[uid] || []).length, np = (D.practice[uid] || []).length, npr = (D.proofs[uid] || []).length, nj = (D.julia[uid] || []).length;
+    const card = (title, sub, act, chips = "") => `<button class="li" data-act="${act}"><span class="num">${title[0]}</span><span><span class="t">${esc(title)} ${chips}</span><br><span class="d">${sub}</span></span><span class="go">›</span></button>`;
+    return `<div class="topbar"><h1>Practice</h1></div>
+    <div class="row">${ready.map(x => `<button class="chip ${x.id === uid ? "unit" : ""}" ${goAttr("practice", { unit: x.id })} style="min-height:40px">Unit ${x.n}</button>`).join("")}<span class="small">More units arrive in batches.</span></div>
+    <section class="bubble tint"><div class="eyebrow">Unit ${u.n}</div><h2>${esc(u.title)}</h2></section>
+    <div class="list">
+      ${card("Drill", `${nd} quick questions · multiple choice, true/false, first move`, "drill")}
+      ${card("Practice", `${np} HW-style problems · hints unlock one step at a time`, "practice")}
+      ${card("Prove It", `${npr} proofs · order the steps, justify, fill the gap`, "proofs", `<span class="chip star">607</span>`)}
+      ${card("Julia Lab", `${nj} snippets · predict, pick, find the bug`, "julia", `<span class="chip sup">Supplemental</span>`)}
+      ${card("Exam mode", "Timed and mixed, graded by topic", "exam")}
+      ${card("Playground", "Every interactive picture for this unit", "play")}
+    </div>
+    <p class="small">Julia Lab is labeled Supplemental for Unit 1: no course notebook for these lectures is in the project yet, so snippets follow his board notation and HW1. Each output was checked against an equivalent NumPy run, not in Julia itself.</p>`;
+  },
+  mount(root, p) {
+    const uid = p.unit || "u1";
+    const act = { drill: () => startSession({ keys: pickDrill(uid), title: "Drill", back: ["practice", { unit: uid }] }),
+      practice: () => startSession({ keys: (D.practice[uid] || []).map(x => x.id), title: "Practice", back: ["practice", { unit: uid }] }),
+      proofs: () => go("proofs", { unit: uid }),
+      julia: () => startSession({ keys: shuffle((D.julia[uid] || []).map(x => x.id)), title: "Julia Lab", back: ["practice", { unit: uid }] }),
+      exam: () => go("exam", { unit: uid }), play: () => go("playground", { unit: uid }) };
+    root.querySelectorAll("[data-act]").forEach(b => b.onclick = act[b.dataset.act]);
+  }
+};
+function pickDrill(uid, n = 10) {
+  const all = (D.drill[uid] || []).map(x => x.id);
+  const score = k => { const r = S.items[k]; if (!r) return 0; return r.trouble ? -1 : r.box + 1; };
+  return shuffle(all).sort((a, b) => score(a) - score(b)).slice(0, n);
+}
+
+/* ── Session runner (drill / julia / practice / proof / review) ── */
+let SESSION = null;
+function startSession(cfg) { SESSION = { ...cfg, i: 0, results: [] }; if (!cfg.keys.length) { toast("Nothing here yet."); return; } go("session", { unit: (ITEMS[cfg.keys[0]] || {}).unit }); }
+VIEWS.session = {
+  html() {
+    const s = SESSION; if (!s) return `<p>No session.</p>`;
+    if (s.i >= s.keys.length) return sessionSummary(s);
+    const it = ITEMS[s.keys[s.i]];
+    const kindChip = { drill: "Drill", julia: "Julia Lab", practice: "Practice", proof: "Prove It" }[it.kind];
+    return `<div class="topbar">${back(...s.back)}<div style="flex:1;min-width:0"><div class="eyebrow">${esc(s.title)} · ${s.i + 1} of ${s.keys.length}</div><div class="progress"><i style="width:${(s.i / s.keys.length) * 100}%"></i></div></div></div>
+    <section class="bubble" id="card"><div class="row"><span class="chip unit">${kindChip}</span>${it.kind === "julia" ? `<span class="chip sup">Supplemental</span>` : ""}${(it.ref.star) ? `<span class="chip star">607</span>` : ""}${S.items[it.key] && S.items[it.key].trouble ? `<span class="chip no">Trouble Spot</span>` : ""}<span class="small">${esc(itemLabel(it))}</span></div><div id="body"></div></section>
+    <div id="nextWrap" hidden><button class="btn primary block" id="nextBtn">${s.i === s.keys.length - 1 ? "See results" : "Next"}</button></div>`;
+  },
+  mount(root) {
+    const s = SESSION; if (!s) return; if (s.i >= s.keys.length) { const r = root; animateRings(r); const sc = $("#scoreN"); if (sc) countUp(sc, s.results.filter(x => x.ok).length); keyHandler = e => { if (e.key === "Enter") { const b = root.querySelector(".btn.primary"); b && b.click(); } }; bindSummary(root); return; }
+    const it = ITEMS[s.keys[s.i]];
+    const body = $("#body"), nextWrap = $("#nextWrap");
+    const finish = ok => { record(it.key, ok); s.results.push({ key: it.key, ok }); nextWrap.hidden = false; $("#nextBtn").focus({ preventScroll: true }); };
+    $("#nextBtn").onclick = () => { s.i++; render(); };
+    let handle = null;
+    if (it.kind === "drill" || it.kind === "julia") handle = mcq(body, it.ref, ok => finish(ok));
+    else if (it.kind === "practice") practiceCard(body, it.ref, ok => finish(ok));
+    else if (it.kind === "proof") proofCard(body, it.ref, it.mode, ok => finish(ok));
+    keyHandler = e => {
+      if (/^[1-4]$/.test(e.key) && handle) handle.pick(+e.key - 1);
+      else if ((e.key === "Enter" || e.key === "ArrowRight") && !nextWrap.hidden) { e.preventDefault(); $("#nextBtn").click(); }
+      else if (e.key === " ") { const b = body.querySelector("[data-space]:not([hidden])"); if (b) { e.preventDefault(); b.click(); } }
+    };
+  }
+};
+function sessionSummary(s) {
+  const n = s.results.length, ok = s.results.filter(r => r.ok).length;
+  const missed = s.results.filter(r => !r.ok);
+  return `<div class="topbar">${back(...s.back)}<h1>${esc(s.title)} done</h1></div>
+  <section class="bubble tint" style="text-align:center"><div class="score"><span id="scoreN">0</span><span style="font-size:28px;color:var(--soft)"> / ${n}</span></div><p class="lead">${ok === n ? "Every one. That's a solid stone wall." : ok >= n * 0.7 ? "Strong round. The misses are now on your radar." : "Good reps. Misses come back tomorrow, smaller and friendlier."}</p></section>
+  ${missed.length ? `<section class="bubble soft"><h3>Coming back for another look</h3><div class="list">${missed.map(r => `<div class="li" style="cursor:default"><span class="num">!</span><span><span class="t">${esc(itemLabel(ITEMS[r.key]))}</span><br><span class="d">${S.items[r.key] && S.items[r.key].trouble ? "Now a Trouble Spot · needs 3 right in a row" : "Due again tomorrow"}</span></span><span></span></div>`).join("")}</div></section>` : ""}
+  <div class="grid2"><button class="btn primary" data-act="again">Another round</button><button class="btn ghost" ${goAttr("home")}>Back to Today</button></div>`;
+}
+function bindSummary(root) { const b = root.querySelector('[data-act="again"]'); if (b) b.onclick = () => { const keys = shuffle(SESSION.keys); startSession({ ...SESSION, keys }); }; }
+
+/* ── practice problem card ── */
+function practiceCard(el, pr, onDone) {
+  el.innerHTML = `<div class="q"><div class="row"><span class="chip">${esc(pr.src)}</span></div><p class="qtext">${rich(pr.q)}</p><div id="hints" class="reveal-steps"></div>
+    <div class="grid2"><button class="btn ghost" id="hintBtn" data-space>Show hint 1</button><button class="btn" id="solBtn">Show worked solution</button></div>
+    <div id="sol" hidden></div><div id="grade" hidden><p class="small" style="text-align:center">Compare with your own work. Be honest, it only helps you.</p><div class="grid2"><button class="btn primary" id="gotIt">I got it</button><button class="btn ghost" id="missed">Not yet</button></div></div></div>`;
+  let h = 0; const hb = $("#hintBtn", el);
+  hb.onclick = () => { if (h < pr.hints.length) { $("#hints", el).insertAdjacentHTML("beforeend", `<div class="hint"><b>Hint ${h + 1}</b>${rich(pr.hints[h])}</div>`); h++; hb.textContent = h < pr.hints.length ? `Show hint ${h + 1}` : "No more hints"; hb.disabled = h >= pr.hints.length; } };
+  $("#solBtn", el).onclick = () => {
+    const sol = $("#sol", el); sol.hidden = false;
+    sol.innerHTML = `<div class="reveal-steps">${pr.solution.map(x => `<div class="stepline">${rich(x)}</div>`).join("")}</div>${pr.answer && pr.answer !== "see solution" ? `<div class="answer" style="margin-top:8px"><b>Answer</b>${rich(pr.answer)}</div>` : ""}`;
+    $("#solBtn", el).hidden = true; hb.hidden = true; $("#grade", el).hidden = false;
+  };
+  let done = false;
+  $("#gotIt", el).onclick = () => { if (done) return; done = true; $("#grade", el).innerHTML = `<div class="feedback ok"><b>${pickCheer()}</b><span>It moves further out in your review schedule.</span></div>`; onDone(true); };
+  $("#missed", el).onclick = () => { if (done) return; done = true; $("#grade", el).innerHTML = `<div class="feedback no"><b>That's useful to know.</b><span>It comes back tomorrow. Miss it twice and it becomes a Trouble Spot.</span></div>`; onDone(false); };
+}
+
+/* ── Prove It ── */
+VIEWS.proofs = {
+  html(p) {
+    const uid = p.unit || "u1"; const list = D.proofs[uid] || [];
+    const st = (id, m) => { const r = S.items[id + ":" + m]; return r ? (isMastered(id + ":" + m) ? "ok" : r.trouble ? "no" : "") : ""; };
+    return `<div class="topbar">${back("practice", { unit: uid })}<h1>Prove It</h1></div>
+    <p class="sub">Every proof type from the homework. Three ways to practice each one.</p>
+    <div class="list">${list.map(pf => `<button class="li" ${goAttr("proof", { unit: uid, id: pf.id, mode: "order" })}><span class="num">${pf.star ? "★" : "∴"}</span><span><span class="t">${esc(pf.title)}</span><br><span class="d">${esc(pf.src)} · ${["order", "why", "fill"].map(m => `<span class="chip ${st(pf.id, m)}" style="min-height:24px">${({ order: "Order", why: "Justify", fill: "Fill" })[m]}</span>`).join(" ")}</span></span><span class="go">›</span></button>`).join("")}</div>`;
+  }
+};
+VIEWS.proof = {
+  html(p) {
+    const pf = (D.proofs[p.unit] || []).find(x => x.id === p.id);
+    return `<div class="topbar">${back("proofs", { unit: p.unit })}<div style="min-width:0"><div class="eyebrow">${esc(pf.src)} ${pf.star ? "· 607" : ""}</div><h1 style="font-size:24px">${esc(pf.title)}</h1></div></div>
+    <div class="seg" role="group" aria-label="Proof mode">${["order", "why", "fill"].map(m => `<button aria-pressed="${p.mode === m}" ${goAttr("proof", { unit: p.unit, id: p.id, mode: m })}>${({ order: "Order", why: "Justify", fill: "Fill the gap" })[m]}</button>`).join("")}</div>
+    <section class="bubble" id="pbody"></section><div id="nextWrap" hidden class="grid2"><button class="btn primary" id="again">Try again</button><button class="btn ghost" ${goAttr("proofs", { unit: p.unit })}>All proofs</button></div>`;
+  },
+  mount(root, p) {
+    const pf = (D.proofs[p.unit] || []).find(x => x.id === p.id);
+    const h = proofCard($("#pbody"), pf, p.mode, ok => { record(pf.id + ":" + p.mode, ok); $("#nextWrap").hidden = false; });
+    $("#again").onclick = () => render();
+    keyHandler = e => { if (/^[1-4]$/.test(e.key) && h && h.pick) h.pick(+e.key - 1); };
+  }
+};
+function proofCard(el, pf, mode, onDone) {
+  const steps = pf.steps;
+  const goal = `<div class="pfgoal"><div class="eyebrow">Goal</div>${rich(pf.goal)}</div>`;
+  if (mode === "order") {
+    const order = shuffle(steps.map((_, i) => i)); let placed = 0, mistakes = 0;
+    el.innerHTML = `${goal}<p class="small">Tap the lines in the order the proof goes.</p><div class="list" id="built"></div><div class="list" id="pool">${order.map(i => `<button class="pfline" data-i="${i}"><span class="n">?</span><span class="b">${rich(steps[i].line)}</span></button>`).join("")}</div><div class="fb"></div>`;
+    el.querySelectorAll("#pool .pfline").forEach(b => b.onclick = () => {
+      const i = +b.dataset.i;
+      if (i === placed) {
+        b.remove(); $("#built", el).insertAdjacentHTML("beforeend", `<div class="pfline placed"><span class="n">${placed + 1}</span><span class="b">${rich(steps[i].line)}<span class="why">${esc(steps[i].why)}</span></span></div>`); placed++;
+        if (placed === steps.length) { const ok = mistakes === 0; el.querySelector(".fb").innerHTML = `<div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? "Flawless order." : `Built, with ${mistakes} wrong tap${mistakes > 1 ? "s" : ""}.`}</b><span>${ok ? "Each line only uses what came before it." : "Counts as a miss this time. The order is the proof's logic, so it's worth another pass."}</span></div>`; onDone(ok); }
+      } else { mistakes++; b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad"); }
+    });
+    return {};
+  }
+  if (mode === "why") {
+    let k = 0, mistakes = 0; const pool = [...new Set([...steps.map(s => s.why), ...pf.whyPool])];
+    el.innerHTML = `${goal}<p class="small">Pick the reason for each line.</p><div class="list" id="built"></div><div id="ask"></div><div class="fb"></div>`;
+    let cur = null;
+    const ask = () => {
+      if (k >= steps.length) { const ok = mistakes === 0; el.querySelector(".fb").innerHTML = `<div class="feedback ${ok ? "ok" : "no"}"><b>${ok ? "Every reason right." : `${mistakes} reason${mistakes > 1 ? "s" : ""} missed.`}</b><span>On the exam, "one reason per line" is the full-credit format.</span></div>`; $("#ask", el).innerHTML = ""; onDone(ok); return; }
+      const s = steps[k]; const distract = shuffle(pool.filter(w => w !== s.why)).slice(0, 3);
+      const opts = [s.why, ...distract];
+      $("#built", el).insertAdjacentHTML("beforeend", `<div class="pfline placed" id="ln${k}"><span class="n">${k + 1}</span><span class="b">${rich(s.line)}<span class="why">…why?</span></span></div>`);
+      cur = mcq($("#ask", el), { q: "Why does this line hold?", opts, a: 0, why: "" }, ok => { if (!ok) mistakes++; $(`#ln${k} .why`, el).textContent = s.why; k++; setTimeout(ask, ok ? 350 : 1100); }, { silent: true });
+    };
+    ask();
+    return { pick: j => cur && cur.pick(j) };
+  }
+  // fill
+  const mid = steps.length > 2 ? 1 + Math.floor(Math.random() * (steps.length - 2)) : 0;
+  el.innerHTML = `${goal}<div class="list">${steps.map((s, i) => i === mid ? `<div class="pfline blank" id="blank"><span class="n">${i + 1}</span><span class="b">Missing line</span></div>` : `<div class="pfline placed"><span class="n">${i + 1}</span><span class="b">${rich(s.line)}<span class="why">${esc(s.why)}</span></span></div>`).join("")}</div><div id="ask"></div>`;
+  const others = steps.filter((_, i) => i !== mid).map(s => s.line);
+  const opts = [steps[mid].line, ...pf.fillDistract.slice(0, 2), shuffle(others)[0]];
+  return mcq($("#ask", el), { q: "Which line fills the gap?", opts, a: 0, why: `Reason: ${steps[mid].why}.` }, ok => { $("#blank", el).outerHTML = `<div class="pfline placed"><span class="n">${mid + 1}</span><span class="b">${rich(steps[mid].line)}<span class="why">${esc(steps[mid].why)}</span></span></div>`; onDone(ok); });
+}
+
+/* ── Exam mode ── */
+let EXAM = null;
+VIEWS.exam = {
+  html(p) {
+    if (EXAM && EXAM.running) return examRun();
+    if (EXAM && EXAM.done) return examReview();
+    const lects = [...new Set(UNITS.filter(u => u.status === "ready").flatMap(u => u.lectures))];
+    return `<div class="topbar">${back("practice", { unit: p.unit || "u1" })}<h1>Exam mode</h1></div>
+    <section class="bubble"><p class="lead">Timed, mixed, no feedback until the end. Then a review graded by topic.</p>
+      <label class="small" for="exFrom">From lecture</label><select id="exFrom">${lects.map(l => `<option>${l}</option>`).join("")}</select>
+      <label class="small" for="exTo">To lecture</label><select id="exTo">${lects.map((l, i) => `<option ${i === lects.length - 1 ? "selected" : ""}>${l}</option>`).join("")}</select>
+      <label class="small" for="exN">Questions</label><select id="exN"><option>10</option><option selected>15</option><option>20</option></select>
+      <label class="small" for="exT">Time</label><select id="exT"><option value="10">10 minutes</option><option value="15" selected>15 minutes</option><option value="20">20 minutes</option></select>
+      <button class="btn primary block" id="exGo">Start exam</button>
+      <p class="small">Pulls from Drill, Julia Lab and Prove It (fill the gap). Guest lectures are never included.</p></section>`;
+  },
+  mount(root, p) {
+    if (EXAM && EXAM.running) return examMount(root);
+    if (EXAM && EXAM.done) { const b = $("#exNew"); b.onclick = () => { EXAM = null; render(); }; animateRings(root); countUp($("#exScore"), EXAM.items.filter(x => x.ok).length); return; }
+    $("#exGo").onclick = () => {
+      const lects = [...new Set(UNITS.filter(u => u.status === "ready").flatMap(u => u.lectures))];
+      const a = lects.indexOf($("#exFrom").value), b = lects.indexOf($("#exTo").value); const range = lects.slice(Math.min(a, b), Math.max(a, b) + 1);
+      const units = UNITS.filter(u => u.status === "ready" && u.lectures.some(l => range.includes(l))).map(u => u.id);
+      const pool = Object.values(ITEMS).filter(i => units.includes(i.unit) && (i.kind === "drill" || i.kind === "julia" || (i.kind === "proof" && i.mode === "fill")));
+      const n = +$("#exN").value;
+      EXAM = { running: true, keys: shuffle(pool).slice(0, n).map(i => i.key), i: 0, items: [], end: Date.now() + (+$("#exT").value) * 60000 };
+      render();
+    };
+  }
+};
+function examRun() {
+  const it = ITEMS[EXAM.keys[EXAM.i]];
+  return `<div class="topbar"><button class="back" aria-label="Quit exam" id="exQuit">×</button><div style="flex:1;min-width:0"><div class="eyebrow">Question ${EXAM.i + 1} of ${EXAM.keys.length}</div><div class="progress"><i style="width:${EXAM.i / EXAM.keys.length * 100}%"></i></div></div><div class="timer" id="exTimer">--:--</div></div>
+  <section class="bubble"><div class="row"><span class="chip">${esc(topicOf(it))}</span></div><div id="body"></div></section>
+  <p class="small" id="quitMsg" hidden>Tap × again to quit. This exam won't be saved.</p>`;
+}
+function examMount(root) {
+  const it = ITEMS[EXAM.keys[EXAM.i]]; const body = $("#body");
+  const tick = () => { const ms = Math.max(0, EXAM.end - Date.now()); const m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60; const el = $("#exTimer"); if (el) el.textContent = `${m}:${String(s).padStart(2, "0")}`; if (ms <= 0) finishExam(); };
+  tick(); const id = setInterval(tick, 500); cleanup.push(() => clearInterval(id));
+  let quitArm = false; $("#exQuit").onclick = () => { if (quitArm) { EXAM = null; go("practice", { unit: "u1" }); } else { quitArm = true; $("#quitMsg").hidden = false; } };
+  const advance = (ok, chosenText) => { EXAM.items.push({ key: it.key, ok, chosen: chosenText }); record(it.key, ok); setTimeout(() => { EXAM.i++; if (EXAM.i >= EXAM.keys.length) finishExam(); else render(); }, 250); };
+  let h;
+  if (it.kind === "proof") {
+    // fill-the-gap in exam style
+    h = proofCard(body, it.ref, "fill", ok => advance(ok, ""));
+  } else {
+    h = mcq(body, it.ref, (ok, chosen, opts) => advance(ok, it.ref.type === "tf" ? opts[chosen] : opts[chosen]), { silent: true });
+  }
+  keyHandler = e => { if (/^[1-4]$/.test(e.key) && h && h.pick) h.pick(+e.key - 1); };
+}
+function finishExam() { if (!EXAM || EXAM.done) return; EXAM.running = false; EXAM.done = true; S.exams.push({ t: Date.now(), n: EXAM.items.length, ok: EXAM.items.filter(x => x.ok).length }); save(); render(); }
+function examReview() {
+  const items = EXAM.items; const n = EXAM.keys.length; const ok = items.filter(x => x.ok).length;
+  const topics = {}; items.forEach(x => { const t = topicOf(ITEMS[x.key]); (topics[t] = topics[t] || { ok: 0, n: 0 }); topics[t].n++; if (x.ok) topics[t].ok++; });
+  const unanswered = n - items.length;
+  return `<div class="topbar"><h1>Exam review</h1></div>
+  <section class="bubble tint" style="text-align:center"><div class="score"><span id="exScore">0</span><span style="font-size:28px;color:var(--soft)"> / ${n}</span></div>${unanswered ? `<p class="small">${unanswered} left unanswered when time ran out.</p>` : ""}</section>
+  <section class="bubble soft"><h3>By topic</h3>${Object.entries(topics).sort((a, b) => a[1].ok / a[1].n - b[1].ok / b[1].n).map(([t, v]) => `<div class="topicbar"><div><div class="small" style="color:var(--fg);font-weight:700">${esc(t)}</div><div class="progress"><i style="width:${v.ok / v.n * 100}%;background:${v.ok === v.n ? "var(--ok)" : v.ok ? "var(--warn)" : "var(--no)"}"></i></div></div><b style="text-align:right">${v.ok}/${v.n}</b></div>`).join("")}</section>
+  <section class="bubble soft"><h3>Every question</h3><div class="list">${items.map((x, i) => { const it = ITEMS[x.key]; const r = it.ref; const isP = it.kind === "proof";
+    const correctTxt = isP ? r.steps.map(s => s.line).join(" ") : r.type === "tf" ? (r.a ? "True" : "False") : r.opts[r.a];
+    return `<div class="bubble" style="padding:16px;gap:8px"><div class="row"><span class="chip ${x.ok ? "ok" : "no"}">${x.ok ? "Right" : "Missed"}</span><span class="small">${i + 1}. ${esc(topicOf(it))}</span></div>${isP ? `<p>${esc(r.title)}</p>` : `${r.code ? `<pre class="jl">${hlJulia(r.code)}</pre>` : ""}<p>${rich(r.q)}</p>`}
+      ${!x.ok && !isP ? `<p class="small">You picked: ${r.codeOpts ? esc(x.chosen) : rich(x.chosen)}</p>` : ""}${!isP ? `<p class="small">Answer: ${r.codeOpts ? `<code>${esc(correctTxt)}</code>` : rich(correctTxt)}</p><p class="small">${rich(r.why)}</p>` : ""}</div>`; }).join("")}</div></section>
+  <button class="btn primary block" id="exNew">New exam</button>`;
+}
+
+/* ── Playground ── */
+VIEWS.playground = {
+  html(p) {
+    const uid = p.unit || "u1"; const ws = [...new Set(stonesOf(uid).map(s => s.visual).filter(Boolean)), "spotlight"].filter((v, i, a) => a.indexOf(v) === i);
+    const names = { columns: "Ax is a recipe of columns", angle: "Match score, angle and shadow", outer: "Copy machines and rank", spotlight: "Spotlights on a matrix" };
+    return `<div class="topbar">${back("practice", { unit: uid })}<h1>Playground</h1></div>${ws.map(w => `<section class="bubble soft"><h3>${names[w]}</h3><div data-widget="${w}"></div></section>`).join("")}`;
+  },
+  mount(root) { mountWidgets(root); }
+};
+
+/* ── Vault ── */
+VIEWS.vault = {
+  html(p) {
+    return `<div class="topbar"><h1>Formula Vault</h1></div>
+    <label class="search" for="vq"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="vq" type="search" placeholder="Search: transpose, spotlight, norm…" autocomplete="off" value="${esc(p.q || "")}"></label>
+    <div class="row"><span class="small">${D.vault.length} entries · tick any to put it on your cheat sheet</span><span class="spacer"></span><button class="btn small ghost" ${goAttr("sheet")}>Cheat sheet</button></div>
+    <div class="list" id="vlist"></div>`;
+  },
+  mount(root, p) {
+    const draw = () => {
+      const q = $("#vq").value.trim().toLowerCase();
+      const list = D.vault.filter(v => !q || [v.title, v.meaning, v.when, v.nick, v.src, v.tex].join(" ").toLowerCase().includes(q));
+      $("#vlist").innerHTML = list.length ? list.map(v => `<section class="bubble ventry"><div class="vh"><h3>${esc(v.title)}</h3><span class="chip unit">${esc(v.nick)}</span>${v.weird ? `<span class="chip star">Weird rule</span>` : ""}${v.star ? `<span class="chip star">607</span>` : ""}</div>
+        <div class="mathbox">${rich(v.tex)}</div><dl class="vmeta"><dt>Means</dt><dd>${rich(v.meaning)}</dd><dt>Use it</dt><dd>${rich(v.when)}</dd><dt>From</dt><dd>${esc(v.src)}</dd></dl>
+        <label class="check"><input type="checkbox" data-v="${v.id}" ${S.sheet.includes(v.id) ? "checked" : ""}> On my cheat sheet</label></section>`).join("") : `<p class="sub">No match. Try a nickname like "socks" or "spotlight".</p>`;
+      $("#vlist").querySelectorAll("[data-v]").forEach(c => c.onchange = () => { const id = c.dataset.v; S.sheet = c.checked ? [...new Set([...S.sheet, id])] : S.sheet.filter(x => x !== id); save(); });
+    };
+    $("#vq").addEventListener("input", draw); draw();
+    keyHandler = e => { if (e.key === "/") { e.preventDefault(); $("#vq").focus(); } };
+  }
+};
+
+/* ── More ── */
+VIEWS.more = {
+  html() {
+    const tc = troubleKeys().length;
+    const row = (view, t, d, n) => `<button class="li" ${goAttr(view)}><span class="num">${n}</span><span><span class="t">${t}</span><br><span class="d">${d}</span></span><span class="go">›</span></button>`;
+    return `<div class="topbar"><h1>More</h1></div><div class="list">
+      ${row("trouble", "Trouble Spots", tc ? `${tc} to clear · 3 right in a row clears one` : "None right now", tc || "0")}
+      ${row("sheet", "Cheat Sheet Builder", "One A4 page, front and back, white for printing", "A4")}
+      ${row("extras", "Extras shelf", "Guest lectures, outside drills and exams", "+")}
+      ${row("backup", "Backup and settings", "Export or import progress", "⇅")}
+      ${row("install", "Put SPAN on your iPhone", "GitHub Pages → Safari → Add to Home Screen", "↓")}
+      ${row("sources", "Sources and coverage", "What this app is built from, and the gaps", "§")}
+    </div>`;
+  }
+};
+VIEWS.trouble = {
+  html() {
+    const ks = troubleKeys();
+    return `<div class="topbar">${back("more")}<h1>Trouble Spots</h1></div>
+    <p class="sub">Anything you miss twice lands here. It comes back on a schedule until you get it right 3 times in a row.</p>
+    ${ks.length ? `<button class="btn primary block" data-act="go">Practice all ${ks.length}</button><div class="list">${ks.map(k => { const r = S.items[k]; return `<div class="li" style="cursor:default"><span class="num">${r.miss}</span><span><span class="t">${esc(itemLabel(ITEMS[k]))}</span><br><span class="d">Streak ${"●".repeat(r.tStreak)}${"○".repeat(3 - r.tStreak)} · next ${r.due || "today"}</span></span><span></span></div>`; }).join("")}</div>`
+      : `<section class="bubble soft"><h3>All clear.</h3><p>Nothing has tripped you twice. When something does, it shows up here.</p></section>`}`;
+  },
+  mount(root) { const b = root.querySelector('[data-act="go"]'); if (b) b.onclick = () => startSession({ keys: troubleKeys(), title: "Trouble Spots", back: ["trouble"] }); }
+};
+VIEWS.extras = {
+  html() {
+    return `<div class="topbar">${back("learn")}<h1>Extras shelf</h1></div><p class="sub">Guest lectures. Interesting context, not core material: they never appear in drills, practice or exams.</p>
+    ${D.extras.map(x => `<section class="bubble soft"><div class="row"><span class="chip">${esc(x.date)}</span><span class="small">${esc(x.who)}</span></div><h3>${esc(x.title)}</h3><p>${esc(x.body)}</p></section>`).join("")}`;
+  }
+};
+VIEWS.sheet = {
+  html() {
+    const ids = S.sheet.length ? S.sheet : D.vault.map(v => v.id);
+    const entries = ids.map(id => D.vault.find(v => v.id === id)).filter(Boolean);
+    const half = Math.ceil(entries.length / 2); const front = entries.slice(0, half), backS = entries.slice(half);
+    const page = (list, side) => `<div class="sheetbox"><div class="sheet"><div class="sh"><span>ELEG 607 · ${side}</span><span>A′ = conjugate transpose</span></div>${list.map(v => `<div class="si"><b>${esc(v.title)} <span class="sm">(${esc(v.nick)})</span></b>${rich(v.tex)}<div class="sm">${rich(v.when)}</div></div>`).join("")}</div></div>`;
+    return `<div class="topbar">${back("more")}<h1>Cheat Sheet</h1></div>
+    <p class="sub noprint">${S.sheet.length ? `${entries.length} entries you ticked in the Vault.` : "Showing every Vault entry. Tick entries in the Vault to choose your own."} Printed version is white A4, two sides.</p>
+    <div class="grid2 noprint">${IN_FRAME ? "" : `<button class="btn primary" id="printBtn">Print or save as PDF</button>`}<button class="btn ghost" ${goAttr("vault")}>Choose entries</button></div>
+    <p class="small noprint">${IN_FRAME ? "Printing opens from the GitHub-hosted version of SPAN. This preview shows exactly what will print." : "On iPhone, Print opens the share sheet. Pinch out on the preview to save a PDF."}</p>
+    <div class="sheetwrap">${page(front, "Front")}${backS.length ? page(backS, "Back") : ""}</div>`;
+  },
+  mount(root) {
+    const pb = $("#printBtn"); if (pb) pb.onclick = () => { try { window.print(); } catch (e) { toast("Printing isn't available here."); } };
+    const fit = () => root.querySelectorAll(".sheetbox").forEach(b => { const sh = b.firstElementChild; const k = Math.min(1, b.clientWidth / sh.offsetWidth); sh.style.transform = `scale(${k})`; b.style.height = sh.offsetHeight * k + "px"; });
+    fit(); window.addEventListener("resize", fit); cleanup.push(() => window.removeEventListener("resize", fit)); }
+};
+VIEWS.backup = {
+  html() {
+    return `<div class="topbar">${back("more")}<h1>Backup</h1></div>
+    <section class="bubble soft"><h3>Export</h3><p class="small">Your progress lives on this device only. Copy it somewhere safe now and then.</p><textarea id="exp" readonly>${esc(JSON.stringify(S))}</textarea><div class="grid2"><button class="btn" id="copyExp">Copy</button>${IN_FRAME ? "" : `<button class="btn ghost" id="dlExp">Download .json</button>`}</div></section>
+    <section class="bubble soft"><h3>Import</h3><p class="small">Paste a backup here. It replaces the progress on this device.</p><textarea id="imp" placeholder='{"v":1,…}'></textarea><button class="btn" id="doImp">Import backup</button></section>
+    <section class="bubble soft"><h3>Settings</h3><label class="check"><input type="checkbox" id="ua" ${S.unlockAll ? "checked" : ""}> Unlock every stone (for review before an exam)</label>
+      <button class="btn ghost" id="reset">Reset all progress</button><p class="small" id="resetMsg" hidden>Tap again to erase everything on this device.</p></section>`;
+  },
+  mount() {
+    $("#copyExp").onclick = async () => { try { await navigator.clipboard.writeText($("#exp").value); toast("Copied"); } catch (e) { $("#exp").select(); toast("Selected. Copy it from the menu."); } };
+    if ($("#dlExp")) $("#dlExp").onclick = () => { try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([$("#exp").value], { type: "application/json" })); a.download = `span-backup-${dayStr()}.json`; a.click(); } catch (e) { toast("Download blocked here. Use Copy."); } };
+    $("#doImp").onclick = () => { try { const o = JSON.parse($("#imp").value); if (!o || o.v !== 1) throw 0; S = Object.assign(blank(), o); save(); toast("Imported"); go("home"); } catch (e) { toast("That isn't a SPAN backup. Paste the whole export."); } };
+    $("#ua").onchange = e => { S.unlockAll = e.target.checked; save(); };
+    let arm = false; $("#reset").onclick = () => { if (!arm) { arm = true; $("#resetMsg").hidden = false; return; } S = blank(); save(); toast("Progress reset"); go("home"); };
+  }
+};
+VIEWS.install = {
+  html() {
+    return `<div class="topbar">${back("more")}<h1>On your iPhone</h1></div>
+    <section class="bubble"><ol class="list" style="padding-left:22px;margin:0">
+      <li>On GitHub, make a new public repo named <code>span</code> (same way you did for SYNCOPE).</li>
+      <li>Upload <code>index.html</code>, <code>manifest.webmanifest</code>, <code>sw.js</code> and the <code>icons</code> folder to the repo root.</li>
+      <li>Settings → Pages → Source: <b>Deploy from a branch</b>, branch <b>main</b>, folder <b>/ (root)</b>. Save.</li>
+      <li>Wait about a minute, then open <code>https://&lt;your-username&gt;.github.io/span/</code> in <b>Safari</b>.</li>
+      <li>Tap <b>Share</b> → <b>Add to Home Screen</b> → Add.</li>
+      <li>Open it once while online. After that it works offline.</li>
+    </ol></section>
+    <section class="bubble soft"><h3>Updating</h3><p>Upload the new files over the old ones. The next time you open SPAN online it picks up the new version. Your progress stays, because it's stored under a versioned key on the phone.</p></section>
+    <section class="bubble soft"><h3>In MECCA</h3><p><code>index.html</code> also runs on its own, so MECCA can link straight to it.</p></section>`;
+  }
+};
+VIEWS.sources = {
+  html() {
+    return `<div class="topbar">${back("more")}<h1>Sources</h1></div>
+    <section class="bubble soft"><p>Everything comes from the Matrix and Tensor Methods project: his handwritten boards (8/25 through 10/20), board photos, HW1 and HW3 with solutions, the syllabus, and our earlier study notes. Anything else is labeled Supplemental.</p></section>
+    <section class="bubble soft"><h3>Gaps to fill</h3><ul style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Lectures 9/01, 9/08, 9/15, 10/22, the 10/29 boards and 11/05</li><li>HW2, HW4, HW5, HW6 and their solutions</li><li>Quiz solutions and Exam 1</li><li>The course Julia notebooks</li></ul><p class="small">Upload any of these to the project and the matching unit moves from prep notes to primary source.</p></section>
+    <section class="bubble soft"><h3>Unit status</h3><div class="list">${UNITS.map(u => `<div class="li" style="cursor:default"><span class="num" style="color:${u.hue}">${u.n}</span><span><span class="t">${esc(u.title)}</span><br><span class="d">${esc(u.sources)}</span></span><span class="chip ${u.status === "ready" ? "ok" : ""}">${u.status === "ready" ? "Built" : "Next"}</span></div>`).join("")}</div></section>`;
+  }
+};
+
+/* ═════════ WIDGETS ═════════ */
+function mountWidgets(root) { root.querySelectorAll("[data-widget]").forEach(el => { const f = WIDGETS[el.dataset.widget]; if (f) f(el); }); }
+const W = 300, RANGE = 4.5, sc = v => (v / RANGE) * (W / 2);
+const toSvg = ([x, y]) => [W / 2 + sc(x), W / 2 - sc(y)];
+const fromSvg = (svg, evt) => { const r = svg.getBoundingClientRect(); const px = (evt.clientX - r.left) / r.width * W, py = (evt.clientY - r.top) / r.height * W; return [((px - W / 2) / (W / 2)) * RANGE, -((py - W / 2) / (W / 2)) * RANGE]; };
+const fmt = v => { const r = Math.round(v * 10) / 10; return (Object.is(r, -0) ? 0 : r).toString().replace("-", "−"); };
+const fmtT = v => { const r = Math.round(v * 10) / 10; return String(Object.is(r, -0) ? 0 : r); };
+function arrow(a, b, color, w = 3.5, id) { const [x1, y1] = toSvg(a), [x2, y2] = toSvg(b); return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${w}" stroke-linecap="round" marker-end="url(#ah-${id})"/>`; }
+function markers(list) { return `<defs>${list.map(([id, c]) => `<marker id="ah-${id}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="${c}"/></marker>`).join("")}</defs>`; }
+function gridBg() { let g = ""; for (let i = -4; i <= 4; i++) { const [x] = toSvg([i, 0]), [, y] = toSvg([0, i]); g += `<line class="gridline" x1="${x}" y1="0" x2="${x}" y2="${W}"/><line class="gridline" x1="0" y1="${y}" x2="${W}" y2="${y}"/>`; } return g + `<line class="axis" x1="0" y1="${W / 2}" x2="${W}" y2="${W / 2}"/><line class="axis" x1="${W / 2}" y1="0" x2="${W / 2}" y2="${W}"/>`; }
+function drag(svg, getHandles, onMove) {
+  let active = null;
+  svg.addEventListener("pointerdown", e => { const pt = fromSvg(svg, e); let best = null, bd = 0.9; getHandles().forEach((h, i) => { const d = Math.hypot(h[0] - pt[0], h[1] - pt[1]); if (d < bd) { bd = d; best = i; } }); if (best != null) { active = best; svg.setPointerCapture(e.pointerId); e.preventDefault(); } });
+  svg.addEventListener("pointermove", e => { if (active == null) return; let [x, y] = fromSvg(svg, e); x = Math.max(-4.2, Math.min(4.2, Math.round(x * 2) / 2)); y = Math.max(-4.2, Math.min(4.2, Math.round(y * 2) / 2)); onMove(active, [x, y]); });
+  const end = () => active = null; svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
+}
+const CO = { a: "#FF8A65", b: "#7FB2FF", r: "#F4F2FF", g: "#6EE7A8" };
+
+const WIDGETS = {
+  columns(el) {
+    let a1 = [2, 1], a2 = [-1, 1.5], x = [1, 1];
+    el.innerHTML = `<div class="widget"><p class="wcap">Drag the two column tips. Slide the weights. Ax is always x₁ scoops of column 1 plus x₂ scoops of column 2.</p><svg viewBox="0 0 ${W} ${W}" role="img" aria-label="Column picture of A x"></svg>
+      <div class="slider"><label for="wx1">x₁</label><input id="wx1" type="range" min="-2" max="2" step="0.1" value="1"><output id="ox1">1</output></div>
+      <div class="slider"><label for="wx2">x₂</label><input id="wx2" type="range" min="-2" max="2" step="0.1" value="1"><output id="ox2">1</output></div>
+      <div class="wout" id="wout"></div></div>`;
+    const svg = el.querySelector("svg");
+    const draw = () => {
+      const Ax = v => [a1[0] * v[0] + a2[0] * v[1], a1[1] * v[0] + a2[1] * v[1]];
+      let warp = ""; for (let i = -4; i <= 4; i++) { const p1 = toSvg(Ax([i, -4])), p2 = toSvg(Ax([i, 4])), q1 = toSvg(Ax([-4, i])), q2 = toSvg(Ax([4, i])); warp += `<line class="warp" x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}"/><line class="warp" x1="${q1[0]}" y1="${q1[1]}" x2="${q2[0]}" y2="${q2[1]}"/>`; }
+      const s1 = [a1[0] * x[0], a1[1] * x[0]], r = Ax(x);
+      svg.innerHTML = markers([["a", CO.a], ["b", CO.b], ["r", CO.r], ["fa", "rgba(255,138,101,.5)"], ["fb", "rgba(127,178,255,.5)"]]) + `<clipPath id="cl"><rect width="${W}" height="${W}"/></clipPath><g clip-path="url(#cl)">${gridBg()}${warp}</g>` +
+        arrow([0, 0], a1, "rgba(255,138,101,.5)", 2.5, "fa") + arrow([0, 0], a2, "rgba(127,178,255,.5)", 2.5, "fb") +
+        arrow([0, 0], s1, CO.a, 4, "a") + arrow(s1, r, CO.b, 4, "b") + arrow([0, 0], r, CO.r, 2.5, "r") +
+        `<circle class="handle" cx="${toSvg(a1)[0]}" cy="${toSvg(a1)[1]}" r="11" fill="${CO.a}" stroke="#0D1022" stroke-width="3"/><circle class="handle" cx="${toSvg(a2)[0]}" cy="${toSvg(a2)[1]}" r="11" fill="${CO.b}" stroke="#0D1022" stroke-width="3"/>` +
+        `<text x="${toSvg(a1)[0] + 12}" y="${toSvg(a1)[1] - 10}" fill="${CO.a}">A:,1</text><text x="${toSvg(a2)[0] + 12}" y="${toSvg(a2)[1] - 10}" fill="${CO.b}">A:,2</text><circle cx="${toSvg(r)[0]}" cy="${toSvg(r)[1]}" r="5" fill="${CO.r}"/><text x="${toSvg(r)[0] + 8}" y="${toSvg(r)[1] + 18}" fill="${CO.r}">Ax</text>`;
+      el.querySelector("#wout").innerHTML = tex(`A=\\mat{${fmtT(a1[0])}&${fmtT(a2[0])}\\\\${fmtT(a1[1])}&${fmtT(a2[1])}}`, true) + tex(`Ax=\\hl{${fmtT(x[0])}}\\mat{${fmtT(a1[0])}\\\\${fmtT(a1[1])}}+\\blu{${fmtT(x[1])}}\\mat{${fmtT(a2[0])}\\\\${fmtT(a2[1])}}=\\mat{${fmtT(r[0])}\\\\${fmtT(r[1])}}`, true);
+      el.querySelector("#ox1").textContent = fmt(x[0]); el.querySelector("#ox2").textContent = fmt(x[1]);
+    };
+    drag(svg, () => [a1, a2], (i, p) => { if (i === 0) a1 = p; else a2 = p; draw(); });
+    el.querySelector("#wx1").oninput = e => { x[0] = +e.target.value; draw(); };
+    el.querySelector("#wx2").oninput = e => { x[1] = +e.target.value; draw(); };
+    draw();
+  },
+  angle(el) {
+    let x = [3, 1], y = [1, 2.5];
+    el.innerHTML = `<div class="widget"><p class="wcap">Drag x and y. The dashed shadow is x projected onto y's direction. Make the match score hit 0.</p><svg viewBox="0 0 ${W} ${W}" role="img" aria-label="Angle between two vectors"></svg><div class="wout" id="wout"></div><div id="cs"></div></div>`;
+    const svg = el.querySelector("svg");
+    const draw = () => {
+      const ip = x[0] * y[0] + x[1] * y[1], nx = Math.hypot(...x), ny = Math.hypot(...y);
+      const c = nx && ny ? ip / (nx * ny) : 0, th = Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
+      const pr = ny ? [ip / (ny * ny) * y[0], ip / (ny * ny) * y[1]] : [0, 0];
+      const ax = Math.atan2(x[1], x[0]), ay = Math.atan2(y[1], y[0]); let d = ay - ax; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+      const rr = 0.9, pts = []; for (let k = 0; k <= 20; k++) { const t = ax + d * k / 20; pts.push(toSvg([rr * Math.cos(t), rr * Math.sin(t)]).join(",")); }
+      const perp = Math.abs(ip) < 0.05;
+      svg.innerHTML = markers([["a", CO.a], ["b", CO.b]]) + gridBg() +
+        `<polyline points="${pts.join(" ")}" fill="none" stroke="${perp ? CO.g : "#FFC857"}" stroke-width="3"/>` +
+        `<line x1="${toSvg(x)[0]}" y1="${toSvg(x)[1]}" x2="${toSvg(pr)[0]}" y2="${toSvg(pr)[1]}" stroke="rgba(244,242,255,.45)" stroke-width="2" stroke-dasharray="5 5"/>` +
+        `<line x1="${toSvg([0, 0])[0]}" y1="${toSvg([0, 0])[1]}" x2="${toSvg(pr)[0]}" y2="${toSvg(pr)[1]}" stroke="#FFC857" stroke-width="6" stroke-linecap="round" opacity=".6"/>` +
+        arrow([0, 0], x, CO.a, 4, "a") + arrow([0, 0], y, CO.b, 4, "b") +
+        `<circle class="handle" cx="${toSvg(x)[0]}" cy="${toSvg(x)[1]}" r="11" fill="${CO.a}" stroke="#0D1022" stroke-width="3"/><circle class="handle" cx="${toSvg(y)[0]}" cy="${toSvg(y)[1]}" r="11" fill="${CO.b}" stroke="#0D1022" stroke-width="3"/>` +
+        `<text x="${toSvg(x)[0] + 12}" y="${toSvg(x)[1] - 8}" fill="${CO.a}">x</text><text x="${toSvg(y)[0] + 12}" y="${toSvg(y)[1] - 8}" fill="${CO.b}">y</text>`;
+      el.querySelector("#wout").innerHTML = tex(`y'x=${fmtT(ip)},\\quad \\norm{x}\\norm{y}=${fmtT(nx * ny)},\\quad \\cos\\theta=${(Math.round(c * 100) / 100)}`, true) + `<p class="small">θ ≈ ${Math.round(th)}° ${perp ? `<span class="badge-perp">· perpendicular: x ⊥ y</span>` : ""}</p>`;
+      const frac = nx * ny ? Math.abs(ip) / (nx * ny) : 0;
+      el.querySelector("#cs").innerHTML = `<div class="small">Cauchy–Schwarz: |y′x| can never pass ‖x‖‖y‖</div><div class="progress" style="height:12px"><i style="width:${frac * 100}%;background:${frac > .99 ? CO.g : "#FFC857"}"></i></div>`;
+    };
+    drag(svg, () => [x, y], (i, p) => { if (i === 0) x = p; else y = p; draw(); });
+    draw();
+  },
+  outer(el) {
+    let u = [1, 2, -1], v = [3, 1, 0], u2 = [0, 1, 1], v2 = [1, 0, 2], two = false;
+    el.innerHTML = `<div class="widget"><p class="wcap">Each column of uv′ is a copy of u, scaled by one entry of v. Add a second copy machine to raise the rank.</p><div id="ctrl"></div><div class="cells" id="cells"></div><div class="wout" id="wout"></div><button class="btn small ghost" id="tog">Add a second piece</button></div>`;
+    const stepper = (arr, i, name) => `<span class="stepper"><button data-a="${name}" data-i="${i}" data-d="-1" aria-label="${name}${i + 1} down">−</button><b>${arr[i]}</b><button data-a="${name}" data-i="${i}" data-d="1" aria-label="${name}${i + 1} up">+</button></span>`;
+    const vecCol = (label, arr, name) => `<div class="vc"><b class="lab">${label}</b>${arr.map((_, i) => stepper(arr, i, name)).join("")}</div>`;
+    const pair = (l1, a1_, n1, l2, a2_, n2) => `<div class="vecs">${vecCol(l1, a1_, n1)}${vecCol(l2, a2_, n2)}</div>`;
+    const rank = M => { const A = M.map(r => r.slice()); let rk = 0; const rows = 3, cols = 3; for (let c = 0; c < cols && rk < rows; c++) { let piv = -1, best = 1e-9; for (let r = rk; r < rows; r++) if (Math.abs(A[r][c]) > best) { best = Math.abs(A[r][c]); piv = r; } if (piv < 0) continue; [A[rk], A[piv]] = [A[piv], A[rk]]; for (let r = 0; r < rows; r++) if (r !== rk) { const f = A[r][c] / A[rk][c]; for (let k = 0; k < cols; k++) A[r][k] -= f * A[rk][k]; } rk++; } return rk; };
+    const draw = () => {
+      const M = [0, 1, 2].map(i => [0, 1, 2].map(j => u[i] * v[j] + (two ? u2[i] * v2[j] : 0)));
+      const mx = Math.max(1, ...M.flat().map(Math.abs));
+      el.querySelector("#ctrl").innerHTML = pair("u", u, "u", "v", v, "v") + (two ? `<div style="height:10px"></div>` + pair("u₂", u2, "u2", "v₂", v2, "v2") : "");
+      el.querySelector("#cells").style.gridTemplateColumns = "repeat(3,52px)";
+      el.querySelector("#cells").innerHTML = M.flat().map(val => `<div class="cell" style="background:${val > 0 ? `rgba(255,138,101,${0.15 + 0.6 * val / mx})` : val < 0 ? `rgba(127,178,255,${0.15 + 0.6 * -val / mx})` : "rgba(255,255,255,.05)"}">${String(val).replace("-", "−")}</div>`).join("");
+      const rk = rank(M);
+      el.querySelector("#wout").innerHTML = (two ? tex(`uv'+u_2v_2'`, true) : tex(`uv'=\\mat{${v[0]}u & ${v[1]}u & ${v[2]}u}`, true)) + `<p class="small">rank = <b>${rk}</b>${two ? (rk < 2 ? " · the two pieces point the same way, or one is zero" : " · two independent copy machines") : (rk === 0 ? " · u or v is all zeros" : " · one direction only")}</p>`;
+      el.querySelector("#tog").textContent = two ? "Back to one piece" : "Add a second piece";
+      el.querySelectorAll("[data-a]").forEach(b => b.onclick = () => { const arr = { u, v, u2, v2 }[b.dataset.a]; const i = +b.dataset.i; arr[i] = Math.max(-3, Math.min(3, arr[i] + +b.dataset.d)); draw(); });
+    };
+    el.querySelector("#tog").onclick = () => { two = !two; draw(); };
+    draw();
+  },
+  spotlight(el) {
+    const A = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]; let mode = "col", k = 1, i = 0;
+    el.innerHTML = `<div class="widget"><div class="seg" role="group" aria-label="Spotlight mode"><button data-m="col">A eₖ</button><button data-m="row">eₖ′A</button><button data-m="ent">eᵢ′A eⱼ</button></div>
+      <div class="row" style="justify-content:center" id="ks"></div><div class="cells" id="cells" style="grid-template-columns:repeat(3,52px)"></div><div class="wout" id="wout"></div></div>`;
+    const draw = () => {
+      el.querySelectorAll("[data-m]").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === mode));
+      const pick = (lab, cur, set) => `<span class="small" style="font-weight:800">${lab}</span>${[0, 1, 2].map(n => `<button class="btn small ${cur === n ? "primary" : "ghost"}" data-${set}="${n}" style="min-width:48px">${n + 1}</button>`).join("")}`;
+      el.querySelector("#ks").innerHTML = mode === "ent" ? pick("i", i, "i") + pick("j", k, "k") : pick("k", k, "k");
+      el.querySelector("#cells").innerHTML = A.flatMap((row, r) => row.map((val, c) => { const on = mode === "col" ? c === k : mode === "row" ? r === k : (r === i && c === k); return `<div class="cell" style="background:${on ? "var(--unit)" : "rgba(255,255,255,.05)"};color:${on ? "var(--unit-ink)" : "var(--muted)"}">${val}</div>`; })).join("");
+      const e = n => `e_{${n + 1}}`;
+      el.querySelector("#wout").innerHTML = mode === "col" ? tex(`A${e(k)}=A_{:,${k + 1}}=\\mat{${A[0][k]}\\\\${A[1][k]}\\\\${A[2][k]}}`, true)
+        : mode === "row" ? tex(`${e(k)}'A=A_{${k + 1},:}=\\mat{${A[k].join("&")}}`, true) : tex(`${e(i)}'A${e(k)}=A_{${i + 1}${k + 1}}=${A[i][k]}`, true);
+      el.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { k = +b.dataset.k; draw(); });
+      el.querySelectorAll("[data-i]").forEach(b => b.onclick = () => { i = +b.dataset.i; draw(); });
+    };
+    el.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { mode = b.dataset.m; draw(); });
+    draw();
+  }
+};
+
+/* ───────── boot ───────── */
+const start = (location.hash || "").slice(1);
+if (["home", "learn", "practice", "vault", "more"].includes(start)) nav = { tab: start, view: start, p: {} };
+render();
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (["home", "learn", "practice", "vault", "more"].includes(h) && h !== nav.tab) go(h, {}, h); });
+if ("serviceWorker" in navigator && location.protocol === "https:" && !/claudeusercontent|claude\.ai/.test(location.hostname)) {
+  try { navigator.serviceWorker.register("sw.js").catch(() => {}); } catch (e) {}
+}
+})();
+
+</script>
+</body>
+</html>
