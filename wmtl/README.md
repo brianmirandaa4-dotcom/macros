@@ -1,4 +1,6 @@
-# whomadethisline
+# Overlay · by whomadethisline
+
+In betting, an overlay is a price that pays more than its real chance. That is what the model hunts, and the icon shows it: the ring is the model's chance, the brass tick is what the price needs, and the green slice is the overlay.
 
 The model's betting command center, as an iPhone app: every sport, every slate, one place.
 It is a static web app, plain HTML, CSS and JavaScript with no build step, so it installs on your home screen and works offline once a slate has loaded.

@@ -249,7 +249,7 @@ const World = (() => {
     if(!ok) return; LOBBY = L; clearRoot(); seed = 11;
     if(wallCanvasDraw) wallCanvasDraw(L); tickers.forEach(t => t.userData.draw(L));
     const sp = 4.7; L.forEach((s, i) => { const x = (i - (L.length - 1) / 2) * sp; buildTable(s, new THREE.Vector3(x, 0, ROW.main.z - Math.abs(x) * .06)); });
-    const lt = canvasTex(1024, 128, (c, W, H) => { c.textAlign = 'center'; c.fillStyle = 'rgba(217,178,102,.9)'; c.font = `800 84px ${FD}`; c.fillText('WHOMADETHISLINE', W/2, 96); });
+    const lt = canvasTex(1024, 128, (c, W, H) => { c.textAlign = 'center'; c.fillStyle = 'rgba(217,178,102,.9)'; c.font = `800 84px ${FD}`; c.fillText('OVERLAY', W/2, 96); });
     const lab = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.12), screenMat(lt, 1.3)); lab.material.transparent = true; lab.material.depthWrite = false; lab.rotation.x = -Math.PI/2; lab.position.set(0, .02, ROW.main.z + 1.9); root.add(lab);
     built = true;
   }
@@ -257,7 +257,7 @@ const World = (() => {
     const c = t.userData.ctx, W = t.userData.canvas.width, H = t.userData.canvas.height;
     const bg = c.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#0b0e13'); bg.addColorStop(1, '#05070a'); c.fillStyle = bg; c.fillRect(0, 0, W, H);
     c.fillStyle = '#12161c'; c.fillRect(0, 0, W, 92); c.fillStyle = '#D9B266'; c.fillRect(0, 92, W, 4);
-    c.fillStyle = '#F2F1EC'; c.font = `800 62px ${FD}`; c.fillText('WHOMADETHISLINE  ·  THE BOARD', 40, 68);
+    c.fillStyle = '#F2F1EC'; c.font = `800 62px ${FD}`; c.fillText('OVERLAY  ·  BY WHOMADETHISLINE', 40, 68);
     c.textAlign = 'right'; c.fillStyle = '#8C939C'; c.font = `700 34px ${FD}`; c.fillText('10,000 REPLAYS PER GAME · 25 QUESTIONS PER PROP', W - 40, 62); c.textAlign = 'left';
     const cols = [[60, 'SPORT'], [360, 'SLATE'], [1500, 'WHEN'], [2100, 'GAMES'], [2500, 'PRICED'], [2950, 'BETS'], [3350, 'LIVE WATCH']];
     const top = 170, rh = Math.min(120, (H - top - 30) / Math.max(L.length, 1));
@@ -275,7 +275,7 @@ const World = (() => {
   function drawTicker(t, L){
     const c = t.userData.ctx, W = t.userData.canvas.width, H = t.userData.canvas.height; c.fillStyle = '#0a0806'; c.fillRect(0, 0, W, H);
     const items = L.filter(s => s.built).map(s => `${s.sport}  ${String(s.title).toUpperCase()}  ·  ${s.bets} BET${s.bets === 1 ? '' : 'S'}  ·  ${s.watch} LIVE WATCH`);
-    if(!items.length) items.push('WHOMADETHISLINE');
+    if(!items.length) items.push('OVERLAY');
     let x = 20; c.font = `800 56px ${FD}`; c.textBaseline = 'middle'; let i = 0;
     while(x < W){ const s = items[i % items.length] + '     ◆     '; c.fillStyle = i % 2 ? '#F2A93B' : '#F3DDB0'; c.fillText(s, x, H/2 + 2); x += c.measureText(s).width; i++; }
     t.needsUpdate = true;

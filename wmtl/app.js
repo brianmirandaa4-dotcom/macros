@@ -2,7 +2,7 @@
    Vanilla JS, no build step. Renders whatever is in /data. The model is the only source of truth:
    nothing here invents a pick, a line, a stat or an injury; missing data reads "Not available". */
 'use strict';
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const STORE_KEY = 'wmtl.v1';
 
 /* ================================================================ helpers */
@@ -143,7 +143,7 @@ function viewLobby(){ const sums = sportSummaries(); const ss = INDEX.slates.sli
     <section class="sec"><div class="hd"><h2>Slates</h2><span class="sub">${INDEX.slates.length} loaded · newest first</span></div>
       <div class="slates">${up}${ss.map(slateCard).join('')}${off}</div></section>
     <section class="sec"><div class="help"><b>Bet only what you can afford to lose.</b><span>If betting stops being fun, call or text 1-800-GAMBLER, any time.</span></div>
-      <div class="sub">Data built ${esc(etTime(INDEX.built_utc, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}))} ET · app ${APP_VERSION}</div></section>
+      <div class="sub">Overlay by whomadethisline · data built ${esc(etTime(INDEX.built_utc, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}))} ET · app ${APP_VERSION}</div></section>
   </div>`; }
 function room2d(sums){ return `<div class="room2d" id="room2d"><div class="tables">${sums.map(s => `<button class="tb ${s.built ? '' : 'off'}" data-sport="${s.key}" style="--c:${SPORTHEX[s.sport]};--glow:${s.bets ? 'var(--edge)' : s.watch ? 'var(--live)' : 'var(--pass)'}" ${s.built ? '' : 'disabled'} aria-label="${s.sport}"><span class="holo">${s.sport}</span><span class="ped"></span></button>`).join('')}</div></div>`; }
 function slateCard(s){ const st = slateStatus(s); const r = s.results || {};
@@ -622,6 +622,7 @@ function openSettings(){ const s = store.d.settings; pushSheet('Settings', `<div
     $('#s-reset', el).onclick = e => { const b = e.currentTarget; if(!b.dataset.armed){ b.dataset.armed = 1; b.textContent = 'Tap again to erase everything'; return; } store.d = {v: 1, bets: [], settings: {unit: 10, bankroll: 500, room: 'auto'}, ui: {}}; store.save(); toast('Erased'); popSheet(); }; }); }
 function openLearn(){ const bar = (w, c, l) => `<div class="side"><div class="l"><span>${l}</span></div><div class="bar"><span style="width:${w}%;background:${c}"></span></div></div>`;
   pushSheet('How it works', `<div class="body"><div class="lt"><h1>How the model works</h1><p>No stats background needed. Four ideas, one picture each.</p></div>
+  <div class="ex"><h2>Why it's called Overlay</h2><p>In betting, an overlay is a price that pays more than the bet's real chance of winning. That is the only thing this model hunts. The logo shows it: the ring is the model's chance, the brass tick is what the price needs, and the green slice past the tick is the overlay. No green, no bet.</p></div>
   <div class="ex"><h2>1 · The report card (25D)</h2><p>For every player and every prop, the model asks 25 questions: his role, his recent form, the matchup, the game setup, and his history. Each prop has its own 25, and each answer's weight was learned from years of games of that exact prop. Add them up and you get one score. Above +1.5 means he should beat his own normal game; −1.5 or lower means he should fall short.</p>
     <svg viewBox="0 0 600 130" role="img" aria-label="A report card scale"><rect x="20" y="52" width="560" height="14" rx="7" fill="var(--line)"/><rect x="20" y="52" width="160" height="14" rx="7" fill="var(--loss)" opacity=".55"/><rect x="420" y="52" width="160" height="14" rx="7" fill="var(--edge)" opacity=".55"/><line x1="300" x2="300" y1="40" y2="78" stroke="var(--faint)"/><text x="100" y="110" fill="var(--soft)" font-size="22" text-anchor="middle">−1.5 or less</text><text x="300" y="110" fill="var(--soft)" font-size="22" text-anchor="middle">normal</text><text x="500" y="110" fill="var(--soft)" font-size="22" text-anchor="middle">+1.5 or more</text><circle cx="470" cy="59" r="11" fill="var(--text)"/><text x="470" y="28" fill="var(--text)" font-size="22" text-anchor="middle">this player</text></svg></div>
   <div class="ex"><h2>2 · 10,000 replays</h2><p>The model plays each game 10,000 times on the computer, play by play. Count how many of those replays the player cleared the line, and that is his chance. A 60% chance still loses 4 times out of 10.</p>
@@ -643,9 +644,9 @@ async function shareProp(d, p){ const W = 1080, H = 1350; const c = document.cre
   x.fillStyle = '#D9B266'; x.font = `800 92px ${FD}`; x.fillText(selText(p).toUpperCase(), 80, 600);
   const kv = [[pc(p.p), 'MODEL CHANCE'], [pc(p.break_even), 'PRICE NEEDS'], [sg(p.edge_pts), 'EDGE']]; kv.forEach(([v, l], i) => { const X = 80 + i * 320; x.fillStyle = '#F2F1EC'; x.font = `600 76px ${FM}`; x.fillText(v, X, 760); x.fillStyle = '#80858C'; x.font = `700 24px ${FB}`; x.fillText(l, X, 800); });
   x.fillStyle = '#F2F1EC'; x.font = `600 40px ${FM}`; x.fillText(`${od(p.odds)}  ${p.book || ''}`, 80, 900); x.fillStyle = '#B4B6B8'; x.font = `500 34px ${FB}`; x.fillText(isNum(p.p) ? `Wins about ${Math.round(p.p * 10)} in 10 · loses about ${10 - Math.round(p.p * 10)} in 10` : '', 80, 960); x.fillText(`25D report card ${sg(p.score25, 1)} · ${p.tier === 'bet' ? 'passes both keys' : p.tier === 'lean' ? 'information only, not a bet' : p.tier === 'live' ? 'live watch' : 'not a bet'}`, 80, 1012);
-  x.fillStyle = '#23272D'; x.fillRect(80, 1130, W - 160, 2); x.fillStyle = '#D9B266'; x.font = `800 50px ${FD}`; x.fillText('WHOMADETHISLINE', 80, 1210); x.fillStyle = '#565B62'; x.font = `500 24px ${FB}`; x.fillText('Model output, not a promise. 1-800-GAMBLER', 80, 1256);
+  x.fillStyle = '#23272D'; x.fillRect(80, 1130, W - 160, 2); x.fillStyle = '#D9B266'; x.font = `800 50px ${FD}`; x.fillText('OVERLAY', 80, 1210); x.fillStyle = '#80858C'; x.font = `600 26px ${FB}`; x.fillText('by whomadethisline', 80 + x.measureText('OVERLAY').width + 24, 1210); x.fillStyle = '#565B62'; x.font = `500 24px ${FB}`; x.fillText('Model output, not a promise. 1-800-GAMBLER', 80, 1256);
   c.toBlob(async blob => { if(!blob) return toast('Could not make the image'); const file = new File([blob], `wmtl-${p.player.replace(/\W+/g, '-').toLowerCase()}.png`, {type: 'image/png'});
-    try{ if(navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: 'whomadethisline'}); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+    try{ if(navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: 'Overlay'}); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
     const url = URL.createObjectURL(blob); pushSheet('Share image', `<div class="body"><img src="${url}" alt="Share card for ${esc(p.player)}" style="width:100%;border-radius:18px"><p class="note">Press and hold the image to save or share it.</p></div>`); }, 'image/png'); }
 function wrapText(x, t, X, Y, maxW, lh){ const w = t.split(' '); let line = '', y = Y; for(const word of w){ const test = line ? line + ' ' + word : word; if(x.measureText(test).width > maxW && line){ x.fillText(line, X, y); line = word; y += lh; } else line = test; } x.fillText(line, X, y); }
 

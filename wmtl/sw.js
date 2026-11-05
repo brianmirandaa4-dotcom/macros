@@ -1,6 +1,6 @@
-/* whomadethisline service worker. It reads and writes only its own "wmtl-" caches, and only for files inside its own
+/* Overlay (whomadethisline) service worker. It reads and writes only its own "wmtl-" caches, and only for files inside its own
    folder, so it never touches SYNCOPE or SPAN on the same site. Shell: cache first. Slate data: network first. */
-const VERSION = 'wmtl-v1-2026-11-05';
+const VERSION = 'wmtl-v2-2026-11-05';
 const DATA = 'wmtl-data';
 const SCOPE = new URL('./', self.location).pathname;
 const SHELL = ['./', './index.html', './app.css', './app.js', './room.js', './vendor/three.min.js', './manifest.webmanifest',
