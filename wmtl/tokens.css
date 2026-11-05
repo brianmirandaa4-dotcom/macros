@@ -1,0 +1,66 @@
+/* Overlay · design tokens · direction "Instrument"
+   The single source for color, type, space, radii and motion. Every screen and the style guide read only these.
+   Layout concept: a precision instrument on warm black. Hairlines instead of boxes, one hero per screen, the Overlay ring as the signature gauge. */
+:root{
+  /* ---- surfaces: warm black, five elevations, each a step lighter */
+  --s0:#0C0B0A;   /* canvas */
+  --s1:#141311;   /* grouped section */
+  --s2:#1B1A17;   /* card, row group */
+  --s3:#23211E;   /* raised: pressed rows, chips, inputs */
+  --s4:#2C2A26;   /* floating: sheets, popovers, toasts */
+  --glass:rgba(20,19,17,.72);          /* frosted bars and sheets, used with --blur */
+  --glass-hi:rgba(255,250,240,.06);    /* the thin inner highlight on glass */
+  --blur:saturate(1.6) blur(22px);
+
+  /* ---- text: one warm white at three opacities (all AA on every surface) */
+  --w:242,239,232;
+  --t1:rgb(var(--w));
+  --t2:rgba(var(--w),.66);
+  --t3:rgba(var(--w),.54);
+  --hair:rgba(var(--w),.08);           /* 0.5px hairline */
+  --hair2:rgba(var(--w),.14);          /* emphasized hairline */
+
+  /* ---- the one brand accent: brass. Primary actions and "bet passes" only */
+  --brass:#D9B266;
+  --brass-ink:#1A1408;
+  --brass-wash:rgba(217,178,102,.13);
+
+  /* ---- semantic set (never color alone: always paired with a word or a shape) */
+  --edge:#46C98A;  --edge-wash:rgba(70,201,138,.14);    /* clears break-even by 5+ */
+  --fair:#93A4B6;  --fair-wash:rgba(147,164,182,.14);   /* price is about right */
+  --pass:#9A958B;  --pass-wash:rgba(154,149,139,.12);   /* no bet */
+  --live:#F2A93B;  --live-wash:rgba(242,169,59,.14);    /* live watch */
+  --loss:#F07272;  --loss-wash:rgba(240,114,114,.13);   /* lost, pulls the score down */
+
+  /* ---- one restrained hue per sport (dots, 3px bars, wayfinding only) */
+  --nfl:#6E9BF0; --cfb:#B596EA; --nba:#EC9455; --nhl:#8FD0EE; --mlb:#63C7B2;
+
+  /* ---- type: the system stack, so it is native and works offline */
+  --f-ui:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Segoe UI',Roboto,sans-serif;
+  --f-num:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  --fs-11:11px; --fs-13:13px; --fs-15:15px; --fs-17:17px; --fs-22:22px; --fs-28:28px; --fs-34:34px; --fs-48:48px; --fs-64:64px;
+  --track-label:.06em;   /* uppercase labels */
+  --track-hero:-.045em;  /* hero numerals */
+
+  /* ---- space: 4pt base, 8pt rhythm, 20pt sides */
+  --u:4px; --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:20px; --sp6:24px; --sp8:32px; --sp10:40px; --sp12:48px;
+  --side:20px;
+
+  /* ---- radii: one continuous family; nest as inner = outer - padding */
+  --r10:10px; --r16:16px; --r24:24px; --r32:32px;
+
+  /* ---- depth: materials first; soft large shadows only on floating things */
+  --float:0 18px 48px -12px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.25);
+
+  /* ---- motion */
+  --ease-in:cubic-bezier(.34,1.4,.64,1);     /* entries: a slight overshoot */
+  --ease-out:cubic-bezier(.32,.72,0,1);      /* exits and settles: critically damped */
+  --ease-std:cubic-bezier(.2,.8,.2,1);
+  --d1:120ms; --d2:200ms; --d3:320ms; --d4:500ms;
+  --stagger:34ms;
+  --press-scale:.97;
+
+  /* ---- size */
+  --tap:44px; --tabh:56px; --col:720px;
+  color-scheme:dark;
+}

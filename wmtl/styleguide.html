@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overlay Design System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0C0B0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="icons/favicon-64.png">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+/* style guide page chrome only; every component above comes from components.css */
+body{padding:0 max(var(--side),env(safe-area-inset-left,0px)) calc(80px + env(safe-area-inset-bottom,0px)) max(var(--side),env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--s0)}
+.wrap{max-width:var(--col);margin:0 auto}
+.sg-top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin:0 calc(-1 * max(var(--side),env(safe-area-inset-left,0px)));padding:var(--sp2) max(var(--side),env(safe-area-inset-left,0px));background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:0 .5px 0 var(--hair)}
+.sg-top .wrap{display:flex;gap:var(--sp2);overflow-x:auto;scrollbar-width:none}
+.sg-top .wrap::-webkit-scrollbar{display:none}
+.sg-top a{flex:none;display:inline-flex;align-items:center;min-height:36px;padding:0 var(--sp3);border-radius:18px;background:var(--s2);color:var(--t2);font:600 var(--fs-13)/1 var(--f-ui);text-decoration:none}
+.hero{padding:var(--sp10) 0 var(--sp8);display:grid;gap:var(--sp4)}
+.hero .mark{display:flex;align-items:center;gap:var(--sp3)}
+.hero h1{margin:0;font:700 var(--fs-48)/.98 var(--f-ui);letter-spacing:-.035em;text-wrap:balance}
+.hero p{margin:0;color:var(--t2);font-size:var(--fs-17);max-width:44ch}
+section.s{padding:var(--sp10) 0 0;display:grid;gap:var(--sp5);scroll-margin-top:72px}
+section.s>header{display:grid;gap:var(--sp2)}
+section.s>header h2{margin:0;font:700 var(--fs-28)/1.1 var(--f-ui);letter-spacing:-.02em}
+section.s>header p{margin:0;color:var(--t2);max-width:56ch}
+.sub{display:grid;gap:var(--sp3)}
+.sub>h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
+.sub>.note{margin:0;font-size:var(--fs-13);color:var(--t3);max-width:60ch}
+.row{display:flex;flex-wrap:wrap;gap:var(--sp3);align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:var(--sp4)}
+.state{display:grid;gap:var(--sp2);align-content:start}
+.state>.label{display:block}
+.swatch{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:var(--sp3);align-items:center;padding:var(--sp3) 0;border-top:.5px solid var(--hair)}
+.swatch:first-child{border-top:0}
+.chip-c{width:56px;height:40px;border-radius:var(--r10);box-shadow:inset 0 0 0 .5px var(--hair2)}
+.swatch b{display:block;font:600 var(--fs-15)/1.2 var(--f-ui)} .swatch span{font-size:var(--fs-13);color:var(--t2)}
+.swatch .num{font-size:var(--fs-13);color:var(--t2);text-align:right}
+.aa{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:6px;font:700 10px/1.3 var(--f-ui);letter-spacing:.04em;background:var(--edge-wash);color:var(--edge)}
+.spec{display:grid;grid-template-columns:64px minmax(0,1fr);gap:var(--sp3);align-items:baseline;padding:var(--sp3) 0;border-top:.5px solid var(--hair)}
+.spec:first-child{border-top:0} .spec .label{align-self:center}
+.panel{background:var(--s1);border-radius:var(--r24);padding:var(--sp5)}
+.icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:var(--sp2)}
+.icons div{display:grid;justify-items:center;gap:var(--sp2);padding:var(--sp3) var(--sp1);border-radius:var(--r16);background:var(--s1);color:var(--t1)}
+.icons div span{font:500 10px/1.2 var(--f-num);color:var(--t3);text-align:center;word-break:break-all}
+.phone{position:relative;width:min(100%,340px);height:420px;border-radius:40px;background:var(--s0);box-shadow:0 0 0 1px var(--hair2),0 0 0 9px #050505,var(--float);overflow:hidden;margin:var(--sp3) auto}
+.phone .scroller{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+.phone .scroller::-webkit-scrollbar{display:none}
+.phone .tabbar{position:absolute;left:0;right:0;bottom:0;padding-bottom:16px}
+.glassdemo{position:relative;height:150px;border-radius:var(--r24);overflow:hidden;background:radial-gradient(60% 90% at 30% 110%,#5b4320,transparent 70%),radial-gradient(40% 80% at 80% 0%,#2c3a4c,transparent 70%),#0f0e0c}
+.glassdemo .lamp{position:absolute;width:10px;height:10px;border-radius:50%;background:#ffd79a;box-shadow:0 0 30px 12px rgba(255,200,120,.5)}
+.glassdemo .g{position:absolute;left:16px;right:16px;bottom:16px;padding:var(--sp4);border-radius:var(--r16);background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:inset 0 .5px 0 var(--glass-hi);display:flex;justify-content:space-between;align-items:center}
+.radii{display:flex;gap:var(--sp3);flex-wrap:wrap}
+.radii div{width:68px;height:68px;background:var(--s3);display:grid;place-items:center;font:600 var(--fs-13)/1 var(--f-num);color:var(--t2)}
+.nest{padding:12px;border-radius:var(--r24);background:var(--s2);display:inline-block}
+.nest>div{padding:12px;border-radius:12px;background:var(--s3)}
+.nest>div>div{width:180px;height:40px;border-radius:4px;background:var(--s4)}
+.grid4{background-image:linear-gradient(var(--hair) 1px,transparent 1px),linear-gradient(90deg,var(--hair) 1px,transparent 1px);background-size:8px 8px;border-radius:var(--r16);padding:var(--sp4)}
+.motion{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--sp3)}
+.mbox{height:128px;display:block;border-radius:var(--r16);background:var(--s1);position:relative;overflow:hidden;border:0;color:var(--t1);text-align:left;padding:var(--sp3)}
+.mbox i{position:absolute;left:12px;bottom:12px;width:28px;height:28px;border-radius:9px;background:var(--brass);transition:transform var(--dur) var(--ease)}
+.mbox.go i{transform:translateX(96px)}
+.mbox b{font:600 var(--fs-13)/1.2 var(--f-ui)} .mbox span{display:block;font:500 var(--fs-11)/1.3 var(--f-num);color:var(--t3);margin-top:4px}
+.sheetdemo{position:absolute;left:0;right:0;bottom:0;touch-action:none;transition:transform var(--d3) var(--ease-in)}
+.sharecard .h34{font-size:var(--fs-28)}
+.sharecard{width:100%;aspect-ratio:1080/1350;max-width:360px;border-radius:var(--r24);overflow:hidden;background:var(--s0);box-shadow:0 0 0 .5px var(--hair2),var(--float);position:relative;padding:8%;display:grid;align-content:space-between}
+.sharecard .sc-brand{display:flex;align-items:center;gap:8px;font:700 14px/1 var(--f-ui);letter-spacing:.02em}
+.sharecard .sc-brand span{color:var(--t3);font-weight:500}
+.toast-demo{display:flex;flex-wrap:wrap;gap:var(--sp3);align-items:center}
+.pick{display:grid;gap:var(--sp3)}
+.pick .opt{border-radius:var(--r24);background:var(--s1);padding:var(--sp5);display:grid;gap:var(--sp3)}
+.pick .opt header{display:grid;gap:2px}
+.pick .opt h4{margin:0;font:600 var(--fs-17)/1.2 var(--f-ui)}
+.foot{padding:var(--sp12) 0 0;color:var(--t3);font-size:var(--fs-13)}
+</style>
+</head>
+<body>
+<div class="sg-top"><nav class="wrap" aria-label="Sections">
+  <a href="#color">Color</a><a href="#type">Type</a><a href="#space">Space</a><a href="#motion">Motion</a><a href="#icons">Icons</a><a href="#components">Components</a><a href="#nav">Navigation</a><a href="#viz">Data viz</a><a href="#hero25">25D hero</a><a href="#share">Share card</a>
+</nav></div>
+<main class="wrap">
+  <div class="hero stagger">
+    <div class="mark"><img src="icons/icon-180.png" width="44" height="44" alt="" style="border-radius:11px"><span class="label">Overlay · design system · Instrument</span></div>
+    <h1>A precision instrument for the line.</h1>
+    <p>Warm black, hairlines instead of boxes, one hero per screen. The Overlay ring is the signature gauge: the model's chance, the break-even tick, and the green slice that makes it a bet.</p>
+  </div>
+
+  <!-- ============================== COLOR -->
+  <section class="s" id="color">
+    <header><span class="label">01</span><h2>Color</h2><p>Five warm elevations, each a step lighter. One brass accent, used only for primary actions and the "bet passes" state. Every semantic color is paired with a word or a shape, never color alone.</p></header>
+    <div class="sub"><h3>Surfaces</h3><div class="panel" id="sw-surf"></div></div>
+    <div class="sub"><h3>Text</h3><p class="note">One warm white at three opacities. Contrast is measured on the darkest and lightest surfaces.</p><div class="panel" id="sw-text"></div></div>
+    <div class="sub"><h3>Accent and semantic</h3><div class="panel" id="sw-sem"></div>
+      <div class="row"><span class="pill pill-bet">Bet</span><span class="pill pill-edge">Edge</span><span class="pill pill-fair">Fair</span><span class="pill pill-pass">Pass</span><span class="pill pill-live">Live</span><span class="pill pill-loss">Loss</span></div>
+      <p class="note">Shapes carry meaning too: ▲ edge, ● fair, — pass, ◆ live, ▼ loss. Brass "Bet" is the only filled pill in the app.</p></div>
+    <div class="sub"><h3>Sports</h3><p class="note">For wayfinding only: a dot, an icon tint, a 3px bar. Team colors follow the same rule and never fill a background.</p><div class="panel" id="sw-sport"></div></div>
+  </section>
+
+  <!-- ============================== TYPE -->
+  <section class="s" id="type">
+    <header><span class="label">02</span><h2>Typography</h2><p>The system font, so it reads native and works offline. Every number is SF Mono with tabular figures, so it never jumps width when it changes. Units sit smaller and lighter than the digits.</p></header>
+    <div class="panel">
+      <div class="spec"><span class="label">64</span><span class="h64 num">64<small>%</small></span></div>
+      <div class="spec"><span class="label">48</span><span class="h48 num">+10.6</span></div>
+      <div class="spec"><span class="label">34</span><span class="h34">Large title</span></div>
+      <div class="spec"><span class="label">28</span><span class="h28">Under 29.5</span></div>
+      <div class="spec"><span class="label">22</span><span class="h22">Section heading</span></div>
+      <div class="spec"><span class="label">17</span><span class="b17">Body for reading, the default for rows and sheets.</span></div>
+      <div class="spec"><span class="label">15</span><span class="b15">Secondary body and supporting detail.</span></div>
+      <div class="spec"><span class="label">13</span><span class="b13 t2">Captions, metadata, sources and timestamps.</span></div>
+      <div class="spec"><span class="label">11</span><span class="label" style="color:var(--t2)">Uppercase label · +6% tracking</span></div>
+    </div>
+    <div class="sub"><h3>Numerals never move</h3><div class="panel"><div class="h48 num" id="ticker">53.5<small>%</small></div><p class="note" style="margin-top:8px">This number counts every 900ms. Tabular figures keep every digit the same width, so nothing beside it shifts.</p></div></div>
+  </section>
+
+  <!-- ============================== SPACE -->
+  <section class="s" id="space">
+    <header><span class="label">03</span><h2>Space, shape, depth</h2><p>4pt base, 8pt rhythm, 20pt sides. One continuous radius family, nested so inner radius equals outer minus padding. Depth comes from materials; only floating things cast a soft shadow.</p></header>
+    <div class="sub"><h3>8pt rhythm</h3><div class="grid4"><div class="row" style="gap:8px"><div style="width:32px;height:32px;border-radius:8px;background:var(--s4)"></div><div style="width:48px;height:32px;border-radius:8px;background:var(--s4)"></div><div style="width:80px;height:32px;border-radius:8px;background:var(--s4)"></div></div></div></div>
+    <div class="sub"><h3>Radii</h3><div class="radii"><div style="border-radius:10px">10</div><div style="border-radius:16px">16</div><div style="border-radius:24px">24</div><div style="border-radius:32px">32</div></div>
+      <div class="nest" aria-label="Nested radii"><div><div></div></div></div><p class="note">24 outer, 12 padding, 12 inner; then 12 outer, 8 padding, 4 inner.</p></div>
+    <div class="sub"><h3>Materials</h3><div class="glassdemo"><i class="lamp" style="left:18%;top:30%"></i><i class="lamp" style="left:64%;top:18%"></i><i class="lamp" style="left:82%;top:58%"></i><div class="g"><span class="b15">Frosted bar over the room</span><span class="num t2">blur 22</span></div></div>
+      <p class="note">Bars, sheets and the tab bar are glass with a 0.5px inner highlight. Everything else is flat surface.</p></div>
+  </section>
+
+  <!-- ============================== MOTION -->
+  <section class="s" id="motion">
+    <header><span class="label">04</span><h2>Motion</h2><p>Every animation explains something. Entries overshoot slightly; exits settle with no bounce. Nothing runs past 500ms except the room's camera dolly. Reduce Motion turns all of it into crossfades.</p></header>
+    <div class="motion" id="motion-demos"></div>
+    <div class="sub"><h3>Press</h3><div class="row"><button class="btn tap">Press and hold</button><span class="note">Scale 0.97 and dim in 40ms, release eases out over 200ms. Every tappable thing does this.</span></div></div>
+  </section>
+
+  <!-- ============================== ICONS -->
+  <section class="s" id="icons">
+    <header><span class="label">05</span><h2>Icons</h2><p>One set, drawn on a 24pt grid with a 1.75 stroke and round joins. Tabs, sports, prop types and actions. No emoji, no mixed libraries.</p></header>
+    <div class="icons" id="icon-grid"></div>
+  </section>
+
+  <!-- ============================== COMPONENTS -->
+  <section class="s" id="components">
+    <header><span class="label">06</span><h2>Components</h2><p>Each component in every state it can be in: default, pressed, disabled, loading and empty.</p></header>
+
+    <div class="sub"><h3>Buttons</h3><div class="grid2">
+      <div class="state"><span class="label">Default</span><div class="row"><button class="btn btn-primary tap">Log bet</button><button class="btn tap">Share</button><button class="btn btn-ghost tap">Cancel</button></div></div>
+      <div class="state"><span class="label">Pressed</span><div class="row"><button class="btn btn-primary tap is-pressed">Log bet</button><button class="btn tap is-pressed">Share</button></div></div>
+      <div class="state"><span class="label">Disabled</span><div class="row"><button class="btn btn-primary" disabled>Log bet</button><button class="btn" disabled>Share</button></div></div>
+      <div class="state"><span class="label">Loading</span><div class="row"><button class="btn btn-primary is-loading" aria-label="Logging">Log bet</button><button class="btn is-loading" aria-label="Loading">Share</button></div></div>
+    </div></div>
+
+    <div class="sub"><h3>Line chip</h3><p class="note">Opening line in brass, the best line found in white, the best book bolded.</p>
+      <div class="row" id="linechips"></div></div>
+
+    <div class="sub"><h3>Slate-window segmented control</h3><div id="seg-demo"></div><p class="note">The thumb slides with the entry curve. Counts sit in the tertiary mono. A window with no bets stays tappable.</p></div>
+
+    <div class="sub"><h3>Sport switcher</h3><div class="sports" id="sport-demo"></div><p class="note">NHL is disabled until a model exists. The brass count is bets that pass.</p></div>
+
+    <div class="sub"><h3>Probability meter</h3><div class="grid2" id="meter-demo"></div></div>
+
+    <div class="sub"><h3>Factor bars: pushing up and pulling down</h3><div class="panel" id="fbar-demo"></div></div>
+
+    <div class="sub"><h3>Bet card</h3><div class="grid2" id="betcard-demo"></div></div>
+
+    <div class="sub"><h3>Player row</h3><div class="grid2" id="prow-demo"></div></div>
+
+    <div class="sub"><h3>Report-card hero</h3><div id="rchero-demo"></div></div>
+
+    <div class="sub"><h3>Empty state</h3><div class="empty"><span class="label">CFB · Week 7 Friday</span><div class="em-title">No bets pass the model today.</div><div class="em-reason">908 props were priced. 212 had a strong or weak report card, and none reached a +5 edge after the market check. That is the model working, not missing.</div></div><p class="note">Example copy written for this state. The real reason always comes from the slate's own rule funnel.</p></div>
+
+    <div class="sub"><h3>Toasts</h3><div class="toast-demo"><span class="toast"><i data-ic="check"></i>Bet logged</span><span class="toast"><i data-ic="refresh"></i>Newest slate loaded</span><button class="btn btn-sm tap" id="toast-btn">Show a toast</button></div></div>
+
+    <div class="sub"><h3>Skeletons</h3><p class="note">Shaped like the layout that replaces them. No spinners anywhere.</p>
+      <div class="group" aria-label="Loading rows" id="sk-demo"></div></div>
+  </section>
+
+  <!-- ============================== NAVIGATION -->
+  <section class="s" id="nav">
+    <header><span class="label">07</span><h2>Navigation</h2><p>A large title that collapses to an inline title on scroll, a frosted tab bar, and bottom sheets with a grabber and detents. Scroll inside the phone; drag the sheet.</p></header>
+    <div class="grid2">
+      <div class="phone"><div class="scroller" id="lt-scroll">
+        <div class="nav" id="lt-nav"><div class="nav-bar"><button class="btn-icon btn tap" aria-label="Back"><i data-ic="back"></i></button><div class="nav-ttl">Props</div><button class="btn-icon btn tap" aria-label="Search"><i data-ic="search"></i></button></div></div>
+        <div class="largetitle" id="lt-title">Props</div>
+        <div style="padding:0 16px 120px;display:grid;gap:12px"><div class="seg" style="pointer-events:none"><button aria-pressed="true">Strong</button><button>Weak</button><button>All priced</button></div>
+          <div class="group" id="lt-rows"></div></div>
+      </div>
+      <nav class="tabbar" aria-label="Tabs demo" id="tab-demo"></nav></div>
+      <div class="phone" id="sheet-phone" style="background:radial-gradient(70% 50% at 50% 30%,#2a2418,transparent 70%),var(--s0)">
+        <div style="padding:56px 20px;display:grid;gap:8px"><span class="label">Report card</span><div class="h28">Calvin Russell III</div><p class="t2" style="margin:0">Drag the sheet down to peek; tap here to bring it back.</p></div>
+        <div class="sheetdemo" id="sheetdemo"><div class="sheet"><div class="grabber"></div><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="h22">Log bet</span><span class="t2 b13">bet365</span></div>
+          <div class="linechip" id="sheetchip"></div>
+          <div class="row"><button class="btn btn-ghost tap" style="flex:1">Cancel</button><button class="btn btn-primary tap" style="flex:1">Log bet</button></div>
+          <p class="b13 t3" style="margin:0">Detents: full and peek. Drag the sheet down, tap the screen to bring it back.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== DATA VIZ -->
+  <section class="s" id="viz">
+    <header><span class="label">08</span><h2>Data visualization</h2><p>The decoration is the data. Hand-built SVG, the same axis and label style everywhere, direct labels instead of legends. Charts draw in; they never bounce.</p></header>
+    <div class="sub"><h3>The Overlay ring</h3><div id="ring-demo" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px"></div><p class="note">White arc: the model's chance. Brass tick: what the price needs. Green slice: the overlay. A pass draws in gray with no green.</p></div>
+    <div class="sub"><h3>Sim distribution</h3><div class="panel" id="density-demo"></div></div>
+    <div class="sub"><h3>Calibration</h3><div class="panel" id="cal-demo"></div><p class="note" id="cal-note"></p></div>
+    <div class="sub"><h3>Bankroll</h3><div class="panel"><div style="display:grid;gap:4px;margin-bottom:12px"><span class="h28 num" id="bank-now"></span><span class="b13 t3" id="bank-when"></span></div><div id="bank-demo"></div></div></div>
+  </section>
+
+  <!-- ============================== 25D HERO -->
+  <section class="s" id="hero25">
+    <header><span class="label">09</span><h2>The 25D hero: two prototypes</h2><p>Lamar Jackson, passing yards, NFL Week 8. Same 25 answers, two ways to see them. Pick one and it becomes the hero of every report card.</p></header>
+    <div class="pick">
+      <div class="opt"><header><h4>A · Fingerprint</h4><span class="b13 t3">25 spokes · glow out, recede in</span></header><div id="fp-demo" style="max-width:360px;margin:0 auto;width:100%"></div><p class="note" style="margin:0">Reads as a shape at a glance. Every player gets a recognizable silhouette. Exact values come on tap.</p></div>
+      <div class="opt"><header><h4>B · Diverging stack</h4><span class="b13 t3">sorted by impact</span></header><div id="div-demo"></div><p class="note" style="margin:0">Reads like a sentence: what helped most, then what hurt. Every value is visible without a tap.</p></div>
+    </div>
+  </section>
+
+  <!-- ============================== SHARE -->
+  <section class="s" id="share">
+    <header><span class="label">10</span><h2>Share card</h2><p>One tap turns any bet or report card into a 1080 × 1350 image for posting, with the brand mark and the honest loss rate.</p></header>
+    <div id="share-demo"></div>
+  </section>
+
+  <p class="foot">Overlay by whomadethisline · tokens.css, components.css, charts.js and icons.js are the single source for every screen. Stats from ESPN; picks from the model only.</p>
+</main>
+<script src="icons.js"></script>
+<script src="charts.js"></script>
+<script id="sg-data" type="application/json">{"player":"Lamar Jackson","team":"BAL","opp":"BUF","market":"Passing yards","side":"over","line":237.5,"odds":-114,"book":"FanDuel","p":0.507,"p_raw":0.653,"be":0.533,"edge":-2.6,"proj":259.97,"r80":[187.5,338.7],"score":7.96,"pct":0.994,"fam":{"A":2.78,"B":-0.36,"C":2.05,"D":3.89,"E":-0.4},"hist":{"lo":0.0,"step":20.0,"counts":[0,0,2,2,9,38,119,238,405,724,976,1207,1379,1258,1194,868,642,423,252,142,65,57],"n":10000,"clipped_at":440.0},"q25":[["A1","Availability",-0.16],["A2","Dropback share",2.702],["A3","Dropbacks / game",2.284],["A4","Snap share",-0.759],["A5","Snap trend",-1.291],["B1","Yards / attempt",-3.306],["B2","Pass EPA / dropback",2.424],["B3","Recent form",0.013],["B4","Completion %",0.308],["B5","Air yards / att",0.203],["C1","Opp yds / dropback",0.42],["C2","Opp secondary out",0.604],["C3","Opp pass EPA allowed",0.641],["C4","Opp pass rush (\u2212)",0.215],["C5","Opp dropbacks faced",0.169],["D1","Wind & rain (\u2212)",0.417],["D2","Own QB quality",1.553],["D3","Implied pts vs usual",1.116],["D4","Trailing script",0.547],["D5","Opp faces passes",0.259],["E1","Baseline reliability",0.172],["E2","H2H production",-0.015],["E3","Team vs this opp",-0.458],["E4","H2H volume",0.037],["E5","Last meeting",-0.133]],"res":{"actual":0,"result":"lost"},"tier":"live","live":{"plan":"BUY LOW","q1_trigger":"\u226436","ht_trigger":"\u226495","number":223.5},"calib":[[0.195,0.226,725],[0.35,0.328,207],[0.426,0.442,120],[0.486,0.515,328],[0.514,0.514,626],[0.569,0.613,119],[0.619,0.647,34],[0.663,0.75,4],[0.732,1.0,2]],"bets":[{"player":"Calvin Russell III","team":"Syracuse","opp":"North Carolina","market":"Receiving yards","side":"under","line":29.5,"odds":-115,"book":"bet365","p":0.641,"be":0.535,"edge":10.6,"score":-3.14,"opener":{"line":22.5,"over":-115,"under":-115},"window":"Prime","kick":"2026-10-24T23:30:00.000Z","res":{"actual":86,"result":"lost"}},{"player":"Trae'shawn Brown","team":"Alabama","opp":"Texas A&M","market":"Rushing yards","side":"under","line":57.5,"odds":-115,"book":"bet365","p":0.588,"be":0.535,"edge":5.3,"score":-3.12,"opener":{"line":52.5,"over":-114,"under":-114},"window":"3:30","kick":"2026-10-24T19:30:00.000Z","res":{"actual":11,"result":"won"}}],"windows":[["Noon",324,0],["3:30",475,1],["Prime",275,1],["Late",64,0]],"sports":{"NFL":{"label":"Week 8","bets":0},"NBA":{"label":"Mon Nov 2","bets":0},"CFB":{"label":"Week 8 Saturday","bets":2}},"rows":[{"player":"Lamar Jackson","team":"BAL","opp":"BUF","market":"Passing yards","side":"over","line":237.5,"score":7.96,"tier":"live","p":0.507,"be":0.533,"proj":259.97,"r80":[187.5,338.7]},{"player":"Kyle Pitts","team":"ATL","opp":"TB","market":"Anytime TD","side":"yes","line":null,"score":-7.16,"tier":"pass","p":0.208,"be":0.25,"proj":0.0,"r80":null},{"player":"A.J. Brown","team":"NE","opp":"MIA","market":"Anytime TD","side":"yes","line":null,"score":6.89,"tier":"pass","p":0.353,"be":0.417,"proj":0.0,"r80":null},{"player":"Jaxon Smith-Njigba","team":"SEA","opp":"CHI","market":"Anytime TD","side":"yes","line":null,"score":-6.66,"tier":"pass","p":0.455,"be":0.545,"proj":1.0,"r80":null},{"player":"Daniel Jones","team":"IND","opp":"JAX","market":"QB rushing yards","side":"over","line":7.5,"score":5.95,"tier":"pass","p":0.504,"be":0.533,"proj":9.0,"r80":[0.0,28.9]},{"player":"Matthew Stafford","team":"LA","opp":"LAC","market":"Anytime TD","side":"yes","line":null,"score":5.69,"tier":"pass","p":0.043,"be":0.053,"proj":0.0,"r80":null},{"player":"Kenneth Walker III","team":"KC","opp":"DEN","market":"Anytime TD","side":"yes","line":null,"score":-5.04,"tier":"pass","p":0.477,"be":0.565,"proj":1.0,"r80":null},{"player":"Derrick Henry","team":"BAL","opp":"BUF","market":"Anytime TD","side":"yes","line":null,"score":-4.98,"tier":"pass","p":0.553,"be":0.677,"proj":1.0,"r80":null},{"player":"Aaron Jones","team":"MIN","opp":"DET","market":"Rushing yards","side":"over","line":29.5,"score":-4.88,"tier":"pass","p":0.513,"be":0.533,"proj":45.0,"r80":[21.0,81.0]},{"player":"Lamar Jackson","team":"BAL","opp":"BUF","market":"QB rushing yards","side":"under","line":25.5,"score":4.84,"tier":"pass","p":0.501,"be":0.533,"proj":25.0,"r80":[6.0,57.0]},{"player":"Saquon Barkley","team":"PHI","opp":"WAS","market":"Anytime TD","side":"yes","line":null,"score":-4.43,"tier":"pass","p":0.383,"be":0.465,"proj":0.0,"r80":null},{"player":"D'Andre Swift","team":"CHI","opp":"SEA","market":"Anytime TD","side":"yes","line":null,"score":-4.25,"tier":"pass","p":0.438,"be":0.524,"proj":1.0,"r80":null}],"pass_ex":{"player":"Matthew Stafford","market":"QB rushing yards","side":"over","line":0.5,"p":0.427,"be":0.442,"edge":-1.6},"bank":[{"v":0,"t":"Start"},{"v":0.87,"t":"CFB Week 7 Saturday \u00b7 Rico Scott under 55.5 \u00b7 won"},{"v":-0.13,"t":"CFB Week 7 Saturday \u00b7 Fredrick Moore under 33.5 \u00b7 lost"},{"v":-1.13,"t":"CFB Week 8 Saturday \u00b7 Calvin Russell III under 29.5 \u00b7 lost"},{"v":-0.26,"t":"CFB Week 8 Saturday \u00b7 Trae'shawn Brown under 57.5 \u00b7 won"}]}</script>
+<script src="styleguide.js"></script>
+</body>
+</html>
