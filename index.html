@@ -735,6 +735,10 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .rems{display:flex;flex-direction:column;gap:8px}
 .rem{display:grid;grid-template-columns:70px 64px 1fr;align-items:center;gap:10px;font-size:13.5px}
 .rem b{font:700 14px var(--f-num);color:var(--c)}.rem i{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}.rem u{display:block;height:100%;background:var(--c);border-radius:99px}
+.ol-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto}
+.ol-list button{width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;text-align:left;color:inherit;cursor:pointer}
+.ol-n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ol-n b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ol-n span{font-size:11.5px;color:var(--muted)}
+.ol-m{font-size:12px;font-weight:700;white-space:nowrap}.ol-busy{padding:14px;text-align:center}.ol-more{width:100%;border-style:dashed}
 .ck-hero{background:linear-gradient(180deg,rgba(11,12,16,.35),rgba(11,12,16,.92)),var(--bnr)!important;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px}
 .ck-hero h2{margin:2px 0 0;font:800 22px/1.2 var(--f-display);text-transform:capitalize}.ck-hero p{margin:0;color:#D5D9E3;font-size:13.5px}
 .ck-ask{display:flex;flex-direction:column;gap:8px;border-color:color-mix(in srgb,var(--good) 45%,var(--line))}.ck-ask b{font-size:16px}.ck-ask .primary{align-self:flex-start}
@@ -1600,7 +1604,280 @@ gatorade|sports drink;26;0;6.4;0;bottle=591
 kombucha;13;0;3;0;bottle=473
 beer;43;0.5;3.6;0;can=355
 wine;83;0.1;2.7;0;glass=150
-liquor|shot|vodka|whiskey|tequila;231;0;0;0;each=44`;
+liquor|shot|vodka|whiskey|tequila;231;0;0;0;each=44
+#Bakery & desserts
+banana bread|banana loaf;326;4.3;55;10.5;slice=60
+zucchini bread;323;4.5;50;12;slice=60
+pumpkin bread;300;4.4;48;10;slice=60
+bran muffin;305;7.5;52;9;each=113
+cinnamon roll|cinnamon bun|cinnamon rolls;380;6;52;16;each=90
+danish|cheese danish;374;7;44;19;each=70
+scone|scones;362;7;50;15;each=75
+biscuit|biscuits;353;7;45;16;each=60
+dinner roll|dinner rolls|roll|rolls;300;9;51;6;each=40
+hamburger bun|bun|buns;279;9.5;50;4;each=50
+hot dog bun;279;9.5;50;4;each=45
+sourdough|sourdough bread;274;10.6;52;2;slice=50
+rye bread;259;8.5;48;3.3;slice=32
+multigrain bread;265;13;43;4.2;slice=32
+brioche;370;9;48;15;slice=40
+baguette|french bread;274;10.7;52;2.4;slice=30
+garlic bread;350;8;42;16;slice=40
+flatbread;300;9;52;6;each=60
+soft pretzel;338;8;69;3;each=115
+apple pie|pie;265;2.4;37;12.5;slice=125
+pumpkin pie;243;4.5;32;10.4;slice=110
+cheesecake;321;5.5;25.5;22.5;slice=125
+chocolate cake|cake;371;4.5;53;17;slice=95
+carrot cake;415;4.4;50;22;slice=110
+cupcake|cupcakes;390;4;56;17;each=70
+pound cake;389;5.5;49;19.5;slice=80
+coffee cake;418;6.8;47;23;slice=56
+pop tart|pop tarts|toaster pastry;403;4.5;70;11;each=52
+donut holes|doughnut holes;421;5;50;23;each=14
+churro|churros;400;4.5;46;22;each=30
+eclair;262;6.4;24;16;each=100
+macaron|macarons;400;7;55;18;each=12
+oreo|oreos;480;5;69;20;each=11
+graham crackers|graham cracker;430;6.7;77;10;each=14
+rice krispie treat|rice krispies treat;410;3;79;9;each=22
+ice cream sandwich;240;4.3;37;9;each=70
+popsicle|ice pop;70;0;18;0;each=55
+frozen yogurt|froyo;159;4;24;5.6;cup=144
+milkshake|shake;112;3.9;18;3;cup=227
+protein ice cream|halo top;100;7;20;3;cup=130
+#Breakfast
+bacon egg and cheese|bacon egg cheese|bec;270;13;22;14;each=150
+egg mcmuffin|mcmuffin;250;13;22;11;each=137
+breakfast sandwich;265;12;23;13;each=150
+omelet|omelette;154;11;1.6;11.7;each=180
+eggs benedict;230;11;13;15;serving=280
+porridge;71;2.5;12;1.5;cup=234
+overnight oats;150;6;22;4;cup=240
+cream of wheat;56;1.8;12;0.2;cup=239
+acai bowl;120;2;20;4;serving=400
+protein pancakes|protein pancake;210;15;24;5;each=50
+crepe|crepes;224;6;29;9;each=60
+breakfast burrito;210;9;20;10;each=220
+granola bar|granola bars;471;10;64;20;each=24
+hard boiled egg|hard boiled eggs|boiled egg|boiled eggs;155;12.6;1.1;10.6;each=50
+#Meat & seafood
+turkey burger|turkey burgers;193;23;1;10;each=113
+veggie burger|beyond burger|impossible burger|plant burger;250;19;8;16;each=113
+burger patty|hamburger patty|beef patty;254;26;0;17;each=113
+meatloaf;218;13;10;14;slice=115
+pulled pork;208;20;10;10;cup=140
+pork belly;518;9;0;53;oz=28.35
+ribs|pork ribs|bbq ribs|baby back ribs;292;21;5;21;oz=28.35
+brisket;280;26;0;19;oz=28.35
+roast beef;117;19;1;3.7;slice=28
+pastrami;147;21;2;6;slice=28
+salami;378;22;2;31;slice=10
+pepperoni;494;23;1.2;44;slice=2
+prosciutto;250;27;0.3;15;slice=15
+chicken tenders|chicken strips|chicken fingers|tenders;275;17;15;16;each=40
+fried chicken;250;20;9;15;each=140
+chicken drumstick|drumstick|drumsticks;195;27;0;9;each=72
+buffalo chicken;210;24;3;11;oz=28.35
+duck;337;19;0;28;oz=28.35
+venison|deer meat;158;30;0;3.2;oz=28.35
+bison;143;28;0;2.4;oz=28.35
+lobster;89;19;0;0.9;oz=28.35
+crab|crab meat;97;19;0;1.5;oz=28.35
+scallops|scallop;111;21;5;0.8;oz=28.35
+mahi mahi|mahi;109;24;0;0.9;oz=28.35
+halibut;111;23;0;2.3;oz=28.35
+trout;190;27;0;8.5;oz=28.35
+catfish;105;18;0;2.9;oz=28.35
+swordfish;172;23;0;8;oz=28.35
+smoked salmon|lox;117;18;0;4.3;oz=28.35
+anchovies;210;29;0;9.7;oz=28.35
+canned chicken;129;24;0;3;can=142
+seitan;120;24;4;1;oz=28.35
+collagen|collagen peptides;360;90;0;0;scoop=11
+egg salad;222;10;2;20;cup=222
+chicken salad;232;15;3;18;cup=220
+tuna salad;187;16;9.4;9.3;cup=205
+#Grains & pasta
+wild rice;101;4;21;0.3;cup=164
+rice and beans;140;5;25;2;cup=240
+whole wheat pasta;149;6;30;1.7;cup=140
+udon;99;2.6;21;0.4;cup=200
+soba;99;5;21;0.1;cup=114
+gnocchi;133;3;29;0.4;cup=150
+farro;106;3.5;21;0.6;cup=160
+barley;123;2.3;28;0.4;cup=157
+bulgur;83;3;19;0.2;cup=182
+polenta;70;1.6;15;0.4;cup=240
+taco shell|taco shells|hard shell;468;6;63;22;each=13
+tostada|tostadas;474;6;63;23;each=14
+#Vegetables & sides
+tater tots;176;2;23;8.5;cup=86
+onion rings;411;4.5;38;27;each=12
+sweet potato fries;260;2;34;12;cup=120
+corn on the cob;96;3.4;21;1.5;each=90
+plantain|plantains;122;1.3;32;0.4;each=179
+tostones|fried plantains;309;1.5;50;12;each=30
+yuca|cassava;160;1.4;38;0.3;cup=206
+butternut squash|squash;45;1;12;0.1;cup=205
+pumpkin;26;1;6.5;0.1;cup=245
+eggplant;35;0.8;8.7;0.2;cup=99
+beets|beet;44;1.7;10;0.2;cup=170
+celery;14;0.7;3;0.2;each=40
+arugula;25;2.6;3.7;0.7;cup=20
+bok choy;13;1.5;2.2;0.2;cup=170
+snap peas|snow peas|sugar snap peas;42;2.8;7.6;0.2;cup=98
+artichoke|artichokes;47;3.3;10.5;0.2;each=120
+okra;33;1.9;7.5;0.2;cup=100
+radish|radishes;16;0.7;3.4;0.1;cup=116
+coleslaw;152;1.4;14;10;cup=191
+pickles|pickle;11;0.3;2.3;0.2;each=35
+olives;115;0.8;6;10.7;each=4
+sauerkraut;19;0.9;4.3;0.1;cup=142
+kimchi;15;1.1;2.4;0.5;cup=150
+potato salad;143;2;11;10;cup=250
+macaroni salad|mac salad;210;3;23;12;cup=200
+stuffing;180;3.5;22;9;cup=200
+#Beans, nuts & seeds
+pistachios;560;20;28;45;oz=28.35
+pecans;691;9;14;72;oz=28.35
+macadamia nuts|macadamias;718;8;14;76;oz=28.35
+brazil nuts;659;14;12;67;oz=28.35
+pumpkin seeds|pepitas;559;30;11;49;oz=28.35
+hemp seeds|hemp hearts;553;32;8.7;49;tbsp=10
+cashew butter;587;17.6;27.6;49.4;tbsp=16
+sunflower butter;617;17;24;55;tbsp=16
+mixed nuts;607;20;21;54;oz=28.35
+baked beans;94;4.8;21;0.4;cup=254
+white beans|cannellini beans;139;9.7;25;0.4;cup=179
+navy beans;140;8.2;26;0.6;cup=182
+lentil soup;56;3.6;9;0.4;cup=248
+falafel;333;13.3;31.8;17.8;each=17
+#More fruit
+blackberries;43;1.4;10;0.5;cup=144
+cantaloupe;34;0.8;8.2;0.2;cup=160
+honeydew;36;0.5;9;0.1;cup=170
+grapefruit;42;0.8;10.7;0.1;each=246
+plum|plums;46;0.7;11.4;0.3;each=66
+apricot|apricots;48;1.4;11;0.4;each=35
+nectarine|nectarines;44;1.1;10.6;0.3;each=142
+pomegranate;83;1.7;18.7;1.2;each=282
+papaya;43;0.5;11;0.3;cup=145
+lemon;29;1.1;9.3;0.3;each=58
+lime;30;0.7;10.5;0.2;each=67
+coconut;354;3.3;15;33;cup=80
+dried cranberries|craisins;308;0.1;82;1.4;oz=28.35
+dried mango;319;2.5;79;1.2;oz=28.35
+applesauce;68;0.2;17.5;0.1;cup=244
+fruit cup|mixed fruit|fruit salad;50;0.5;13;0.1;cup=240
+banana chips;519;2.3;58;34;oz=28.35
+figs|fig;74;0.8;19;0.3;each=50
+dragon fruit;60;1.2;13;0;each=200
+passion fruit;97;2.2;23;0.7;each=18
+#More dairy
+pepper jack;373;24;0.5;30;oz=28.35
+goat cheese;364;22;0;30;oz=28.35
+ricotta;174;11;3;13;cup=246
+whipped cream;257;3.2;12.5;22;cup=60
+coffee creamer;195;1;20;12;tbsp=15
+#Takeout & dishes
+chicken parmesan|chicken parm;210;16;12;11;serving=300
+spaghetti and meatballs;150;7;18;5.5;cup=250
+chicken alfredo|fettuccine alfredo;180;9;16;9;cup=250
+pad thai;170;8;24;5;cup=200
+general tso chicken|general tsos chicken|general tso;295;13;23;16;cup=150
+orange chicken;270;13;27;12;cup=150
+sesame chicken;290;14;24;15;cup=150
+teriyaki chicken;155;20;8;4.5;cup=140
+chicken curry|curry;150;12;6;9;cup=240
+butter chicken;160;12;6;10;cup=240
+tikka masala|chicken tikka masala;140;12;6;8;cup=240
+biryani;180;8;25;6;cup=200
+pho;45;3.5;6;0.8;cup=240
+poke bowl|poke;150;10;18;4;serving=450
+gyro;217;10;20;11;each=250
+shawarma|chicken shawarma;200;14;16;9;each=300
+kebab|kabob|kebabs|kabobs;190;18;4;11;each=100
+fajitas|chicken fajitas;150;12;12;6;cup=200
+enchilada|enchiladas;168;8;15;8.5;each=150
+tamale|tamales;200;6;20;10;each=140
+empanada|empanadas;300;9;30;16;each=100
+beef stew|stew;95;7;8;4;cup=245
+tomato soup;30;0.8;6;0.5;cup=245
+clam chowder;87;3.5;9;4;cup=248
+grilled chicken salad;95;10;4;4.5;serving=300
+caesar salad;190;7;8;15;cup=100
+cobb salad;160;10;3;12;serving=300
+chicken caesar wrap;230;14;20;10;each=250
+club sandwich;230;13;20;11;each=250
+blt;250;9;24;13;each=150
+philly cheesesteak|cheesesteak;245;14;21;12;each=280
+reuben;240;13;17;13;each=250
+sloppy joe;200;10;22;8;each=180
+chicken wrap;210;14;20;8;each=250
+calzone;260;11;30;10;each=300
+stromboli;270;12;29;12;slice=100
+ravioli;175;7.5;24;5.5;cup=200
+dumplings|potstickers|gyoza;220;8;25;9;each=25
+egg roll|egg rolls|spring roll|spring rolls;220;6;24;11;each=85
+hot pocket;260;9;30;11;each=127
+corn dog;270;8;28;14;each=100
+chicken pot pie|pot pie;220;7;20;12;each=200
+shepherds pie|shepherd's pie;125;7;11;6;cup=230
+deviled eggs|deviled egg;200;11;1;17;each=30
+#Fast food
+big mac;257;12;20;14;each=219
+whopper;231;10;18;13;each=290
+quarter pounder;250;14;17;14;each=200
+mcchicken;270;10;28;13;each=150
+chick fil a sandwich|chick-fil-a sandwich;240;15;21;10;each=183
+#More snacks
+beef stick|beef sticks|meat stick|slim jim;460;20;5;40;each=28
+fruit snacks|gummy bears|gummies;343;0;81;0;each=25
+candy bar|snickers;488;7.5;60;24;each=52
+peanut butter cups|reeses;515;10;55;30;each=21
+skittles;405;0;91;4.4;oz=28.35
+cheez its|cheez-its|cheese crackers;507;11;58;25;oz=28.35
+goldfish;460;10;67;17;oz=28.35
+pita chips;460;11;65;18;oz=28.35
+veggie straws;500;2.5;63;27;oz=28.35
+energy balls|protein balls|energy bites;420;14;45;20;each=30
+protein cookie;400;20;50;15;each=113
+rxbar;404;23;44;17;each=52
+clif bar;368;18;61;9;each=68
+kind bar;500;14;40;36;each=40
+quest bar;317;35;37;13;each=60
+#More drinks
+iced coffee;40;1;7;1;cup=240
+cold brew;2;0.1;0;0;cup=240
+frappuccino;80;1.2;14;2.2;cup=240
+cappuccino;31;1.7;2.5;1.6;cup=240
+hot chocolate|hot cocoa;77;3.5;11;2.3;cup=250
+tea|green tea;1;0;0.2;0;cup=240
+sweet tea;35;0;9;0;cup=240
+lemonade;40;0;10.4;0;cup=248
+coconut water;19;0.7;3.7;0.2;cup=240
+seltzer|sparkling water|la croix;0;0;0;0;can=355
+diet soda|diet coke|coke zero;1;0.1;0;0;can=355
+cranberry juice;46;0;12;0.1;cup=253
+bubble tea|boba|milk tea;80;0.8;15;2;cup=480
+#More sauces
+gravy;50;1.5;5;2.5;cup=240
+pesto;460;5;6;46;tbsp=16
+buffalo sauce;100;0.5;3;9;tbsp=16
+honey mustard;250;1;30;14;tbsp=15
+thousand island;379;1;15;35;tbsp=16
+balsamic vinaigrette;290;0.3;10;27;tbsp=16
+balsamic vinegar;88;0.5;17;0;tbsp=16
+tzatziki;100;4;4;7;tbsp=15
+tahini;595;17;21;54;tbsp=15
+sweet chili sauce;200;0.5;48;0.5;tbsp=19
+peanut sauce;300;10;20;20;tbsp=16
+pancake syrup;260;0;65;0;tbsp=20
+chocolate syrup;279;2;65;1;tbsp=19
+caramel;382;2;77;8;tbsp=17
+salad dressing;400;1;8;40;tbsp=15
+`;
 
 let CAT='Protein';
 const BUILTIN=[];
@@ -1627,7 +1904,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.14';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.15';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -1649,6 +1926,59 @@ function buildFoods(){
   ALIAS=[];FOODS.forEach(fd=>fd.aliases.forEach(al=>ALIAS.push([al,fd])));
   ALIAS.sort((x,y)=>(y[0].length-x[0].length)||((y[1].custom?1:0)-(x[1].custom?1:0)));
 }
+
+/* ================= ONLINE FOOD SEARCH: USDA FoodData Central + Open Food Facts ================= */
+// USDA: hundreds of thousands of lab-measured and branded foods (free public key, cached on this phone).
+// Open Food Facts: 3M+ products worldwide. Results are per 100 g; picking one saves it to My foods.
+const FDC_KEY=()=>(S.prefs&&S.prefs.fdcKey)||'DEMO_KEY',OFC='syncope.foodcache';
+function ofCache(){try{return JSON.parse(localStorage.getItem(OFC)||'{}')}catch(e){return {}}}
+function ofSave(c){try{const ks=Object.keys(c);if(ks.length>80)ks.sort((a,b)=>c[a].t-c[b].t).slice(0,ks.length-80).forEach(k=>delete c[k]);localStorage.setItem(OFC,JSON.stringify(c))}catch(e){}}
+const tidy=s=>String(s||'').replace(/\s+/g,' ').trim();
+function niceName(d){d=tidy(d);if(d===d.toUpperCase())d=d.toLowerCase();const ps=d.split(', ');
+  if(ps.length>1&&!/ or /.test(ps[1])&&ps[1].split(' ').length<=2&&ps[0].split(' ').length===1){const [a,b,...r]=ps;d=`${b} ${a.toLowerCase()}`+(r.length?` (${r.join(', ')})`:'')}return cap(d)}
+let ofLimited=0;
+async function foodSearch(q){q=tidy(q).toLowerCase();if(q.length<2)return [];const c=ofCache();if(c[q]&&Date.now()-c[q].t<30*864e5)return c[q].r;
+  const usda=fetch('https://api.nal.usda.gov/fdc/v1/foods/search?api_key='+encodeURIComponent(FDC_KEY()),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,pageSize:30,dataType:['Survey (FNDDS)','SR Legacy','Foundation','Branded']})})
+    .then(r=>{if(r.status===429){ofLimited=Date.now();return {foods:[]}}return r.ok?r.json():{foods:[]}}).then(j=>(j.foods||[]).map(f=>{const n=id=>{const x=(f.foodNutrients||[]).find(x=>x.nutrientId===id);return x?+x.value:null};
+      const p=n(1003),cc=n(1005),fa=n(1004);let k=n(1008);if(k==null)k=n(2047)??n(2048);if(k==null&&p==null)return null;
+      const br=f.dataType==='Branded',sg=br&&/^(g|grm)$/i.test(f.servingSizeUnit||'')&&f.servingSize>0?+f.servingSize:null;
+      return {src:'USDA',brand:br?cap(tidy(f.brandName||f.brandOwner).toLowerCase()):'',name:br?cap(tidy(f.description).toLowerCase()):niceName(f.description),k:k??((p||0)*4+(cc||0)*4+(fa||0)*9),p:p||0,c:cc||0,f:fa||0,sg,sn:sg?(tidy(f.householdServingFullText).toLowerCase()||'serving'):null,generic:!br}}).filter(Boolean)).catch(()=>[]);
+  const off=fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&json=1&page_size=15&fields=product_name,brands,nutriments,serving_size,serving_quantity')
+    .then(r=>r.ok?r.json():{products:[]}).then(j=>(j.products||[]).map(p=>{const N=p.nutriments||{},k=N['energy-kcal_100g'];if(k==null||!p.product_name)return null;const sq=+p.serving_quantity||null;
+      return {src:'Open Food Facts',brand:tidy(String(p.brands||'').split(',')[0]),name:cap(tidy(p.product_name)),k:+k,p:+N.proteins_100g||0,c:+N.carbohydrates_100g||0,f:+N.fat_100g||0,sg:sq&&sq<1500?sq:null,sn:sq?tidy(p.serving_size)||'serving':null}}).filter(Boolean)).catch(()=>[]);
+  const [a,b]=await Promise.all([usda,off]),words=q.split(/\s+/);
+  const sc=x=>{const n=(x.name+' '+(x.brand||'')).toLowerCase();let s=words.filter(w=>n.includes(w)).length*10;if(x.generic)s+=8;if(n.startsWith(q))s+=6;return s-n.length/40};
+  const seen=new Set(),all=[...a,...b].filter(x=>{const key=(x.name+'|'+x.brand+'|'+Math.round(x.k)).toLowerCase();if(seen.has(key)||!(x.k>=0&&x.k<950))return false;seen.add(key);return true}).sort((x,y)=>sc(y)-sc(x)).slice(0,30);
+  if(all.length){c[q]={t:Date.now(),r:all};ofSave(c)}return all}
+function localSearch(q){q=tidy(q).toLowerCase();if(q.length<2)return [];return FOODS.filter(f=>f.aliases.some(a=>a.includes(q))).slice(0,8)}
+// save an online result as one of My foods (named the way you typed it, so typing it again just works)
+function saveOnline(x,alias){const sg=x.sg||100,name=cap(tidy(alias||x.name));
+  const rec={id:'c'+uid(),name,sn:x.sg?x.sn||'serving':'100 g',sg,k:r0(x.k*sg/100),p:r1(x.p*sg/100),c:r1(x.c*sg/100),f:r1(x.f*sg/100),from:`${x.src}${x.brand?' · '+x.brand:''} · ${x.name}`};
+  S.custom=[rec,...S.custom.filter(c=>c.name.toLowerCase()!==name.toLowerCase())];buildFoods();save();return rec}
+const per=x=>x.sg?`${fmt(x.k*x.sg/100)} kcal per ${esc(x.sn||'serving')} (${r0(x.sg)} g)`:`${fmt(x.k)} kcal per 100 g`;
+const macroLine=x=>{const m=x.sg?x.sg/100:1;return `<span style="color:var(--pro)">${r0(x.p*m)}P</span> <span style="color:var(--carb)">${r0(x.c*m)}C</span> <span style="color:var(--fat)">${r0(x.f*m)}F</span>`};
+/* the search sheet. o.mode: 'log' (from the food box), 'save' (Foods tab), 'pick' (favourites) */
+function openOnline(q,o={}){let res=[],busy=false,loc=[];
+  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches Syncope's library, the USDA FoodData Central database and Open Food Facts (millions of foods and brands).</p></div>
+    <div class="inrow"><div class="inbox"><input id="olQ" type="search" value="${esc(q)}" placeholder="e.g. banana bread, Chobani, birria tacos" autocomplete="off" autocapitalize="off"></div><button class="go" type="button" id="olGo">Search</button></div>
+    ${o.mode==='pick'?`<div class="field"><label>Use it as my</label><div class="wn-acts" id="olG">${LIKE_GROUPS.map(([g,l,c],i)=>`<button type="button" class="chip" data-g="${g}" aria-pressed="${(o.g||'p')===g}" style="--c:var(${c})">${l.replace('Healthy ','').replace(/s$/,'')}</button>`).join('')}</div></div>`:''}
+    <ul class="ol-list" id="olL">${loc.map((f,i)=>`<li><button type="button" data-ol="l${i}"><span class="ol-n"><b>${esc(cap(f.name))}</b><span>${f.custom?'My foods':'Syncope library'} · ${fmt(servKcal(f))} kcal per ${esc(servLabel(f))}</span></span><span class="ol-m num">${macroLine({p:f.p*f.units[f.def]/100,c:f.c*f.units[f.def]/100,f:f.f*f.units[f.def]/100})}</span></button></li>`).join('')}
+      ${busy?`<li class="note ol-busy">Searching millions of foods…</li>`:res.map((x,i)=>`<li><button type="button" data-ol="o${i}"><span class="ol-n"><b>${esc(x.name)}</b><span>${x.brand?esc(x.brand)+' · ':''}${per(x)} · ${esc(x.src)}</span></span><span class="ol-m num">${macroLine(x)}</span></button></li>`).join('')}
+      ${!busy&&!res.length&&!loc.length?`<li class="note">${ofLimited&&Date.now()-ofLimited<36e5?'The free USDA search is busy for this hour. Try again later, or add it from the label.':'No matches yet. Try fewer or different words.'}</li>`:''}</ul>
+    <div class="row" style="justify-content:space-between"><button class="link" type="button" id="olMan">Enter from a label instead</button><button class="ghost" type="button" id="olX">${o.mode==='pick'?'Back':'Close'}</button></div>`,{nofocus:true});
+    const run=async()=>{q=$('olQ').value.trim();if(q.length<2)return;loc=localSearch(q);busy=true;res=[];draw();res=await foodSearch(q).catch(()=>[]);busy=false;if($('olL'))draw()};
+    $('olGo').onclick=run;$('olQ').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();run()}};
+    if($('olG'))$('olG').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;o.g=b.dataset.g;$('olG').querySelectorAll('[data-g]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};
+    $('olX').onclick=()=>{closeSheet();o.onClose&&o.onClose()};
+    $('olMan').onclick=()=>{closeSheet();openManual(q,true)};
+    $('olL').onclick=e=>{const b=e.target.closest('[data-ol]');if(!b)return;const id=b.dataset.ol,isL=id[0]==='l',x=isL?loc[+id.slice(1)]:res[+id.slice(1)];if(!x)return;
+      if(o.mode==='pick'){const fd=isL?x:FOODS.find(f=>f.id===saveOnline(x).id);closeSheet();o.onPick&&o.onPick(fd,o.g||guessGroup(fd));return}
+      if(isL){closeSheet();openLogFood(x);return}
+      const rec=saveOnline(x,o.mode==='log'?o.alias:null);closeSheet();
+      if(o.mode==='log'&&o.raw){const p=parseItem(o.raw);if(p&&p.ok){if(o.onLogged){o.onLogged();save()}addEntries([p.e]);input.value=(input.value||'').split(',').map(s=>s.trim()).filter(s=>s&&s.toLowerCase()!==o.raw.toLowerCase()).join(', ');status.textContent=`Saved “${rec.name}” from ${x.src}. Next time just type it.`;return}}
+      const fd=FOODS.find(f=>f.id===rec.id);if(fd)openLogFood(fd)}};
+  draw();if(q&&q.length>=2)setTimeout(()=>{const b=$('olGo');if(b)b.click()},0)}
+function guessGroup(fd){const p=fd.p*4,c=fd.c*4,f=fd.f*9,t=p+c+f||1;if(fd.k<60&&c/t>.5)return 'v';if(p/t>=.4)return 'p';if(f/t>=.55)return 'f';return 'c'}
 
 /* ---------- utils ---------- */
 function pad(n){return String(n).padStart(2,'0')}
@@ -1841,14 +2171,18 @@ function submitFood(){
   if(miss.length){
     input.value=miss.map(m=>m.raw).join(', ');
     status.className='status err';
-    status.textContent=`Not in the food library: “${miss.map(m=>m.raw).join('”, “')}”. Add its macros once and it'll be recognized from now on.`;
-    openManual(miss[0].raw,true);
+    status.textContent=`Looking up “${miss.map(m=>m.raw).join('”, “')}” in the food databases…`;
+    {const t=(stripQty(miss[0].raw).term||miss[0].raw).trim();openOnline(t,{mode:'log',raw:miss[0].raw,alias:t})}
   }else{
     input.value=''; status.className='status';
-    status.textContent=guesses.length?`Closest matches used for “${guesses.map(g=>g.raw).join('”, “')}”. Tap an item marked check to adjust it.`:'';
+    status.innerHTML=guesses.length?`Closest matches used for “${esc(guesses.map(g=>g.raw).join('”, “'))}”. <button class="link" type="button" data-olfix="${esc(guesses[0].raw)}" data-olid="${esc(guesses[0].e.id)}">Find the exact food</button>`:'';
   }
 }
 $('addBtn').addEventListener('click',submitFood);
+status.addEventListener('click',e=>{const b=e.target.closest('[data-olfix]');if(!b)return;const raw=b.dataset.olfix,id=b.dataset.olid,t=(stripQty(raw).term||raw).trim();
+  // replace the guessed entry with the exact food once one is picked
+  const k=S.day;const drop=()=>{S.days[k]=(S.days[k]||[]).filter(x=>x.id!==id);if(!S.days[k].length)delete S.days[k]};
+  openOnline(t,{mode:'log',raw,alias:t,onLogged:drop});status.textContent=''});
 input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&($('sugg').hidden||sIdx<0)){e.preventDefault();submitFood()}});
 $('manualBtn').onclick=()=>openManual(input.value.trim(),true);
 
@@ -2141,11 +2475,12 @@ function renderFoods(){renderTip('foods');
   setTimeout(()=>{const fb=$('fAllBtn');if(fb)fb.onclick=()=>{S.fAll=true;renderFoods()}},0);
   $('dbCount').textContent=q?`${b.length} match${b.length===1?'':'es'}`:S.fCat==='All'?`${BUILTIN.length} common foods`:S.fCat;
   const cap=!q&&!S.fAll&&b.length>24;
-  $('dbFoods').innerHTML=b.length?(cap?b.slice(0,24):b).map(fItem).join('')+(cap?`<li style="grid-column:1/-1;list-style:none"><button class="ghost" type="button" id="fAllBtn" style="width:100%">Show all ${b.length} foods</button></li>`:''):'<li class="note" style="grid-column:1/-1">No match. Add it with “+ New food”.</li>';
+  const olBtn=q.length>=2?`<li style="grid-column:1/-1;list-style:none"><button class="ghost ol-more" type="button" data-olq="${esc(q)}">Search millions of foods for “${esc(q)}”</button></li>`:'';
+  $('dbFoods').innerHTML=(b.length?(cap?b.slice(0,24):b).map(fItem).join('')+(cap?`<li style="grid-column:1/-1;list-style:none"><button class="ghost" type="button" id="fAllBtn" style="width:100%">Show all ${b.length} foods</button></li>`:''):'<li class="note" style="grid-column:1/-1">Not in the built-in list yet.</li>')+olBtn;
 }
 $('fSearch').addEventListener('input',renderFoods);
 $('fCats').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(b){S.fCat=b.dataset.cat;renderFoods()}});
-$('v-foods').addEventListener('click',e=>{const mb=e.target.closest('[data-meal-i]');if(mb)return openMeal(+mb.dataset.mealI);const b=e.target.closest('[data-food]');if(b){const fd=FOODS.find(f=>f.id===b.dataset.food);if(fd)openLogFood(fd)}});
+$('v-foods').addEventListener('click',e=>{const ol=e.target.closest('[data-olq]');if(ol)return openOnline(ol.dataset.olq,{mode:'save'});const mb=e.target.closest('[data-meal-i]');if(mb)return openMeal(+mb.dataset.mealI);const b=e.target.closest('[data-food]');if(b){const fd=FOODS.find(f=>f.id===b.dataset.food);if(fd)openLogFood(fd)}});
 $('newFood').onclick=()=>openManual('',true);
 
 /* ---------- PLAN ---------- */
@@ -3006,7 +3341,10 @@ const ING=Object.fromEntries(ING_SRC.split('\n').map(l=>{const [k,n,food,g,u,d,l
 const SAUCE={teriyaki:['teriyaki sauce','tbsp',2,'Teriyaki sauce'],soy:['soy sauce','tbsp',1,'Low-sodium soy sauce'],salsa:['salsa','tbsp',3,'Salsa'],marinara:['marinara','cup',0.5,'Marinara sauce'],honey:['honey','tbsp',0.5,'Honey']};
 const LIKE_GROUPS=[['p','Proteins','--pro'],['c','Carbs','--carb'],['f','Healthy fats','--fat'],['v','Vegetables','--good'],['fr','Fruit','--kcal']];
 const LIKE_DEF={p:['chicken','eggs','yogurt','salmon','beef','shrimp'],c:['rice','potato','oats','sweet','wrap','pasta'],f:['oil','avocado','almonds','pb','cheese'],v:['broccoli','spinach','pepper','asparagus','tomato','onion'],fr:['banana','blueberries','strawberries']};
-function likes(){const L=(S.profile&&S.profile.likes)||{};const out={},custom=!!(S.profile&&S.profile.likes);LIKE_GROUPS.forEach(([g])=>{const v=(L[g]||[]).filter(k=>ING[k]);out[g]=v.length?v:LIKE_DEF[g]});out.custom=custom;return out}
+const XDEF={p:[150,80,300,'Meat & seafood','ld'],c:[150,60,350,'Grains & pasta','bld'],f:[20,10,45,'Pantry','bld'],v:[100,100,100,'Produce','bld'],fr:[120,60,240,'Produce','b']};
+function ingX(){const X=(S.profile&&S.profile.likesX)||{};Object.entries(X).forEach(([k,x])=>{if(ING[k]||!XDEF[x.g])return;const [d,lo,hi,aisle,slots]=XDEF[x.g];
+  ING[k]={k,n:x.n,food:x.food,g:x.g,u:'g',d,lo,hi,raw:1,aisle:x.g==='p'?'Other':aisle,cook:'any',slots,custom:true}})}
+function likes(){ingX();const L=(S.profile&&S.profile.likes)||{};const out={},custom=!!(S.profile&&S.profile.likes);LIKE_GROUPS.forEach(([g])=>{const v=(L[g]||[]).filter(k=>ING[k]);out[g]=v.length?v:LIKE_DEF[g]});out.custom=custom;return out}
 const grp=(ks,f)=>ks.map(k=>ING[k]).filter(x=>x&&(!f||f(x)));
 const rot=(a,i)=>a.length?a[((i%a.length)+a.length)%a.length]:null;
 const cap1=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -3015,8 +3353,8 @@ function short(x){return x.n.replace(/ \(.*\)/,'').replace(/^(Extra-firm|Lean gr
 /* meal builders: each returns {name,fmt,slot,parts:[{x,role,q?}],sauce,style} or null */
 function buildMeals(slot,seed){
   const L=likes(),out=[],P=grp(L.p),C=grp(L.c),F=grp(L.f),V=grp(L.v),FR=grp(L.fr);
-  const pick=(arr,f,i)=>rot(arr.filter(f),i);
-  const veg=(f,n,i)=>{const a=V.filter(f);if(!a.length)return [];const o=[];for(let j=0;j<a.length&&o.length<n;j++)o.push(a[(i+j)%a.length]);return o};
+  const pick=(arr,f,i)=>rot(arr.filter(x=>f(x)||x.cook==='any'),i);
+  const veg=(f,n,i)=>{const a=V.filter(x=>f(x)||x.cook==='any');if(!a.length)return [];const o=[];for(let j=0;j<a.length&&o.length<n;j++)o.push(a[(i+j)%a.length]);return o};
   const add=(m)=>{if(m&&m.parts.every(p=>p.x))out.push(m)};
   const s=seed||0;
   if(slot==='breakfast'){
@@ -3027,6 +3365,8 @@ function buildMeals(slot,seed){
       const w=pick(C,x=>x.k==='wrap',0);if(w)add({fmt:'burrito',name:'Breakfast burrito',parts:[{x:p,role:'p'},{x:w,role:'c'},...(pick(F,x=>x.k==='cheese'||x.k==='avocado',i+s)?[{x:pick(F,x=>x.k==='cheese'||x.k==='avocado',i+s),role:'f'}]:[]),...veg(x=>['pepper','onion','spinach','tomato'].includes(x.k),2,i+s).map(v=>({x:v,role:'x'}))],sauce:'salsa'});
       const av=F.find(x=>x.k==='avocado'),tb=pick(C,x=>x.k==='toast'||x.k==='bagel'||x.k==='muffin',i+s);if(av&&tb)add({fmt:'avotoast',name:`Avocado ${short(tb)} with ${p.k==='whites'?'egg whites':'eggs'}`,parts:[{x:p,role:'p'},{x:tb,role:'c'},{x:av,role:'f'},...veg(x=>x.k==='tomato'||x.k==='spinach',1,i).map(v=>({x:v,role:'x'}))]});
     });
+    P.filter(x=>x.cook==='any').forEach((p,i)=>{const c=pick(C,x=>x.cook==='toast'||x.k==='potato'||x.k==='oats',i+s),f=pick(F,x=>['avocado','cheese','oil'].includes(x.k),i+s),vs=veg(x=>x.slots.includes('b'),1,i+s);
+      if(c)add({fmt:'plate',name:`${cap1(short(p))} breakfast plate`,parts:[{x:p,role:'p'},{x:c,role:'c'},...(f?[{x:f,role:'f'}]:[]),...vs.map(v=>({x:v,role:'x'}))]})});
     const fruits=FR.length?FR:grp(['banana']);
     const oats=C.find(x=>x.k==='oats');
     if(oats)(dairy.length?dairy:grp(['whey'])).forEach((p,i)=>{const fr=rot(fruits,i+s),f=pick(F,x=>['pb','ab','almonds','walnuts','chia'].includes(x.k),i+s);
@@ -3035,7 +3375,7 @@ function buildMeals(slot,seed){
       add({fmt:'parfait',name:`${fr?cap1(sing(short(fr)))+' ':''}${p.k==='yogurt'?'Greek yogurt':'cottage cheese'} parfait`,parts:[{x:p,role:'p'},{x:gr,role:'c'},...(fr?[{x:fr,role:'c'}]:[]),...(f?[{x:f,role:'f'}]:[])]})});
     return out}
   const main=P.filter(x=>x.slots.includes(slot==='lunch'?'l':'d')&&!['eggs','cold','shake'].includes(x.cook));
-  const grain=C.filter(x=>['rice','quinoa','couscous','lentils','beans'].includes(x.cook)),pot=C.filter(x=>x.cook==='potato'),past=C.filter(x=>x.cook==='pasta'),nood=C.filter(x=>x.cook==='noodles'||x.cook==='rice'),tort=C.filter(x=>x.cook==='tortilla');
+  const grain=C.filter(x=>['rice','quinoa','couscous','lentils','beans','any'].includes(x.cook)),pot=C.filter(x=>x.cook==='potato'),past=C.filter(x=>x.cook==='pasta'),nood=C.filter(x=>x.cook==='noodles'||x.cook==='rice'),tort=C.filter(x=>x.cook==='tortilla');
   main.forEach((p,i)=>{const j=i+s;
     if(!['tuna','deli'].includes(p.cook)){
       const g=rot(grain,j);if(g){const med=F.some(x=>x.k==='feta')||V.some(x=>x.k==='cucumber'),tex=g.cook==='beans'||F.some(x=>x.k==='avocado');
@@ -3044,14 +3384,14 @@ function buildMeals(slot,seed){
         const vs=style==='med'?veg(x=>['cucumber','tomato','greens','spinach','pepper','onion'].includes(x.k),2,j):veg(x=>x.cook==='roast'||x.cook==='saute'||x.cook==='wilt',2,j);
         add({fmt:'bowl',style,name:style==='teriyaki'?`Teriyaki ${short(p)} ${short(g)} bowl`:style==='med'?`Mediterranean ${short(p)} bowl`:`${cap1(short(p))} burrito bowl`,parts:[{x:p,role:'p'},{x:g,role:'c'},...(f?[{x:f,role:'f'}]:[]),...vs.map(v=>({x:v,role:'x'}))],sauce:style==='teriyaki'?'teriyaki':style==='burrito'?'salsa':null})}
       const po=rot(pot,j);if(po&&!['ground','tuna','deli'].includes(p.cook)&&(slot==='dinner'||j%2===0)){const vs=veg(x=>x.cook==='roast',2,j+1);if(vs.length)add({fmt:'sheetpan',name:`Sheet-pan ${short(p)} with ${short(po)} & ${short(vs[0])}`,parts:[{x:p,role:'p'},{x:po,role:'c'},{x:ING.oil,role:'f'},...vs.map(v=>({x:v,role:'x'}))]})}
-      const nd=rot(nood,j+1);if(nd&&['chicken','steak','shrimp','tofu','pork','ground','tempeh','thigh'].includes(p.cook)){const vs=veg(x=>['pepper','broccoli','onion','mushrooms','cabbage','carrots','greenbeans','zucchini','spinach'].includes(x.k),3,j);if(vs.length)add({fmt:'stirfry',name:`${cap1(short(p))} stir-fry with ${short(nd)}`,parts:[{x:p,role:'p'},{x:nd,role:'c'},{x:ING.oil,role:'f'},...vs.map(v=>({x:v,role:'x'}))],sauce:'soy'})}
+      const nd=rot(nood,j+1);if(nd&&['chicken','steak','shrimp','tofu','pork','ground','tempeh','thigh','any'].includes(p.cook)){const vs=veg(x=>['pepper','broccoli','onion','mushrooms','cabbage','carrots','greenbeans','zucchini','spinach'].includes(x.k),3,j);if(vs.length)add({fmt:'stirfry',name:`${cap1(short(p))} stir-fry with ${short(nd)}`,parts:[{x:p,role:'p'},{x:nd,role:'c'},{x:ING.oil,role:'f'},...vs.map(v=>({x:v,role:'x'}))],sauce:'soy'})}
       const pa=rot(past,j);if(pa&&['chicken','ground','shrimp','thigh','salmon'].includes(p.cook)){const red=j%2===0;const vs=veg(x=>['spinach','mushrooms','tomato','zucchini','broccoli','pepper','kale','onion'].includes(x.k),2,j);
         add({fmt:'pasta',name:red?`${cap1(short(p))} marinara pasta`:`Garlic ${short(p)} pasta with parmesan`,parts:[{x:p,role:'p'},{x:pa,role:'c'},{x:red?pick(F,x=>x.k==='parm'||x.k==='cheese',0)||ING.parm:ING.oil,role:'f'},...(red?[]:[{x:ING.parm,role:'x'}]),...vs.map(v=>({x:v,role:'x'}))],sauce:red?'marinara':null})}
-      const tt=rot(tort,j);if(tt&&['chicken','ground','shrimp','whitefish','steak','thigh','salmon','pork'].includes(p.cook)){const f=pick(F,x=>['avocado','cheese'].includes(x.k),j);const vs=veg(x=>['cabbage','pepper','onion','tomato','greens'].includes(x.k),2,j);
+      const tt=rot(tort,j);if(tt&&['chicken','ground','shrimp','whitefish','steak','thigh','salmon','pork','any'].includes(p.cook)){const f=pick(F,x=>['avocado','cheese'].includes(x.k),j);const vs=veg(x=>['cabbage','pepper','onion','tomato','greens'].includes(x.k),2,j);
         add({fmt:'tacos',name:`${cap1(short(p))} ${tt.k==='wrap'&&slot==='lunch'?'wrap':'tacos'}`,parts:[{x:p,role:'p'},{x:tt,role:'c'},...(f?[{x:f,role:'f'}]:[]),...vs.map(v=>({x:v,role:'x'}))],sauce:'salsa'})}
     }
     if(slot==='lunch'){
-      const w=rot(tort,j);if(w&&['chicken','tuna','deli','thigh','salmon','shrimp','tofu'].includes(p.cook)){const f=pick(F,x=>['avocado','hummus','cheese','feta'].includes(x.k),j);const vs=veg(x=>['greens','tomato','cucumber','spinach','pepper'].includes(x.k),2,j);
+      const w=rot(tort,j);if(w&&['chicken','tuna','deli','thigh','salmon','shrimp','tofu','any'].includes(p.cook)){const f=pick(F,x=>['avocado','hummus','cheese','feta'].includes(x.k),j);const vs=veg(x=>['greens','tomato','cucumber','spinach','pepper'].includes(x.k),2,j);
         add({fmt:'wrap',name:`${cap1(short(p))} ${w.k==='corn'?'tacos':'wrap'}`,parts:[{x:p,role:'p'},{x:w,role:'c'},...(f?[{x:f,role:'f'}]:[]),...vs.map(v=>({x:v,role:'x'}))]})}
       const gb=pick(C,x=>['quinoa','chickpeas','blackbeans','lentils','couscous'].includes(x.k),j);const f=pick(F,x=>['feta','avocado','oil','walnuts','almonds'].includes(x.k),j);const vs=veg(x=>['greens','spinach','kale','cucumber','tomato','pepper','carrots'].includes(x.k),3,j);
       if(gb&&vs.length)add({fmt:'salad',name:`${cap1(short(p))} power salad`,parts:[{x:p,role:'p'},{x:gb,role:'c'},...(f?[{x:f,role:'f'}]:[]),...(f&&f.k!=='oil'?[{x:ING.oil,role:'x',q:0.5}]:[]),...vs.map(v=>({x:v,role:'x'}))]})}
@@ -3074,7 +3414,7 @@ med=1788619996569-ecdac125ee35,1609461098241-8f259e32bdb9,1786975357128-48f5bb7b
 burritobowl=1668665771757-4d42737d295a,1533606117812-0783e8e690f1,1771074168439-0083aaac48e7,1520066391310-428f06ebd602,1771074168436-8692a866cdb1,1716392976013-66d90cac4411`.split('\n').map(l=>{const [k,v]=l.split('=');return [k,v.split(',').map(x=>'photo-'+x)]}));
 function recipePhoto(r,slot){const key=r.fmt==='bowl'?(r.style==='teriyaki'?'teriyaki':r.style==='med'?'med':'burritobowl'):r.fmt==='tacos'&&/wrap$/i.test(r.name)?'wrap':r.fmt==='wrap'&&/tacos$/i.test(r.name)?'tacos':r.fmt;
   const pool=FMT_PH[key];return pool?pool[hashStr(r.name)%pool.length]:photoFor(slot,r.name)}
-const FMT_MIN={scramble:15,burrito:15,avotoast:10,oats:8,parfait:5,bowl:30,sheetpan:40,stirfry:25,pasta:25,tacos:25,wrap:10,salad:20};
+const FMT_MIN={plate:15,scramble:15,burrito:15,avotoast:10,oats:8,parfait:5,bowl:30,sheetpan:40,stirfry:25,pasta:25,tacos:25,wrap:10,salad:20};
 function fitRecipe(m,T){const ing=m.parts.map(p=>({food:p.x.food,role:p.role==='x'?'x':p.role,unit:p.x.u,d:p.q!=null?p.q:p.x.d,lo:p.role==='x'?(p.q!=null?p.q:p.x.d):p.x.lo,hi:p.role==='x'?(p.q!=null?p.q:p.x.d):p.x.hi,_x:p.x}));
   if(m.sauce){const [food,unit,q]=SAUCE[m.sauce];ing.push({food,role:'x',unit,d:q,lo:q,hi:q,_s:m.sauce})}
   const r=fitIdea({name:m.name,ing},T),used=new Set();
@@ -3107,7 +3447,8 @@ function recipeSteps(r,sv){const by=f=>r.ing.filter(i=>i._x&&i._x.cook===f),P=r.
     shrimp:i=>`Toss ${A(i)} peeled shrimp with garlic, salt and pepper. Cook in a hot pan 1–2 min per side until pink.`,
     tuna:i=>`Drain ${A(i)} tuna and mix with a squeeze of lemon, salt and pepper.`,deli:i=>`Use ${A(i)} sliced turkey breast.`,
     tofu:i=>`Press ${A(i)} tofu for 10 min, cube it, and pan-fry or air-fry at 400°F (200°C) for 12–15 min until golden.`,tempeh:i=>`Slice ${A(i)} tempeh, steam 5 min, then pan-fry 3 min per side until browned.`,
-    eggs:i=>`Whisk ${A(i)} ${N(i)} with a pinch of salt and pepper.`};
+    eggs:i=>`Whisk ${A(i)} ${N(i)} with a pinch of salt and pepper.`,
+    any:i=>`Prepare ${A(i)} ${N(i)}: cook it the way the package or your recipe says (pan, oven or air fryer), seasoned with salt, pepper and garlic.`};
   const cookC={rice:i=>`Cook the rice: rinse about ${gramsTxt(qOf(r,i)*(sv||1)*i._x.raw)} dry ${N(i)} and simmer covered in twice its volume of water (brown rice: 2½×) for 15 min (brown: 40 min). This makes about ${A(i)} cooked.`,
     quinoa:i=>`Rinse about ${gramsTxt(qOf(r,i)*(sv||1)*i._x.raw)} dry quinoa, simmer in twice the water for 15 min, then fluff. Makes about ${A(i)} cooked.`,
     couscous:i=>`Pour boiling water over about ${gramsTxt(qOf(r,i)*(sv||1)*i._x.raw)} dry couscous (equal volume), cover 5 min, fluff. Makes about ${A(i)} cooked.`,
@@ -3116,21 +3457,23 @@ function recipeSteps(r,sv){const by=f=>r.ing.filter(i=>i._x&&i._x.cook===f),P=r.
     lentils:i=>`Simmer about ${gramsTxt(qOf(r,i)*(sv||1)*i._x.raw)} dry lentils in 3× the water for 20 min. Makes about ${A(i)} cooked.`,
     beans:i=>`Rinse and warm ${A(i)} canned ${N(i)} with a pinch of cumin and salt.`,
     potato:i=>`Cube ${A(i)} ${N(i)}, toss with a little of the oil and salt, and roast at 425°F (220°C) for 25–30 min, flipping once.`,
-    toast:i=>`Toast ${A(i)} ${N(i)}.`,tortilla:i=>`Warm ${A(i)} ${N(i)} in a dry pan, 20 sec per side.`,oats:i=>`Cook ${A(i)} oats with water or milk (1:2), 3–5 min on the stove or 2 min in the microwave.`};
+    toast:i=>`Toast ${A(i)} ${N(i)}.`,tortilla:i=>`Warm ${A(i)} ${N(i)} in a dry pan, 20 sec per side.`,oats:i=>`Cook ${A(i)} oats with water or milk (1:2), 3–5 min on the stove or 2 min in the microwave.`,
+    any:i=>`Prepare ${A(i)} ${N(i)} following the package directions (or warm it through if it's ready to eat).`};
   const f=r.fmt;
+  if(f==='plate'){const c=C[0];st.push((cookP[P._x.cook]||cookP.any)(P));if(c)st.push((cookC[c._x.cook]||cookC.any)(c));if(V.length)st.push(`Sauté or slice ${vlist}.`);st.push(`Plate it up${F.length?` with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}`:''}.`);return st}
   if(f==='parfait'){const p=P;st.push(`Spoon half of the ${A(p)} ${N(p)} into a glass or jar.`);st.push(`Layer with half of the ${C.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`);st.push(`Repeat the layers${F.length?` and top with ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}. Eat now or refrigerate up to 2 days (add granola just before eating).`);return st}
   if(f==='oats'){const o=C.find(i=>i._x.k==='oats'),fr=C.find(i=>i._x.g==='fr');st.push(cookC.oats(o));st.push(P._x.k==='whey'?`Let it cool 1 min, then stir in ${A(P)} whey protein (adding it off the heat keeps it smooth).`:`Top with ${A(P)} ${N(P)} for creamy protein.`);if(fr)st.push(`Add ${A(fr)} ${N(fr)}${fr._x.u==='each'?', sliced':''}.`);if(F.length)st.push(`Finish with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`);return st}
   if(f==='scramble'||f==='burrito'||f==='avotoast'){const c=C[0];if(c&&c._x.k==='potato'){st.push(`Dice ${A(c)} potatoes small and pan-fry with ${oil?A(oil):'a little'} oil, 10–12 min, until crisp.`)}
     if(V.length)st.push(`Sauté ${vlist} in a non-stick pan for 3–4 min until soft.`);st.push(cookP.eggs(P)+` Pour into the pan and stir gently over medium-low heat for 2–3 min until just set.`);
-    if(c&&c._x.k!=='potato')st.push(f==='burrito'?cookC.tortilla(c)+` Fill with the eggs${F.length?`, ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}${sauce?` and ${A(sauce)} salsa`:''}, then roll it up.`:f==='avotoast'?`Toast ${A(c)} ${N(c)} and spread with ${F.map(i=>`${A(i)} mashed ${N(i)}`).join(', ')}, a pinch of salt and chilli flakes. Top with the eggs.`:cookC.toast(c));
+    if(c&&c._x.k!=='potato')st.push(f==='burrito'?(cookC[c._x.cook]||cookC.tortilla)(c)+` Fill with the eggs${F.length?`, ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}${sauce?` and ${A(sauce)} salsa`:''}, then roll it up.`:f==='avotoast'?`Toast ${A(c)} ${N(c)} and spread with ${F.map(i=>`${A(i)} mashed ${N(i)}`).join(', ')}, a pinch of salt and chilli flakes. Top with the eggs.`:(cookC[c._x.cook]||cookC.toast)(c));
     if(F.length&&f==='scramble')st.push(`Top with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`);return st}
   const p=P,c=C[0];
   if(f==='sheetpan'){st.push(`Heat the oven to 425°F (220°C) and line a sheet pan.`);st.push(`Toss ${A(c)} cubed ${N(c)} and ${vlist} with ${oil?A(oil):'1 tbsp'} olive oil, salt, pepper and garlic powder. Spread out and roast 15 min.`);
     st.push(`Push the vegetables aside, add the ${A(p)} ${N(p)} (seasoned with salt, pepper and paprika) and roast another ${p._x.cook==='salmon'||p._x.cook==='whitefish'||p._x.cook==='shrimp'?'10–12':'18–22'} min, until cooked through.`);st.push(`Plate it all together. A squeeze of lemon brightens it up.`);return st}
-  st.push((cookP[p._x.cook]||cookP.chicken)(p));
-  if(f==='stirfry'){st.push(cookC[c._x.cook](c));st.push(`In a hot wok or large pan with ${oil?A(oil):'1 tbsp'} oil, stir-fry ${vlist} for 4–5 min until crisp-tender.`);st.push(`Add the ${N(p)} back in with ${sauce?A(sauce)+' soy sauce':'a splash of soy sauce'}, a little garlic and ginger. Toss 1 min, then serve over the ${N(c)}.`);return st}
-  if(f==='pasta'){st.push(cookC.pasta(c));st.push(`In the same pan, cook ${vlist} for 3–4 min.`);st.push(sauce?`Stir in ${A(sauce)} marinara, add the ${N(p)} and pasta, and heat through 2 min. Top with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`:`Toss the pasta with ${oil?A(oil):'1 tbsp'} olive oil, 2 cloves of garlic, the ${N(p)} and the vegetables. Top with parmesan and black pepper.`);return st}
-  if(f==='tacos'||f==='wrap'){if(c)st.push(cookC.tortilla(c));if(V.length)st.push(`Slice ${vlist} thinly.`);st.push(`Fill with the ${N(p)}, vegetables${F.length?`, ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}${sauce?` and ${A(sauce)} salsa`:''}. ${f==='wrap'?'Roll tightly and slice in half.':'Add hot sauce or lime if you like.'}`);return st}
+  st.push((cookP[p._x.cook]||cookP.any)(p));
+  if(f==='stirfry'){st.push((cookC[c._x.cook]||cookC.any)(c));st.push(`In a hot wok or large pan with ${oil?A(oil):'1 tbsp'} oil, stir-fry ${vlist} for 4–5 min until crisp-tender.`);st.push(`Add the ${N(p)} back in with ${sauce?A(sauce)+' soy sauce':'a splash of soy sauce'}, a little garlic and ginger. Toss 1 min, then serve over the ${N(c)}.`);return st}
+  if(f==='pasta'){st.push((cookC[c._x.cook]||cookC.pasta)(c));st.push(`In the same pan, cook ${vlist} for 3–4 min.`);st.push(sauce?`Stir in ${A(sauce)} marinara, add the ${N(p)} and pasta, and heat through 2 min. Top with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`:`Toss the pasta with ${oil?A(oil):'1 tbsp'} olive oil, 2 cloves of garlic, the ${N(p)} and the vegetables. Top with parmesan and black pepper.`);return st}
+  if(f==='tacos'||f==='wrap'){if(c)st.push((cookC[c._x.cook]||cookC.tortilla)(c));if(V.length)st.push(`Slice ${vlist} thinly.`);st.push(`Fill with the ${N(p)}, vegetables${F.length?`, ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}${sauce?` and ${A(sauce)} salsa`:''}. ${f==='wrap'?'Roll tightly and slice in half.':'Add hot sauce or lime if you like.'}`);return st}
   if(f==='salad'){if(c)st.push((cookC[c._x.cook]||cookC.beans)(c));st.push(`Chop ${vlist} and add to a large bowl.`);st.push(`Add the ${N(p)} and ${N(c)}${F.length?`, top with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}`:''}. Dress with olive oil, lemon, salt and pepper.`);return st}
   // bowls
   st.push((cookC[c._x.cook]||cookC.rice)(c));
@@ -3144,7 +3487,7 @@ function groceryList(r,sv){const rows={};
     else t=amtTxt(i,qOf(r,i)*sv);
     (rows[x.aisle]=rows[x.aisle]||[]).push(`${x.n} — ${t}`)});
   (rows.Pantry=rows.Pantry||[]).push('Salt, pepper, garlic & your favourite spices');
-  const ORDER=['Produce','Meat & seafood','Deli','Dairy & eggs','Bakery','Grains & pasta','Pantry'];return ORDER.filter(a=>rows[a]).map(a=>[a,rows[a]])}
+  const ORDER=['Produce','Meat & seafood','Deli','Dairy & eggs','Bakery','Grains & pasta','Pantry','Other'];return ORDER.filter(a=>rows[a]).map(a=>[a,rows[a]])}
 /* page */
 let cookSlot=null,cookSeed=0;
 function renderCook(){const el=$('pg-cook');if(!el)return;const L=likes();if(!cookSlot)cookSlot=(()=>{const h=new Date().getHours();return h<10?'breakfast':h<15?'lunch':'dinner'})();
@@ -3159,12 +3502,14 @@ function renderCook(){const el=$('pg-cook');if(!el)return;const L=likes();if(!co
     if(e.target.closest('#ckLikes,#ckLikes1')){openLikes();return}
     const c=e.target.closest('[data-ck]');if(c)openRecipe(el._list[+c.dataset.ck],cookSlot)}}
 GACT.ckLikes=()=>openLikes();
-function openLikes(){const cur=(S.profile&&S.profile.likes)||{},sel={};LIKE_GROUPS.forEach(([g])=>sel[g]=new Set((cur[g]&&cur[g].length?cur[g]:LIKE_DEF[g])));
-  sheet(`<div><div class="eyebrow">Your favourites</div><h3>What do you like to eat?</h3><p class="note">Tap everything you enjoy. More picks means more variety. Recipes, portions and grocery lists are built from these.</p></div>
+function openLikes(pre){ingX();const cur=(S.profile&&S.profile.likes)||{},sel=pre||{};if(!pre)LIKE_GROUPS.forEach(([g])=>sel[g]=new Set((cur[g]&&cur[g].length?cur[g]:LIKE_DEF[g])));
+  sheet(`<div><div class="eyebrow">Your favourites</div><h3>What do you like to eat?</h3><p class="note">Tap everything you enjoy. More picks means more variety. Recipes, portions and grocery lists are built from these.</p><button class="ghost ol-more" type="button" id="lkAny">＋ Add any food (search millions)</button></div>
     ${LIKE_GROUPS.map(([g,l,c])=>`<div class="field"><label style="color:var(${c})">${l}</label><div class="wn-acts" data-lg="${g}">${Object.values(ING).filter(x=>x.g===g).map(x=>`<button type="button" class="chip" data-lk="${x.k}" aria-pressed="${sel[g].has(x.k)}">${esc(x.n)}</button>`).join('')}</div></div>`).join('')}
     <div class="row" style="justify-content:flex-end"><button class="ghost" type="button" id="lkX">Cancel</button><button class="primary" type="button" id="lkOk">Save favourites</button></div>`,{nofocus:true});
   $('sheetRoot').querySelector('.sheet').onclick=e=>{const b=e.target.closest('[data-lk]');if(!b)return;const g=b.closest('[data-lg]').dataset.lg;const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));on?sel[g].add(b.dataset.lk):sel[g].delete(b.dataset.lk)};
   $('lkX').onclick=closeSheet;
+  $('lkAny').onclick=()=>openOnline('',{mode:'pick',onClose:()=>openLikes(sel),onPick:(fd,g)=>{const k='x'+String(fd.id).replace(/[^a-z0-9]/gi,'');S.profile.likesX=S.profile.likesX||{};
+    S.profile.likesX[k]={n:cap(fd.name),food:fd.aliases?fd.aliases[0]:fd.name.toLowerCase(),g};delete ING[k];ingX();Object.values(sel).forEach(set=>set.delete(k));sel[g].add(k);save();openLikes(sel);toast(`Added ${esc(cap(fd.name))}`)}});
   $('lkOk').onclick=()=>{if(!sel.p.size||!sel.c.size){toast('Pick at least one protein and one carb');return}S.profile.likes=Object.fromEntries(LIKE_GROUPS.map(([g])=>[g,[...sel[g]]]));save();closeSheet();cookSeed=0;renderCook();toast('Saved. Recipes rebuilt from your favourites')}}
 function openRecipe(r,slot){let sv=1;const draw=()=>{const gr=gradeMeal(slot,r.entries,goalsFor(todayKey())),gl=groceryList(r,sv),k=r.got.p*4+r.got.c*4+r.got.f*9;
   sheet(`<div class="rc-ph" style='background-image:url("https://images.unsplash.com/${recipePhoto(r,slot)}?w=900&q=65&auto=format&fit=crop")'></div>
