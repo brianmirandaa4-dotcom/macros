@@ -1940,7 +1940,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.26';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.27';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3197,8 +3197,8 @@ function renderPrefs(){
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}
       ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Your music keeps playing and dips while it sounds.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">${v==='none'?'🔇':'▶'} ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
-      <div class="gopts">${[['dip','Dip my music'],['pause','Pause music for the sound']].map(([v,l])=>`<button type="button" class="chip" data-pk="alertStyle" data-pv="${v}" aria-pressed="${alertStyle()===v}">${l}</button>`).join('')}<button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
-      <p class="note" style="padding:0 14px;margin:0">Can’t hear it? Flip off the silent switch on the side of your iPhone, or pick “Pause music for the sound”.</p>
+      <div class="gopts">${[['dip','Play over my music (ringer on)'],['pause','Always play, even on silent (pauses music for the sound)']].map(([v,l])=>`<button type="button" class="chip" data-pk="alertStyle" data-pv="${v}" aria-pressed="${alertStyle()===v}">${l}</button>`).join('')}<button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
+      <p class="note" style="padding:0 14px;margin:0">On iPhone, web apps can’t dim other apps’ music. “Play over my music” keeps your music going but is muted when your ringer is off. “Always play” works on silent but pauses the music while the sound plays.</p>
       <div class="rs-up"><button type="button" class="ghost" id="rsUp">${cm?'Replace your sound':'＋ Upload your own sound'}</button>${cm?'<button type="button" class="link" id="rsDel" style="color:var(--over)">Remove</button>':''}<input type="file" id="rsIn" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden><span class="note" id="rsSt">${cm?`${esc(cm.name)} · ${r1(cm.sec)} s`:'Any short clip (MP3, M4A, WAV): a hype line, a horn, your coach. It plays at full quality and its real length.'}</span></div>`})()}</div>
     <div class="glabel">Look</div><div class="glist">
       ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="acc-grid">${ACCENTS.map(([v,l])=>`<button type="button" class="acc" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}" aria-label="${l}" title="${l}" style="--c:${v}"><i></i><span>${l}</span></button>`).join('')}</div>
@@ -5200,7 +5200,7 @@ function rsUnlock(){const el=rsElement();if(!el)return;sessType('ambient');try{e
 function rsCancel(){clearTimeout(rsT1);clearTimeout(rsT2);clearTimeout(rsT3);if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}if(rsEl&&!rsEl.paused&&!rsEl.muted){try{rsEl.pause()}catch(e){}}sessType('ambient')}
 function rsFire(id){id=id||restSoundId();if(id==='none')return;const el=rsElement(id);restBeeped=Date.now();
   const back=()=>{clearTimeout(rsT2);rsT2=setTimeout(()=>sessType('ambient'),300)};
-  sessType(alertStyle()==='pause'?'transient-solo':'transient');
+  sessType(alertStyle()==='pause'?'playback':'transient');
   if(el){try{el.muted=false;el.currentTime=0;el.onended=back;const p=el.play();if(p&&p.catch)p.catch(()=>{webAudioNow(id);back()});return}catch(e){}}
   webAudioNow(id);back()}
 function webAudioNow(id){const ac=restCtx();if(!ac)return;const go=()=>{try{const b=rsBuffer(ac,id);if(!b)return;const src=ac.createBufferSource();src.buffer=b;src.connect(ac.destination);src.start();rsSrc=src}catch(e){}};
