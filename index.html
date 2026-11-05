@@ -2356,7 +2356,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.32';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.33';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3625,9 +3625,9 @@ function renderPrefs(){
     <div class="glabel">Today screen</div><div class="glist">${grow({ic:'list',c:'--kcal',t:'Daily checklist',s:'Weigh in, meals, protein, train, check-in',ctl:`<input type="checkbox" class="sw" data-tog="showCoach" ${!P.hideCoach?'checked':''} aria-label="Daily checklist">`})}</div>
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}
-      ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Your music keeps playing and dips while it sounds.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">${v==='none'?'🔇':'▶'} ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
-      <div class="gopts">${[['dip','Play over my music (ringer on)'],['pause','Always play, even on silent (music pauses for the beep, then resumes)']].map(([v,l])=>`<button type="button" class="chip" data-pk="alertStyle" data-pv="${v}" aria-pressed="${alertStyle()===v}">${l}</button>`).join('')}<button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
-      <p class="note" style="padding:0 14px;margin:0">On iPhone, web apps can’t dim other apps’ music. “Play over my music” keeps your music going but is muted when your ringer is off. “Always play” works on silent but pauses the music while the sound plays.</p>
+      ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Plays over your music without stopping it.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">${v==='none'?'🔇':'▶'} ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
+      <div class="gopts"><button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
+      <p class="note" style="padding:0 14px;margin:0">The sound plays right on top of your music and never pauses it. Keep your ringer on to hear it: iPhone mutes web-app sounds on silent.</p>
       <div class="rs-up"><button type="button" class="ghost" id="rsUp">${cm?'Replace your sound':'＋ Upload your own sound'}</button>${cm?'<button type="button" class="link" id="rsDel" style="color:var(--over)">Remove</button>':''}<input type="file" id="rsIn" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden><span class="note" id="rsSt">${cm?`${esc(cm.name)} · ${r1(cm.sec)} s`:'Any short clip (MP3, M4A, WAV): a hype line, a horn, your coach. It plays at full quality and its real length.'}</span></div>`})()}</div>
     <div class="glabel">Look</div><div class="glist">
       ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="acc-grid">${ACCENTS.map(([v,l])=>`<button type="button" class="acc" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}" aria-label="${l}" title="${l}" style="--c:${v}"><i></i><span>${l}</span></button>`).join('')}</div>
@@ -5354,6 +5354,8 @@ function startWorkout(name,exNames,prefill,dev){
   save();setView('train');
 }
 function saveActive(){clearTimeout(saveActive.t);saveActive.t=setTimeout(save,400)}
+// closing or swiping the app away: write any half-typed set right now so nothing is lost
+(()=>{const flush=()=>{if(saveActive.t){clearTimeout(saveActive.t);saveActive.t=0;try{save()}catch(e){}}};document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flush()});addEventListener('pagehide',flush);addEventListener('blur',flush)})();
 function renderActive(){
   const a=S.active;a.ex.forEach(x=>{if(isCardio(x.n)&&!x.cardio)toCardio(x);else if(!isCardio(x.n)&&x.cardio){delete x.cardio;if(!x.sets||!x.sets.length)x.sets=[{w:'',r:'',done:false},{w:'',r:'',done:false},{w:'',r:'',done:false}]}});
   $('trainActive').innerHTML=`<div class="wk-bar"><input id="wkName" value="${esc(a.name)}" aria-label="Workout name"><span class="wk-time" id="wkTime">${a.wStart?(a.orig?'Editing':'From watch'):clock(Date.now()-a.start)}</span><button class="primary" id="wkFinish" style="padding:9px 16px">Finish</button></div>
@@ -5639,7 +5641,7 @@ function rsDur(){const id=restSoundId();return id==='none'?0:id==='custom'&&RS_C
    Just before it plays, the audio session switches to "transient" (dips your music) or "transient-solo" (pauses it
    for the clip and resumes it after); then it goes back to "ambient" so the music comes back up. */
 let rsSrc=null,rsT1=0,rsT2=0,rsT3=0,rsEl=null,rsElKey='';
-const alertStyle=()=>((S.prefs||{}).alertStyle)||'dip';
+const alertStyle=()=>'dip'; // always plays over your music, never pauses it
 function rsWavUrl(id){const sr=44100,d=synthSound(id,sr),n=d.length,buf=new ArrayBuffer(44+n*2),dv=new DataView(buf),w=(o,t)=>{for(let i=0;i<t.length;i++)dv.setUint8(o+i,t.charCodeAt(i))};
   w(0,'RIFF');dv.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,'data');dv.setUint32(40,n*2,true);
   for(let i=0;i<n;i++)dv.setInt16(44+i*2,Math.round(32767*Math.max(-1,Math.min(1,d[i]))),true);return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
@@ -5655,12 +5657,12 @@ function rsRelease(){clearTimeout(rsT2);clearTimeout(rsT3);const el=rsEl;
   if(el){try{el.onended=null;el.pause();if(alertStyle()==='pause'){if(el._u)URL.revokeObjectURL(el._u);el.removeAttribute('src');el.load();rsEl=null;rsElKey=''}}catch(e){}}
   if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}
   try{if(restAC&&restAC.state==='running'&&!(restLockOn()&&restAudio))restAC.suspend()}catch(e){}
-  sessType('auto');setTimeout(()=>sessType('ambient'),60)}
+  sessType('ambient')}
 function rsFire(id){id=id||restSoundId();if(id==='none')return;const el=rsElement(id);restBeeped=Date.now();
   if(id==='custom'&&!RS_CUSTOM)rsLoadCustom();
   const C=id==='custom'?RS_CUSTOM:null,lead=C?C.lead||0:0,dur=C?C.sec:rsDur();
   const back=()=>rsRelease();
-  sessType(alertStyle()==='pause'?'playback':'transient');
+  sessType('ambient'); // mix with the music: never pause it
   if(el){try{el.muted=false;el.currentTime=lead;el.onended=back;const p=el.play();
       // end exactly when the sound ends (skips silence at the end of your clip)
       clearTimeout(rsT3);rsT3=setTimeout(back,Math.round(dur*1000)+40);
