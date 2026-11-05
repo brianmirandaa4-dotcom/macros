@@ -2,7 +2,7 @@
    Vanilla JS, no build step. Renders whatever is in /data. The model is the only source of truth:
    nothing here invents a pick, a line, a stat or an injury; missing data reads "Not available". */
 'use strict';
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 const STORE_KEY = 'wmtl.v1';
 
 /* ================================================================ helpers */
@@ -419,7 +419,7 @@ const POSKEYS = {QB: ['pass_yds', 'pass_td', 'rush_yds', 'att'], RB: ['rush_yds'
 function profileKeys(sport, P, todays){ if(sport === 'NBA') return ['pts', 'reb', 'ast', 'tpm'];
   if(sport === 'NFL' && POSKEYS[P.pos]) return POSKEYS[P.pos];
   const tot = {}; (P.games || []).forEach(g => g.st && Object.entries(g.st).forEach(([k, v]) => tot[k] = (tot[k] || 0) + (v || 0)));
-  if((tot.pass_yds || 0) > 200) return ['pass_yds', 'pass_td', 'rush_yds', 'cmp']; if((tot.rec_yds || 0) >= (tot.rush_yds || 0)) return ['rec', 'rec_yds', 'rec_td', 'rush_yds']; return ['rush_yds', 'car', 'rush_td', 'rec']; }
+  if((tot.kick_pts || 0) > 0 && (tot.rush_yds || 0) + (tot.rec_yds || 0) + (tot.pass_yds || 0) === 0) return ['kick_pts', 'fgm', 'fga', 'xpm']; if((tot.pass_yds || 0) > 200) return ['pass_yds', 'pass_td', 'rush_yds', 'cmp']; if((tot.rec_yds || 0) >= (tot.rush_yds || 0)) return ['rec', 'rec_yds', 'rec_td', 'rush_yds']; return ['rush_yds', 'car', 'rush_td', 'rec']; }
 function trendSVG(games, key, line){ const g = games.filter(x => x.st).slice(-12); if(!g.length) return ''; const vals = g.map(x => x.st[key] || 0); const W = 600, H = 220, pb = 40, pt = 28; const mx = Math.max(1, ...vals, isNum(line) ? line * 1.15 : 0);
   const bw = W / g.length; const y = v => H - pb - v / mx * (H - pb - pt);
   const bars = g.map((x, i) => { const v = vals[i]; const hit = isNum(line) ? v > line : false; return `<rect x="${(i * bw + bw * .18).toFixed(1)}" y="${y(v).toFixed(1)}" width="${(bw * .64).toFixed(1)}" height="${(H - pb - y(v)).toFixed(1)}" rx="4" fill="${isNum(line) ? (hit ? 'var(--edge)' : 'var(--line2)') : 'var(--fair)'}" opacity="${isNum(line) && hit ? .85 : 1}"/><text x="${(i * bw + bw / 2).toFixed(1)}" y="${(y(v) - 5).toFixed(1)}" text-anchor="middle" font-size="${g.length > 9 ? 16 : 19}" fill="var(--soft)" font-family="ui-monospace,SF Mono,Menlo,monospace">${ln(v)}</text><text x="${(i * bw + bw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" font-size="${g.length > 9 ? 14 : 17}" fill="var(--mute)" font-family="-apple-system,system-ui,sans-serif">${esc(x.opp || '')}</text>`; }).join('');

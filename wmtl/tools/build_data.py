@@ -9,8 +9,8 @@ What it does (nothing here re-models anything; it only reshapes and grades what 
 Usage:
   python3 -I tools/build_data.py <src_dir> <raw_dir> <out_data_dir>
 src_dir holds the published slate JSON (nfl_slate-data.json, nfl_results-data.json, nba_slate-data.json, cfb7_/cfb8_slate-data.json)
-raw_dir holds the history files: nflverse stats_player_week_{2025,2026}.csv, nfldata games.csv,
-        sportsdataverse ESPN NBA player_box_{2026,2027}.parquet, cfbfastR play_by_play_2026.parquet
+raw_dir/espn holds ESPN box scores (nfl.json, nba.json, cfb.json, upcoming.json), pulled from ESPN's site API
+        (scoreboard + game summary) by tools/espn_pull.js run in a browser on espn.com. ESPN is the only stats source.
 """
 import json, sys, os, re, math, unicodedata
 from datetime import datetime, timezone, timedelta
@@ -18,7 +18,8 @@ import pandas as pd, numpy as np
 
 SRC, RAW, OUT = sys.argv[1:4]
 ET = timezone(timedelta(hours=-5))  # standard time after Nov 1, 2026
-def et(ts): return datetime.fromisoformat(ts.replace('Z', '+00:00')).astimezone(ET if ts >= '2026-11-01T06' else timezone(timedelta(hours=-4)))
+from zoneinfo import ZoneInfo
+def et(ts): return datetime.fromisoformat(ts.replace('Z', '+00:00')).astimezone(ZoneInfo('America/New_York'))
 def norm(s):
     s = unicodedata.normalize('NFKD', str(s)).encode('ascii', 'ignore').decode().lower()
     s = re.sub(r"[\.'’`]", '', s); s = re.sub(r'\b(jr|sr|ii|iii|iv|v)\b', '', s); return re.sub(r'[^a-z0-9]+', ' ', s).strip()
@@ -31,83 +32,49 @@ def dec(o): o = float(o); return 1 + o / 100 if o > 0 else 1 + 100 / (-o)
 TIER = {'recommended': 'bet', 'watch': 'live', 'lean': 'lean', 'check_news': 'check', 'pass': 'pass'}
 os.makedirs(OUT, exist_ok=True)
 
-# ------------------------------------------------------------------ history: NFL
-nw = pd.concat([pd.read_csv(f'{RAW}/nfl_week_{y}.csv', low_memory=False) for y in (2025, 2026)])
-nw = nw[nw.season_type == 'REG'].copy()
-ng = pd.read_csv(f'{RAW}/nfl_games.csv'); ng = ng[ng.season.isin([2025, 2026])]
-gd = {(r.season, r.week, t): (r.gameday, r.home_team == t, r.home_score if r.home_team == t else r.away_score, r.away_score if r.home_team == t else r.home_score) for r in ng.itertuples() for t in (r.home_team, r.away_team)}
-def nfl_row(r):
-    g = gd.get((r.season, r.week, r.team), (None, None, None, None))
-    v = lambda c: fnum(getattr(r, c), 0) or 0
-    st = dict(cmp=v('completions'), att=v('attempts'), pass_yds=v('passing_yards'), pass_td=v('passing_tds'), int=v('passing_interceptions'),
-              car=v('carries'), rush_yds=v('rushing_yards'), rush_td=v('rushing_tds'), tgt=v('targets'), rec=v('receptions'), rec_yds=v('receiving_yards'), rec_td=v('receiving_tds'),
-              fgm=v('fg_made'), fga=v('fg_att'), xpm=v('pat_made'), tkl=v('def_tackles_solo') + v('def_tackle_assists'))
-    st['atd'] = st['rush_td'] + st['rec_td']; st['kick_pts'] = 3 * st['fgm'] + st['xpm']
-    res = None if g[2] is None or pd.isna(g[2]) else ('W' if g[2] > g[3] else 'L' if g[2] < g[3] else 'T') + f' {int(g[2])}–{int(g[3])}'
-    return dict(d=g[0], s=int(r.season), wk=int(r.week), tm=r.team, opp=r.opponent_team, ha='vs' if g[1] else '@', res=res, st=st)
-NFL_H = {}
-for r in nw.sort_values(['season', 'week']).itertuples():
-    NFL_H.setdefault(r.player_id, dict(name=r.player_display_name, pos=r.position, team=r.team, games=[]))['games'].append(nfl_row(r))
-    NFL_H[r.player_id]['team'] = r.team; NFL_H[r.player_id]['pos'] = r.position
-NFL_BYNAME = {}
-for pid, h in NFL_H.items(): NFL_BYNAME.setdefault((norm(h['name']), h['team']), pid); NFL_BYNAME.setdefault((norm(h['name']), None), pid)
-
-# ------------------------------------------------------------------ history: NBA (ESPN box scores)
-nb = pd.concat([pd.read_parquet(f'{RAW}/nba_{y}.parquet') for y in (2026, 2027)])
-ESPN2 = {'GS': 'GSW', 'NY': 'NYK', 'SA': 'SAS', 'NO': 'NOP', 'UTAH': 'UTA', 'WSH': 'WAS'}
-nb['tm'] = nb.team_abbreviation.map(lambda x: ESPN2.get(x, x)); nb['opp'] = nb.opponent_team_abbreviation.map(lambda x: ESPN2.get(x, x))
-nb['d'] = nb.game_date.astype(str)
-NBA_COL = {}
-NBA_H = {}
-for r in nb.sort_values('game_date_time').itertuples():
-    k = norm(r.athlete_display_name)
-    h = NBA_H.setdefault(k, dict(name=r.athlete_display_name, pos=r.athlete_position_abbreviation, team=r.tm, games=[]))
-    NBA_COL[r.tm] = r.team_color
-    if r.did_not_play or not (r.minutes and r.minutes > 0):
-        h['games'].append(dict(d=r.d, tm=r.tm, opp=r.opp, ha='vs' if r.home_away == 'home' else '@', res=None, dnp=True, why=r.reason if isinstance(r.reason, str) else None, st=None, post=int(r.season_type) == 3)); continue
-    v = lambda c: fnum(getattr(r, c), 0) or 0
-    st = dict(min=v('minutes'), pts=v('points'), reb=v('rebounds'), ast=v('assists'), tpm=v('three_point_field_goals_made'), stl=v('steals'), blk=v('blocks'), tov=v('turnovers'),
-              fgm=v('field_goals_made'), fga=v('field_goals_attempted'))
-    st.update(pra=st['pts'] + st['reb'] + st['ast'], pr=st['pts'] + st['reb'], pa=st['pts'] + st['ast'], ra=st['reb'] + st['ast'])
-    res = ('W' if r.team_winner else 'L') + f' {int(r.team_score)}–{int(r.opponent_team_score)}'
-    h['games'].append(dict(d=r.d, tm=r.tm, opp=r.opp, ha='vs' if r.home_away == 'home' else '@', res=res, st=st, start=bool(r.starter), post=int(r.season_type) == 3))
-    h['team'] = r.tm; h['pos'] = r.athlete_position_abbreviation
-
-# ------------------------------------------------------------------ history: CFB (box scores built from 2026 play-by-play)
-cols = ['game_id', 'week', 'start_date', 'pos_team', 'def_pos_team', 'home', 'away', 'rush', 'rush_player', 'rush_yds', 'completion', 'pass_attempt', 'reception_player', 'reception_yds',
-        'completion_player', 'completion_yds', 'touchdown_player', 'rush_td', 'pass_td', 'play_type', 'pos_team_score', 'def_pos_team_score', 'team_score', 'opponent_score']
-cp = pd.read_parquet(f'{RAW}/cfb_pbp_2026.parquet', columns=cols)
-fin = {}
-for gid, g in cp.groupby('game_id'):
-    last = g.iloc[-1]; h, a = last.home, last.away
-    sc = {}
-    for r in g[['pos_team', 'def_pos_team', 'pos_team_score', 'def_pos_team_score']].itertuples(index=False):
-        sc[r.pos_team] = max(sc.get(r.pos_team, 0), r.pos_team_score or 0); sc[r.def_pos_team] = max(sc.get(r.def_pos_team, 0), r.def_pos_team_score or 0)
-    fin[gid] = dict(home=h, away=a, hs=int(sc.get(h, 0)), as_=int(sc.get(a, 0)), wk=int(last.week), d=str(last.start_date)[:10])
-CF = {}
-def cadd(gid, name, team, k, v):
-    if not isinstance(name, str) or not name.strip() or name.strip().upper() == 'TEAM': return
-    rec = CF.setdefault((norm(name), team), dict(name=name.strip(), team=team, g={}))
-    gg = rec['g'].setdefault(gid, dict(pass_yds=0, cmp=0, att=0, rush_yds=0, car=0, rec=0, rec_yds=0, rush_td=0, rec_td=0, pass_td=0)); gg[k] += v
-R = cp[cp.rush == 1]
-for r in R[['game_id', 'rush_player', 'pos_team', 'rush_yds', 'rush_td']].itertuples(index=False):
-    cadd(r.game_id, r.rush_player, r.pos_team, 'rush_yds', r.rush_yds or 0); cadd(r.game_id, r.rush_player, r.pos_team, 'car', 1)
-    if r.rush_td == 1: cadd(r.game_id, r.rush_player, r.pos_team, 'rush_td', 1)
-C = cp[cp.completion == 1]
-for r in C[['game_id', 'reception_player', 'completion_player', 'pos_team', 'reception_yds', 'completion_yds', 'pass_td']].itertuples(index=False):
-    cadd(r.game_id, r.reception_player, r.pos_team, 'rec', 1); cadd(r.game_id, r.reception_player, r.pos_team, 'rec_yds', r.reception_yds or 0)
-    cadd(r.game_id, r.completion_player, r.pos_team, 'pass_yds', r.completion_yds or 0); cadd(r.game_id, r.completion_player, r.pos_team, 'cmp', 1)
-    if r.pass_td == 1: cadd(r.game_id, r.reception_player, r.pos_team, 'rec_td', 1); cadd(r.game_id, r.completion_player, r.pos_team, 'pass_td', 1)
-CFB_H = {}
-for (k, team), rec in CF.items():
-    games = []
-    for gid, st in sorted(rec['g'].items(), key=lambda x: fin[x[0]]['d']):
-        f = fin[gid]; home = f['home'] == team; opp = f['away'] if home else f['home']
-        mine, theirs = (f['hs'], f['as_']) if home else (f['as_'], f['hs'])
-        st = {a: int(b) for a, b in st.items()}; st['atd'] = st['rush_td'] + st['rec_td']
-        games.append(dict(d=f['d'], wk=f['wk'], tm=team, opp=opp, ha='vs' if home else '@', res=('W' if mine > theirs else 'L' if mine < theirs else 'T') + f' {mine}–{theirs}', st=st, gid=str(gid)))
-    CFB_H[(k, team)] = dict(name=rec['name'], team=team, pos=None, games=games)
-
+# ------------------------------------------------------------------ history: ESPN box scores, every sport (the only stats source)
+# raw_dir/espn/{nfl,nba,cfb}.json come from ESPN's own site API (scoreboard + game summary), pulled through the browser.
+ESPN_AB = {'NFL': {'LAR': 'LA', 'WSH': 'WAS'}, 'NBA': {'GS': 'GSW', 'NY': 'NYK', 'SA': 'SAS', 'NO': 'NOP', 'UTAH': 'UTA', 'WSH': 'WAS'}, 'CFB': {}}
+def pair(v): return v if isinstance(v, list) and len(v) == 2 else [0, 0]
+def n0(v): return v if isinstance(v, (int, float)) else 0
+from zoneinfo import ZoneInfo
+NY = ZoneInfo('America/New_York')
+KICK = json.load(open(f'{RAW}/espn/kick_times.json'))  # ESPN event id -> start time (UTC); dates below are Eastern
+def et_date(eid, fallback):
+    t = KICK.get(eid)
+    return datetime.fromisoformat(t.replace('Z', '+00:00')).astimezone(NY).strftime('%Y-%m-%d') if t else fallback
+def espn_load(sport):
+    E = json.load(open(f'{RAW}/espn/{sport.lower()}.json')); K = E['keep']; ab = ESPN_AB[sport]
+    G = E['games']; P = E['players']; H = {}; FIN = {}
+    for r in E['rows']:
+        gi, pi, tm, op, home, tsc, osc, dnp, starter, vals, tloc, oloc = r
+        eid, date, wk, stype = G[gi]; date = et_date(eid, date); aid, name, pos = P[pi]; v = dict(zip(K, vals))
+        tm = ab.get(tm, tm); op = ab.get(op, op); season = int(date[:4]) if sport == 'NBA' else (int(date[:4]) if date[5:7] > '02' else int(date[:4]) - 1)
+        key = (home, eid); FIN.setdefault(eid, {})['home' if home else 'away'] = dict(ab=tm, loc=tloc, sc=tsc); FIN[eid].update(d=date, wk=wk, st=stype)
+        if sport == 'NBA':
+            mins = v.get('all:MIN'); played = isinstance(mins, (int, float)) and mins > 0 and not dnp
+            st = None
+            if played:
+                fg = pair(v.get('all:FG')); tp = pair(v.get('all:3PT'))
+                st = dict(min=mins, pts=n0(v.get('all:PTS')), reb=n0(v.get('all:REB')), ast=n0(v.get('all:AST')), tpm=tp[0], stl=n0(v.get('all:STL')), blk=n0(v.get('all:BLK')), tov=n0(v.get('all:TO')), fgm=fg[0], fga=fg[1])
+                st.update(pra=st['pts'] + st['reb'] + st['ast'], pr=st['pts'] + st['reb'], pa=st['pts'] + st['ast'], ra=st['reb'] + st['ast'])
+        else:
+            ca = pair(v.get('passing:C/ATT')); fg = pair(v.get('kicking:FG')); xp = pair(v.get('kicking:XP'))
+            st = dict(cmp=ca[0], att=ca[1], pass_yds=n0(v.get('passing:YDS')), pass_td=n0(v.get('passing:TD')), int=n0(v.get('passing:INT')),
+                      car=n0(v.get('rushing:CAR')), rush_yds=n0(v.get('rushing:YDS')), rush_td=n0(v.get('rushing:TD')),
+                      rec=n0(v.get('receiving:REC')), rec_yds=n0(v.get('receiving:YDS')), rec_td=n0(v.get('receiving:TD')), tgt=n0(v.get('receiving:TGTS')),
+                      fgm=fg[0], fga=fg[1], xpm=xp[0], kick_pts=n0(v.get('kicking:PTS')) or 3 * fg[0] + xp[0], tkl=n0(v.get('defensive:TOT')))
+            st['atd'] = st['rush_td'] + st['rec_td']
+        res = ('W' if tsc > osc else 'L' if tsc < osc else 'T') + f' {tsc}–{osc}' if isinstance(tsc, (int, float)) else None
+        g = dict(d=date, s=season, wk=wk, tm=tm, tloc=tloc, opp=op, ha='vs' if home else '@', res=res, st=st, dnp=None if st else True, start=bool(starter), post=stype == 3, eid=eid)
+        h = H.setdefault(aid, dict(id=aid, name=name, pos=pos or None, games=[]))
+        h['games'].append(g)
+    for h in H.values():
+        h['games'].sort(key=lambda g: g['d']); last = [g for g in h['games'] if g['st']] or h['games']; h['team'] = last[-1]['tm']; h['tloc'] = last[-1]['tloc']
+    BY = {}
+    for aid, h in H.items(): BY.setdefault(norm(h['name']), []).append(h)
+    return H, BY, FIN
+ESPN = {sp: espn_load(sp) for sp in ('NFL', 'NBA', 'CFB')}
 # ------------------------------------------------------------------ slates v1 -> v2
 def window(sport, g):
     if sport != 'NFL': return g['slate']
@@ -117,54 +84,49 @@ def window(sport, g):
     if wd == 'Sun' and t.hour >= 19: return 'SNF'
     if wd == 'Sat': return 'Sat'
     return '1 PM' if t.hour < 15 else '4 PM'
+def team_of(sport, p, g):
+    if sport == 'CFB': return next((t['model_name'] for t in (g['away'], g['home']) if t['abbr'] == p['team'] or t['model_name'] == p['team']), p['team'])
+    return p['team']
 def pid_of(sport, p, gmap):
-    parts = p['id'].split('-'); g = gmap[p['gid']]
-    if sport == 'NFL':
-        gs = '-'.join(parts[1:-1]) if len(parts) >= 4 else None
-        if gs in NFL_H: return 'nfl:' + gs
-        k = NFL_BYNAME.get((norm(p['player']), p['team'])) or NFL_BYNAME.get((norm(p['player']), None))
-        return 'nfl:' + k if k else 'nfl:x:' + norm(p['player'])
-    if sport == 'NBA': return 'nba:' + norm(p['player'])
-    team_full = next((t['model_name'] for t in (g['away'], g['home']) if t['abbr'] == p['team'] or t['model_name'] == p['team']), p['team'])
-    return 'cfb:' + norm(p['player']) + ':' + norm(team_full)
-
+    g = gmap[p['gid']]
+    if sport == 'CFB': return 'cfb:' + norm(p['player']) + ':' + norm(team_of(sport, p, g))
+    return sport.lower() + ':' + norm(p['player'])
+NAMEOF = {}
+PTEAM = {}  # pkey -> team seen on a slate, to pick the right ESPN athlete when two share a name
 STAT = {'rec_yds': 'rec_yds', 'receptions': 'rec', 'rec': 'rec', 'rush_yds': 'rush_yds', 'qb_rush': 'rush_yds', 'pass_yds': 'pass_yds', 'atd': 'atd', 'qb_atd': 'atd', 'kicker': 'kick_pts', 'kick': 'kick_pts',
         'pts': 'pts', 'reb': 'reb', 'ast': 'ast', 'tpm': 'tpm', 'pra': 'pra', 'pr': 'pr', 'pa': 'pa', 'ra': 'ra', 'stl': 'stl', 'blk': 'blk', 'tov': 'tov'}
 
 def hist_for(sport, key):
-    if sport == 'NFL':
-        return NFL_H.get(key[4:]) if not key.startswith('nfl:x:') else None
-    if sport == 'NBA': return NBA_H.get(key[4:])
-    _, n, t = key.split(':', 2)
-    for (k, team), h in CFB_H.items():
-        if k == n and norm(team) == t: return h
-    return None
-
+    H, BY, FIN = ESPN[sport]
+    if sport == 'CFB':
+        _, n, t = key.split(':', 2); c = BY.get(n, [])
+        hit = [h for h in c if any(norm(g['tloc'] or '') == t or norm(g['tm']) == t for g in h['games'])]
+        return max(hit, key=lambda h: len(h['games'])) if hit else None
+    n = key.split(':', 1)[1]; c = BY.get(n, [])
+    if not c: return None
+    tm = PTEAM.get(key)
+    hit = [h for h in c if tm and any(g['tm'] == tm for g in h['games'])] or c
+    return max(hit, key=lambda h: len(h['games']))
 def game_on(sport, h, g, meta):
-    """The player's game for this slate's matchup, or None."""
+    """The player's ESPN box-score line for this slate's game, or None."""
     if not h: return None
-    if sport == 'NFL':
-        wk = meta.get('week'); teams = {g['away']['model_name'], g['home']['model_name']}
-        return next((x for x in h['games'] if x['s'] == 2026 and x['wk'] == wk and x['tm'] in teams), None)
-    if sport == 'NBA':
-        d = et(g['kick_utc']).strftime('%Y-%m-%d'); teams = {g['away']['abbr'], g['home']['abbr']}
-        return next((x for x in h['games'] if x['d'] == d and x['tm'] in teams), None)
-    wk = meta.get('week'); teams = {norm(g['away']['model_name']), norm(g['home']['model_name'])}
-    return next((x for x in h['games'] if x['wk'] == wk and norm(x['tm']) in teams), None)
-
+    if sport == 'CFB':
+        teams = {norm(g['away']['model_name']), norm(g['home']['model_name'])}
+        return next((x for x in h['games'] if x['wk'] == meta.get('week') and x['s'] == 2026 and (norm(x['tloc'] or '') in teams)), None)
+    d0 = et(g['kick_utc']).strftime('%Y-%m-%d'); teams = {g['away']['model_name'], g['home']['model_name'], g['away']['abbr'], g['home']['abbr']}
+    if sport == 'NFL': return next((x for x in h['games'] if x['s'] == 2026 and x['wk'] == meta.get('week') and x['tm'] in teams), None)
+    return next((x for x in h['games'] if x['d'] == d0 and x['tm'] in teams), None)
 def final_for(sport, g, meta):
-    if sport == 'NFL':
-        r = ng[(ng.season == 2026) & (ng.week == meta['week']) & (ng.home_team == g['home']['model_name']) & (ng.away_team == g['away']['model_name'])]
-        if len(r) and pd.notna(r.iloc[0].home_score): return dict(away=int(r.iloc[0].away_score), home=int(r.iloc[0].home_score))
-        return None
-    if sport == 'NBA':
-        d = et(g['kick_utc']).strftime('%Y-%m-%d')
-        r = nb[(nb.d == d) & (nb.tm == g['home']['abbr']) & (nb.opp == g['away']['abbr'])]
-        if len(r): return dict(away=int(r.iloc[0].opponent_team_score), home=int(r.iloc[0].team_score))
-        return None
-    for gid, f in fin.items():
-        if f['wk'] == meta['week'] and norm(f['home']) == norm(g['home']['model_name']) and norm(f['away']) == norm(g['away']['model_name']):
-            return dict(away=f['as_'], home=f['hs'])
+    H, BY, FIN = ESPN[sport]; ab = ESPN_AB[sport]
+    for eid, f in FIN.items():
+        if 'home' not in f or 'away' not in f: continue
+        if sport == 'CFB':
+            ok = f['wk'] == meta.get('week') and f['d'][:4] == '2026' and norm(f['home']['loc'] or '') == norm(g['home']['model_name']) and norm(f['away']['loc'] or '') == norm(g['away']['model_name'])
+        elif sport == 'NFL':
+            ok = f['wk'] == meta.get('week') and f['d'] >= '2026-03' and f['home']['ab'] in (g['home']['model_name'], g['home']['abbr']) and f['away']['ab'] in (g['away']['model_name'], g['away']['abbr'])
+        else:
+            ok = f['d'] == et(g['kick_utc']).strftime('%Y-%m-%d') and f['home']['ab'] == g['home']['abbr'] and f['away']['ab'] == g['away']['abbr']
+        if ok: return dict(away=f['away']['sc'], home=f['home']['sc'])
     return None
 
 def grade_side(side, line, actual, market):
@@ -206,7 +168,7 @@ def convert(sport, src, sid, label):
         if g['window'] not in order: order.append(g['window'])
     graded = 0; gradable = 0; res_props = {}
     for p in d['props']:
-        g = gmap[p['gid']]; p['pkey'] = pid_of(sport, p, gmap); p['tier'] = TIER.get(p['classification'], 'pass'); p['window'] = g['window']
+        g = gmap[p['gid']]; p['pkey'] = pid_of(sport, p, gmap); PTEAM.setdefault(p['pkey'], p['team']); p['tier'] = TIER.get(p['classification'], 'pass'); p['window'] = g['window']
         h = hist_for(sport, p['pkey']); x = game_on(sport, h, g, meta)
         if p.get('odds') is not None: gradable += 1
         stat = STAT.get(p['market'])
@@ -244,7 +206,7 @@ def convert(sport, src, sid, label):
     for v in res_games.values():
         for k, r in (v['lines'] or {}).items(): lines[r] += 1
     status = 'graded' if (graded or res_games) else 'pending'
-    d['results'] = dict(status=status, source={'NFL': 'nflverse weekly player stats + nfldata final scores', 'NBA': 'ESPN box scores (sportsdataverse)', 'CFB': 'cfbfastR play-by-play (box scores rebuilt from plays)'}[sport],
+    d['results'] = dict(status=status, source='ESPN box scores and final scores (espn.com)',
         graded_utc=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), props=res_props, games=res_games,
         summary=dict(priced=len(priced), graded=sum(1 for p in priced if res_props.get(p['id'], {}).get('result') in ('won', 'lost', 'push')),
                      bets=by_tier['bet'], by_tier=by_tier, by_market=by_mk, lines=lines, calibration=calib),
@@ -274,8 +236,7 @@ R1 = json.load(open(f'{SRC}/nfl_results-data.json'))
 for w in R1['detail']:
     for kind in ('bets', 'leans'):
         for r in w.get(kind) or []:
-            k = NFL_BYNAME.get((norm(r['player']), r['team'])) or NFL_BYNAME.get((norm(r['player']), None))
-            key = 'nfl:' + k if k else 'nfl:x:' + norm(r['player'])
+            key = 'nfl:' + norm(r['player']); PTEAM.setdefault(key, r['team']); NAMEOF.setdefault(key, r['player'])
             m = re.match(r'(Over|Under|Yes)\s*([\d.]+)?', r.get('sel') or '')
             APPEAR.setdefault(key, []).append(dict(slate=f'nfl-2026-wk{w["week"]:02d}', sport='NFL', date=None, label=f'Week {w["week"]}' + (' (replay)' if w.get('kind') == 'replay' else ''),
                 market=r.get('mk'), market_label=r.get('market'), side=(m.group(1).lower() if m else None), line=fnum(m.group(2), 1) if m and m.group(2) else None, odds=r.get('odds'),
@@ -290,7 +251,7 @@ def mkprof(sport, key, h, fallback_name, team):
     ap = sorted(APPEAR.get(key, []), key=lambda a: (a['date'] or '', a['slate']), reverse=True)
     col = None
     if sport == 'NFL': col = (TEAMC['NFL'].get(h['team'] if h else team) or [None])[0]
-    elif sport == 'NBA': col = (TEAMC['NBA'].get(h['team'] if h else team) or [None])[0] or NBA_COL.get(team)
+    elif sport == 'NBA': col = (TEAMC['NBA'].get(h['team'] if h else team) or [None])[0]
     g2 = [{k: v for k, v in g.items() if v is not None and k not in ('gid',)} for g in games]
     return dict(name=h['name'] if h else fallback_name, team=(h['team'] if h else team), pos=(h or {}).get('pos'), color=col, games=g2, model=ap,
                 history='found' if h else 'not_found')
@@ -303,23 +264,21 @@ for sport in ('NFL', 'NBA', 'CFB'):
             P[p['pkey']] = mkprof(sport, p['pkey'], hist_for(sport, p['pkey']), p['player'], p['team'])
     if sport == 'NFL':
         for key in APPEAR:
-            if key.startswith('nfl:') and key not in P: P[key] = mkprof('NFL', key, hist_for('NFL', key), APPEAR[key][0].get('label'), None)
+            if key.startswith('nfl:') and key not in P: P[key] = mkprof('NFL', key, hist_for('NFL', key), NAMEOF.get(key, key[4:].title()), PTEAM.get(key))
     stats = {'NFL': [['pass_yds', 'Pass yds'], ['pass_td', 'Pass TD'], ['cmp', 'Cmp'], ['att', 'Att'], ['int', 'INT'], ['car', 'Car'], ['rush_yds', 'Rush yds'], ['rush_td', 'Rush TD'], ['tgt', 'Tgt'], ['rec', 'Rec'], ['rec_yds', 'Rec yds'], ['rec_td', 'Rec TD'], ['fgm', 'FGM'], ['xpm', 'XPM'], ['kick_pts', 'Kick pts'], ['tkl', 'Tkl']],
              'NBA': [['min', 'Min'], ['pts', 'Pts'], ['reb', 'Reb'], ['ast', 'Ast'], ['tpm', '3PM'], ['stl', 'Stl'], ['blk', 'Blk'], ['tov', 'TO'], ['pra', 'PRA']],
              'CFB': [['pass_yds', 'Pass yds'], ['pass_td', 'Pass TD'], ['cmp', 'Cmp'], ['car', 'Car'], ['rush_yds', 'Rush yds'], ['rush_td', 'Rush TD'], ['rec', 'Rec'], ['rec_yds', 'Rec yds'], ['rec_td', 'Rec TD']]}[sport]
-    src = {'NFL': 'nflverse weekly stats, 2025–26 regular season', 'NBA': 'ESPN box scores via sportsdataverse, 2025–26 season and playoffs plus 2026–27 to date', 'CFB': 'Box scores rebuilt from cfbfastR 2026 play-by-play. Plays without a player tag are missing, so a few totals can run low.'}[sport]
+    src = {'NFL': 'ESPN box scores (espn.com game summaries), 2025 and 2026 regular season', 'NBA': 'ESPN box scores (espn.com game summaries), 2025–26 season and playoffs plus 2026–27 to date', 'CFB': 'ESPN box scores (espn.com game summaries), 2026 FBS games'}[sport]
     out = dict(schema='wmtl.players.v1', sport=sport, source=src, built_utc=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), stats=stats, market_stat=STAT, players=P)
     os.makedirs(f'{OUT}/players', exist_ok=True)
     json.dump(out, open(f'{OUT}/players/{sport.lower()}.json', 'w'), separators=(',', ':'), ensure_ascii=False)
     print(sport, 'players', len(P), 'with history', sum(1 for v in P.values() if v['history'] == 'found'))
 
 # ------------------------------------------------------------------ upcoming NFL games (schedule only, no picks)
-up = ng[(ng.season == 2026) & ng.home_score.isna()].sort_values(['week', 'gameday'])
 nxt = None
-if len(up):
-    wk = int(up.iloc[0].week); u = up[up.week == wk]
-    nxt = dict(sport='NFL', label=f'Week {wk}', first=datetime.fromisoformat(f'{u.sort_values(["gameday","gametime"]).iloc[0].gameday}T{u.sort_values(["gameday","gametime"]).iloc[0].gametime}').replace(tzinfo=ET).astimezone(timezone.utc).strftime('%Y-%m-%dT%H:%M:00Z'), games=int(len(u)),
-               note='On the schedule. The model has not been run for this week yet, so there are no picks.')
+UP = f'{RAW}/espn/upcoming.json'   # ESPN scoreboard for the next week, pulled with the box scores
+if os.path.exists(UP):
+    u = json.load(open(UP)); nxt = dict(sport=u['sport'], label=u['label'], first=u['first'], games=u['games'], note='On the schedule. The model has not been run for this week yet, so there are no picks.')
 index = dict(schema='wmtl.index.v1', built_utc=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), brand='whomadethisline', slates=slates,
              players={s: f'data/players/{s.lower()}.json' for s in ('NFL', 'NBA', 'CFB')}, results={'NFL': 'data/nfl/results-2026.json'},
              sports=dict(NFL=dict(status='live'), CFB=dict(status='live'), NBA=dict(status='live'),

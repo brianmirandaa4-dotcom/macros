@@ -49,11 +49,11 @@ You can also skip GitHub: in the app, go to **More → Import a slate**, then pa
 
 See `SCHEMA.md` for every field.
 
-## Data sources for history and grading
+## Where every stat comes from: ESPN, nothing else
 
-- NFL: nflverse weekly player stats and final scores (2025–26).
-- NBA: ESPN box scores via sportsdataverse (2025–26 and 2026–27).
-- CFB: box scores rebuilt from cfbfastR 2026 play-by-play. Plays without a player tag are missing, so a few totals can run low.
+Player game logs, box scores, final scores and every graded result come from ESPN's own data (espn.com game summaries). That covers NFL 2025–26, NBA 2025–26 plus 2026–27, and every 2026 FBS college game. Odds still come from the model's own price pulls; ESPN does not publish sportsbook prop prices.
+
+To refresh after games: open espn.com in the browser, run `tools/espn_pull.js` in the page, save the four JSON files it produces into `raw/espn/`, then run `tools/build_data.py`.
 
 ## Honesty, built in
 
