@@ -1904,7 +1904,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.15';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.16';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -1927,29 +1927,20 @@ function buildFoods(){
   ALIAS.sort((x,y)=>(y[0].length-x[0].length)||((y[1].custom?1:0)-(x[1].custom?1:0)));
 }
 
-/* ================= ONLINE FOOD SEARCH: USDA FoodData Central + Open Food Facts ================= */
-// USDA: hundreds of thousands of lab-measured and branded foods (free public key, cached on this phone).
-// Open Food Facts: 3M+ products worldwide. Results are per 100 g; picking one saves it to My foods.
-const FDC_KEY=()=>(S.prefs&&S.prefs.fdcKey)||'DEMO_KEY',OFC='syncope.foodcache';
-function ofCache(){try{return JSON.parse(localStorage.getItem(OFC)||'{}')}catch(e){return {}}}
-function ofSave(c){try{const ks=Object.keys(c);if(ks.length>80)ks.sort((a,b)=>c[a].t-c[b].t).slice(0,ks.length-80).forEach(k=>delete c[k]);localStorage.setItem(OFC,JSON.stringify(c))}catch(e){}}
+/* ================= FOOD DATABASE (offline): 6,500 USDA foods bundled with the app =================
+   Food nutrition data from TempoLife (tempolife.app), CC-BY-4.0; underlying USDA FoodData Central SR Legacy data is public domain.
+   Stored on this phone by the offline cache, so searching works with no internet. */
+let DBX=null,DBXp=null;
+function foodsDB(){if(DBX)return Promise.resolve(DBX);return DBXp||(DBXp=fetch('./foods-db.json').then(r=>r.ok?r.json():[]).catch(()=>[]).then(j=>(DBX=j.map(([n,k,p,c,f])=>({n,l:n.toLowerCase(),k,p,c,f})))))}
 const tidy=s=>String(s||'').replace(/\s+/g,' ').trim();
 function niceName(d){d=tidy(d);if(d===d.toUpperCase())d=d.toLowerCase();const ps=d.split(', ');
   if(ps.length>1&&!/ or /.test(ps[1])&&ps[1].split(' ').length<=2&&ps[0].split(' ').length===1){const [a,b,...r]=ps;d=`${b} ${a.toLowerCase()}`+(r.length?` (${r.join(', ')})`:'')}return cap(d)}
+async function foodSearch(q){q=tidy(q).toLowerCase();if(q.length<2)return [];const db=await foodsDB();
+  const words=q.split(/\s+/).map(w=>w.replace(/(ies)$/,'y').replace(/([^s])s$/,'$1')).filter(Boolean),re=words.map(w=>new RegExp('(^|[^a-z])'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+  const hits=[];for(const x of db){if(!re.every(r=>r.test(x.l)))continue;let s=0;if(x.l.startsWith(words[0]))s+=6;if(x.l.split(',')[0].includes(words[0]))s+=4;
+    if(/cooked|roasted|grilled|baked|boiled|steamed/.test(x.l))s+=1.5;if(/\braw\b/.test(x.l))s-=.5;if(/\(.*\)$/.test(x.n))s-=1;s-=(x.l.match(/,/g)||[]).length*.8;s-=x.l.length/60;hits.push([s,x])}
+  return hits.sort((a,b)=>b[0]-a[0]).slice(0,40).map(([,x])=>({src:'USDA',brand:'',name:niceName(x.n),k:x.k,p:x.p,c:x.c,f:x.f,sg:null,sn:null,generic:true}))}
 let ofLimited=0;
-async function foodSearch(q){q=tidy(q).toLowerCase();if(q.length<2)return [];const c=ofCache();if(c[q]&&Date.now()-c[q].t<30*864e5)return c[q].r;
-  const usda=fetch('https://api.nal.usda.gov/fdc/v1/foods/search?api_key='+encodeURIComponent(FDC_KEY()),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,pageSize:30,dataType:['Survey (FNDDS)','SR Legacy','Foundation','Branded']})})
-    .then(r=>{if(r.status===429){ofLimited=Date.now();return {foods:[]}}return r.ok?r.json():{foods:[]}}).then(j=>(j.foods||[]).map(f=>{const n=id=>{const x=(f.foodNutrients||[]).find(x=>x.nutrientId===id);return x?+x.value:null};
-      const p=n(1003),cc=n(1005),fa=n(1004);let k=n(1008);if(k==null)k=n(2047)??n(2048);if(k==null&&p==null)return null;
-      const br=f.dataType==='Branded',sg=br&&/^(g|grm)$/i.test(f.servingSizeUnit||'')&&f.servingSize>0?+f.servingSize:null;
-      return {src:'USDA',brand:br?cap(tidy(f.brandName||f.brandOwner).toLowerCase()):'',name:br?cap(tidy(f.description).toLowerCase()):niceName(f.description),k:k??((p||0)*4+(cc||0)*4+(fa||0)*9),p:p||0,c:cc||0,f:fa||0,sg,sn:sg?(tidy(f.householdServingFullText).toLowerCase()||'serving'):null,generic:!br}}).filter(Boolean)).catch(()=>[]);
-  const off=fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&json=1&page_size=15&fields=product_name,brands,nutriments,serving_size,serving_quantity')
-    .then(r=>r.ok?r.json():{products:[]}).then(j=>(j.products||[]).map(p=>{const N=p.nutriments||{},k=N['energy-kcal_100g'];if(k==null||!p.product_name)return null;const sq=+p.serving_quantity||null;
-      return {src:'Open Food Facts',brand:tidy(String(p.brands||'').split(',')[0]),name:cap(tidy(p.product_name)),k:+k,p:+N.proteins_100g||0,c:+N.carbohydrates_100g||0,f:+N.fat_100g||0,sg:sq&&sq<1500?sq:null,sn:sq?tidy(p.serving_size)||'serving':null}}).filter(Boolean)).catch(()=>[]);
-  const [a,b]=await Promise.all([usda,off]),words=q.split(/\s+/);
-  const sc=x=>{const n=(x.name+' '+(x.brand||'')).toLowerCase();let s=words.filter(w=>n.includes(w)).length*10;if(x.generic)s+=8;if(n.startsWith(q))s+=6;return s-n.length/40};
-  const seen=new Set(),all=[...a,...b].filter(x=>{const key=(x.name+'|'+x.brand+'|'+Math.round(x.k)).toLowerCase();if(seen.has(key)||!(x.k>=0&&x.k<950))return false;seen.add(key);return true}).sort((x,y)=>sc(y)-sc(x)).slice(0,30);
-  if(all.length){c[q]={t:Date.now(),r:all};ofSave(c)}return all}
 function localSearch(q){q=tidy(q).toLowerCase();if(q.length<2)return [];return FOODS.filter(f=>f.aliases.some(a=>a.includes(q))).slice(0,8)}
 // save an online result as one of My foods (named the way you typed it, so typing it again just works)
 function saveOnline(x,alias){const sg=x.sg||100,name=cap(tidy(alias||x.name));
@@ -1959,12 +1950,12 @@ const per=x=>x.sg?`${fmt(x.k*x.sg/100)} kcal per ${esc(x.sn||'serving')} (${r0(x
 const macroLine=x=>{const m=x.sg?x.sg/100:1;return `<span style="color:var(--pro)">${r0(x.p*m)}P</span> <span style="color:var(--carb)">${r0(x.c*m)}C</span> <span style="color:var(--fat)">${r0(x.f*m)}F</span>`};
 /* the search sheet. o.mode: 'log' (from the food box), 'save' (Foods tab), 'pick' (favourites) */
 function openOnline(q,o={}){let res=[],busy=false,loc=[];
-  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches Syncope's library, the USDA FoodData Central database and Open Food Facts (millions of foods and brands).</p></div>
-    <div class="inrow"><div class="inbox"><input id="olQ" type="search" value="${esc(q)}" placeholder="e.g. banana bread, Chobani, birria tacos" autocomplete="off" autocapitalize="off"></div><button class="go" type="button" id="olGo">Search</button></div>
+  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches Syncope's library and 6,500 USDA foods stored on your phone. Works offline.</p></div>
+    <div class="inrow"><div class="inbox"><input id="olQ" type="search" value="${esc(q)}" placeholder="e.g. banana bread, lamb chop, burrito" autocomplete="off" autocapitalize="off"></div><button class="go" type="button" id="olGo">Search</button></div>
     ${o.mode==='pick'?`<div class="field"><label>Use it as my</label><div class="wn-acts" id="olG">${LIKE_GROUPS.map(([g,l,c],i)=>`<button type="button" class="chip" data-g="${g}" aria-pressed="${(o.g||'p')===g}" style="--c:var(${c})">${l.replace('Healthy ','').replace(/s$/,'')}</button>`).join('')}</div></div>`:''}
     <ul class="ol-list" id="olL">${loc.map((f,i)=>`<li><button type="button" data-ol="l${i}"><span class="ol-n"><b>${esc(cap(f.name))}</b><span>${f.custom?'My foods':'Syncope library'} · ${fmt(servKcal(f))} kcal per ${esc(servLabel(f))}</span></span><span class="ol-m num">${macroLine({p:f.p*f.units[f.def]/100,c:f.c*f.units[f.def]/100,f:f.f*f.units[f.def]/100})}</span></button></li>`).join('')}
-      ${busy?`<li class="note ol-busy">Searching millions of foods…</li>`:res.map((x,i)=>`<li><button type="button" data-ol="o${i}"><span class="ol-n"><b>${esc(x.name)}</b><span>${x.brand?esc(x.brand)+' · ':''}${per(x)} · ${esc(x.src)}</span></span><span class="ol-m num">${macroLine(x)}</span></button></li>`).join('')}
-      ${!busy&&!res.length&&!loc.length?`<li class="note">${ofLimited&&Date.now()-ofLimited<36e5?'The free USDA search is busy for this hour. Try again later, or add it from the label.':'No matches yet. Try fewer or different words.'}</li>`:''}</ul>
+      ${busy?`<li class="note ol-busy">Searching…</li>`:res.map((x,i)=>`<li><button type="button" data-ol="o${i}"><span class="ol-n"><b>${esc(x.name)}</b><span>${x.brand?esc(x.brand)+' · ':''}${per(x)}</span></span><span class="ol-m num">${macroLine(x)}</span></button></li>`).join('')}
+      ${!busy&&!res.length&&!loc.length?`<li class="note">No matches. Try fewer or different words, or add it from the label.</li>`:''}</ul>
     <div class="row" style="justify-content:space-between"><button class="link" type="button" id="olMan">Enter from a label instead</button><button class="ghost" type="button" id="olX">${o.mode==='pick'?'Back':'Close'}</button></div>`,{nofocus:true});
     const run=async()=>{q=$('olQ').value.trim();if(q.length<2)return;loc=localSearch(q);busy=true;res=[];draw();res=await foodSearch(q).catch(()=>[]);busy=false;if($('olL'))draw()};
     $('olGo').onclick=run;$('olQ').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();run()}};
@@ -2171,7 +2162,7 @@ function submitFood(){
   if(miss.length){
     input.value=miss.map(m=>m.raw).join(', ');
     status.className='status err';
-    status.textContent=`Looking up “${miss.map(m=>m.raw).join('”, “')}” in the food databases…`;
+    status.textContent=`Looking up “${miss.map(m=>m.raw).join('”, “')}” in the food database…`;
     {const t=(stripQty(miss[0].raw).term||miss[0].raw).trim();openOnline(t,{mode:'log',raw:miss[0].raw,alias:t})}
   }else{
     input.value=''; status.className='status';
@@ -2475,7 +2466,7 @@ function renderFoods(){renderTip('foods');
   setTimeout(()=>{const fb=$('fAllBtn');if(fb)fb.onclick=()=>{S.fAll=true;renderFoods()}},0);
   $('dbCount').textContent=q?`${b.length} match${b.length===1?'':'es'}`:S.fCat==='All'?`${BUILTIN.length} common foods`:S.fCat;
   const cap=!q&&!S.fAll&&b.length>24;
-  const olBtn=q.length>=2?`<li style="grid-column:1/-1;list-style:none"><button class="ghost ol-more" type="button" data-olq="${esc(q)}">Search millions of foods for “${esc(q)}”</button></li>`:'';
+  const olBtn=q.length>=2?`<li style="grid-column:1/-1;list-style:none"><button class="ghost ol-more" type="button" data-olq="${esc(q)}">Search 6,500+ foods for “${esc(q)}”</button></li>`:'';
   $('dbFoods').innerHTML=(b.length?(cap?b.slice(0,24):b).map(fItem).join('')+(cap?`<li style="grid-column:1/-1;list-style:none"><button class="ghost" type="button" id="fAllBtn" style="width:100%">Show all ${b.length} foods</button></li>`:''):'<li class="note" style="grid-column:1/-1">Not in the built-in list yet.</li>')+olBtn;
 }
 $('fSearch').addEventListener('input',renderFoods);
@@ -3179,8 +3170,16 @@ const POOL=Object.fromEntries(PHOTO_SRC.split('\n').map(l=>{const [k,v]=l.split(
 POOL.all=[...POOL.general,...POOL.lunch,...POOL.dinner,...POOL.breakfast,...POOL.snack];
 const hashStr=t=>{let h=2166136261;for(const ch of String(t))h=Math.imul(h^ch.charCodeAt(0),16777619);return h>>>0};
 function dayNum(){const d=new Date();return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)}
-function photoFor(kind,salt){if(kind==='train')return PHOTO.train;const pool=POOL[kind]||POOL.all,n=pool.length;let st=7;while(n%st===0)st+=2;
-  return pool[((dayNum()*st+hashStr(kind+'|'+(salt||'')))%n+n)%n]}
+function photoFor(kind,salt,dd){if(kind==='train')return PHOTO.train;const pool=POOL[kind]||POOL.all,n=pool.length;let st=7;while(n%st===0)st+=2;
+  return pool[(((dayNum()+(dd||0))*st+hashStr(kind+'|'+(salt||'')))%n+n)%n]}
+// While online, quietly save the next week's photos (and every recipe photo) so the app looks the same offline.
+function warmOffline(){foodsDB();if(!navigator.onLine||(S.prefs||{}).photos===false||(navigator.connection&&navigator.connection.saveData))return;
+  let mark;try{mark=localStorage.getItem('syncope.warm')}catch(e){}if(mark===String(dayNum()))return;
+  const U=(id,w,q)=>`https://images.unsplash.com/${id}?w=${w}&q=${q}&auto=format&fit=crop`,urls=new Set();
+  for(let d=0;d<8;d++){['breakfast','lunch','dinner'].forEach(k=>{urls.add(U(photoFor(k,'today',d),1200,70));urls.add(U(photoFor(k,'cook',d),1200,70))});
+    [['plan','plan'],['progress','progress'],['all','week'],['all','month'],['all','friends'],['plan','me'],['dinner','prep'],['lunch','prepcard']].forEach(([k,sl])=>urls.add(U(photoFor(k,sl,d),1200,70)))}
+  Object.values(FMT_PH).flat().forEach(id=>urls.add(U(id,700,62)));
+  const list=[...urls];let i=0;const next=()=>{if(i>=list.length){try{localStorage.setItem('syncope.warm',String(dayNum()))}catch(e){}return}fetch(list[i++],{mode:'no-cors'}).catch(()=>{}).finally(()=>setTimeout(next,150))};setTimeout(next,4000)}
 const ARTC={};
 function bnr(kind,salt){const art=ARTC[kind]||(ARTC[kind]=artURL(ART.banner(['breakfast','lunch','dinner','snack','train','plan'].includes(kind)?kind:'lunch')));
   const id=(S.prefs||{}).photos!==false?photoFor(kind,salt):null;
@@ -3496,14 +3495,14 @@ function renderCook(){const el=$('pg-cook');if(!el)return;const L=likes();if(!co
     ${L.custom?'':`<div class="card ck-ask"><b>Make these yours</b><p class="note" style="margin:0">Pick your favourite proteins, carbs, fats, vegetables and fruit, and every recipe here is built from them.</p><button class="primary" type="button" id="ckLikes1">Pick my favourites</button></div>`}
     <div class="ck-bar"><div class="seg2">${['breakfast','lunch','dinner'].map(m=>`<button type="button" data-cks="${m}" aria-pressed="${m===cookSlot}">${mealName(m)}</button>`).join('')}</div><button class="pill-btn" type="button" id="ckShuf">Shuffle</button></div>
     <div class="ck-likes"><span class="dim">Built from</span> ${LIKE_GROUPS.map(([gk,l,c])=>`<span class="ck-l" style="--c:var(${c})">${L[gk].slice(0,3).map(k=>ING[k].n.replace(/ \\(.*\\)/,'')).join(', ')}${L[gk].length>3?` +${L[gk].length-3}`:''}</span>`).join('')} <button class="link" type="button" id="ckLikes">Edit favourites</button></div>
-    <div class="ck-grid">${list.map((r,i)=>{const gr=gradeMeal(cookSlot,r.entries,g);return `<button class="ck-card" type="button" data-ck="${i}"><span class="ck-ph" style='background-image:url("https://images.unsplash.com/${recipePhoto(r,cookSlot)}?w=500&q=60&auto=format&fit=crop")'><i class="mg-big" style="--c:var(${gr.col})">${gr.letter}</i><em>${r.min} min</em></span><span class="ck-t"><b>${esc(r.name)}</b><span class="num"><i style="color:var(--pro)">${r0(r.got.p)}P</i> <i style="color:var(--carb)">${r0(r.got.c)}C</i> <i style="color:var(--fat)">${r0(r.got.f)}F</i> · ${fmt(r.got.p*4+r.got.c*4+r.got.f*9)} kcal</span></span></button>`}).join('')||emptyState('list','--carb','No recipes yet','Add a few more favourites (at least one protein and one carb) and recipes appear here.','Pick favourites','ckLikes')}</div>`;
+    <div class="ck-grid">${list.map((r,i)=>{const gr=gradeMeal(cookSlot,r.entries,g);return `<button class="ck-card" type="button" data-ck="${i}"><span class="ck-ph" style='background-image:url("https://images.unsplash.com/${recipePhoto(r,cookSlot)}?w=700&q=62&auto=format&fit=crop")'><i class="mg-big" style="--c:var(${gr.col})">${gr.letter}</i><em>${r.min} min</em></span><span class="ck-t"><b>${esc(r.name)}</b><span class="num"><i style="color:var(--pro)">${r0(r.got.p)}P</i> <i style="color:var(--carb)">${r0(r.got.c)}C</i> <i style="color:var(--fat)">${r0(r.got.f)}F</i> · ${fmt(r.got.p*4+r.got.c*4+r.got.f*9)} kcal</span></span></button>`}).join('')||emptyState('list','--carb','No recipes yet','Add a few more favourites (at least one protein and one carb) and recipes appear here.','Pick favourites','ckLikes')}</div>`;
   el.onclick=e=>{const s=e.target.closest('[data-cks]');if(s){cookSlot=s.dataset.cks;renderCook();return}
     if(e.target.closest('#ckShuf')){cookSeed++;renderCook();return}
     if(e.target.closest('#ckLikes,#ckLikes1')){openLikes();return}
     const c=e.target.closest('[data-ck]');if(c)openRecipe(el._list[+c.dataset.ck],cookSlot)}}
 GACT.ckLikes=()=>openLikes();
 function openLikes(pre){ingX();const cur=(S.profile&&S.profile.likes)||{},sel=pre||{};if(!pre)LIKE_GROUPS.forEach(([g])=>sel[g]=new Set((cur[g]&&cur[g].length?cur[g]:LIKE_DEF[g])));
-  sheet(`<div><div class="eyebrow">Your favourites</div><h3>What do you like to eat?</h3><p class="note">Tap everything you enjoy. More picks means more variety. Recipes, portions and grocery lists are built from these.</p><button class="ghost ol-more" type="button" id="lkAny">＋ Add any food (search millions)</button></div>
+  sheet(`<div><div class="eyebrow">Your favourites</div><h3>What do you like to eat?</h3><p class="note">Tap everything you enjoy. More picks means more variety. Recipes, portions and grocery lists are built from these.</p><button class="ghost ol-more" type="button" id="lkAny">＋ Add any food (6,500+ to choose from)</button></div>
     ${LIKE_GROUPS.map(([g,l,c])=>`<div class="field"><label style="color:var(${c})">${l}</label><div class="wn-acts" data-lg="${g}">${Object.values(ING).filter(x=>x.g===g).map(x=>`<button type="button" class="chip" data-lk="${x.k}" aria-pressed="${sel[g].has(x.k)}">${esc(x.n)}</button>`).join('')}</div></div>`).join('')}
     <div class="row" style="justify-content:flex-end"><button class="ghost" type="button" id="lkX">Cancel</button><button class="primary" type="button" id="lkOk">Save favourites</button></div>`,{nofocus:true});
   $('sheetRoot').querySelector('.sheet').onclick=e=>{const b=e.target.closest('[data-lk]');if(!b)return;const g=b.closest('[data-lg]').dataset.lg;const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));on?sel[g].add(b.dataset.lk):sel[g].delete(b.dataset.lk)};
@@ -3512,7 +3511,7 @@ function openLikes(pre){ingX();const cur=(S.profile&&S.profile.likes)||{},sel=pr
     S.profile.likesX[k]={n:cap(fd.name),food:fd.aliases?fd.aliases[0]:fd.name.toLowerCase(),g};delete ING[k];ingX();Object.values(sel).forEach(set=>set.delete(k));sel[g].add(k);save();openLikes(sel);toast(`Added ${esc(cap(fd.name))}`)}});
   $('lkOk').onclick=()=>{if(!sel.p.size||!sel.c.size){toast('Pick at least one protein and one carb');return}S.profile.likes=Object.fromEntries(LIKE_GROUPS.map(([g])=>[g,[...sel[g]]]));save();closeSheet();cookSeed=0;renderCook();toast('Saved. Recipes rebuilt from your favourites')}}
 function openRecipe(r,slot){let sv=1;const draw=()=>{const gr=gradeMeal(slot,r.entries,goalsFor(todayKey())),gl=groceryList(r,sv),k=r.got.p*4+r.got.c*4+r.got.f*9;
-  sheet(`<div class="rc-ph" style='background-image:url("https://images.unsplash.com/${recipePhoto(r,slot)}?w=900&q=65&auto=format&fit=crop")'></div>
+  sheet(`<div class="rc-ph" style='background-image:url("https://images.unsplash.com/${recipePhoto(r,slot)}?w=700&q=62&auto=format&fit=crop")'></div>
     <div><div class="eyebrow">${mealName(slot)} · ${r.min} min · per serving</div><h3>${esc(r.name)}</h3></div>
     <div class="rc-mac"><div style="--c:var(--pro)"><b class="num">${r0(r.got.p)}</b><span>protein g</span></div><div style="--c:var(--carb)"><b class="num">${r0(r.got.c)}</b><span>carbs g</span></div><div style="--c:var(--fat)"><b class="num">${r0(r.got.f)}</b><span>fat g</span></div><div style="--c:var(--kcal)"><b class="num">${fmt(k)}</b><span>kcal</span></div><div style="--c:var(${gr.col})"><b>${gr.letter}</b><span>${esc(gr.label)}</span></div></div>
     <div class="rc-sv"><span>Servings</span><button class="pill-btn" type="button" data-sv="-1" aria-label="Fewer servings">−</button><b class="num">${sv}</b><button class="pill-btn" type="button" data-sv="1" aria-label="More servings">+</button><span class="dim">${sv>1?'Meal prep: amounts and grocery list cover all servings':'Bump this up to meal prep for the week'}</span></div>
@@ -4979,7 +4978,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.add
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 const jm=location.hash.match(/^#join=([A-Za-z0-9]{4,10})/);if(jm){try{localStorage.setItem('syncope.join',jm[1].toUpperCase())}catch(e){}try{history.replaceState(null,'','#friends')}catch(e){}}
-applyPrefs(); checkBackup(); setView(jm?'friends':(location.hash.slice(1)||'today')); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
+applyPrefs(); setTimeout(warmOffline,3000); checkBackup(); setView(jm?'friends':(location.hash.slice(1)||'today')); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
 if(!storageOK){$('saved').textContent='Not saving — storage blocked';$('saved').style.color='var(--over)'}
 if(window.__restoredFrom){save();setTimeout(()=>toast('Your log was recovered from its automatic safety copy'),900)}
 if(loadBlocked){$('backupBanner').hidden=false;$('backupText').textContent='Syncope couldn’t read your saved log, so it paused saving to protect it. Restore from a backup in Profile → Backup & export.'}
