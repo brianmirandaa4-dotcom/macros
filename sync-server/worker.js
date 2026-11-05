@@ -349,7 +349,7 @@ async function rawSample(user, env, day) {
 /* ---------------- Friends & leaderboard ----------------
    Opt-in. Each person stores one record: soc:<uid>. Friends see only what that person chose to share. */
 const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-const SHARE_KEYS = ['streak', 'workouts', 'protein', 'steps', 'weight', 'meals', 'nutrition', 'foods', 'recovery'];
+const SHARE_KEYS = ['streak', 'workouts', 'protein', 'steps', 'weight', 'meals', 'nutrition', 'foods', 'recovery', 'templates'];
 const EVENT_SHARE = { workout: 'workouts', pr: 'workouts', protein: 'protein', streak: 'streak', steps: 'steps', weight: 'weight', day: 'meals', score: null };
 const clampN = (v, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : 0; };
 const cleanStr = (v, n) => String(v ?? '').replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, n);
@@ -383,7 +383,7 @@ function publicView(r, forSelf) {
     if (on('weight')) o.w = x.w;
     return o;
   });
-  const detail = { daily, foods: on('foods') ? (dt.foods || []) : null, wks: on('workouts') ? (dt.wks || []) : null, plan: on('nutrition') ? dt.plan : null, shares: Object.fromEntries(SHARE_KEYS.map(k => [k, !!sh[k]])) };
+  const detail = { daily, foods: on('foods') ? (dt.foods || []) : null, wks: on('workouts') ? (dt.wks || []) : null, tpls: (forSelf || sh.templates !== false) ? (dt.tpls || []) : null, plan: on('nutrition') ? dt.plan : null, shares: Object.fromEntries(SHARE_KEYS.map(k => [k, k === 'templates' ? sh[k] !== false : !!sh[k]])) };
   return { uid: r.uid, name: r.name, username: r.username, color: r.color, stats, events, detail, updated: r.updated };
 }
 async function social(action, req, url, user, env, cors) {
@@ -418,7 +418,7 @@ async function social(action, req, url, user, env, cors) {
       }
     }
     me.name = name; me.color = cleanStr(body.color, 9) || '#C7B6FF';
-    if (body.share || !me.share) me.share = Object.fromEntries(SHARE_KEYS.map(k => [k, !!(body.share || {})[k]]));
+    if (body.share || !me.share) me.share = Object.fromEntries(SHARE_KEYS.map(k => [k, k === 'templates' ? (body.share || {})[k] !== false : !!(body.share || {})[k]]));
     await socPut(env, me);
     return json({ code: me.code, share: me.share, name: me.name, username: me.username, phoneLast4: me.phLast4 || null }, 200, cors);
   }
@@ -437,6 +437,7 @@ async function social(action, req, url, user, env, cors) {
       foods: (Array.isArray(D.foods) ? D.foods : []).slice(0, 40).map(x => ({ n: cleanStr(x.n, 40), a: cleanStr(x.a, 24), m: cleanStr(x.m, 10), k: num(x.k, 5e3), p: num(x.p, 500), c: num(x.c, 800), f: num(x.f, 500) })),
       wks: (Array.isArray(D.wks) ? D.wks : []).slice(0, 10).map(x => ({ name: cleanStr(x.name, 40), d: cleanStr(x.d, 10), min: num(x.min, 600), sets: num(x.sets, 300), vol: num(x.vol, 1e6), prs: num(x.prs, 50), kcal: num(x.kcal, 5e3), strain: num(x.strain, 21), src: cleanStr(x.src, 10),
         ex: (Array.isArray(x.ex) ? x.ex : []).slice(0, 12).map(e => ({ n: cleanStr(e.n, 40), top: cleanStr(e.top, 20), sets: num(e.sets, 50) })) })),
+      tpls: (Array.isArray(D.tpls) ? D.tpls : []).slice(0, 30).map(t => ({ name: cleanStr(t.name, 40), ex: (Array.isArray(t.ex) ? t.ex : []).slice(0, 20).map(e => ({ n: cleanStr(e.n, 40), m: cleanStr(e.m, 24), eq: cleanStr(e.eq, 16), s: cleanStr(e.s, 16) })) })).filter(t => t.name && t.ex.length),
       plan: cleanStr(D.plan, 40) };
     const keep = new Set(me.events.map(e => e.id)); me.cheers = Object.fromEntries(Object.entries(me.cheers || {}).filter(([k]) => keep.has(k)));
     await socPut(env, me);

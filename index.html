@@ -902,6 +902,9 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .tc:disabled{opacity:.35}.dots{display:flex;gap:3px;height:6px}.dots i{width:6px;height:6px;border-radius:50%}
 .tl-card{display:flex;flex-direction:column;gap:8px}.tl-card .ing li>span b{font:600 14.5px var(--f-body)}.tl-card .ing li>span .dim{font-family:var(--f-num)}.tl-card .ing li{cursor:pointer}
 @media (prefers-reduced-motion:reduce){.lc-line{animation:none;stroke-dashoffset:0}}
+
+.ft-card{display:flex;flex-direction:column;gap:8px}.ft-card>.row>div{flex:1}.ft-n{font:700 17px var(--f-display)}.ft-add{padding:9px 14px;white-space:nowrap}
+.ft-who{display:flex;align-items:center;gap:8px}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -1135,6 +1138,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
     </div>
 </div>
   <div class="pg" id="pg-help"></div>
+  <div class="pg" id="pg-ftpl"></div>
   <div class="pg" id="pg-lifts"></div>
   <div class="pg" id="pg-tlog"></div>
   <div class="pg" id="pg-friend"></div>
@@ -2536,8 +2540,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');let bt=$('pgBig');if(!bt){bt=document.createElement('h1');bt.id='pgBig';bt.className='page-big'}$('pgBody').appendChild(bt);$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';bt.textContent=PG_T[id]||'';bt.hidden=id==='me';r.classList.remove('scrolled');
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -2914,7 +2918,7 @@ function renderFriends(){
     <div class="glabel">Privacy</div><div class="glist" id="frShare2">${shareRows(c.share||{})}</div>
     <button class="link" id="frLeave" style="color:var(--muted);align-self:center;padding:10px">Leave Syncope Friends</button>`;
 }
-function shareRows(sh){return [['nutrition','Calories & macros','--kcal','target'],['foods','Food log (what you ate)','--carb','list'],['recovery','Recovery & sleep','--good','heart'],['streak','Logging streak','--carb','fire'],['workouts','Workouts & PRs','--pro','dumbbell'],['protein','Protein days','--pro','target'],['steps','Steps','--fat','watch'],['meals','Days on target','--good','list'],['weight','Weekly weight change','--kcal','scale']]
+function shareRows(sh){sh={...sh,templates:sh.templates!==false};return [['templates','Workout templates','--pro','dumbbell'],['nutrition','Calories & macros','--kcal','target'],['foods','Food log (what you ate)','--carb','list'],['recovery','Recovery & sleep','--good','heart'],['streak','Logging streak','--carb','fire'],['workouts','Workouts & PRs','--pro','dumbbell'],['protein','Protein days','--pro','target'],['steps','Steps','--fat','watch'],['meals','Days on target','--good','list'],['weight','Weekly weight change','--kcal','scale']]
   .map(([k,t,c,ic])=>grow({ic,c,t,ctl:`<input type="checkbox" class="sw" data-sh="${k}" ${sh[k]?'checked':''} aria-label="${t}">`})).join('')}
 $('frBody').addEventListener('click',async e=>{
   const m=e.target.closest('[data-fm]');if(m){S.frMetric=m.dataset.fm;renderFriends();return}
@@ -2967,7 +2971,8 @@ function myDetail(){
     return {name:w?w.name:d.name,d:x.date,min:w?Math.round((w.end-w.start)/60000):d.min,sets:w?w.ex.reduce((a,y)=>a+y.sets.length,0):null,vol:w?r0(w.ex.reduce((a,y)=>a+y.sets.reduce((b,z)=>b+setVol(z),0),0)):null,prs:w?(w.prs||[]).length:0,kcal:d?d.kcal:null,strain:d?d.strain:null,src:d?d.src:'',
       ex:w?w.ex.map(y=>{const b=y.sets.reduce((a,z)=>e1rm(z.w,z.r)>e1rm(a.w,a.r)?z:a,y.sets[0]);return {n:y.n,sets:y.sets.length,top:b?`${b.w}×${b.r}`:''}}):[]}});
   const pl=S.plan?`${S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}`:'';
-  return {daily,foods,wks,plan:pl}}
+  const tpls=S.templates.map(t=>({name:t.name,ex:t.ex.map(n=>{const l=lastFor(n);return {n,m:musOf(n),eq:eqOf(n),s:l&&l.length?`${l.length}×${l[0].r}`:''}})}));
+  return {daily,foods,wks,tpls,plan:pl}}
 let fpUid=null;
 function openFriend(uid){fpUid=uid;openPage('friend')}
 function ringMini(v,goal,col,size=128,stroke=12){const R=(size-stroke)/2,C=2*Math.PI*R,f=goal?Math.min(1,v/goal):0;
@@ -3001,6 +3006,7 @@ function renderFriendPage(){
       <table class="dtable fp-t"><thead><tr><th>Day</th>${sh.nutrition||isMe?'<th>kcal</th><th style="color:var(--pro)">P</th>':''}${sh.steps||isMe?'<th>Steps</th>':''}${sh.recovery||isMe?'<th style="color:var(--good)">Rec</th><th>Sleep</th>':''}</tr></thead><tbody>${days.slice().reverse().map(x=>`<tr><td>${niceDate(x.d,{weekday:'short',day:'numeric'})}</td>${sh.nutrition||isMe?`<td>${x.k!=null&&x.n?fmt(x.k):'—'}</td><td>${x.p!=null&&x.n?x.p:'—'}</td>`:''}${sh.steps||isMe?`<td>${x.steps!=null?fmt(x.steps):'—'}</td>`:''}${sh.recovery||isMe?`<td>${x.rec!=null?x.rec+'%':'—'}</td><td>${x.sleep!=null?x.sleep+'h':'—'}</td>`:''}</tr>`).join('')}</tbody></table></div>`}
   if(D.wks&&D.wks.length)html+=`<div class="glabel">Workouts this week</div><div class="fp-wks">${D.wks.map(w=>`<details class="card fp-w"><summary><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(w.name)}${w.prs?` <span class="pr">${w.prs} PR</span>`:''}</b><span>${niceDate(w.d,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.strain!=null?` · strain ${w.strain}`:''}</span></span><span class="gv">${w.vol?fmt(w.vol)+' lb':w.kcal?fmt(w.kcal)+' kcal':''}</span></summary>${w.ex&&w.ex.length?`<ul class="ing">${w.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.sets} sets · top ${esc(e.top)}</b></li>`).join('')}</ul>`:'<p class="note">Watch session, no lifts logged.</p>'}</details>`).join('')}</div>`;
   else if(!isMe&&!sh.workouts)html+=locked('Workouts','Workouts & PRs');
+  if(!isMe&&D.tpls&&D.tpls.length)html+=`<div class="glabel">${esc(F.name.split(' ')[0])}'s workout templates</div>${D.tpls.map((t,i)=>tplCard(t,F.uid,i)).join('')}`;
   if(!isMe)html+=`<button class="link" data-rm="${esc(F.uid)}" style="color:var(--muted);align-self:center;padding:12px">Remove ${esc(F.name.split(' ')[0])}</button>`;
   else html+=`<p class="note" style="text-align:center">This is exactly what your friends see when they tap you.</p>`;
   el.innerHTML=html;
@@ -3141,6 +3147,24 @@ function liftReviewRow(){const tk=todayKey();if(parseKey(tk).getDay()!==0||S.day
   const c={up:0,down:0};names.forEach(n=>{const t=liftTrend(liftSessions(n,R.from,R.to));if(t&&t.status!=='flat')c[t.status]++});
   return grow({ga:'liftReview',ic:'chart',c:'--good',t:'Sunday lift review',s:`Last 4 weeks: ${c.up} progressing · ${c.down} slipping`,v:'See',vc:'on'})}
 GACT.liftReview=()=>{S.lpPeriod='4w';S.lpLift=null;openPage('lifts')};
+
+/* ---- shared workout templates ---- */
+function tplHave(t){return S.templates.some(x=>x.name.toLowerCase()===t.name.toLowerCase()&&x.ex.join('|').toLowerCase()===t.ex.map(e=>e.n).join('|').toLowerCase())}
+function importTpl(t,from){if(tplHave(t)){toast('Already in your templates');return}
+  let name=t.name;if(S.templates.some(x=>x.name.toLowerCase()===name.toLowerCase()))name=`${t.name} (${from.split(' ')[0]})`;
+  t.ex.forEach(e=>{if(!LIB_BY[e.n.toLowerCase()]&&!customLift(e.n)){S.customLifts=S.customLifts||[];S.customLifts.push({n:e.n,m:MUS_ALL.includes(e.m)?e.m:'Other',eq:EQ_LIST.includes(e.eq)?e.eq:'Other'})}});
+  const nt={id:'t'+uid(),name,ex:t.ex.map(e=>e.n),from};S.templates.push(nt);save();if(S.view==='train')renderTrain();
+  toast(`Added “${esc(name)}” to your templates`,()=>{S.templates=S.templates.filter(x=>x.id!==nt.id);save();if(S.view==='train')renderTrain()})}
+function tplCard(t,who,i){const have=tplHave(t);return `<div class="card ft-card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px"><div style="min-width:0"><b class="ft-n">${esc(t.name)}</b><div class="note" style="margin:2px 0 0">${t.ex.length} exercise${t.ex.length>1?'s':''} · ${[...new Set(t.ex.map(e=>e.m).filter(Boolean))].slice(0,3).map(esc).join(', ')}</div></div>
+  <button type="button" class="${have?'ghost':'primary'} ft-add" data-ftadd="${esc(who)}|${i}" ${have?'disabled':''}>${have?'✓ Added':'+ Add'}</button></div>
+  <ul class="ing">${t.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.s?esc(e.s):''}</b></li>`).join('')}</ul></div>`}
+function friendTpls(uid){const b=socCfg().board||{},f=(b.friends||[]).find(x=>x.uid===uid);return f&&f.detail&&f.detail.tpls||[]}
+function renderFtpl(){const b=socCfg().board||{},frs=(b.friends||[]).filter(f=>f.detail&&f.detail.tpls&&f.detail.tpls.length);
+  if(!socCfg().on){$('pg-ftpl').innerHTML=emptyState('user','--good','Share templates with friends','Join Syncope Friends and you can browse and copy each other’s workout templates.','Open Friends','friends');return}
+  $('pg-ftpl').innerHTML=frs.length?frs.map(f=>`<div class="glabel ft-who">${AV(f.name,f.color,26)} ${esc(f.name)}</div>${f.detail.tpls.map((t,i)=>tplCard(t,f.uid,i)).join('')}`).join('')
+    :emptyState('dumbbell','--pro','No shared templates yet','When your friends update Syncope, their workout templates show up here for you to copy.');}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ftadd]');if(!b)return;const [uid,i]=b.dataset.ftadd.split('|'),f=((socCfg().board||{}).friends||[]).find(x=>x.uid===uid),t=friendTpls(uid)[+i];if(!t)return;
+  importTpl(t,f?f.name:'Friend');b.textContent='✓ Added';b.disabled=true;b.className='ghost ft-add'});
 /* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
 function openAdd(){
   const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
@@ -3422,7 +3446,7 @@ function renderTrain(){
   const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
   $('trRows').innerHTML=grow({pg:'tlog',ic:'cal',c:'--fat',t:'Training calendar',s:'Every workout by day, week and month',v:`${fWk.length} this wk`})+grow({pg:'lifts',ic:'chart',c:'--carb',t:'Lift progress',s:'Which lifts are going up, and how fast',v:lifts?`${lifts} lifts`:''})
     +grow({pg:'muscle',ic:'bars',c:'--good',t:'Sets per muscle',s:'Are you training enough this week?',v:`${sets} sets`})
-    +grow({act:'templates',ic:'list',c:'--pro',t:'Workout templates',s:'Edit, delete or restore',v:String(S.templates.length)});
+    +grow({act:'templates',ic:'list',c:'--pro',t:'Workout templates',s:'Edit, delete or restore',v:String(S.templates.length)})+grow({pg:'ftpl',ic:'user',c:'--good',t:'Friends’ templates',s:'Browse and copy your friends’ workouts',v:String(((socCfg().board||{}).friends||[]).reduce((a,f)=>a+((f.detail&&f.detail.tpls)||[]).length,0)||'')});
 }
 function exChart(name){
   const pts=[];S.workouts.slice().reverse().forEach(w=>{const ex=w.ex.find(x=>x.n===name);if(!ex)return;const b=Math.max(0,...ex.sets.map(s=>e1rm(s.w,s.r)));if(b)pts.push([w.date,b,ex.sets.reduce((a,s)=>e1rm(s.w,s.r)>=e1rm(a.w,a.r)?s:a,ex.sets[0])])});
@@ -3568,20 +3592,21 @@ function openWorkout(i){
     ${dv?`<div class="live"><div style="--c:var(--good)"><b>${dv.strain??'—'}</b><span>${esc(dv.src)} strain</span></div><div style="--c:var(--over)"><b>${dv.kcal!=null?fmt(dv.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--pro)"><b>${dv.avgHr||'—'}</b><span>avg bpm</span></div><div style="--c:var(--fat)"><b>${dv.maxHr||'—'}</b><span>max bpm</span></div></div>`:''}
     ${w.copied?'<p class="note">Sets were copied from your last session. Tap Edit sets if anything changed.</p>':''}
     ${w.ex.map(x=>`<div><div class="row" style="justify-content:space-between"><b>${esc(x.n)}${(w.prs||[]).some(p=>p.n===x.n)?'<span class="pr">PR</span>':''}</b><span class="mus">${esc(musOf(x.n))}</span></div><div class="num" style="color:var(--muted);font-size:13.5px;margin-top:4px">${x.sets.map(s=>`${s.w}×${s.r}`).join('  ·  ')}</div></div>`).join('')}
-    <div class="row" style="justify-content:space-between"><button class="danger" id="wvDel">Delete</button><div class="row"><button class="ghost" id="wvTpl">Save as template</button><button class="ghost" id="wvEdit">Edit sets</button><button class="primary" id="wvAgain">Do it again</button></div></div>`);
+    <div class="row" style="justify-content:space-between"><button class="danger" id="wvDel">Delete</button><div class="row"><button class="ghost" id="wvTpl">Make a template from this</button><button class="ghost" id="wvEdit">Edit sets</button><button class="primary" id="wvAgain">Do it again</button></div></div>`);
   $('wvEdit').onclick=()=>{if(S.active){toast('Finish your current workout first');return}S.workouts.splice(i,1);
     S.active={id:w.id,name:w.name,date:w.date,start:Date.now(),wStart:w.start,wEnd:w.end,devId:w.devId,orig:w,ex:w.ex.map(x=>({n:x.n,sets:x.sets.map(s2=>({w:String(s2.w),r:String(s2.r),done:true}))}))};
     save();closeSheet();setView('train')};
   $('wvAgain').onclick=()=>{closeSheet();startWorkout(w.name,w.ex.map(x=>x.n))};
-  $('wvTpl').onclick=()=>{S.templates.push({id:'t'+uid(),name:w.name,ex:w.ex.map(x=>x.n)});save();closeSheet();renderTrain();toast(`Saved template “${esc(w.name)}”`)};
+  $('wvTpl').onclick=()=>{closeSheet();editTemplate({name:w.name,ex:w.ex.map(x=>x.n),i:-1});toast('Starts with every lift from this workout. Add more, then Save')};
   $('wvDel').onclick=()=>{const gone=S.workouts.splice(i,1)[0];save();closeSheet();renderTrain();toast(`Deleted ${esc(gone.name)}`,()=>{S.workouts.push(gone);S.workouts.sort((x,y)=>y.end-x.end);save();renderTrain()})};
 }
 function openTemplates(){
   sheet(`<div><div class="eyebrow">Templates</div><h3>Your workout templates</h3></div>
-    <div class="glist">${S.templates.map((t,i)=>`<button class="gr" type="button" data-tedit="${i}"><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · ')||'No exercises')}</span></span><span class="gv">${t.ex.length}</span>${CHEV}</button>`).join('')}
-      <button class="gr" type="button" data-tedit="-1"><span class="gi" style="--c:var(--good)">${GI.plus}</span><span class="gt"><b>New template</b><span>Name it and pick the lifts</span></span><span></span>${CHEV}</button></div>
+    <div class="glist">${S.templates.map((t,i)=>`<button class="gr" type="button" data-tedit="${i}"><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(t.name)}</b><span>${t.from?`From ${esc(t.from.split(' ')[0])} · `:''}${esc(t.ex.join(' · ')||'No exercises')}</span></span><span class="gv">${t.ex.length}</span>${CHEV}</button>`).join('')}
+      <button class="gr" type="button" data-tedit="-1"><span class="gi" style="--c:var(--good)">${GI.plus}</span><span class="gt"><b>New template</b><span>Name it and pick the lifts</span></span><span></span>${CHEV}</button>
+      <button class="gr" type="button" data-ftb><span class="gi" style="--c:var(--good)">${GI.user}</span><span class="gt"><b>Copy from a friend</b><span>Browse your friends’ templates</span></span><span></span>${CHEV}</button></div>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="tRestore">Restore starter templates</button><button class="primary" id="tDone">Done</button></div>`,{nofocus:true});
-  $('sheetRoot').querySelector('.glist').onclick=e=>{const b=e.target.closest('[data-tedit]');if(!b)return;const i=+b.dataset.tedit;editTemplate(i>=0?{...S.templates[i],ex:S.templates[i].ex.slice(),i}:{name:'',ex:[],i:-1})};
+  $('sheetRoot').querySelector('.glist').onclick=e=>{if(e.target.closest('[data-ftb]')){closeSheet();openPage('ftpl');return}const b=e.target.closest('[data-tedit]');if(!b)return;const i=+b.dataset.tedit;editTemplate(i>=0?{...S.templates[i],ex:S.templates[i].ex.slice(),i}:{name:'',ex:[],i:-1})};
   $('tRestore').onclick=()=>{const have=new Set(S.templates.map(t=>t.name.toLowerCase()));DEF_TPL.forEach(([n,x])=>{if(!have.has(n.toLowerCase()))S.templates.push({id:'t'+uid(),name:n,ex:x.split('|')})});save();openTemplates();renderTrain()};
   $('tDone').onclick=closeSheet;
 }
@@ -3590,11 +3615,12 @@ function editTemplate(d){
     <div class="field"><label for="teN">Name</label><input id="teN" type="text" value="${esc(d.name)}" placeholder="e.g. Push A"></div>
     <ul class="ml-items" id="teL">${d.ex.map((n,j)=>`<li><span><b>${esc(n)}</b><br><span class="dim" style="font-size:12.5px">${esc(musOf(n))} · ${esc(eqOf(n))}</span></span><span class="row" style="gap:4px">${j?`<button class="link" data-up="${j}" aria-label="Move up">↑</button>`:''}<button class="link" data-rm="${j}" style="color:var(--over)">Remove</button></span></li>`).join('')||'<li class="note">No exercises yet.</li>'}</ul>
     <button class="ghost" id="teAdd" type="button" style="padding:13px">+ Add exercises</button>
-    <div class="row" style="justify-content:space-between">${d.i>=0?'<button class="danger" id="teDel">Delete</button>':'<span></span>'}<div class="row"><button class="ghost" id="teX">Cancel</button><button class="primary" id="teOk">Save</button></div></div>`,{nofocus:d.i>=0});
+    <div class="row" style="justify-content:space-between">${d.i>=0?'<div class="row" style="gap:8px"><button class="danger" id="teDel">Delete</button><button class="ghost" id="teDup">Duplicate</button></div>':'<span></span>'}<div class="row"><button class="ghost" id="teX">Cancel</button><button class="primary" id="teOk">Save</button></div></div>`,{nofocus:d.i>=0});
   const keep=()=>{d.name=$('teN').value};
   $('teL').onclick=e=>{const u=e.target.closest('[data-up]'),r=e.target.closest('[data-rm]');keep();if(u){const j=+u.dataset.up;[d.ex[j-1],d.ex[j]]=[d.ex[j],d.ex[j-1]];editTemplate(d)}if(r){d.ex.splice(+r.dataset.rm,1);editTemplate(d)}};
   $('teAdd').onclick=()=>{keep();openExPicker({eyebrow:d.name||'Template',title:'Add exercises',onDone:ns=>{ns.forEach(n=>{if(!d.ex.includes(n))d.ex.push(n)});editTemplate(d)}})};
   $('teX').onclick=openTemplates;
+  if($('teDup'))$('teDup').onclick=()=>{keep();editTemplate({name:`${d.name.trim()||'Workout'} copy`,ex:d.ex.slice(),i:-1});toast('Copied. Add or remove lifts, rename it, then Save')};
   if($('teDel'))$('teDel').onclick=()=>{const gone=S.templates.splice(d.i,1)[0];save();renderTrain();openTemplates();toast(`Deleted “${esc(gone.name)}”`,()=>{S.templates.splice(d.i,0,gone);save();renderTrain();openTemplates()})};
   $('teOk').onclick=()=>{const n=$('teN').value.trim();if(!n){$('teN').focus();return}if(!d.ex.length){toast('Add at least one exercise');return}
     const t={id:d.id||'t'+uid(),name:n,ex:d.ex};if(d.i>=0)S.templates[d.i]=t;else S.templates.push(t);save();renderTrain();openTemplates();toast(`Saved “${esc(n)}”`)};
