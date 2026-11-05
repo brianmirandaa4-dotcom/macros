@@ -905,6 +905,23 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 
 .ft-card{display:flex;flex-direction:column;gap:8px}.ft-card>.row>div{flex:1}.ft-n{font:700 17px var(--f-display)}.ft-add{padding:9px 14px;white-space:nowrap}
 .ft-who{display:flex;align-items:center;gap:8px}
+
+/* ===== programs ===== */
+.prog-intro{display:flex;flex-direction:column;gap:10px;border-color:color-mix(in srgb,var(--good) 35%,var(--line))}
+.prog-intro h2{margin:2px 0 0;font:800 21px/1.2 var(--f-display)}
+.pi-list{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.5;color:var(--muted)}.pi-list b{color:var(--fg)}
+.prog{display:flex;flex-direction:column;gap:12px}
+.prog-h{display:flex;gap:14px;align-items:center}.prog-h h2{margin:0;font:800 20px/1.15 var(--f-display)}
+.prog-days{width:56px;height:56px;border-radius:16px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:color-mix(in srgb,var(--kcal) 14%,var(--surface-2));border:1px solid color-mix(in srgb,var(--kcal) 35%,transparent)}
+.prog-days b{font:800 22px/1 var(--f-num);color:var(--kcal)}.prog-days span{font-size:10.5px;color:var(--muted)}
+.prog-why{margin:0;font-size:14px;line-height:1.5;color:var(--muted)}
+.prog-sched,.prog-vol{display:flex;flex-wrap:wrap;gap:6px}
+.prog-sched span{font-size:12.5px;padding:5px 9px;border-radius:999px;background:var(--surface-2);color:var(--fg)}
+.prog-vol span{font-size:12px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);color:var(--muted)}.prog-vol b{color:var(--fg);font-family:var(--f-num)}
+.prog-t{padding:10px 0;border-bottom:1px solid var(--line)}.prog-t:last-child{border-bottom:0}
+.zone{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:999px;padding:2px 7px;align-self:flex-start}
+.tpl .zone{margin-bottom:2px}
+.tgt{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;margin:-4px 0 8px;font-size:12.5px;color:var(--muted)}.tgt b{color:var(--fg);font-family:var(--f-num)}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -979,7 +996,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
         <div class="tip" id="tip-train" hidden></div>
         <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
-          <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div></div>
+          <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div><button class="pill-btn" data-pg="progs" type="button">Programs</button></div>
           <div class="tpl-grid" id="tplGrid"></div>
         </div>
         <div class="tiles" id="trTiles"></div>
@@ -1138,6 +1155,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
     </div>
 </div>
   <div class="pg" id="pg-help"></div>
+  <div class="pg" id="pg-progs"></div>
   <div class="pg" id="pg-ftpl"></div>
   <div class="pg" id="pg-lifts"></div>
   <div class="pg" id="pg-tlog"></div>
@@ -2540,8 +2558,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');let bt=$('pgBig');if(!bt){bt=document.createElement('h1');bt.id='pgBig';bt.className='page-big'}$('pgBody').appendChild(bt);$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';bt.textContent=PG_T[id]||'';bt.hidden=id==='me';r.classList.remove('scrolled');
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -3165,6 +3183,70 @@ function renderFtpl(){const b=socCfg().board||{},frs=(b.friends||[]).filter(f=>f
     :emptyState('dumbbell','--pro','No shared templates yet','When your friends update Syncope, their workout templates show up here for you to copy.');}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ftadd]');if(!b)return;const [uid,i]=b.dataset.ftadd.split('|'),f=((socCfg().board||{}).friends||[]).find(x=>x.uid===uid),t=friendTpls(uid)[+i];if(!t)return;
   importTpl(t,f?f.name:'Friend');b.textContent='✓ Added';b.disabled=true;b.className='ghost ft-add'});
+
+/* ================= EVIDENCE-BASED PROGRAMS =================
+   Built on: NSCA position statement (Fragala et al., JSCR 2019) — multijoint lifts first, 2–3 sessions per muscle per week,
+   multiple sets of 6–12 reps without needing failure, 1.5–3 min rest, progression + periodization;
+   Simão et al. (JSCR 2012) — nonlinear (daily undulating) periodization rotating 3–5RM (3 min), 8–10RM (2 min) and 12–15RM (1 min) zones
+   produced larger strength and muscle-thickness effects than linear periodization at equal volume. */
+const ZONE={H:{l:'Heavy day',r:180,c:'--pro',d:'Low reps, long rests: builds the strength you use on volume days'},V:{l:'Volume day',r:120,c:'--kcal',d:'The main growth zone: moderate weight, 8–12 reps'},M:{l:'Pump day',r:75,c:'--fat',d:'Lighter weight, 12–20 reps, short rests'}};
+const PROG_SRC=[
+ {id:'fb3',name:'Full Body Undulating',days:3,level:'Beginner → intermediate',sched:['Mon · Heavy','Wed · Volume','Fri · Pump'],
+  why:'Every muscle 3× a week, and each day uses a different rep zone, the exact rotation that beat a fixed plan in Simão 2012. The most growth per hour if you can train 3 days.',
+  t:[['FB Heavy','H','Back squat:4:4–6|Bench press:4:4–6|Barbell row:4:5–7|Romanian deadlift:3:5–7|Overhead press:3:5–7'],
+     ['FB Volume','V','Leg press:3:8–10|Incline dumbbell press:3:8–10|Lat pulldown:3:8–10|Lying leg curl:3:8–10|Dumbbell lateral raise:3:10–12|EZ-bar curl:2:8–10|EZ-bar skull crusher:2:8–10'],
+     ['FB Pump','M','Hack squat:2:12–15|Machine chest press:2:12–15|Seated cable row:2:12–15|Seated leg curl:2:12–15|Cable lateral raise:3:15–20|Incline dumbbell curl:2:12–15|Rope pushdown:2:12–15|Standing calf raise:3:12–15']]},
+ {id:'ul4',name:'Upper / Lower Undulating',days:4,level:'Intermediate',sched:['Mon · Upper Heavy','Tue · Lower Heavy','Thu · Upper Volume','Fri · Lower Volume'],
+  why:'Each muscle twice a week, one heavy and one volume session, with about 10–16 hard sets per muscle each week. The best fit for most people chasing size.',
+  t:[['Upper Heavy','H','Bench press:4:4–6|Weighted pull-up:4:4–6|Overhead press:3:5–7|Chest-supported row:3:6–8|Close-grip bench press:2:6–8|Barbell curl:2:6–8'],
+     ['Lower Heavy','H','Back squat:4:4–6|Romanian deadlift:3:5–7|Bulgarian split squat:2:6–8|Lying leg curl:3:6–8|Standing calf raise:4:6–8'],
+     ['Upper Volume','V','Incline dumbbell press:3:8–12|Neutral-grip lat pulldown:3:8–12|Machine shoulder press:3:10–12|Single-arm cable row:3:10–12|Low-to-high cable fly:2:12–15|Cable lateral raise:3:12–20|Bayesian curl:3:10–15|Cable overhead tricep extension:3:10–15'],
+     ['Lower Volume','V','Hack squat:3:8–12|Hip thrust:3:8–12|Leg extension:3:12–15|Seated leg curl:3:10–15|Hip adduction:2:12–15|Seated calf raise:4:12–15|Cable crunch:3:10–15']]},
+ {id:'ppl6',name:'Push / Pull / Legs ×2',days:6,level:'Advanced',sched:['Mon · Push A','Tue · Pull A','Wed · Legs A','Thu · Push B','Fri · Pull B','Sat · Legs B'],
+  why:'The highest-volume option: each muscle twice a week, with heavy A days and volume B days. Use it when you can recover from 6 sessions a week.',
+  t:[['Push A','H','Bench press:4:5–7|Overhead press:3:6–8|Incline dumbbell press:3:8–10|Dumbbell lateral raise:3:10–15|EZ-bar skull crusher:3:8–10'],
+     ['Pull A','H','Weighted pull-up:4:5–7|Barbell row:3:6–8|Chest-supported row:2:8–10|Reverse pec deck:3:12–15|Barbell curl:3:6–10|Hammer curl:2:8–12'],
+     ['Legs A','H','Back squat:4:5–7|Romanian deadlift:3:6–8|Leg press:3:8–10|Lying leg curl:3:8–10|Standing calf raise:4:8–10'],
+     ['Push B','V','Smith machine incline bench press:3:8–12|Machine chest press:3:10–12|Machine shoulder press:3:10–12|Pec deck:2:12–15|Cable lateral raise:4:12–20|Rope pushdown:3:12–15|Cable overhead tricep extension:2:12–15'],
+     ['Pull B','V','Neutral-grip lat pulldown:3:10–12|Seated cable row:3:10–12|Straight-arm pulldown:2:12–15|Face pull:3:15–20|Bayesian curl:3:12–15|Machine preacher curl:2:10–12'],
+     ['Legs B','V','Hack squat:3:10–12|Hip thrust:3:8–12|Walking lunge:2:10–12|Seated leg curl:3:12–15|Leg extension:3:12–15|Seated calf raise:4:12–15|Hanging leg raise:3:10–15']]},
+ {id:'min2',name:'Minimum Effective Dose',days:2,level:'Busy weeks',sched:['Mon · Day A','Thu · Day B'],
+  why:'Two full-body sessions, 72 hours apart, which is the frequency used in Simão 2012. It keeps you growing when life is busy.',
+  t:[['Minimum A','H','Back squat:3:5–8|Bench press:3:5–8|Lat pulldown:3:8–10|Romanian deadlift:2:6–8|Dumbbell lateral raise:2:12–15'],
+     ['Minimum B','V','Leg press:3:10–12|Incline dumbbell press:3:8–12|Chest-supported row:3:8–12|Lying leg curl:2:10–12|Cable curl:2:10–15|Rope pushdown:2:10–15']]},
+ {id:'arms',name:'Arms & Delts Add-on',days:1,level:'Any program',sched:['Any extra day'],
+  why:'One extra pump session for the slower-growing small muscles: side delts, biceps and triceps. Add it to any program above.',
+  t:[['Arms & Delts','M','Cable lateral raise:4:12–20|Machine preacher curl:3:8–12|Cable overhead tricep extension:3:10–15|Bayesian curl:2:12–15|Single-arm pushdown:2:12–15|Reverse pec deck:3:15–20']]}];
+const PROGS=PROG_SRC.map(p=>({...p,t:p.t.map(([name,zone,ex])=>({name,zone,ex:ex.split('|').map(x=>{const [n,sets,r]=x.split(':');return {n,s:+sets,r}})}))}));
+function progVolume(p){const v={};p.t.forEach(t=>t.ex.forEach(e=>{const m=musOf(e.n);if(m==='Cardio')return;v[m]=(v[m]||0)+e.s}));return v}
+function progTplName(p,t){return p.id==='ppl6'||p.id==='arms'?t.name:t.name}
+function progAdded(p){return p.t.every(t=>S.templates.some(x=>x.prog===p.id&&x.name===t.name))}
+function addProgram(p){let n=0;p.t.forEach(t=>{if(S.templates.some(x=>x.prog===p.id&&x.name===t.name))return;
+  let name=t.name;if(S.templates.some(x=>x.name.toLowerCase()===name.toLowerCase()))name=`${t.name} (${p.name.split(' ')[0]})`;
+  S.templates.push({id:'t'+uid(),name,ex:t.ex.map(e=>e.n),tg:t.ex.map(e=>({s:e.s,r:e.r})),zone:t.zone,rest:ZONE[t.zone].r,prog:p.id});n++});
+  save();if(S.view==='train')renderTrain();toast(n?`Added ${n} workout${n>1?'s':''} from ${esc(p.name)}`:'Already in your templates')}
+function renderProgs(){
+  $('pg-progs').innerHTML=`<div class="card prog-intro"><div class="eyebrow" style="color:var(--good)">Built from the research</div><h2>How these programs grow muscle</h2>
+    <ul class="pi-list"><li><b>Each muscle 2–3× a week.</b> Training a muscle 2–3 times a week beat once a week for both strength and size (NSCA position statement, 2019).</li>
+    <li><b>Rotate heavy, volume and pump days.</b> Changing the rep zone from session to session (3–5, 8–10, 12–15 reps) beat changing it only every 4 weeks, at the same total work (Simão et al., 2012).</li>
+    <li><b>Big lifts first, then isolation.</b> Multi-joint lifts go early while you're fresh, then single-joint work finishes each muscle.</li>
+    <li><b>Hard sets, not failure.</b> Stop 1–2 reps before failure on big lifts. Going all the way isn't needed for growth and costs more recovery.</li>
+    <li><b>Progressive overload.</b> When you hit the top of the rep range on every set, Syncope suggests adding weight next time.</li></ul>
+    <p class="note" style="margin:0">One of the two papers studied adults 50+, so its exact loads are conservative. These programs keep its principles and use the 6–20 rep zones that work across ages. Rest times are set for you: ${restLbl(ZONE.H.r)} heavy, ${restLbl(ZONE.V.r)} volume, ${restLbl(ZONE.M.r)} pump.</p></div>
+    ${PROGS.map(p=>{const v=progVolume(p),added=progAdded(p),top=Object.entries(v).sort((a,b)=>b[1]-a[1]);
+      return `<div class="card prog"><div class="prog-h"><div class="prog-days"><b>${p.days}</b><span>day${p.days>1?'s':''}/wk</span></div><div style="min-width:0"><h2>${esc(p.name)}</h2><div class="note" style="margin:2px 0 0">${esc(p.level)}</div></div></div>
+        <p class="prog-why">${esc(p.why)}</p>
+        <div class="prog-sched">${p.sched.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+        <div class="prog-vol">${top.map(([m,n])=>`<span><b>${n}</b> ${esc(m==='Hamstrings & glutes'?'Hams/glutes':m)}</span>`).join('')}</div>
+        <details class="steps"><summary>See the ${p.t.length} workout${p.t.length>1?'s':''}</summary>${p.t.map(t=>`<div class="prog-t"><div class="row" style="justify-content:space-between"><b>${esc(t.name)}</b><span class="zone" style="--c:var(${ZONE[t.zone].c})">${ZONE[t.zone].l}</span></div><ul class="ing">${t.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.s} × ${esc(e.r)}</b></li>`).join('')}</ul></div>`).join('')}</details>
+        <button class="${added?'ghost':'primary'}" type="button" data-addprog="${p.id}" ${added?'disabled':''} style="width:100%;padding:14px">${added?'✓ In your templates':`Add ${p.t.length} workout${p.t.length>1?'s':''} to my templates`}</button></div>`}).join('')}
+    <p class="note" style="padding:0 6px">Weekly hard sets per muscle are shown on each program. Isolation work for small muscles adds to the compound lifts that already train them.</p>`;
+}
+$('pg-progs')&&$('pg-progs').addEventListener('click',e=>{const b=e.target.closest('[data-addprog]');if(!b)return;const p=PROGS.find(x=>x.id===b.dataset.addprog);if(p){addProgram(p);renderProgs()}});
+function tplFor(name,exNames){return S.templates.find(t=>t.name===name&&t.ex.length===exNames.length&&t.ex.every((n,i)=>n===exNames[i]))}
+function restLbl(sec){return sec%60?`${sec} sec`:`${sec/60} min`}
+function topRep(r){const m=String(r||'').match(/(\d+)\D*$/);return m?+m[1]:null}
+function lowRep(r){const m=String(r||'').match(/^(\d+)/);return m?+m[1]:null}
 /* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
 function openAdd(){
   const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
@@ -3417,7 +3499,7 @@ function renderTrain(){
   if(!S.tplSeeded){S.templates=DEF_TPL.map(([n,x])=>({id:'t'+uid(),name:n,ex:x.split('|')}));S.tplSeeded=true;save()}
   const act=!!S.active;$('trainHome').hidden=act;$('trainActive').hidden=!act;
   if(act)return renderActive();
-  $('tplGrid').innerHTML=S.templates.map((t,i)=>`<button class="tpl" data-tpl="${i}"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></button>`).join('')+`<button class="tpl empty" data-tpl="-1"><b>+ Empty workout</b><span>Add exercises as you go</span></button>`;
+  $('tplGrid').innerHTML=S.templates.map((t,i)=>`<button class="tpl" data-tpl="${i}">${t.zone?`<i class="zone" style="--c:var(${ZONE[t.zone].c})">${ZONE[t.zone].l.split(' ')[0]}</i>`:''}<b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></button>`).join('')+`<button class="tpl empty" data-tpl="-1"><b>+ Empty workout</b><span>Add exercises as you go</span></button>`;
   // week stats
   const ws=weekStart(todayKey()),inWk=S.workouts.filter(w=>w.date>=ws),feed=trainFeed(),fWk=feed.filter(x=>x.date>=ws),burn=fWk.reduce((a,x)=>a+((x.dev&&x.dev.kcal)||0),0);
   renderWatchNow();renderTip('train');const cs=syncCfg();$('trSync').hidden=!(cs.url&&cs.uid);
@@ -3446,7 +3528,7 @@ function renderTrain(){
   const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
   $('trRows').innerHTML=grow({pg:'tlog',ic:'cal',c:'--fat',t:'Training calendar',s:'Every workout by day, week and month',v:`${fWk.length} this wk`})+grow({pg:'lifts',ic:'chart',c:'--carb',t:'Lift progress',s:'Which lifts are going up, and how fast',v:lifts?`${lifts} lifts`:''})
     +grow({pg:'muscle',ic:'bars',c:'--good',t:'Sets per muscle',s:'Are you training enough this week?',v:`${sets} sets`})
-    +grow({act:'templates',ic:'list',c:'--pro',t:'Workout templates',s:'Edit, delete or restore',v:String(S.templates.length)})+grow({pg:'ftpl',ic:'user',c:'--good',t:'Friends’ templates',s:'Browse and copy your friends’ workouts',v:String(((socCfg().board||{}).friends||[]).reduce((a,f)=>a+((f.detail&&f.detail.tpls)||[]).length,0)||'')});
+    +grow({pg:'progs',ic:'book',c:'--good',t:'Science-based programs',s:'Ready-made splits built for fastest muscle growth',v:'5'})+grow({act:'templates',ic:'list',c:'--pro',t:'Workout templates',s:'Edit, delete or restore',v:String(S.templates.length)})+grow({pg:'ftpl',ic:'user',c:'--good',t:'Friends’ templates',s:'Browse and copy your friends’ workouts',v:String(((socCfg().board||{}).friends||[]).reduce((a,f)=>a+((f.detail&&f.detail.tpls)||[]).length,0)||'')});
 }
 function exChart(name){
   const pts=[];S.workouts.slice().reverse().forEach(w=>{const ex=w.ex.find(x=>x.n===name);if(!ex)return;const b=Math.max(0,...ex.sets.map(s=>e1rm(s.w,s.r)));if(b)pts.push([w.date,b,ex.sets.reduce((a,s)=>e1rm(s.w,s.r)>=e1rm(a.w,a.r)?s:a,ex.sets[0])])});
@@ -3471,15 +3553,19 @@ $('trSync').onclick=()=>syncDevices(true);
 
 function startWorkout(name,exNames,prefill,dev){
   if(S.active){toast('Finish or discard your current workout first');setView('train');return}
-  S.active={id:'w'+uid(),name,date:dev?dev.date:todayKey(),start:Date.now(),...(dev?{devId:dev.id,wStart:dev.start?Date.parse(dev.start):null,wEnd:dev.start&&dev.min?Date.parse(dev.start)+dev.min*60000:null}:{}),ex:exNames.map(n=>{const last=lastFor(n);const k=prefill&&prefill[n]||last;return {n,sets:(k&&k.length?k:[{},{},{}]).map(p=>p&&p.r!==undefined&&p.r!==''?{w:String(p.w??''),r:String(p.r),done:false,pf:true}:{w:'',r:'',done:false})}})};
+  const T=tplFor(name,exNames);
+  S.active={id:'w'+uid(),name,date:dev?dev.date:todayKey(),start:Date.now(),...(T&&T.rest?{restSec:T.rest,zone:T.zone}:{}),...(dev?{devId:dev.id,wStart:dev.start?Date.parse(dev.start):null,wEnd:dev.start&&dev.min?Date.parse(dev.start)+dev.min*60000:null}:{}),
+    ex:exNames.map((n,i)=>{const last=lastFor(n),k=prefill&&prefill[n]||last,tg=T&&T.tg&&T.tg[i];
+      let src=k&&k.length?k.slice():[{},{},{}];if(tg&&tg.s){while(src.length<tg.s)src.push(src[src.length-1]&&src[src.length-1].r!==undefined?src[src.length-1]:{});src=src.slice(0,tg.s)}
+      return {n,...(tg?{tg}:{}),sets:src.map(p=>p&&p.r!==undefined&&p.r!==''?{w:String(p.w??''),r:String(p.r),done:false,pf:true}:{w:'',r:'',done:false})}})};
   save();setView('train');
 }
 function saveActive(){clearTimeout(saveActive.t);saveActive.t=setTimeout(save,400)}
 function renderActive(){
   const a=S.active;
   $('trainActive').innerHTML=`<div class="wk-bar"><input id="wkName" value="${esc(a.name)}" aria-label="Workout name"><span class="wk-time" id="wkTime">${a.wStart?(a.orig?'Editing':'From watch'):clock(Date.now()-a.start)}</span><button class="primary" id="wkFinish" style="padding:9px 16px">Finish</button></div>
-  ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id)||[];return `<div class="card ex-card"><div class="ex-h"><h3>${esc(x.n)}</h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exswap="${i}">Swap</button><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>${(()=>{const pv=lastFor(x.n,a.id)||[];if(pv.length<2||!pv.every(z=>+z.r>=10&&+z.w>0)||x.sets.every(z=>z.done))return '';const nw=+pv[0].w+(+pv[0].w>=100?5:2.5);return `<div class="bump-row"><span>You got 10+ reps on every set last time.</span><button class="link bump" type="button" data-bump="${i}|${nw}">Try ${nw} lb</button></div>`})()}
-    <table class="sets"><thead><tr><th>Set</th><th>Last</th><th>lb</th><th>Reps</th><th></th></tr></thead><tbody>${x.sets.map((s,j)=>{const p=prev[j];return `<tr class="${s.done?'done':''}"><td class="setn">${j+1}</td><td class="prev">${p?`${p.w}×${p.r}`:'—'}</td><td><input type="number" inputmode="decimal" class="${s.pf&&!s.done?'pf':''}" data-w="${i}.${j}" value="${esc(s.w)}" placeholder="${p?esc(p.w):''}" aria-label="Weight, set ${j+1}"></td><td><input type="number" inputmode="numeric" class="${s.pf&&!s.done?'pf':''}" data-r="${i}.${j}" value="${esc(s.r)}" placeholder="${p?esc(p.r):''}" aria-label="Reps, set ${j+1}"></td><td><button class="chk" data-done="${i}.${j}" aria-pressed="${!!s.done}" aria-label="Mark set ${j+1} done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button></td></tr>`}).join('')}</tbody></table>
+  ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id)||[];return `<div class="card ex-card"><div class="ex-h"><h3>${esc(x.n)}</h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exswap="${i}">Swap</button><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>${x.tg?`<div class="tgt"><span>Target <b>${x.tg.s} × ${esc(x.tg.r)}</b></span><span>${a.zone?ZONE[a.zone].l+` · `:``}rest ${restLbl((a.restSec)||S.restSec||120)} · stop 1–2 reps short</span></div>`:''}${(()=>{const pv=lastFor(x.n,a.id)||[];const top=x.tg?topRep(x.tg.r):10;if(pv.length<2||!pv.every(z=>+z.r>=top&&+z.w>0)||x.sets.every(z=>z.done))return '';const nw=+pv[0].w+(+pv[0].w>=100?5:2.5);return `<div class="bump-row"><span>You hit ${top}+ reps on every set last time. Time to add weight.</span><button class="link bump" type="button" data-bump="${i}|${nw}">Try ${nw} lb</button></div>`})()}
+    <table class="sets"><thead><tr><th>Set</th><th>Last</th><th>lb</th><th>Reps</th><th></th></tr></thead><tbody>${x.sets.map((s,j)=>{const p=prev[j];return `<tr class="${s.done?'done':''}"><td class="setn">${j+1}</td><td class="prev">${p?`${p.w}×${p.r}`:'—'}</td><td><input type="number" inputmode="decimal" class="${s.pf&&!s.done?'pf':''}" data-w="${i}.${j}" value="${esc(s.w)}" placeholder="${p?esc(p.w):''}" aria-label="Weight, set ${j+1}"></td><td><input type="number" inputmode="numeric" class="${s.pf&&!s.done?'pf':''}" data-r="${i}.${j}" value="${esc(s.r)}" placeholder="${p?esc(p.r):x.tg?lowRep(x.tg.r)||'':''}" aria-label="Reps, set ${j+1}"></td><td><button class="chk" data-done="${i}.${j}" aria-pressed="${!!s.done}" aria-label="Mark set ${j+1} done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button></td></tr>`}).join('')}</tbody></table>
     <div class="ex-f"><button class="link" data-addset="${i}">+ Add set</button>${x.sets.some(z=>!z.done)&&prev.length?`<button class="link" data-allset="${i}">✓ Log all like last time</button>`:''}${x.sets.length>1?`<button class="link" data-rmset="${i}" style="color:var(--muted)">Remove last set</button>`:''}</div></div>`}).join('')}
   <button class="ghost" id="wkAddEx" style="padding:14px">+ Add exercise</button>
   <div class="row" style="justify-content:space-between"><button class="danger" id="wkDiscard">Discard workout</button><button class="ghost" id="wkTpl">Save as template</button></div>`;
@@ -3626,7 +3712,7 @@ function editTemplate(d){
     const t={id:d.id||'t'+uid(),name:n,ex:d.ex};if(d.i>=0)S.templates[d.i]=t;else S.templates.push(t);save();renderTrain();openTemplates();toast(`Saved “${esc(n)}”`)};
 }
 /* rest timer */
-function startRest(){S.rest={end:Date.now()+(S.restSec||120)*1000};renderRest()}
+function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};renderRest()}
 function renderRest(){
   let el=$('restBar');
   if(!S.rest||!S.active){if(el)el.remove();return}
