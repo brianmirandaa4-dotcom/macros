@@ -30,7 +30,7 @@ function density(o){ const H = o.hist; if(!H || !H.counts || !H.counts.length) r
   const pk = H.counts.indexOf(mx); const lab = o.pLabel; const labX = winLeft ? Math.max(40, lx - 70) : Math.min(W - 40, lx + 70);
   const ly = (() => { const i = Math.max(0, Math.min(n - 1, Math.round(((winLeft ? lx - 70 : lx + 70) - 8) / (W - 16) * n - .5))); return Math.max(pt + 22, y(H.counts[i]) - 14); })();
   const proj = o.proj != null ? `<line x1="${x(o.proj)}" x2="${x(o.proj)}" y1="${y(H.counts[Math.min(n - 1, Math.max(0, Math.floor((o.proj - H.lo) / H.step)))])}" y2="${Ht - pb}" stroke="var(--t3)" stroke-width="1" stroke-dasharray="2 3"/>` : '';
-  const actual = o.actual != null && o.actual >= H.lo && o.actual <= H.lo + n * H.step ? `<g><line x1="${x(o.actual)}" x2="${x(o.actual)}" y1="${pt}" y2="${Ht - pb}" stroke="var(--live)" stroke-width="1.5"/><text x="${x(o.actual)}" y="${pt - 4}" fill="var(--live)" font-size="16" text-anchor="middle" ${NUM}>final ${fx(o.actual)}</text></g>` : '';
+  const actual = o.actual != null && o.actual >= H.lo && o.actual <= H.lo + n * H.step ? `<g><line x1="${x(o.actual)}" x2="${x(o.actual)}" y1="${pt}" y2="${Ht - pb}" stroke="var(--live)" stroke-width="1.5"/><text x="${Math.max(30, Math.min(W - 30, x(o.actual)))}" y="${pt - 4}" fill="var(--live)" font-size="13" text-anchor="middle" ${NUM}>final ${fx(o.actual)}</text></g>` : '';
   return `<svg class="ch ch-density" viewBox="0 0 ${W} ${Ht}" role="img" aria-label="${esc(o.aria || `Distribution of ${(H.n || 10000).toLocaleString()} replays, line ${L}`)}">
     <defs><clipPath id="${cid}">${clipWin}</clipPath><clipPath id="${cid2}">${clipLose}</clipPath></defs>
     <path d="${area}" fill="var(--s3)" clip-path="url(#${cid2})"/>

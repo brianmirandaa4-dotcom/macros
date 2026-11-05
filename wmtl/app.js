@@ -2,7 +2,7 @@
    Vanilla JS, no build step. Renders whatever is in /data. The model is the only source of truth:
    nothing here invents a pick, a line, a stat or an injury; missing data reads "Not available". */
 'use strict';
-const APP_VERSION = '1.1.1';
+const APP_VERSION = '2.0.0';
 const STORE_KEY = 'wmtl.v1';
 
 /* ================================================================ helpers */
@@ -21,35 +21,18 @@ const decOdds = o => o > 0 ? 1 + o / 100 : 1 + 100 / -o;
 const money = (x, d = 0) => isNum(x) ? (x < 0 ? '−$' : '$') + Math.abs(x).toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '—';
 const SPORTS = ['NFL', 'CFB', 'NBA', 'NHL', 'MLB'];
 const SPORTC = {NFL: 'var(--nfl)', CFB: 'var(--cfb)', NBA: 'var(--nba)', NHL: 'var(--nhl)', MLB: 'var(--mlb)'};
-const SPORTHEX = {NFL: '#5B8DEF', CFB: '#B08BE8', NBA: '#E8894A', NHL: '#8FD0EE', MLB: '#5FC2AE'};
+const SPORTHEX = {NFL: '#6E9BF0', CFB: '#B596EA', NBA: '#EC9455', NHL: '#8FD0EE', MLB: '#63C7B2'};
 const FAM = {A: 'Role', B: 'Form', C: 'Matchup', D: 'Game setup', E: 'History'};
 const LPRICES = [-105, -115, -125, -140];
 const MKT_ORDER = ['pass_yds', 'rush_yds', 'rec_yds', 'receptions', 'qb_rush', 'atd', 'qb_atd', 'kicker', 'pts', 'reb', 'ast', 'tpm', 'pra', 'pr', 'pa', 'ra', 'stl', 'blk', 'tov'];
 const STATWORD = {rec_yds: 'rec yds', receptions: 'rec', rush_yds: 'rush yds', qb_rush: 'rush yds', pass_yds: 'pass yds', atd: 'TD', qb_atd: 'TD', kicker: 'kick pts', pts: 'pts', reb: 'reb', ast: 'ast', tpm: '3PM', pra: 'PRA', pr: 'P+R', pa: 'P+A', ra: 'R+A', stl: 'stl', blk: 'blk', tov: 'TO'};
-const ICON = {
-  lobby: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-5h5v5"/></svg>',
-  card: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v2a2 2 0 0 0 0 4v2a2 2 0 0 0 0 4v-1A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-2a2 2 0 0 0 0-4v-2a2 2 0 0 0 0-3Z"/><path d="M9 9h6M9 13h4"/></svg>',
-  props: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19h16"/><path d="M7 19v-6M12 19V6M17 19v-9"/></svg>',
-  live: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M10 2.5h4"/></svg>',
-  more: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>',
-  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
-  chev: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>',
-  lines: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M4 12h16M4 17h7"/><circle cx="18" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>',
-  parlay: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8 8.5l2.8 6.2M16 8.5l-2.8 6.2"/></svg>',
-  results: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M7 15l4-4 3 3 5-6"/></svg>',
-  bets: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="6" width="17" height="12" rx="2.5"/><path d="M3.5 10h17M7 14.5h4"/></svg>',
-  learn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5 2-1.5 5-1.9 8-1.5V5c-3-.4-6 0-8 1.5Z"/><path d="M12 6.5V19"/></svg>',
-  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>',
-  share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v6.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V12"/></svg>',
-  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
-  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>',
-  import: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 19h14"/></svg>'
-};
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), 2000); }
+const ICON = new Proxy({}, {get: (_, k) => typeof k === 'string' ? Icon.svg(k) : undefined});
+function toast(msg){ const w = $('#toastw'), t = $('#toast'); t.innerHTML = Icon.svg('check', {size: 20}) + esc(msg); w.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => w.classList.remove('on'), 2000); }
 function countUp(el){ if(RM) return; $$('[data-count]', el).forEach(n => { const to = parseFloat(n.dataset.count); if(!isFinite(to)) return; const dp = (n.dataset.count.split('.')[1] || '').length; const t0 = performance.now(), D = 520;
   const step = t => { const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3); n.textContent = (n.dataset.prefix || '') + (to * e).toFixed(dp) + (n.dataset.suffix || ''); if(k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }); }
-const lossLine = p => { if(!isNum(p)) return ''; const w = Math.round(p * 10), l = 10 - w; return `Wins about <b>${w} in 10</b> · loses about <b>${l} in 10</b>`; };
+const lossLine = p => { if(!isNum(p)) return ''; const l = Math.round((1 - p) * 100); return `Loses about <b>${l}</b> in 100`; };
 function etTime(iso, opts){ try{ return new Date(iso).toLocaleString('en-US', Object.assign({timeZone: 'America/New_York'}, opts)); }catch(e){ return ''; } }
+const winWord = w => w && !/\d/.test(w) ? w + ' · ' : '';
 const kickET = iso => etTime(iso, {hour: 'numeric', minute: '2-digit'}) + ' ET';
 const dayET = iso => etTime(iso, {weekday: 'short', month: 'short', day: 'numeric'});
 function countdown(iso){ const ms = new Date(iso) - Date.now(); if(ms <= 0) return null; const h = Math.floor(ms / 3.6e6), m = Math.floor(ms % 3.6e6 / 6e4), d = Math.floor(h / 24);
@@ -137,8 +120,8 @@ function viewLobby(){ const sums = sportSummaries(); const ss = INDEX.slates.sli
   return `<div class="view">
     <div class="room" id="room">
       <div id="roomCanvas"></div>${room2d(sums)}
-      <div class="ov"><div><b>The Book</b><span>Tap a table to open its slate</span></div></div>
-      <div class="bt">${sums.map(s => `<button data-sport="${s.key}" ${s.built ? '' : 'disabled style="opacity:.5"'}><i class="dot" style="background:${SPORTHEX[s.sport]}"></i>${s.sport}${s.built && s.bets ? ` <span class="m pos">${s.bets}</span>` : ''}</button>`).join('')}</div>
+      <div class="ov"><b>The Book</b><span>Tap a screen to open its slate</span></div>
+      <div class="bt">${sums.map(s => `<button class="tap" data-sport="${s.key}" style="--c:${SPORTHEX[s.sport]}" ${s.built ? '' : 'disabled style="opacity:.45"'}>${Icon.svg(s.key.toLowerCase(), {size: 18})}${s.sport}${s.built && s.bets ? ` <span class="m">${s.bets}</span>` : ''}</button>`).join('')}</div>
     </div>
     <section class="sec"><div class="hd"><h2>Slates</h2><span class="sub">${INDEX.slates.length} loaded · newest first</span></div>
       <div class="slates">${up}${ss.map(slateCard).join('')}${off}</div></section>
@@ -147,8 +130,8 @@ function viewLobby(){ const sums = sportSummaries(); const ss = INDEX.slates.sli
   </div>`; }
 function room2d(sums){ return `<div class="room2d" id="room2d"><div class="tables">${sums.map(s => `<button class="tb ${s.built ? '' : 'off'}" data-sport="${s.key}" style="--c:${SPORTHEX[s.sport]};--glow:${s.bets ? 'var(--edge)' : s.watch ? 'var(--live)' : 'var(--pass)'}" ${s.built ? '' : 'disabled'} aria-label="${s.sport}"><span class="holo">${s.sport}</span><span class="ped"></span></button>`).join('')}</div></div>`; }
 function slateCard(s){ const st = slateStatus(s); const r = s.results || {};
-  return `<button class="sl" data-slate="${esc(s.id)}" style="--c:${SPORTHEX[s.sport]}"><div><span class="sp" style="--c:${SPORTHEX[s.sport]}">${s.sport}${s.imported ? ' · imported' : ''}</span><div class="t" style="margin-top:6px">${esc(s.label)}</div></div>
-    <div class="cnt">${s.bets ? `<span class="tag edge">${s.bets} bet${s.bets > 1 ? 's' : ''} pass</span>` : `<span class="tag">No bets pass</span>`}${s.watch ? `<span class="tag live">${s.watch} live watch</span>` : ''}</div>
+  return `<button class="sl tap" data-slate="${esc(s.id)}" style="--c:${SPORTHEX[s.sport]}"><div><span class="sp" style="--c:${SPORTHEX[s.sport]}">${s.sport}${s.imported ? ' · imported' : ''}</span><div class="t" style="margin-top:8px">${esc(s.label)}</div></div>
+    <div class="cnt">${s.bets ? `<span class="pill pill-bet">${s.bets} bet${s.bets > 1 ? 's' : ''}</span>` : `<span class="pill pill-pass">No bets</span>`}${s.watch ? `<span class="pill pill-live">${s.watch} live</span>` : ''}</div>
     <div class="w">${esc(s.date_label || '')} · ${s.n_games} games · ${s.priced} priced · <span class="${st.k === 'up' ? 'cd' : ''}">${esc(st.word)}</span>${r.status === 'graded' && r.bets && (r.bets.w + r.bets.l) ? ` · bets ${r.bets.w}–${r.bets.l}` : ''}</div></button>`; }
 function wireLobby(){ const m = $('#main');
   $$('[data-slate]', m).forEach(b => b.onclick = () => setSlate(b.dataset.slate, 'card'));
@@ -173,27 +156,28 @@ function windowSeg(d, cur, key, count){ const W = d.meta.windows || []; if(W.len
 function funnelHTML(F){ if(!F || !F.length) return ''; const mx = Math.max(1, F[0].n); return `<div class="funnel">${F.map(f => `<div class="fr ${f.n ? '' : 'zero'}"><div><div class="l">${esc(f.step)}</div><div class="bar"><span style="width:${Math.max(f.n ? 2 : 0, f.n / mx * 100)}%"></span></div></div><div class="n">${f.n.toLocaleString()}</div></div>`).join('')}</div>`; }
 function noBetReason(F){ if(!F || !F.length) return 'The model did not export its rule funnel for this slate.'; const z = F.findIndex(f => f.n === 0); if(z < 0) return 'Every bet that cleared the rules was capped by the exposure limits.'; const f = F[z];
   return `${F[0].n.toLocaleString()} props were priced. None made it past “${f.step.toLowerCase()}”${f.note ? ` (${f.note})` : ''}.`; }
-function ticket(p, d){ const r = resultOf(d, p); return `<button class="ticket" data-prop="${esc(p.id)}">
-  <div class="who"><span>${esc(p.player)} · ${teamOpp(p)}</span><span>${esc(p.window || '')}${p._g ? ' · ' + kickET(p._g.kick_utc) : ''}</span></div>
-  <div class="sel">${esc(selText(p))}</div>
-  <div class="px"><b>${od(p.odds)}</b><span class="soft">at <b style="font:600 16px var(--f-b)">${esc(p.book || '')}</b></span>${isNum(p.units) ? `<span class="tag brass">${p.units}u</span>` : ''}${resultTag(r)}</div>
-  <div class="kv"><div><b>${pc(p.p)}</b><span>Model chance</span></div><div><b>${pc(p.break_even)}</b><span>Price needs</span></div><div><b class="pos">${sg(p.edge_pts)}</b><span>Edge (pts)</span></div></div>
-  <div class="lossline">${lossLine(p.p)} · 25D ${sg(p.score25, 1)}</div></button>`; }
+function ticket(p, d){ const r = resultOf(d, p); const sp = d.sport.toLowerCase();
+  const res = r && r.result ? (r.result === 'won' ? '<span class="pill pill-edge">Won</span>' : r.result === 'lost' ? '<span class="pill pill-loss">Lost</span>' : `<span class="pill pill-fair">${esc(r.result === 'push' ? 'Push' : 'Void')}</span>`) + (isNum(r.actual) ? ` <span>Final <b class="num">${ln(r.actual)}</b></span>` : '') : `<span>25D <b class="num">${sg(p.score25, 1)}</b></span>`;
+  return `<button class="betcard tap" data-prop="${esc(p.id)}" style="--c:var(--${sp})">
+  <div class="bc-top"><span style="display:flex;align-items:center;gap:6px;min-width:0;color:var(--${sp})">${Icon.svg(sp, {size: 16})}<span class="t2" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(winWord(p.window))}${p._g ? esc(dayET(p._g.kick_utc).split(',')[0]) + ' ' + kickET(p._g.kick_utc) : esc(p.window || '')}</span></span><span class="pill pill-bet">Bet</span></div>
+  <div class="bc-main">${Charts.ring({p: p.p, be: p.break_even, size: 88, stroke: 9})}<div style="min-width:0"><div class="bc-sel">${esc(selText(p))}</div><div class="bc-who">${esc(p.player)} · ${teamOpp(p)}</div>
+    <div class="bc-px"><span class="num">${od(p.odds)}</span><span><b>${esc(p.book || '')}</b></span><span class="pill pill-edge">Edge ${sg(p.edge_pts)}</span>${isNum(p.units) ? `<span class="t2 b13">${p.units}u</span>` : ''}</div></div></div>
+  <div class="bc-foot"><span>${lossLine(p.p)}</span><span style="display:flex;align-items:center;gap:8px">${res}</span></div></button>`; }
 function viewCard(d){ const m = d.meta, info = slateInfo(d.id) || {}; const st = slateStatus(info);
   const inWin = p => S.win === 'all' || p.window === S.win;
   const bets = d.props.filter(p => p.tier === 'bet').sort((a, b) => (b.edge_pts || 0) - (a.edge_pts || 0));
   const leans = d.props.filter(p => p.tier === 'lean').sort((a, b) => (b.edge_pts ?? -99) - (a.edge_pts ?? -99));
   const bw = bets.filter(inWin), lw = leans.filter(inWin);
   const R = d.results && d.results.summary;
-  const verdict = bets.length ? `<div class="verdict"><div class="eyebrow">The card</div><div class="big"><span data-count="${bets.length}">${bets.length}</span> bet${bets.length > 1 ? 's' : ''} pass the model</div><p>Each one cleared both keys: a strong 25D report card with the pattern check, and an edge of 5 or more points after the market check at the best price.</p></div>`
-    : `<div class="verdict"><div class="eyebrow">The card</div><div class="big none">No bets pass the model today</div><p>${esc(noBetReason(m.funnel))}</p>${funnelHTML(m.funnel)}</div>`;
+  const verdict = bets.length ? `<div class="verdict"><span class="label">The card</span><div class="big"><span class="num" data-count="${bets.length}">${bets.length}</span> bet${bets.length > 1 ? 's' : ''} pass${bets.length > 1 ? '' : 'es'} the model</div><p>Each one cleared both keys: a strong 25D report card with the pattern check, and an edge of 5 or more points after the market check at the best price.</p></div>`
+    : `<div class="verdict"><span class="label">The card</span><div class="big none">No bets pass the model today.</div><p>${esc(noBetReason(m.funnel))}</p>${funnelHTML(m.funnel)}</div>`;
   return `<div class="view">
-    <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(m.label || '')}${m.week ? '' : ''}</span><h1>${esc(m.date_label || 'The card')}</h1><p>${esc(st.word)} · prices ${esc(m.prices_et || 'Not available')}</p></div>
+    <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(m.label || '')}</span><h1>${esc(m.date_label || 'The card')}</h1><p>${esc(st.word)} · prices ${esc(m.prices_et || 'Not available')}</p></div>
     ${verdict}
     ${bets.length && (m.windows || []).length > 1 ? windowSeg(d, S.win, 'card', w => bets.filter(p => w === 'all' || p.window === w).length) : ''}
-    ${bets.length ? `<section class="sec">${bw.length ? bw.map(p => ticket(p, d)).join('') : `<p class="sub">No bets in this window. Swipe or pick another window.</p>`}${bw.length ? `<div class="sub">Tap a ticket for its full report card and the Log bet button.</div>` : ''}</section>` : ''}
+    ${bets.length ? `<section class="sec cardlist stagger">${bw.length ? bw.map(p => ticket(p, d)).join('') : `<p class="sub">No bets in this window. Swipe or pick another window.</p>`}${bw.length ? `<div class="sub">Tap a ticket for its full report card and the Log bet button.</div>` : ''}</section>` : ''}
     ${R && R.graded ? `<section class="sec"><div class="hd"><h2>How it went</h2><span class="sub">${R.graded.toLocaleString()} of ${R.priced.toLocaleString()} priced props graded</span></div>${gradedStrip(d)}</section>` : ''}
-    ${leans.length ? `<section class="info" aria-label="Information only, not recommended"><div class="hd"><b>Information only · not recommended</b><span class="sub">${leans.length} leans</span></div>
+    ${leans.length ? `<section class="info" aria-label="Information only, not recommended"><div class="hd"><b>Information only · not bets</b><span class="sub">${leans.length} leans</span></div>
       <p class="note" style="margin:0">Strong report card, but the price is already fair. These are not bets.</p>
       ${lw.slice(0, S.leanAll ? 999 : 8).map(p => leanRow(p, d)).join('')}${lw.length > 8 && !S.leanAll ? `<button class="link" data-leanall>Show all ${lw.length}</button>` : ''}</section>` : ''}
     <section class="sec"><div class="sub">Model ${esc(m.model_version || '')} · built ${esc(m.generated_et || 'Not available')} · injuries ${esc(m.injuries_et || 'Not available')} · ${(m.sims_per_game || 10000).toLocaleString()} replays per game</div></section>
@@ -235,11 +219,11 @@ function pvlStrip(p){ const lo0 = p.range80 && p.range80[0], hi0 = p.range80 && 
   if(!isNum(L) || !isNum(P)) return ''; const vals = [L, P, lo0, hi0, O].filter(isNum); let a = Math.min(...vals), b = Math.max(...vals); const pad = (b - a) * .08 || 1; a -= pad; b += pad;
   const x = v => ((v - a) / (b - a) * 100).toFixed(2) + '%'; const good = p.side === 'under' ? P < L : P >= L;
   return `<div class="pvl" aria-hidden="true"><div class="tr"></div>${isNum(lo0) && isNum(hi0) ? `<div class="rg" style="left:${x(lo0)};width:calc(${x(hi0)} - ${x(lo0)})"></div>` : ''}${isNum(O) ? `<div class="op" style="left:${x(O)}"></div>` : ''}<div class="ln" style="left:${x(L)}"></div><div class="pj" style="left:${x(P)};--c:${good ? 'var(--edge)' : 'var(--fair)'}"></div></div>`; }
-function propRow(p, d){ const o = p.opener; const r = resultOf(d, p);
-  return `<button class="row" data-prop="${esc(p.id)}"><div><div class="nm">${esc(p.player)}</div><div class="mt">${teamOpp(p)} · ${esc(selText(p))}</div></div>
+function propRow(p, d){ const o = p.opener; const r = resultOf(d, p); const os = o ? o[p.side === 'under' ? 'under' : 'over'] : null;
+  return `<button class="row tap" data-prop="${esc(p.id)}"><div style="min-width:0"><div class="nm">${esc(p.player)}</div><div class="mt">${teamOpp(p)} · ${esc(selText(p))}</div></div>
     <div class="rt">${scoreChip(p)}<span>proj ${ln(p.projection)}</span></div>
-    <div class="pl">${pvlStrip(p)}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px">${isNum(p.line) ? `<span class="soft" style="font-size:13.5px">Best <b class="m" style="color:var(--text)">${ln(p.line)} ${od(p.odds)}</b> <b>${esc(p.book || '')}</b></span>` : `<span class="na" style="font-size:13.5px">No line posted</span>`}
-      <span class="openbig">OPEN ${o && isNum(o.line) ? `<b>${ln(o.line)}${isNum(o[p.side === 'under' ? 'under' : 'over']) ? ' ' + od(o[p.side === 'under' ? 'under' : 'over']) : ''}</b>` : (o && isNum(o.over) ? `<b>${od(o.over)}</b>` : '<b style="font-family:var(--f-b);font-weight:600">n/a</b>')}</span>${resultTag(r)}</div></div></button>`; }
+    <div class="pl">${pvlStrip(p)}<div style="display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:8px">${isNum(p.line) ? `<span class="price">${ln(p.line)} ${od(p.odds)} <b>${esc(p.book || '')}</b></span>` : `<span class="na b13">No line posted</span>`}
+      <span class="openbig">Open <b>${o && isNum(o.line) ? ln(o.line) + (isNum(os) ? ' ' + od(os) : '') : o && isNum(o.over) ? od(o.over) : 'n/a'}</b></span>${resultTag(r)}</div></div></button>`; }
 function viewProps(d){ const mks = marketsOf(d); if(!S.props.mk || !mks.includes(S.props.mk)) S.props.mk = mks[0]; const mk = S.props.mk;
   const all = d.props.filter(p => p.market === mk); const mode = S.props.mode;
   const pick = p => mode === 'strong' ? cardKind(p) === 'strong' : mode === 'weak' ? cardKind(p) === 'weak' : p.odds != null;
@@ -250,13 +234,13 @@ function viewProps(d){ const mks = marketsOf(d); if(!S.props.mk || !mks.includes
   const hits = q.length >= 2 ? Object.values(d.byPlayer).map(ps => ps[0]).filter(p => p.player.toLowerCase().includes(q)).slice(0, 12) : [];
   return `<div class="view">
     <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(d.meta.label || '')}</span><h1>Props</h1><p>Each prop has its own 25 questions, learned from that prop's history. The board shows projection against the best line found, with the opening line marked.</p></div>
-    <div class="fld"><label for="pq">Find a player</label><input id="pq" type="search" inputmode="search" autocomplete="off" placeholder="Search ${Object.keys(d.byPlayer).length} players" value="${esc(S.props.q)}" style="font-family:var(--f-b);font-size:16px"></div>
+    <div class="fld search"><label for="pq" class="sr">Find a player</label>${Icon.svg('search', {size: 18})}<input id="pq" type="search" inputmode="search" autocomplete="off" placeholder="Search ${Object.keys(d.byPlayer).length} players" value="${esc(S.props.q)}"></div>
     <div id="phits">${hits.length ? `<div class="list">${hits.map(p => `<button class="row" data-player="${esc(p.pkey)}"><div><div class="nm">${esc(p.player)}</div><div class="mt">${teamOpp(p)} · ${(d.byPlayer[p.pkey] || []).length} props</div></div><div class="rt">${ICON.chev}</div></button>`).join('')}</div>` : q.length >= 2 ? `<p class="sub">No player matches “${esc(S.props.q)}”.</p>` : ''}</div>
-    <div class="chips" role="tablist" aria-label="Prop type">${mks.map(k => `<button class="chip" data-mk="${k}" aria-pressed="${k === mk}">${esc((all.find(p => p.market === k) || d.props.find(p => p.market === k)).market_label)}<span class="n">${cnt(k)}</span></button>`).join('')}</div>
+    <div class="chips" role="tablist" aria-label="Prop type">${mks.map(k => `<button class="chip tap" data-mk="${k}" aria-pressed="${k === mk}">${Icon.svg(k, {size: 18})}${esc((all.find(p => p.market === k) || d.props.find(p => p.market === k)).market_label)}<span class="n">${cnt(k)}</span></button>`).join('')}</div>
     ${factorPage(d, mk)}
-    <div class="seg" role="group" aria-label="Which cards" data-seg="mode"><button data-m="strong" aria-pressed="${mode === 'strong'}">Strong ≥ +1.5</button><button data-m="weak" aria-pressed="${mode === 'weak'}">Weak ≤ −1.5</button><button data-m="all" aria-pressed="${mode === 'all'}">All priced</button></div>
+    <div class="seg" role="group" aria-label="Which cards" data-seg="mode"><button data-m="strong" aria-pressed="${mode === 'strong'}">Strong +1.5</button><button data-m="weak" aria-pressed="${mode === 'weak'}">Weak −1.5</button><button data-m="all" aria-pressed="${mode === 'all'}">All priced</button></div>
     ${windowSeg(d, S.win, 'pwin')}
-    <div class="legend"><span><i style="background:var(--edge);border-radius:50%"></i>projection, on the bet side</span><span><i style="background:var(--text)"></i>best line</span><span><i style="background:var(--brass)"></i>opening line</span><span><i style="background:rgba(147,161,177,.4)"></i>80% range</span></div>
+    <div class="legend"><span><i style="background:var(--edge);border-radius:50%"></i>projection, bet side</span><span><i style="background:var(--t1);width:2px"></i>best line</span><span><i style="background:var(--brass);width:2px"></i>opening line</span><span><i style="background:rgba(var(--w),.12)"></i>80% range</span></div>
     ${list.length ? groups.map(g => `<div class="list"><div class="wl">${esc(g.w)}<span>${g.ps.length}</span></div>${g.ps.map(p => propRow(p, d)).join('')}</div>`).join('') : `<div class="group pad"><h3>No players here</h3><p class="sub" style="margin:6px 0 0">${mode === 'strong' ? 'No player has a report card above +1.5 for this prop' : mode === 'weak' ? 'No player has a report card at −1.5 or below for this prop' : 'No priced props'}${S.win !== 'all' ? ' in this window' : ''}.</p></div>`}
     ${list.length > S.props.n ? `<div id="more-sentinel" class="sub" style="text-align:center;padding:12px">Loading more…</div>` : ''}
   </div>`; }
@@ -344,7 +328,7 @@ function openLive(d, id){ const p = d.props.find(x => x.id === id); if(!p) retur
 
 /* ================================================================ sheets (pushed screens) */
 const STACK = [];
-function pushSheet(title, html, after){ const el = document.createElement('section'); el.className = 'sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', title);
+function pushSheet(title, html, after){ const el = document.createElement('section'); el.className = 'page'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', title);
   el.innerHTML = `<div class="sbar"><div class="col"><button class="back" aria-label="Back">${ICON.back}Back</button><div class="ttl">${esc(title)}</div><span style="width:64px"></span></div></div><div class="col">${html}</div>`;
   $('#sheets').appendChild(el); if(STACK.length) STACK[STACK.length - 1].classList.add('under'); STACK.push(el); document.documentElement.style.overflow = 'hidden';
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
@@ -358,76 +342,92 @@ function edgeSwipe(el){ let x0 = null, y0 = null, dx = 0;
   el.addEventListener('touchend', () => { if(x0 == null) return; x0 = null; el.style.transition = ''; el.style.transform = ''; if(dx > 90) popSheet(); }); }
 
 /* ================================================================ prop report card */
-function ringSVG(p, be){ const r = 48, C = 2 * Math.PI * r; const v = isNum(p) ? p : 0; const b = isNum(be) ? be : null;
-  const bx = b == null ? null : [60 + r * Math.sin(b * 2 * Math.PI), 60 - r * Math.cos(b * 2 * Math.PI)];
-  return `<svg viewBox="0 0 120 120" role="img" aria-label="Model chance ${pc(p)}"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--line)" stroke-width="11"/><circle cx="60" cy="60" r="${r}" fill="none" stroke="${b != null && v - b >= .05 ? 'var(--edge)' : 'var(--fair)'}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C * v} ${C}" transform="rotate(-90 60 60)"/>${bx ? `<line x1="${60 + (r - 9) * Math.sin(b * 2 * Math.PI)}" y1="${60 - (r - 9) * Math.cos(b * 2 * Math.PI)}" x2="${60 + (r + 9) * Math.sin(b * 2 * Math.PI)}" y2="${60 - (r + 9) * Math.cos(b * 2 * Math.PI)}" stroke="var(--text)" stroke-width="2.5"/>` : ''}<text x="60" y="62" text-anchor="middle" fill="var(--text)" font-family="ui-monospace,SF Mono,Menlo,monospace" font-size="24" font-weight="600">${isNum(p) ? Math.round(p * 100) : '—'}<tspan font-size="13">%</tspan></text><text x="60" y="80" text-anchor="middle" fill="var(--mute)" font-size="10" font-family="-apple-system,system-ui,sans-serif">model</text></svg>`; }
-function histSVG(p, actual){ const H = p.hist; if(!H || !H.counts || !H.counts.length) return ''; const n = H.counts.length, W = 600, Ht = 200, pl = 6, pb = 34, mx = Math.max(...H.counts);
-  const bw = (W - pl * 2) / n; const X = v => pl + (v - H.lo) / H.step * bw; const L = p.line, P = p.projection; const side = p.side;
-  const bars = H.counts.map((c, i) => { const v = H.lo + i * H.step; const win = isNum(L) ? (side === 'under' ? v + H.step / 2 < L : v + H.step / 2 > L) : false; const h = c / mx * (Ht - pb - 14);
-    return `<rect x="${(pl + i * bw + .5).toFixed(1)}" y="${(Ht - pb - h).toFixed(1)}" width="${Math.max(1, bw - 1).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="${win ? 'var(--edge)' : 'var(--line2)'}" opacity="${win ? .75 : 1}"/>`; }).join('');
-  const tick = (v, lab, col, y = 12) => isNum(v) && v >= H.lo && v <= H.clipped_at ? `<line x1="${X(v)}" x2="${X(v)}" y1="${y + 4}" y2="${Ht - pb}" stroke="${col}" stroke-width="2"/><text x="${Math.min(W - 4, Math.max(4, X(v) + (X(v) > W - 60 ? -6 : 6)))}" y="${y + 14}" fill="${col}" font-size="19" text-anchor="${X(v) > W - 60 ? 'end' : 'start'}" font-family="ui-monospace,SF Mono,Menlo,monospace">${lab}</text>` : '';
-  return `<div class="chart"><svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Distribution of ${(H.n || 10000).toLocaleString()} replays">${bars}<line x1="${pl}" x2="${W - pl}" y1="${Ht - pb}" y2="${Ht - pb}" stroke="var(--line2)"/>${tick(L, 'line ' + ln(L), 'var(--text)')}${tick(P, 'proj ' + ln(P), 'var(--brass)', 30)}${isNum(actual) ? tick(actual, 'final ' + ln(actual), 'var(--live)', 48) : ''}</svg></div>
-    <div class="legend"><span><i style="background:var(--edge);opacity:.75"></i>replays where the ${side === 'under' ? 'under' : 'over'} cashes</span><span>${(H.n || 10000).toLocaleString()} replays${H.clipped_at ? ` · right tail capped at ${ln(H.clipped_at)}` : ''}</span></div>`; }
-function q25Bars(d, p){ const key = p.q25_key || p.market; const C = (d.meta.cards || {})[key]; if(!p.q25 || !C) return '';
-  const nm = {}; C.ids.forEach((id, i) => nm[id] = C.names[i]); const rows = p.q25.map(([id, x, c]) => ({id, name: nm[id] || id, c})).filter(r => isNum(r.c)).sort((a, b) => b.c - a.c);
-  const mx = Math.max(.01, ...rows.map(r => Math.abs(r.c)));
-  return `<div class="fac">${rows.map(r => `<div class="fb"><div class="nm">${esc(r.name)}<span>${esc(FAM[r.id[0]] || '')}</span></div><div><div class="bar" style="background:var(--line)"><span style="${r.c >= 0 ? 'left:50%' : `right:50%`};width:${Math.abs(r.c) / mx * 50}%;background:${r.c >= 0 ? 'var(--edge)' : 'var(--loss)'}"></span><span style="left:50%;width:1px;background:var(--faint)"></span></div><div class="sub m" style="text-align:right;margin-top:3px">${sg(r.c, 2)}</div></div></div>`).join('')}</div>`; }
+function ringSVG(p, be, size = 132){ return Charts.ring({p: isNum(p) ? p : 0, be: isNum(be) ? be : null, size, stroke: size > 100 ? 12 : 9}); }
+function histSVG(p, actual, w){ const H = p.hist; if(!H || !H.counts || !H.counts.length) return ''; const yes = p.market === 'atd' || p.market === 'qb_atd';
+  const W = Math.max(280, Math.round(w || 340)); const bet = p.tier === 'bet'; const pSide = isNum(p.p) ? p.p : null;
+  return `<div class="chart">${Charts.density({hist: H, line: isNum(p.line) ? p.line : .5, side: p.side === 'under' ? 'under' : 'over', proj: isNum(p.projection) ? p.projection : null, pLabel: pSide != null && !yes ? Math.round(pSide * 100) + '%' : '', color: bet ? 'var(--edge)' : 'var(--fair)', actual: isNum(actual) ? actual : null, w: W, h: Math.round(Math.min(220, W * .56))})}</div>
+    <div class="legend"><span><i style="background:${bet ? 'var(--edge)' : 'var(--fair)'};opacity:.5"></i>replays where the ${p.side === 'under' ? 'under' : 'over'} cashes</span><span><i style="background:var(--t3);width:2px"></i>projection ${ln(p.projection)}</span>${isNum(actual) ? `<span><i style="background:var(--live);width:2px"></i>final ${ln(actual)}</span>` : ''}<span>${(H.n || 10000).toLocaleString()} replays${H.clipped_at ? ` · tail capped at ${ln(H.clipped_at)}` : ''}</span></div>`; }
+function q25Bars(d, p){ const rows = q25Named(d, p).slice().sort((a, b) => b[2] - a[2]); if(!rows.length) return ''; const mx = Math.max(.01, ...rows.map(r => Math.abs(r[2])));
+  return `<div style="display:grid;gap:2px">${rows.map(r => `<div class="fbar"><div class="nm">${esc(r[1])}<span>${esc(FAM[r[0][0]] || '')}</span></div><div class="tr"><span class="${r[2] >= 0 ? 'up' : 'dn'}" style="width:${Math.abs(r[2]) / mx * 50}%"></span></div><div class="v">${sg(r[2], 2)}</div></div>`).join('')}</div>`; }
 function famBars(p){ const f = p.families || {}; const ks = Object.keys(FAM).filter(k => isNum(f[k])); if(!ks.length) return ''; const mx = Math.max(1, ...ks.map(k => Math.abs(f[k])));
-  return `<div class="fac">${ks.map(k => `<div class="fb"><div class="nm">${FAM[k]}</div><div><div class="bar"><span style="${f[k] >= 0 ? 'left:50%' : 'right:50%'};width:${Math.abs(f[k]) / mx * 50}%;background:${f[k] >= 0 ? 'var(--edge)' : 'var(--loss)'}"></span><span style="left:50%;width:1px;background:var(--faint)"></span></div><div class="sub m" style="text-align:right;margin-top:3px">${sg(f[k], 2)}</div></div></div>`).join('')}</div>`; }
+  return `<div style="display:grid;gap:4px">${ks.map(k => `<div class="fbar"><div class="nm">${FAM[k]}<span>${f[k] >= 0 ? 'pushes up' : 'pulls down'}</span></div><div class="tr"><span class="${f[k] >= 0 ? 'up' : 'dn'}" style="width:${Math.abs(f[k]) / mx * 50}%"></span></div><div class="v">${sg(f[k], 2)}</div></div>`).join('')}</div>`; }
 function factorList(list, up){ if(!list || !list.length) return `<p class="sub" style="margin:0">None stood out.</p>`; return `<div class="checks">${list.map(f => `<div class="ck"><i class="${up ? 'ok' : 'no'}">${up ? '↑' : '↓'}</i><div><b style="font-weight:600">${esc(f.name)}</b> <span class="m sub">${sg(f.v, 2)}</span><div class="sub">${esc(f.how || '')}</div></div></div>`).join('')}</div>`; }
 function rulesList(p){ const L = p.lights || {}; const rows = [['card', `Report card ${L.card_kind ? `(${L.card_kind})` : ''} on the bet side`], ['proj', 'Projection on the bet side of the line'], ['play', 'Play chance of at least 50%'], ['edge', 'Edge of 5 or more after the market check'], ['gap', `Projection and line within 50%${isNum(L.gap_pct) ? ` (gap ${L.gap_pct}%)` : ''}`]];
   return `<div class="checks">${rows.map(([k, t]) => `<div class="ck"><i class="${L[k] === true ? 'ok' : L[k] === false ? 'no' : 'na'}">${L[k] === true ? '✓' : L[k] === false ? '✕' : '–'}</i><div>${esc(t)}</div></div>`).join('')}</div>`; }
 function tierTag(p){ return p.tier === 'bet' ? '<span class="tag edge">Bet · passes both keys</span>' : p.tier === 'live' ? '<span class="tag live">Live watch</span>' : p.tier === 'lean' ? '<span class="tag">Information only</span>' : p.tier === 'check' ? '<span class="tag">Check news</span>' : '<span class="tag">Pass</span>'; }
-function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p) return; const r = resultOf(d, p); const av = p.availability || {}; const o = p.opener;
+async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p) return; const r = resultOf(d, p); const av = p.availability || {}; const o = p.opener;
   const pOver = isNum(p.p) ? (p.side === 'under' ? 1 - p.p : p.p) : null, pUnder = isNum(pOver) ? 1 - pOver : null; const rawOver = isNum(p.p_raw) ? (p.side === 'under' ? 1 - p.p_raw : p.p_raw) : null;
-  const yes = p.market === 'atd' || p.market === 'qb_atd';
+  const yes = p.market === 'atd' || p.market === 'qb_atd'; const sp = d.sport.toLowerCase();
   const offers = (p.offers || []).filter(x => x.book); const bestDec = (k) => Math.max(...offers.filter(x => isNum(x[k]) && x.line === p.line).map(x => decOdds(x[k])), -1);
+  const inj = await injuryFor(d.sport, p.pkey); const info = slateInfo(d.id) || {}; const upcoming = slateStatus(info).k !== 'final';
+  const Q = q25Named(d, p); const vac = Q.find(q => /vacated/i.test(q[1]));
+  const tierPill = p.tier === 'bet' ? '<span class="pill pill-bet">Bet</span>' : p.tier === 'live' ? '<span class="pill pill-live">Live watch</span>' : p.tier === 'lean' ? '<span class="pill pill-fair">Information only</span>' : p.tier === 'check' ? '<span class="pill pill-live">Check news</span>' : '<span class="pill pill-pass">Pass</span>';
+  const resPill = r && r.result ? (r.result === 'won' ? '<span class="pill pill-edge">Won</span>' : r.result === 'lost' ? '<span class="pill pill-loss">Lost</span>' : `<span class="pill pill-fair">${r.result === 'push' ? 'Push' : 'Void'}</span>`) : '';
   const html = `<div class="body">
-    <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(p.window || '')} · ${p._g ? dayET(p._g.kick_utc) + ' ' + kickET(p._g.kick_utc) : ''}</span>
-      <h1 style="font-size:clamp(30px,8.5vw,42px)"><button class="link" data-player="${esc(p.pkey)}" style="font:inherit;color:var(--text);padding:0;min-height:0;text-align:left">${esc(p.player)} <span style="color:var(--brass2);font-size:.6em">›</span></button></h1>
+    <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(winWord(p.window))}${p._g ? esc(dayET(p._g.kick_utc)) + ' · ' + kickET(p._g.kick_utc) : esc(p.window || '')}</span>
+      <button class="rc-name tap" data-player="${esc(p.pkey)}">${esc(p.player)}${Icon.svg('chev')}</button>
       <p>${teamOpp(p)} · ${esc(p.market_label)}</p></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">${tierTag(p)}${resultTag(r)}</div>
-    <div class="group pad" style="display:grid;gap:16px">
-      <div class="ring">${ringSVG(p.p, p.break_even)}<div style="display:grid;gap:6px"><div style="font:800 28px/1.02 var(--f-d)">${esc(selText(p))}</div>
-        <div class="soft" style="font-size:15px">${isNum(p.odds) ? `<b class="m" style="color:var(--text);font-size:19px">${od(p.odds)}</b> at <b style="color:var(--text)">${esc(p.book || '')}</b> needs ${pc(p.break_even, 1)}` : 'No price posted'}</div>
-        <div class="soft" style="font-size:14px">${isNum(p.edge_pts) ? `Edge <b class="m ${p.edge_pts >= 5 ? 'pos' : ''}">${sg(p.edge_pts)}</b> pts after the market check` : 'Edge not available'}</div></div></div>
-      ${isNum(p.p) ? `<div class="lossline">${lossLine(p.p)}</div>` : ''}
-      ${!yes && isNum(pOver) ? `<div class="sides"><div class="side"><div class="l"><span>Over ${ln(p.line)}</span><b>${pc(pOver)}</b></div><div class="bar"><span style="width:${pOver * 100}%;background:${p.side !== 'under' ? 'var(--text)' : 'var(--pass)'}"></span></div></div>
-        <div class="side"><div class="l"><span>Under ${ln(p.line)}</span><b>${pc(pUnder)}</b></div><div class="bar"><span style="width:${pUnder * 100}%;background:${p.side === 'under' ? 'var(--text)' : 'var(--pass)'}"></span></div></div>
-        <div class="sub">Both sides come from the same ${(d.meta.sims_per_game || 10000).toLocaleString()} replays after the market check.${isNum(rawOver) ? ` Raw replays before the check: over ${pc(rawOver)}.` : ''}</div></div>` : ''}
+    <div class="rchero">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${tierPill}${resPill}${isNum(r && r.actual) ? `<span class="t2 b15">Final <b class="num" style="color:var(--t1)">${ln(r.actual)}</b></span>` : ''}</div>
+      <div class="rc-top">${ringSVG(p.p, p.break_even, 132)}<div style="min-width:0"><div class="rc-sel">${esc(selText(p))}</div>
+        <div class="rc-px">${isNum(p.odds) ? `<span class="num">${od(p.odds)}</span><b>${esc(p.book || '')}</b>` : '<span class="na">No price posted</span>'}</div></div></div>
+      ${isNum(p.p) ? Charts.meter({p: p.p, be: isNum(p.break_even) ? p.break_even : null, label: isNum(p.break_even) ? `Price needs ${pc(p.break_even, 1)}` : 'Model chance'}) : ''}
+      <div class="rc-nums"><div><span class="label">Projection</span><span class="num">${ln(p.projection)}</span></div><div><span class="label">Edge</span><span class="num" style="color:${isNum(p.edge_pts) && p.edge_pts >= 5 ? 'var(--edge)' : isNum(p.edge_pts) && p.edge_pts < 0 ? 'var(--loss)' : 'var(--t1)'}">${sg(p.edge_pts)}</span></div><div><span class="label">25D</span><span class="num" style="color:${cardKind(p) === 'strong' ? 'var(--edge)' : cardKind(p) === 'weak' ? 'var(--loss)' : 'var(--t1)'}">${sg(p.score25, 2)}</span></div></div>
+      ${isNum(p.p) ? `<div class="lossline">${lossLine(p.p)}${isNum(p.pctile) ? ` · report card beats ${Math.round(p.pctile * 100)}% of history` : ''}</div>` : ''}
     </div>
-    <section class="sec"><div class="hd"><h2>Projection</h2><span class="sub m">${ln(p.projection)}${p.range80 && isNum(p.range80[0]) ? ` · 80% range ${ln(p.range80[0])}–${ln(p.range80[1])}` : ''}</span></div>
-      <div class="group pad">${histSVG(p, r && r.actual) || `<p class="sub" style="margin:0">The replay distribution was not exported for this prop.</p>`}</div>${d.meta.histogram_note ? `<div class="note">${esc(d.meta.histogram_note)}</div>` : ''}</section>
-    <section class="sec"><div class="hd"><h2>Report card</h2><span class="sub">25D ${sg(p.score25, 2)}${isNum(p.pctile) ? ` · better than ${Math.round(p.pctile * 100)}% of history` : ''}</span></div>
-      <div class="group pad" style="display:grid;gap:16px">${famBars(p)}
-        <div class="sec"><h3>Pushing it up</h3>${factorList(p.helping, true)}</div><div class="sec"><h3>Pulling it down</h3>${factorList(p.hurting, false)}</div>
-        ${p.q25 ? `<details><summary class="link" style="list-style:none;cursor:pointer">All 25 questions</summary><div style="margin-top:12px">${q25Bars(d, p)}</div></details>` : ''}</div></section>
+    ${Q.length ? `<section class="sec"><div class="hd"><h2>The 25 answers</h2><span class="sub">tap a spoke</span></div>
+      <div class="fp"><div class="fp-wrap">${Charts.fingerprint({q25: Q, score: isNum(p.score25) ? p.score25 : 0, size: 320})}</div>
+        <div class="fp-tip" id="fp-tip">Longer green spokes push him past his normal game. Red spokes pull him short.</div>
+        <div class="fp-legend"><span><i style="background:var(--edge)"></i>pushes up</span><span><i style="background:var(--loss)"></i>pulls down</span></div></div>
+      <div class="group pad">${famBars(p)}</div>
+      <details class="group pad"><summary class="link" style="list-style:none;cursor:pointer;padding:0;min-height:0">All 25, sorted by impact</summary><div style="margin-top:12px">${q25Bars(d, p)}</div></details></section>` : ''}
+    <section class="sec"><div class="hd"><h2>Projection</h2><span class="sub m">${ln(p.projection)}${p.range80 && isNum(p.range80[0]) ? ` · 80% ${ln(p.range80[0])}–${ln(p.range80[1])}` : ''}</span></div>
+      <div class="group pad" id="dens">${p.hist ? '' : `<p class="sub" style="margin:0">The replay distribution was not exported for this prop.</p>`}</div>
+      ${!yes && isNum(pOver) ? `<div class="group pad sides"><div class="side"><div class="l"><span>Over ${ln(p.line)}</span><b>${pc(pOver)}</b></div><div class="bar"><span style="width:${pOver * 100}%;background:${p.side !== 'under' ? 'var(--t1)' : 'var(--pass)'}"></span></div></div>
+        <div class="side"><div class="l"><span>Under ${ln(p.line)}</span><b>${pc(pUnder)}</b></div><div class="bar"><span style="width:${pUnder * 100}%;background:${p.side === 'under' ? 'var(--t1)' : 'var(--pass)'}"></span></div></div>
+        <div class="sub">Both sides come from the same ${(d.meta.sims_per_game || 10000).toLocaleString()} replays after the market check.${isNum(rawOver) ? ` Before the check: over ${pc(rawOver)}.` : ''}</div></div>` : ''}
+      ${d.meta.histogram_note ? `<div class="note">${esc(d.meta.histogram_note)}</div>` : ''}</section>
+    <section class="sec"><h2>Availability</h2><div class="group pad avail">
+      <div class="st"><b>${esc(av.report || 'No injury designation')}</b><span class="t2 b15">play chance <span class="num">${pc(av.p_play)}</span></span>${av.p_play != null && av.p_play < .9 ? '<span class="pill pill-live">Unconfirmed</span>' : ''}</div>
+      <span class="sub">At model time · ${esc(d.meta.injuries_et || 'Not available')}</span>
+      ${upcoming ? (inj ? `<div class="st" style="margin-top:8px"><span class="pill ${/out|reserve|suspen/i.test(inj[0]) ? 'pill-loss' : /question|doubt|day/i.test(inj[0]) ? 'pill-live' : 'pill-fair'}">${esc(inj[0])}</span>${inj[1] ? `<span class="t2 b15">${esc(inj[1])}</span>` : ''}</div><div class="com">${esc(inj[5] || '')}</div><span class="sub">${esc(injSource(d.sport))} · ${esc(etTime(inj[4], {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'}))} ET</span>` : `<span class="sub" style="margin-top:8px">${esc(injSource(d.sport))}: not on the injury report.</span>`) : ''}
+      ${vac && Math.abs(vac[2]) >= .05 ? `<div class="ck" style="margin-top:4px"><i class="${vac[2] > 0 ? 'ok' : 'no'}">${vac[2] > 0 ? '↑' : '↓'}</i><div>${vac[2] > 0 ? 'Teammates are missing at his spot. The model hands him part of their share' : 'Teammates who were out at his spot are back, so his share shrinks'}: <b class="num">${sg(vac[2], 2)}</b> on his report card.</div></div>` : ''}</div></section>
     <section class="sec"><h2>The rules</h2><div class="group pad">${rulesList(p)}</div></section>
-    <section class="sec"><div class="hd"><h2>Prices</h2><span class="openbig">OPEN ${o && isNum(o.line) ? `<b>${ln(o.line)}</b>` : o && isNum(o.over) ? `<b>${od(o.over)}</b>` : '<b style="font-family:var(--f-b)">n/a</b>'}</span></div>
+    <section class="sec"><div class="hd"><h2>Prices</h2><span class="openbig">Open <b>${o && isNum(o.line) ? ln(o.line) : o && isNum(o.over) ? od(o.over) : 'n/a'}</b></span></div>
       <div class="group pad">${offers.length ? `<div class="tbl"><table><thead><tr><th>Book</th><th>Line</th><th>Over</th><th>Under</th></tr></thead><tbody>${offers.map(x => `<tr><td>${x.book === p.book ? `<b>${esc(x.book)}</b>` : esc(x.book)}</td><td>${ln(x.line)}</td><td class="${x.line === p.line && isNum(x.over) && decOdds(x.over) === bestDec('over') && p.side !== 'under' ? 'best' : ''}">${od(x.over)}</td><td class="${x.line === p.line && isNum(x.under) && decOdds(x.under) === bestDec('under') && p.side === 'under' ? 'best' : ''}">${od(x.under)}</td></tr>`).join('')}</tbody></table></div>` : `<p class="sub" style="margin:0">Only the best price was exported: ${isNum(p.odds) ? `${od(p.odds)} at ${esc(p.book)}` : 'Not available'}.</p>`}
         <div class="sub" style="margin-top:8px">${o ? `Opening line from ${esc(d.meta.opener_book || 'the opener feed')}.` : 'Opening line: not available for this prop.'}</div></div></section>
-    <section class="sec"><h2>Availability</h2><div class="group pad" style="display:grid;gap:4px"><b>${esc(av.report || 'No injury designation')}</b><span class="soft">Play chance ${pc(av.p_play)}${p.roster ? ` · roster ${esc(p.roster)}` : ''}</span><span class="sub">Source: ${esc(d.meta.injuries_et || 'Not available')}</span>${av.p_play != null && av.p_play < .9 ? `<span class="tag live" style="justify-self:start;margin-top:4px">UNCONFIRMED · check before betting</span>` : ''}</div></section>
-    ${p.live ? `<section class="sec"><h2>Live plan</h2><div class="group pad" style="display:grid;gap:10px"><span class="tag live" style="justify-self:start">${p.live.plan === 'BUY LOW' ? '↑ Buy low' : '↓ Sell high'}</span><span class="soft">End of Q1 ${esc(p.live.q1_trigger)} · halftime ${esc(p.live.ht_trigger)}</span><button class="btn" data-golive>Open live calculator</button></div></section>` : ''}
-    ${r && r.result ? `<section class="sec"><h2>Result</h2><div class="group pad soft">${r.result === 'void' ? 'Void: he did not play.' : `Final ${esc(STATWORD[p.market] || '')}: <b class="m" style="color:var(--text)">${ln(r.actual)}</b> against ${yes ? 'a yes/no market' : 'a line of ' + ln(p.line)} → ${r.result === 'won' ? 'the shown side hit' : r.result === 'lost' ? 'the shown side missed' : 'push'}.`} <span class="sub">${esc(d.results.source || '')}</span></div></section>` : ''}
-    <div class="btns"><button class="btn quiet" data-share>${ICON.share}Share</button><button class="btn primary" data-logp>${ICON.plus}Log bet</button></div>
+    ${p.live ? `<section class="sec"><h2>Live plan</h2><div class="group pad" style="display:grid;gap:12px"><span class="pill pill-live" style="justify-self:start">${p.live.plan === 'BUY LOW' ? 'Buy low · over' : 'Sell high · under'}</span><span class="t2">End of Q1 <span class="num">${esc(p.live.q1_trigger)}</span> · halftime <span class="num">${esc(p.live.ht_trigger)}</span>${isNum(p.live.number) ? ` · ready at <b class="num" style="color:var(--t1)">${ln(p.live.number)}</b>` : ''}</span><button class="btn tap" data-golive>${Icon.svg('live', {size: 20})}Open live calculator</button></div></section>` : ''}
+    ${r && r.result ? `<section class="sec"><h2>Result</h2><div class="group pad t2">${r.result === 'void' ? 'Void: he did not play.' : `Final ${esc(STATWORD[p.market] || '')}: <b class="num" style="color:var(--t1)">${ln(r.actual)}</b> against ${yes ? 'a yes/no market' : 'a line of ' + ln(p.line)}. ${r.result === 'won' ? 'The shown side hit.' : r.result === 'lost' ? 'The shown side missed.' : 'Push.'}`} <span class="sub">${esc(d.results.source || '')}</span></div></section>` : ''}
+    <div class="btns"><button class="btn quiet tap" data-share>${Icon.svg('share', {size: 20})}Share</button><button class="btn primary tap" data-logp>${Icon.svg('plus', {size: 20})}Log bet</button></div>
   </div>`;
   pushSheet(`${p.player} · ${selText(p)}`, html, el => { bindTaps(el, d); const gl = $('[data-golive]', el); if(gl) gl.onclick = () => openLive(d, p.id);
-    $('[data-logp]', el).onclick = () => logBet(d, p); $('[data-share]', el).onclick = () => shareProp(d, p); }); }
-
+    $('[data-logp]', el).onclick = () => logBet(d, p); $('[data-share]', el).onclick = () => shareProp(d, p);
+    const dn = $('#dens', el); if(dn && p.hist) requestAnimationFrame(() => { dn.innerHTML = histSVG(p, r && r.actual, dn.clientWidth - 32); });
+    wireFingerprint($('.ch-fp', el), Q, $('#fp-tip', el)); }); }
+function q25Named(d, p){ const key = p.q25_key || p.market; const C = (d.meta.cards || {})[key]; if(!p.q25 || !C) return [];
+  const nm = {}; C.ids.forEach((id, i) => nm[id] = C.names[i]); return p.q25.filter(q => isNum(q[2])).map(([id, x, c]) => [id, nm[id] || id, c]).sort((a, b) => a[0] < b[0] ? -1 : 1); }
+function wireFingerprint(svg, Q, tip){ if(!svg || !Q.length || !tip) return; const sp = $$('line.spoke', svg);
+  const pick = e => { const r = svg.getBoundingClientRect(); const vb = svg.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) / r.width * vb.width, y = vb.y + (e.clientY - r.top) / r.height * vb.height; const c = 160;
+    let a = Math.atan2(y - c, x - c) + Math.PI / 2; if(a < 0) a += 2 * Math.PI; const i = Math.round(a / (2 * Math.PI) * Q.length) % Q.length; const q = Q[i];
+    sp.forEach((l, k) => l.classList.toggle('is-on', k === i)); tip.innerHTML = `<span><b>${esc(q[1])}</b> · ${esc(FAM[q[0][0]] || '')} · <b class="num" style="color:${q[2] >= 0 ? 'var(--edge)' : 'var(--loss)'}">${sg(q[2], 2)}</b></span>`; };
+  svg.addEventListener('click', pick); }
+const INJ = {}; async function injuryFor(sport, pkey){ try{ if(!INJ.all) INJ.all = await getJSON('data/injuries.json'); const PF = await loadPlayers(sport); const P = PF && PF.players && PF.players[pkey]; const t = INJ.all[sport.toLowerCase()];
+  return P && P.eid && t && t.by_id ? t.by_id[P.eid] || null : null; }catch(e){ return null; } }
+const injSource = sp => sp === 'CFB' ? 'covers.com injury report' : 'ESPN injury report';
 /* ================================================================ player profile */
 const POSKEYS = {QB: ['pass_yds', 'pass_td', 'rush_yds', 'att'], RB: ['rush_yds', 'car', 'rec', 'rec_yds'], FB: ['rush_yds', 'car', 'rec', 'rec_yds'], WR: ['rec', 'rec_yds', 'tgt', 'rec_td'], TE: ['rec', 'rec_yds', 'tgt', 'rec_td'], K: ['kick_pts', 'fgm', 'fga', 'xpm']};
 function profileKeys(sport, P, todays){ if(sport === 'NBA') return ['pts', 'reb', 'ast', 'tpm'];
   if(sport === 'NFL' && POSKEYS[P.pos]) return POSKEYS[P.pos];
   const tot = {}; (P.games || []).forEach(g => g.st && Object.entries(g.st).forEach(([k, v]) => tot[k] = (tot[k] || 0) + (v || 0)));
   if((tot.kick_pts || 0) > 0 && (tot.rush_yds || 0) + (tot.rec_yds || 0) + (tot.pass_yds || 0) === 0) return ['kick_pts', 'fgm', 'fga', 'xpm']; if((tot.pass_yds || 0) > 200) return ['pass_yds', 'pass_td', 'rush_yds', 'cmp']; if((tot.rec_yds || 0) >= (tot.rush_yds || 0)) return ['rec', 'rec_yds', 'rec_td', 'rush_yds']; return ['rush_yds', 'car', 'rush_td', 'rec']; }
-function trendSVG(games, key, line){ const g = games.filter(x => x.st).slice(-12); if(!g.length) return ''; const vals = g.map(x => x.st[key] || 0); const W = 600, H = 220, pb = 40, pt = 28; const mx = Math.max(1, ...vals, isNum(line) ? line * 1.15 : 0);
+function trendSVG(games, key, line){ const g = games.filter(x => x.st).slice(-8); if(!g.length) return ''; const vals = g.map(x => x.st[key] || 0); const W = 600, H = 220, pb = 40, pt = 28; const mx = Math.max(1, ...vals, isNum(line) ? line * 1.15 : 0);
   const bw = W / g.length; const y = v => H - pb - v / mx * (H - pb - pt);
-  const bars = g.map((x, i) => { const v = vals[i]; const hit = isNum(line) ? v > line : false; return `<rect x="${(i * bw + bw * .18).toFixed(1)}" y="${y(v).toFixed(1)}" width="${(bw * .64).toFixed(1)}" height="${(H - pb - y(v)).toFixed(1)}" rx="4" fill="${isNum(line) ? (hit ? 'var(--edge)' : 'var(--line2)') : 'var(--fair)'}" opacity="${isNum(line) && hit ? .85 : 1}"/><text x="${(i * bw + bw / 2).toFixed(1)}" y="${(y(v) - 5).toFixed(1)}" text-anchor="middle" font-size="${g.length > 9 ? 16 : 19}" fill="var(--soft)" font-family="ui-monospace,SF Mono,Menlo,monospace">${ln(v)}</text><text x="${(i * bw + bw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" font-size="${g.length > 9 ? 14 : 17}" fill="var(--mute)" font-family="-apple-system,system-ui,sans-serif">${esc(x.opp || '')}</text>`; }).join('');
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Last ${g.length} games">${bars}<line x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}" stroke="var(--line2)"/>${isNum(line) ? `<line x1="0" x2="${W}" y1="${y(line)}" y2="${y(line)}" stroke="var(--brass)" stroke-width="2" stroke-dasharray="6 5"/><text x="${W - 4}" y="${y(line) - 8}" text-anchor="end" font-size="18" fill="var(--brass2)" font-family="ui-monospace,SF Mono,Menlo,monospace">line ${ln(line)}</text>` : ''}</svg>`; }
+  const bars = g.map((x, i) => { const v = vals[i]; const hit = isNum(line) ? v > line : false; return `<rect x="${(i * bw + bw * .18).toFixed(1)}" y="${y(v).toFixed(1)}" width="${(bw * .64).toFixed(1)}" height="${(H - pb - y(v)).toFixed(1)}" rx="4" fill="${isNum(line) ? (hit ? 'var(--edge)' : 'var(--line2)') : 'var(--fair)'}" opacity="${isNum(line) && hit ? .85 : 1}"/><text x="${(i * bw + bw / 2).toFixed(1)}" y="${(y(v) - 5).toFixed(1)}" text-anchor="middle" font-size="24" fill="var(--t2)" font-family="ui-monospace,SF Mono,Menlo,monospace">${ln(v)}</text><text x="${(i * bw + bw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" font-size="21" fill="var(--t3)" font-family="-apple-system,system-ui,sans-serif">${esc(x.opp || '')}</text>`; }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Last ${g.length} games">${bars}<line x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}" stroke="var(--line2)"/>${isNum(line) ? `<line x1="0" x2="${W}" y1="${y(line)}" y2="${y(line)}" stroke="var(--brass)" stroke-width="2" stroke-dasharray="6 5"/><text x="${W - 4}" y="${y(line) - 8}" text-anchor="end" font-size="22" fill="var(--brass)" font-family="ui-monospace,SF Mono,Menlo,monospace">line ${ln(line)}</text>` : ''}</svg>`; }
 async function openPlayer(sport, key, d){ const PF = await loadPlayers(sport); const P = PF && PF.players && PF.players[key]; const todays = d && d.byPlayer[key] || [];
   const nm = (P && P.name) || (todays[0] && todays[0].player) || 'Player';
   if(!P){ pushSheet(nm, `<div class="body"><div class="lt"><h1>${esc(nm)}</h1><p>Game history is not available for this player.</p></div>${todays.length ? todayChips(todays, d) : ''}</div>`, el => d && bindTaps(el, d)); return; }
-  const games = (P.games || []).slice(); const played = games.filter(g => g.st);
+  const games = (P.games || []).slice(); const played = games.filter(g => g.st); const inj = await injuryFor(sport, key);
   const statLabel = Object.fromEntries(PF.stats); const keys = profileKeys(sport, P, todays);
   const curSeason = sport === 'NBA' ? played.filter(g => g.d >= '2026-10-01') : sport === 'NFL' ? played.filter(g => g.s === 2026) : played;
   const base = curSeason.length ? curSeason : played; const seasonLbl = sport === 'NBA' ? (curSeason.length ? '2026–27' : '2025–26') : '2026';
@@ -438,7 +438,7 @@ async function openPlayer(sport, key, d){ const PF = await loadPlayers(sport); c
   const cols = (sport === 'NBA' ? ['min', 'pts', 'reb', 'ast', 'tpm'] : keys.slice(0, 4));
   const html = `<div class="body">
     <div class="phero" style="--tc:${esc(tc)}" data-mono="${esc(mono)}"><span class="sp" style="--c:${SPORTHEX[sport]}">${sport}</span><div class="nm">${esc(P.name)}</div>
-      <div class="meta"><span>${esc(P.team || '')}</span>${P.pos ? `<span>${esc(P.pos)}</span>` : ''}<span>${played.length} games on file</span></div></div>
+      <div class="meta"><span>${esc(P.team || '')}</span>${P.pos ? `<span>${esc(P.pos)}</span>` : ''}<span>${played.length} games on file</span></div>${inj ? `<div class="meta" style="align-items:center"><span class="pill ${/out|reserve|suspen/i.test(inj[0]) ? 'pill-loss' : /question|doubt|day/i.test(inj[0]) ? 'pill-live' : 'pill-fair'}">${esc(inj[0])}</span><span>${esc(inj[1] || '')}</span><span class="b13">${esc(injSource(sport))}</span></div>` : ''}</div>
     <section class="sec"><div class="hd"><h2>${seasonLbl} per game</h2><span class="sub">${base.length} games</span></div>
       <div class="statstrip">${keys.map(k => `<div><b data-count="${(avg(k) ?? 0).toFixed(1)}">${isNum(avg(k)) ? avg(k).toFixed(1) : '—'}</b><span>${esc(statLabel[k] || k)}</span></div>`).join('')}</div></section>
     <section class="sec"><div class="hd"><h2>Trend</h2><span class="sub" id="trendnote"></span></div>
@@ -447,13 +447,13 @@ async function openPlayer(sport, key, d){ const PF = await loadPlayers(sport); c
     ${todays.length ? todayChips(todays, d) : ''}
     <section class="sec"><div class="hd"><h2>Game log</h2><span class="sub">newest first</span></div>
       <div class="gl"><table><thead><tr><th>Game</th><th>Result</th>${cols.map(k => `<th>${esc(statLabel[k] || k)}</th>`).join('')}</tr></thead><tbody>
-      ${games.slice().reverse().map(g => `<tr><td>${esc(fmtDate(g))}<div class="sub" style="font-size:12px">${esc((g.ha || '') + ' ' + (g.opp || ''))}</div></td><td>${g.dnp ? `<span class="dim">DNP</span>` : esc(g.res || '—')}</td>${cols.map(k => `<td>${g.st ? ln(g.st[k] ?? 0) : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      ${games.slice().reverse().map(g => `<tr><td>${esc(fmtDate(g))}<div class="sub" style="font-size:12px;white-space:nowrap">${esc((g.ha || '') + ' ' + (g.opp || ''))}</div></td><td>${g.dnp ? `<span class="dim">DNP</span>` : esc(g.res || '—')}</td>${cols.map(k => `<td>${g.st ? ln(g.st[k] ?? 0) : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
       <div class="note">${esc(PF.source)}</div></section>
     <section class="sec"><div class="hd"><h2>With the model</h2><span class="sub">${(P.model || []).length} graded looks</span></div>${modelHistory(P.model || [])}</section>
   </div>`;
   pushSheet(P.name, html, el => { if(d) bindTaps(el, d);
     const draw = k => { const L = lineFor(k); $('#trend', el).innerHTML = trendSVG(games, k, L) || `<p class="sub" style="margin:0">No games on file.</p>`; const last = played.slice(-10);
-      $('#trendnote', el).textContent = isNum(L) && last.length ? `Over ${ln(L)} in ${last.filter(g => (g.st[k] || 0) > L).length} of last ${last.length}` : `last ${Math.min(12, played.length)} games`; };
+      $('#trendnote', el).textContent = isNum(L) && last.length ? `Over ${ln(L)} in ${last.filter(g => (g.st[k] || 0) > L).length} of last ${last.length}` : `last ${Math.min(8, played.length)} games`; };
     $$('[data-pstat] .chip', el).forEach(b => b.onclick = () => { $$('[data-pstat] .chip', el).forEach(x => x.setAttribute('aria-pressed', x === b)); store.d.ui.pstat = store.d.ui.pstat || {}; store.d.ui.pstat[sport] = b.dataset.k; store.save(); draw(b.dataset.k); });
     draw(st0); }); }
 function fmtDate(g){ if(g.d){ const [y, m, dd] = g.d.split('-').map(Number); return `${m}/${dd}${g.post ? ' P' : ''}`; } return g.wk ? `Wk ${g.wk}` : '—'; }
@@ -501,13 +501,7 @@ async function openResults(){ const sl = INDEX.slates.filter(s => s.results && s
     $$('[data-rs]', el).forEach(b => b.onclick = () => { S.resSport = b.dataset.rs; draw(); });
     $$('[data-slate-open]', el).forEach(b => b.onclick = () => { while(STACK.length) popSheet(); setSlate(b.dataset.slateOpen, 'card'); }); }; draw(); }
 function addT(a, b){ a = a || {w: 0, l: 0, p: 0, units: 0, risked: 0}; b = b || {}; return {w: a.w + (b.w || 0), l: a.l + (b.l || 0), p: a.p + (b.p || 0), units: +(a.units + (b.units || 0)).toFixed(2), risked: +(a.risked + (b.risked || 0)).toFixed(2)}; }
-function calibSVG(bins){ if(!bins.length) return ''; const W = 600, H = 340, p = 62; const X = v => p + v * (W - p - 12), Y = v => H - p - v * (H - p - 12); const mxn = Math.max(...bins.map(b => b.n));
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Calibration: predicted chance against how often it happened">
-    ${[0, .25, .5, .75, 1].map(v => `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${X(0) - 8}" y="${Y(v) + 6}" text-anchor="end" font-size="18" fill="var(--mute)" font-family="ui-monospace,SF Mono,Menlo,monospace">${v * 100}%</text><text x="${X(v)}" y="${H - p + 26}" text-anchor="middle" font-size="18" fill="var(--mute)" font-family="ui-monospace,SF Mono,Menlo,monospace">${v * 100}%</text>`).join('')}
-    <line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}" stroke="var(--brass)" stroke-width="1.5" stroke-dasharray="5 5"/>
-    <polyline fill="none" stroke="var(--text)" stroke-width="2" points="${bins.map(b => `${X(b.pred)},${Y(b.hit)}`).join(' ')}"/>
-    ${bins.map(b => `<circle cx="${X(b.pred)}" cy="${Y(b.hit)}" r="${4 + 10 * Math.sqrt(b.n / mxn)}" fill="var(--edge)" fill-opacity=".35" stroke="var(--edge)"/>`).join('')}
-    <text x="${X(.5)}" y="${H - 4}" text-anchor="middle" font-size="18" fill="var(--soft)" font-family="-apple-system,system-ui,sans-serif">model's chance</text></svg>`; }
+function calibSVG(bins){ if(!bins.length) return ''; return Charts.calibration({points: bins.map(b => [b.pred, b.hit, b.n]), w: 340, h: 290}); }
 function resultsHTML(sp, ss, R, sports){ let bets, lean, lines = {won: 0, lost: 0, push: 0}; const tiers = {}, mk = {}; const binsAll = {};
   ss.forEach(s => { const r = s.results; bets = addT(bets, r.bets); lean = addT(lean, (r.by_tier || {}).lean); Object.entries(r.by_tier || {}).forEach(([k, v]) => tiers[k] = addT(tiers[k], v));
     Object.entries(r.by_market || {}).forEach(([k, v]) => { mk[k] = Object.assign(addT(mk[k], v), {label: v.label}); }); Object.entries(r.lines || {}).forEach(([k, v]) => lines[k] += v);
@@ -635,16 +629,15 @@ function openLearn(){ const bar = (w, c, l) => `<div class="side"><div class="l"
 
 /* ================================================================ share image */
 async function shareProp(d, p){ const W = 1080, H = 1350; const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
-  try{ await document.fonts.load('800 80px "WMTL Display"'); }catch(e){}
-  const FD = '"WMTL Display","Arial Narrow",sans-serif', FB = '-apple-system,system-ui,sans-serif', FM = 'ui-monospace,"SF Mono",Menlo,monospace';
-  x.fillStyle = '#0B0C0E'; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W / 2, H * 1.05, 40, W / 2, H, 900); g.addColorStop(0, '#2a2416'); g.addColorStop(1, 'rgba(11,12,14,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-  x.fillStyle = SPORTHEX[d.sport]; x.fillRect(80, 96, 14, 14); x.fillStyle = '#B4B6B8'; x.font = `700 30px ${FB}`; x.fillText(`${d.sport} · ${d.meta.label || ''} · ${p.window || ''}`.toUpperCase(), 108, 110);
-  x.fillStyle = '#F2F1EC'; x.font = `800 112px ${FD}`; wrapText(x, p.player.toUpperCase(), 80, 250, W - 160, 108);
-  x.fillStyle = '#B4B6B8'; x.font = `600 36px ${FB}`; x.fillText(`${p.team}${p.opp ? ' vs ' + p.opp : ''} · ${p.market_label}`, 80, 470);
-  x.fillStyle = '#D9B266'; x.font = `800 92px ${FD}`; x.fillText(selText(p).toUpperCase(), 80, 600);
-  const kv = [[pc(p.p), 'MODEL CHANCE'], [pc(p.break_even), 'PRICE NEEDS'], [sg(p.edge_pts), 'EDGE']]; kv.forEach(([v, l], i) => { const X = 80 + i * 320; x.fillStyle = '#F2F1EC'; x.font = `600 76px ${FM}`; x.fillText(v, X, 760); x.fillStyle = '#80858C'; x.font = `700 24px ${FB}`; x.fillText(l, X, 800); });
-  x.fillStyle = '#F2F1EC'; x.font = `600 40px ${FM}`; x.fillText(`${od(p.odds)}  ${p.book || ''}`, 80, 900); x.fillStyle = '#B4B6B8'; x.font = `500 34px ${FB}`; x.fillText(isNum(p.p) ? `Wins about ${Math.round(p.p * 10)} in 10 · loses about ${10 - Math.round(p.p * 10)} in 10` : '', 80, 960); x.fillText(`25D report card ${sg(p.score25, 1)} · ${p.tier === 'bet' ? 'passes both keys' : p.tier === 'lean' ? 'information only, not a bet' : p.tier === 'live' ? 'live watch' : 'not a bet'}`, 80, 1012);
-  x.fillStyle = '#23272D'; x.fillRect(80, 1130, W - 160, 2); x.fillStyle = '#D9B266'; x.font = `800 50px ${FD}`; x.fillText('OVERLAY', 80, 1210); x.fillStyle = '#80858C'; x.font = `600 26px ${FB}`; x.fillText('by whomadethisline', 80 + x.measureText('OVERLAY').width + 24, 1210); x.fillStyle = '#565B62'; x.font = `500 24px ${FB}`; x.fillText('Model output, not a promise. 1-800-GAMBLER', 80, 1256);
+    const FD = '-apple-system,system-ui,sans-serif', FB = '-apple-system,system-ui,sans-serif', FM = 'ui-monospace,"SF Mono",Menlo,monospace';
+  x.fillStyle = '#0C0B0A'; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W / 2, H * 1.05, 40, W / 2, H, 900); g.addColorStop(0, '#2a2416'); g.addColorStop(1, 'rgba(11,12,14,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.fillStyle = SPORTHEX[d.sport]; x.fillRect(80, 96, 14, 14); x.fillStyle = 'rgba(242,239,232,.66)'; x.font = `700 30px ${FB}`; x.fillText(`${d.sport} · ${d.meta.label || ''} · ${p.window || ''}`.toUpperCase(), 108, 110);
+  x.fillStyle = '#F2EFE8'; x.font = `700 104px ${FD}`; wrapText(x, p.player.toUpperCase(), 80, 250, W - 160, 108);
+  x.fillStyle = 'rgba(242,239,232,.66)'; x.font = `600 36px ${FB}`; x.fillText(`${p.team}${p.opp ? ' vs ' + p.opp : ''} · ${p.market_label}`, 80, 470);
+  x.fillStyle = '#D9B266'; x.font = `700 84px ${FD}`; x.fillText(selText(p).toUpperCase(), 80, 600);
+  const kv = [[pc(p.p), 'MODEL CHANCE'], [pc(p.break_even), 'PRICE NEEDS'], [sg(p.edge_pts), 'EDGE']]; kv.forEach(([v, l], i) => { const X = 80 + i * 320; x.fillStyle = '#F2EFE8'; x.font = `600 76px ${FM}`; x.fillText(v, X, 760); x.fillStyle = 'rgba(242,239,232,.54)'; x.font = `700 24px ${FB}`; x.fillText(l, X, 800); });
+  x.fillStyle = '#F2EFE8'; x.font = `600 40px ${FM}`; x.fillText(`${od(p.odds)}  ${p.book || ''}`, 80, 900); x.fillStyle = 'rgba(242,239,232,.66)'; x.font = `500 34px ${FB}`; x.fillText(isNum(p.p) ? `Wins about ${Math.round(p.p * 10)} in 10 · loses about ${10 - Math.round(p.p * 10)} in 10` : '', 80, 960); x.fillText(`25D report card ${sg(p.score25, 1)} · ${p.tier === 'bet' ? 'passes both keys' : p.tier === 'lean' ? 'information only, not a bet' : p.tier === 'live' ? 'live watch' : 'not a bet'}`, 80, 1012);
+  x.fillStyle = '#2C2A26'; x.fillRect(80, 1130, W - 160, 2); x.fillStyle = '#D9B266'; x.font = `700 46px ${FD}`; x.fillText('OVERLAY', 80, 1210); x.fillStyle = 'rgba(242,239,232,.54)'; x.font = `600 26px ${FB}`; x.fillText('by whomadethisline', 80 + x.measureText('OVERLAY').width + 24, 1210); x.fillStyle = 'rgba(242,239,232,.4)'; x.font = `500 24px ${FB}`; x.fillText('Model output, not a promise. 1-800-GAMBLER', 80, 1256);
   c.toBlob(async blob => { if(!blob) return toast('Could not make the image'); const file = new File([blob], `wmtl-${p.player.replace(/\W+/g, '-').toLowerCase()}.png`, {type: 'image/png'});
     try{ if(navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: 'Overlay'}); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
     const url = URL.createObjectURL(blob); pushSheet('Share image', `<div class="body"><img src="${url}" alt="Share card for ${esc(p.player)}" style="width:100%;border-radius:18px"><p class="note">Press and hold the image to save or share it.</p></div>`); }, 'image/png'); }

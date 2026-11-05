@@ -253,7 +253,7 @@ def mkprof(sport, key, h, fallback_name, team):
     if sport == 'NFL': col = (TEAMC['NFL'].get(h['team'] if h else team) or [None])[0]
     elif sport == 'NBA': col = (TEAMC['NBA'].get(h['team'] if h else team) or [None])[0]
     g2 = [{k: v for k, v in g.items() if v is not None and k not in ('gid',)} for g in games]
-    return dict(name=h['name'] if h else fallback_name, team=(h['team'] if h else team), pos=(h or {}).get('pos'), color=col, games=g2, model=ap,
+    return dict(eid=(h or {}).get('id'), name=h['name'] if h else fallback_name, team=(h['team'] if h else team), pos=(h or {}).get('pos'), color=col, games=g2, model=ap,
                 history='found' if h else 'not_found')
 for sport in ('NFL', 'NBA', 'CFB'):
     P = {}
