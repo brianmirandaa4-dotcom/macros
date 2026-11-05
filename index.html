@@ -933,6 +933,17 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .ft-step{position:relative;padding:12px 0 12px 22px;border-left:2px solid var(--line);margin-left:6px}.ft-step::before{content:"";position:absolute;left:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--kcal);box-shadow:0 0 0 3px var(--surface)}
 .ft-step b{font:700 15px var(--f-display)}.ft-step p{margin:3px 0 0;color:var(--muted);font-size:13.5px;line-height:1.5}
 .pspread{display:grid;grid-template-columns:80px 1fr 52px;gap:10px;align-items:center;padding:6px 0;font-size:14px}.pspread i{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}.pspread u{display:block;height:100%;border-radius:99px}.pspread b{font:700 14px var(--f-num);text-align:right}
+
+.prot-study{display:flex;flex-direction:column;gap:12px}
+.ps-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ps-stats div{background:var(--surface-2);border-radius:12px;padding:10px}
+.ps-stats b{display:block;font:800 20px var(--f-num);color:var(--pro)}.ps-stats span{font-size:11.5px;color:var(--muted);line-height:1.35;display:block;margin-top:2px}
+.pcov{position:relative;height:56px;margin-top:12px}
+.pc-track{position:absolute;left:0;right:0;top:22px;height:12px;border-radius:99px;background:var(--surface-2)}
+.pc-dose{position:absolute;top:22px;height:12px;border-radius:99px;background:linear-gradient(90deg,var(--pro),color-mix(in srgb,var(--pro) 35%,transparent))}
+.pc-lab{position:absolute;top:0;font:700 11.5px var(--f-num);color:var(--pro);transform:translateX(-10%)}
+.pc-x{position:absolute;bottom:0;font-size:10.5px;color:var(--subtle);transform:translateX(-50%)}
+.pwk{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:110px}.pwk>div{display:flex;flex-direction:column;align-items:center;gap:6px}.pwk span{font-size:11px;color:var(--muted)}
+.pwk-c{position:relative;flex:1;width:100%;max-width:26px;background:var(--surface-2);border-radius:8px;overflow:hidden}.pwk-c u{position:absolute;left:0;right:0;bottom:0;border-radius:8px}.pwk-c .g{position:absolute;left:-2px;right:-2px;height:2px;background:var(--fg);opacity:.55;z-index:1}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -1717,7 +1728,7 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
   $('meals').innerHTML=MEALS.map(([m,l])=>{
     const es=list.filter(e=>(e.meal||'snack')===m),mt=sumEntries(es),ms=mt.p*4+mt.c*4+mt.f*9||1;
     const pe=prev.filter(e=>(e.meal||'snack')===m);
-    return `<div class="card meal"><div class="meal-h"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>${m!=='snack'?(mt.p>=proteinPerMealTarget()?' <span class="pchk ok">✓ protein</span>':` <span class="pchk">+${proteinPerMealTarget()-r0(mt.p)} g protein</span>`):''}`:'Empty'}</div></div>
+    return `<div class="card meal"><div class="meal-h"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>${m!=='snack'?(mt.p>=50?' <span class="pchk ok">✓ big protein meal</span>':mt.p>=proteinPerMealTarget()?' <span class="pchk ok">✓ protein</span>':` <span class="pchk">+${proteinPerMealTarget()-r0(mt.p)} g protein</span>`):''}`:'Empty'}</div></div>
       <button class="meal-add" data-addto="${m}" aria-label="Add food to ${l}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <div class="k"><b>${fmt(mt.k)}</b><small>kcal</small>${es.length?`<div class="mini"><i style="width:${mt.p*4/ms*100}%;background:var(--pro)"></i><i style="width:${mt.c*4/ms*100}%;background:var(--carb)"></i><i style="width:${mt.f*9/ms*100}%;background:var(--fat)"></i></div>`:''}</div></div>
       ${es.length?`<ul class="entries">${es.map(e=>`<li><button class="entry" data-edit="${e.id}"><span class="n">${esc(e.n)}${e.src==='guess'?'<span class="tag">check</span>':''}</span><span class="kc">${fmt(e.k)}</span><span class="a">${esc(e.a)}${e.g?` · ${r0(e.g)} g`:''}</span><span class="mc"><span style="--c:var(--pro)">${r0(e.p)}P</span><span style="--c:var(--carb)">${r0(e.c)}C</span><span style="--c:var(--fat)">${r0(e.f)}F</span></span></button></li>`).join('')}</ul><div class="meal-f"><button class="save-meal" data-savemeal="${m}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save as a meal</button></div>`
@@ -2812,7 +2823,7 @@ function renderIdeas(){
       <p class="note" style="margin:0">${FUEL_TXT[ideaTarget(mode).fuel].s}</p>
       <div class="xp-f" style="margin:0">${['breakfast','lunch','dinner','snack'].map(m=>`<button type="button" class="chip" data-isl="${m}" aria-pressed="${slot===m}">${mealName(m)}</button>`).join('')}</div>
       ${T.p*4+T.c*4+Math.max(0,T.f)*9>1300?'<p class="note" style="margin:0;color:var(--carb)">That\'s more than one normal meal. These get you most of the way; a snack later covers the rest.</p>':''}
-      <p class="note" style="margin:0">Aiming for <b>${r0(Math.max(0,T.p))} g protein · ${r0(Math.max(0,T.c))} g carbs · ${r0(Math.max(0,T.f))} g fat</b> ${mode==='day'?'in one meal':`this meal${n>1?`, leaving room for ${n-1} more`:''}`}. Amounts are sized to fit.</p></div>
+      <p class="note" style="margin:0">${mode==='day'?'<span style="color:var(--good)">One big protein meal is fine: large doses keep building muscle longer, not wasted. </span>':''}Aiming for <b>${r0(Math.max(0,T.p))} g protein · ${r0(Math.max(0,T.c))} g carbs · ${r0(Math.max(0,T.f))} g fat</b> ${mode==='day'?'in one meal':`this meal${n>1?`, leaving room for ${n-1} more`:''}`}. Amounts are sized to fit.</p></div>
     ${list.map((x,i)=>`<div class="card idea" style="display:flex;flex-direction:column;gap:12px">
       <div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot)}'></div><div class="idea-t"><div class="eyebrow">${x.idea.min} min · ${r0(x.got.k)} kcal</div><h2>${esc(x.idea.name)}</h2></div><span class="idea-fit ${x.fit>=.85?'hi':''}">${Math.round(x.fit*100)}%</span></div>
       <ul class="ing">${x.entries.map(e=>`<li><span>${esc(e.n)}</span><b>${esc(e.a)}</b></li>`).join('')}</ul>
@@ -3278,6 +3289,38 @@ function lowRep(r){const m=String(r||'').match(/^(\d+)/);return m?+m[1]:null}
    • Fat 20–35% of energy; going under 20% doesn't help performance. Keep fat lower right around training (slows digestion).
    • Micronutrients of key interest: iron (heme, or plant iron + vitamin C), vitamin D, calcium (1,500 mg/d with vitamin D for bone), antioxidants from food.
    • Fluids: 5–10 mL/kg 2–4 h before; replace 1.25–1.5 L per kg lost after. */
+
+/* ================= PROTEIN: the 100 g study =================
+   Trommelen et al. (2023) Cell Reports Medicine 4:101324. 36 healthy young men did whole-body resistance exercise, then drank 0, 25 or 100 g milk protein.
+   • 100 g produced a larger AND longer muscle-building response than 25 g: myofibrillar protein synthesis ~20% higher in hours 0–4 and ~40% higher in hours 4–12, still elevated at 12 h.
+   • A big dose digests slowly: 25 g mostly appears in the blood within ~4–8 h; only ~53% of 100 g had appeared by 12 h.
+   • Very little extra protein was burned for energy (<15% of the increment), so >85% went to building tissue: no evidence of a 20–25 g "ceiling".
+   • Larger, less frequent protein meals are a viable alternative to many small ones; daily total still matters most.
+   • Limits: one 12-hour study, young men, milk protein, right after lifting; long-term effects not tested. */
+function protCover(g){if(g<10)return 0;if(g<=25)return 3+2*(g/25);return Math.min(14,5+7*Math.min(1,(g-25)/75)+(g>100?2:0))}
+function proteinMeals(k){const list=S.days[k]||[],by={};list.forEach(e=>{const m=e.meal||'snack',t=e.t||parseKey(k).getTime()+12*36e5;(by[m]=by[m]||{p:0,t:t,n:mealName(m)});by[m].p+=+e.p||0;by[m].t=Math.min(by[m].t,t)});
+  return Object.values(by).filter(x=>x.p>=5).sort((a,b)=>a.t-b.t)}
+function proteinCoverage(k){const ms=proteinMeals(k),day0=parseKey(k).getTime(),a=day0+7*36e5,b=day0+23*36e5;let cov=0,iv=ms.map(m=>[Math.max(a,m.t),Math.min(b,m.t+protCover(m.p)*36e5)]).filter(x=>x[1]>x[0]).sort((x,y)=>x[0]-y[0]);
+  let cur=null;iv.forEach(([s0,e0])=>{if(!cur||s0>cur[1]){if(cur)cov+=cur[1]-cur[0];cur=[s0,e0]}else cur[1]=Math.max(cur[1],e0)});if(cur)cov+=cur[1]-cur[0];return {hrs:cov/36e5,ms,a,b}}
+function proteinWeek(){const tk=todayKey(),out=[];for(let i=6;i>=0;i--){const d=addDays(tk,-i),t=dayTotals(d),g=goalsFor(d);out.push({d,p:t.p,g:g.p,n:t.n})}return out}
+function proteinHTML(){const kg=kgNow(),k=todayKey(),g=goalsFor(k),t=dayTotals(k),pm=proteinPerMealTarget(),cv=proteinCoverage(k),wk=proteinWeek(),hit=wk.filter(x=>x.n&&x.p>=x.g*.9).length,mx=Math.max(...wk.map(x=>Math.max(x.p,x.g)),1);
+  const span=cv.b-cv.a,pos=x=>Math.max(0,Math.min(100,(x-cv.a)/span*100));
+  return `<div class="glabel">Protein: what the 100 g study found</div>
+    <div class="card prot-study"><div class="ps-stats"><div><b>+20%</b><span>muscle building in hours 0–4 with 100 g vs 25 g</span></div><div><b>+40%</b><span>in hours 4–12, still going at 12 h</span></div><div><b>&gt;85%</b><span>of the protein went to building tissue, almost none wasted</span></div></div>
+      <ul class="pi-list"><li><b>Daily total comes first.</b> Aim for ${r0(g.p)} g a day (${r1(g.p/kg)} g/kg). Timing only fine-tunes it.</li>
+      <li><b>No real per-meal ceiling.</b> The old "your body can only use 20–30 g" idea didn't hold: 100 g at once built more muscle and for longer. Big meals aren't wasted.</li>
+      <li><b>~25 g is the floor, not the max.</b> Get at least ~${pm} g each time you eat protein. Under that, the muscle-building signal is weaker.</li>
+      <li><b>Make the post-workout meal your biggest.</b> Training primes muscle to take in protein, and a large dose keeps that going for 12+ hours.</li>
+      <li><b>Spread it out or don't.</b> 4 meals of ~${r0(g.p/4)} g or 2–3 bigger ones both work. Pick what fits your day; consistency wins.</li>
+      <li><b>Slow plus fast protein.</b> The study used milk protein (20% whey, 80% casein). Dairy, eggs, meat and fish all qualify. A slow protein like Greek yogurt or cottage cheese before bed covers the night.</li></ul>
+      <p class="note" style="margin:0">Trommelen et al., <i>Cell Reports Medicine</i>, 2023: 36 healthy young men, whole-body lifting, then 0, 25 or 100 g milk protein, measured for 12 hours. It's one acute study; long-term effects weren't tested.</p></div>
+    <div class="glabel">Today's protein</div>
+    <div class="card"><div class="row" style="justify-content:space-between;align-items:baseline"><b style="font:800 24px var(--f-num)">${r0(t.p)} <small style="font-size:14px;color:var(--muted)">/ ${r0(g.p)} g</small></b><span class="note" style="margin:0">~${r1(cv.hrs)} of 16 waking hours covered</span></div>
+      <div class="pcov"><i class="pc-track"></i>${cv.ms.map(m=>`<i class="pc-dose" style="left:${pos(m.t)}%;width:${Math.max(2,pos(m.t+protCover(m.p)*36e5)-pos(m.t))}%;opacity:${Math.min(1,.45+m.p/80)}"></i><span class="pc-lab" style="left:${pos(m.t)}%">${r0(m.p)}g</span>`).join('')}<span class="pc-x" style="left:0">7am</span><span class="pc-x" style="left:50%">3pm</span><span class="pc-x" style="left:100%;transform:translateX(-100%)">11pm</span></div>
+      <p class="note" style="margin:6px 0 0">Each bar is a protein meal and roughly how long it keeps muscle building: about 5 h for 25 g, 12 h+ for 100 g (an estimate based on the study). Gaps are good spots for your next ${pm}+ g.</p></div>
+    <div class="glabel">This week</div>
+    <div class="card"><div class="pwk">${wk.map(x=>`<div><div class="pwk-c"><i class="g" style="bottom:${x.g/mx*100}%"></i><u style="height:${x.p/mx*100}%;background:${x.p>=x.g*.9?'var(--good)':'var(--pro)'}"></u></div><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`).join('')}</div>
+      <p class="note" style="margin:8px 0 0"><b style="color:var(--fg)">${hit} of 7 days</b> at your protein goal. Muscle is built across the whole week, so steady days beat one perfect day. Rest days count too, because you keep rebuilding after a session.</p></div>`}
 function kgNow(){const lw=latestWeight();return ((lw&&lw.w)||(S.calc&&S.calc.wt)||165)*.4536}
 function fuelState(){const now=Date.now(),tk=todayKey();if(S.day!==tk)return {mode:'reg'};
   const pk=S.fuelPick;if(pk&&pk.t&&now-pk.t<3*36e5)return {mode:pk.m,manual:true};
@@ -3286,11 +3329,11 @@ function fuelState(){const now=Date.now(),tk=todayKey();if(S.day!==tk)return {mo
   const last=ends.length?Math.max(...ends):0;if(last&&now>=last&&now-last<2*36e5)return {mode:'post',left:2*36e5-(now-last),ago:now-last};
   return {mode:'reg'}}
 function fuelTarget(mode,R){const kg=kgNow();
-  if(mode==='post')return {p:Math.max(20,Math.min(40,.3*kg)),c:Math.min(.8*kg,Math.max(25,R.c)),f:Math.max(0,Math.min(12,R.f))};
+  if(mode==='post')return {p:Math.max(.3*kg,Math.min(Math.max(R.p,0),.6*kg)),c:Math.min(.8*kg,Math.max(25,R.c)),f:Math.max(0,Math.min(12,R.f))};
   if(mode==='pre')return {p:Math.max(10,Math.min(25,.2*kg)),c:Math.min(1*kg,Math.max(25,R.c)),f:Math.max(0,Math.min(8,R.f))};return null}
 const FUEL_TXT={pre:{t:'Before training',s:'Carbs first, a little protein, low fat and fiber so it digests fast. Eat it 1–3 hours out.'},
-  post:{t:'After training',s:'High-quality protein (dairy, whey, eggs, meat) plus carbs within about 2 hours to rebuild muscle and refill glycogen.'},
-  reg:{t:'Regular meal',s:'Hit at least ~0.3 g of protein per kg in every meal, and put most of your fats in meals away from training.'}};
+  post:{t:'After training',s:'Your best time for a big protein meal: 25 g is the floor, and more keeps muscle building longer (the 100 g study). Add carbs to refill glycogen.'},
+  reg:{t:'Regular meal',s:'At least ~25 g of protein per meal. Bigger protein meals are not wasted, so fewer, larger meals work too. Keep most fats away from training.'}};
 const MICRO=[['iron','Iron','--over',/steak|beef|lamb|turkey|spinach|kale|lentil|bean|chickpea|tofu|edamame|oats|egg/],['calcium','Calcium','--fat',/milk|yogurt|skyr|kefir|cheese|mozzarella|parmesan|feta|cottage|tofu|sardine|almond/],
   ['vitd','Vitamin D','--carb',/salmon|sardine|tuna|egg|milk|mushroom/],['vitc','Vitamin C','--good',/orange|strawberr|kiwi|pepper|broccoli|tomato|pineapple|mango|salsa|berr|potato|brussels|cauliflower/],
   ['omega','Omega-3','--kcal',/salmon|sardine|tuna|chia|flax|walnut/]];
@@ -3299,16 +3342,17 @@ function microChips(list){const has=microOf(list);return has.length?`<div class=
 function microRow(){const k=S.day,list=S.days[k]||[];if(list.length<2)return '';const has=microOf(list),miss=MICRO.filter(m=>!has.includes(m[0])&&m[0]!=='omega');
   const tip={iron:'lean beef, spinach, beans (pair plants with vitamin C)',calcium:'Greek yogurt, milk, cheese',vitd:'salmon, eggs, fortified milk',vitc:'berries, peppers, oranges, broccoli'};
   return grow({pg:'fuel',ic:'heart',c:'--good',t:miss.length?`Micronutrients: add ${miss.map(m=>m[1].toLowerCase()).join(', ')}`:'Micronutrients covered today',s:miss.length?`Try ${tip[miss[0][0]]}`:'Iron, calcium, vitamin D and vitamin C all have a food source today',v:`${4-miss.length}/4`,vc:miss.length?'':'on'})}
-function proteinPerMealTarget(){return Math.round(Math.max(15,Math.min(40,.3*kgNow())))}
+function proteinPerMealTarget(){return Math.round(Math.max(25,.3*kgNow()))}
 function renderFuel(){const kg=kgNow(),g=goalsFor(todayKey()),fs=fuelState(),pm=proteinPerMealTarget(),lb=r0(kg/.4536);
   const day=MEALS.filter(([m])=>m!=='snack').map(([m,l])=>{const es=(S.days[todayKey()]||[]).filter(e=>(e.meal||'snack')===m),t=sumEntries(es);return [l,t.p,es.length]});
   $('pg-fuel').innerHTML=`<div class="card fuel-hero"><div class="eyebrow" style="color:var(--good)">Your numbers at ${lb} lb</div><h2>When to eat what</h2>
-    <div class="fuel-grid"><div style="--c:var(--pro)"><b>${pm} g</b><span>protein per meal, every 3–5 h</span></div><div style="--c:var(--carb)"><b>${r0(.8*kg)}–${r0(1*kg)} g</b><span>carbs before or after lifting</span></div><div style="--c:var(--fat)"><b>${r0(g.f*9/Math.max(1,goalKcal(g))*100)}%</b><span>of calories from fat (aim 20–35%)</span></div><div style="--c:var(--fat)"><b>${r1(kg*7.5/1000*33.8)} oz</b><span>water 2–4 h before training</span></div></div></div>
+    <div class="fuel-grid"><div style="--c:var(--pro)"><b>${pm}+ g</b><span>protein each meal, more is fine</span></div><div style="--c:var(--carb)"><b>${r0(.8*kg)}–${r0(1*kg)} g</b><span>carbs before or after lifting</span></div><div style="--c:var(--fat)"><b>${r0(g.f*9/Math.max(1,goalKcal(g))*100)}%</b><span>of calories from fat (aim 20–35%)</span></div><div style="--c:var(--fat)"><b>${r1(kg*7.5/1000*33.8)} oz</b><span>water 2–4 h before training</span></div></div></div>
+    ${proteinHTML()}
     <div class="glabel">Around a workout</div>
     <div class="card fuel-tl"><div class="ft-step"><b>1–4 h before</b><p>~${r0(1*kg)} g carbs with ~${r0(.2*kg)} g protein. Keep fat and fiber low so it settles: oats with banana, a bagel with jam, rice with chicken.</p></div>
       <div class="ft-step"><b>During</b><p>Lifting under about an hour needs only water. For 1–2+ hours of hard activity, 30–60 g carbs an hour helps.</p></div>
-      <div class="ft-step"><b>0–2 h after</b><p>~${pm} g high-quality protein plus ~${r0(.8*kg)} g carbs. Dairy proteins (milk, Greek yogurt, whey) work especially well. Training twice in a day? Push carbs to ~${r0(kg)} g an hour for the first few hours.</p></div>
-      <div class="ft-step"><b>Rest of the day</b><p>Spread protein every 3–5 hours across 4 or more meals. Put most of your fats and fiber in meals away from training.</p></div>
+      <div class="ft-step"><b>0–2 h after</b><p>At least ~${pm} g high-quality protein, and more is better here (40–60 g is great), plus ~${r0(.8*kg)} g carbs. Dairy proteins (milk, Greek yogurt, whey) work especially well. Training twice in a day? Push carbs to ~${r0(kg)} g an hour for the first few hours.</p></div>
+      <div class="ft-step"><b>Rest of the day</b><p>Hit your daily protein total in whatever pattern fits: 4+ meals of ~${pm}+ g, or fewer bigger ones. Put most of your fats and fiber in meals away from training.</p></div>
       <div class="ft-step"><b>Fluids</b><p>Drink ~${r1(kg*7.5/1000*33.8)} oz 2–4 h before. After, replace about 20–24 oz for every pound you lost in sweat.</p></div></div>
     <div class="glabel">Today's protein spread</div><div class="card">${day.map(([l,p,n])=>`<div class="pspread"><span>${l}</span><i><u style="width:${Math.min(100,p/pm*100)}%;background:${p>=pm?'var(--good)':'var(--pro)'}"></u></i><b>${n?r0(p)+' g':'—'}</b></div>`).join('')}<p class="note" style="margin:8px 0 0">Each main meal should reach ~${pm} g of protein to keep muscle building all day.</p></div>
     <div class="glabel">Micronutrients that matter for training</div><div class="card"><ul class="ing">${MICRO.slice(0,4).map(([id,l])=>{const has=microOf(S.days[todayKey()]||[]).includes(id);return `<li><span>${has?'✓ ':''}${l}</span><b style="font-family:var(--f-body);font-weight:500;color:var(--muted);text-align:right">${{iron:'Red meat, beans, spinach + vitamin C',calcium:'Dairy, tofu · ~1,500 mg/day for bone',vitd:'Salmon, eggs, fortified milk, sun',vitc:'Berries, peppers, citrus, broccoli'}[id]}</b></li>`}).join('')}</ul>
@@ -3361,7 +3405,7 @@ function coachItems(){
   const items=[
     {id:'w',t:'Weigh in',s:S.weights[k]?`${r1(S.weights[k])} lb`:'Takes 5 seconds',done:S.weights[k]!=null,go:openWeigh,cta:'Log'},
     {id:'m',t:'Log your meals',s:`${['breakfast','lunch','dinner'].filter(m=>meals.has(m)).length} of 3 main meals`,done:['breakfast','lunch','dinner'].every(m=>meals.has(m)),go:()=>{const n=['breakfast','lunch','dinner'].find(m=>!meals.has(m));if(n)S.mealSel=n;renderToday();document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('foodIn').focus({preventScroll:true}),250)},cta:'Add'},
-    {id:'p',t:'Hit your protein',s:`${r0(t.p)} of ${r0(g.p)} g · see meals that fit`,done:t.p>=g.p*0.9,go:()=>openPage('ideas'),cta:'Ideas'},
+    {id:'p',t:'Hit your protein',s:`${r0(t.p)} of ${r0(g.p)} g${g.p-t.p>30?` · one ${r0(Math.min(g.p-t.p,100))} g meal covers it`:''}`,done:t.p>=g.p*0.9,go:()=>openPage('ideas'),cta:'Ideas'},
     {id:'t',t:'Train',s:wk?'Done, nice work':'Or take a rest day',done:wk,go:()=>setView('train'),cta:'Go'},
     {id:'c',t:'Daily check-in',s:'How you felt, 20 seconds',done:!!S.checkins[k],go:()=>openPage('checkin'),cta:'Open'}];
   return {mode:'day',items};
@@ -3394,7 +3438,7 @@ const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like 
 function renderTip(v){const el=$('tip-'+v);if(!el)return;const P=S.prefs||{};if((P.tipsSeen||{})[v]||!TIPS[v]){el.hidden=true;return}
   el.hidden=false;el.innerHTML=`<span class="tic">i</span><div class="tx"><b class="tt">${TIPS[v][0]}</b><span>${TIPS[v][1]}</span><br><button type="button" data-tipx="${v}">Got it</button></div>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tipx]');if(!b)return;S.prefs.tipsSeen={...(S.prefs.tipsSeen||{}),[b.dataset.tipx]:true};save();renderTip(b.dataset.tipx)});
-const FAQ=[['When should I eat carbs, protein and fat?','Carbs before and after training, protein (~0.3 g per kg, about 20–30 g) after training and every 3–5 hours, and most of your fat in meals away from training. Meal ideas switch to pre- or post-workout picks automatically when you have just trained. Details in Profile → Fuel & timing.'],['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
+const FAQ=[['How much protein can my body use in one meal?','More than people think. In a 2023 study, 100 g after lifting built more muscle than 25 g, and for over 12 hours, with almost none wasted. Get your daily total, eat at least ~25 g each time, and make the post-workout meal a big one. Details in Profile → Fuel & timing.'],['When should I eat carbs, protein and fat?','Carbs before and after training, protein (~0.3 g per kg, about 20–30 g) after training and every 3–5 hours, and most of your fat in meals away from training. Meal ideas switch to pre- or post-workout picks automatically when you have just trained. Details in Profile → Fuel & timing.'],['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
   ['Where do my calorie and macro targets come from?','From your body stats and goal. Syncope estimates what you burn, then sets a gradual weekly plan. Protein stays high to protect muscle. You can see every week in Plan.'],
   ['What is the + button?','A shortcut for logging anything: food, a photo, a saved meal, your weight, a workout or your daily check-in.'],
   ['How do WHOOP and Garmin work?','Connect once in Profile → WHOOP & Garmin. After that, sleep, recovery, strain and workouts come in on their own whenever you open the app.'],
