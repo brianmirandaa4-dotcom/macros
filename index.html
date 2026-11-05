@@ -2356,7 +2356,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.30';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.31';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3663,7 +3663,7 @@ function renderPrefs(){
    about 80% of which comes from drinks). Training: sweat rates of ~0.5–2 L/h (ACSM 2007; Baker 2017), so we use
    0.5 L/h lifting, 0.8 L/h steady cardio, 1.0 L/h runs or hard sessions, +30% on hot or humid days.
    Timing and sodium follow the ACSM position stand on exercise and fluid replacement. */
-const HYD_TYPES=[['rest','Rest day',0,0],['lift','Lifting',.5,60],['cardio','Cardio',.8,45],['hard','Run / hard',1.0,60],['long','Long or double',1.1,120]];
+const HYD_TYPES=[['rest','Rest day',0,0],['lift','Lifting',.5,60],['cardio','Cardio',.8,45],['hard','Run / hard',1.0,60],['long','Long session (2h+)',1.1,120]];
 const HYD_KINDS=[['water','Water'],['elec','Electrolytes'],['sports','Sports drink'],['coffee','Coffee / tea'],['milk','Milk / shake'],['other','Other']];
 const NA_PRESETS=[['Pinch of salt in water',150],['¼ tsp salt in a bottle',575],['Electrolyte packet',500],['High-sodium packet',1000],['Sports drink (20 oz)',270]];
 const hydS=()=>{S.hyd=S.hyd||{};S.hyd.log=S.hyd.log||{};S.hyd.bottles=S.hyd.bottles||[];S.hyd.day=S.hyd.day||{};return S.hyd};
@@ -3673,16 +3673,26 @@ function hydTrainMin(k){let lift=0,cardio=0,run=0;(S.workouts||[]).filter(w=>w.d
   cardio-=run;
   ((S.dev&&S.dev.workouts)||[]).filter(d=>d.date===k&&d.min&&!(S.workouts||[]).some(w=>w.devId===d.id)).forEach(d=>{const t=String(d.type||d.name||'').toLowerCase();if(/run|jog/.test(t))run+=d.min;else if(/strength|weight|lift|functional/.test(t))lift+=d.min;else cardio+=d.min});
   return {lift:Math.min(lift,240),cardio,run,all:lift+cardio+run}}
-function hydAutoType(k){const m=hydTrainMin(k);if(!m.all){const nx=k===todayKey()&&typeof tplNext==='function'?tplNext():null;return nx&&nx.why==='today'&&!nx.done?'lift':'rest'}
-  if(m.all>=105)return 'long';if(m.run>=20)return 'hard';if(m.cardio>m.lift)return 'cardio';return 'lift'}
-function hydPlan(k=S.day){const H=hydS(),d=H.day[k]||{},type=d.type||hydAutoType(k),hot=!!d.hot,kg=kgNow(),T=HYD_TYPES.find(x=>x[0]===type)||HYD_TYPES[0];
-  const base=Math.min(4000,Math.max(1600,33*kg));const m=hydTrainMin(k);
-  // minutes: what you logged today, else a typical session for the chosen day type
-  const mins=type==='rest'?0:(m.all||T[3]);const rate=type==='rest'?0:(m.all?(m.lift*.5+m.cardio*.8+m.run*1.0)/Math.max(1,m.all):T[2])*(hot?1.3:1);
-  const sweat=rate*mins/60*1000,heat=hot?500:0,total=base+sweat+heat;
-  const naPerH=hot||mins>=90||((type==='hard'||type==='long')&&mins>=60)?(type==='long'||hot?600:400):0,naGoal=Math.round(naPerH*mins/60/50)*50;
-  return {type,hot,auto:!d.type,base,sweat,heat,total,mins,rate,kg,naGoal,logged:!!m.all,
-    oz:{total:ozR(total/ML_OZ),base:ozR(base/ML_OZ),sweat:ozR((sweat+heat)/ML_OZ),pre:[ozR(5*kg/ML_OZ),ozR(7*kg/ML_OZ)],during:mins>=45?[4,8]:null,wake:16}}}
+const HYD_ACT={lift:'lift',cardio:'cardio',hard:'run'};
+function hydAutoTypes(k){const m=hydTrainMin(k),o=[];if(m.lift)o.push('lift');if(m.cardio)o.push('cardio');if(m.run)o.push('hard');
+  if(!o.length){const nx=k===todayKey()&&typeof tplNext==='function'?tplNext():null;if(nx&&nx.why==='today'&&!nx.done)o.push('lift')}return o}
+function hydTypes(k){const d=hydS().day[k]||{};if(Array.isArray(d.types))return {types:d.types.filter(t=>HYD_TYPES.some(x=>x[0]===t&&t!=='rest')),auto:false};
+  if(d.type)return {types:d.type==='rest'?[]:[d.type],auto:false};return {types:hydAutoTypes(k),auto:true}}
+function hydLabel(types){if(!types.length)return 'Rest day';const L=types.map(t=>(HYD_TYPES.find(x=>x[0]===t)||[,t])[1]);return L.map((x,i)=>i?x.toLowerCase():x).join(' + ')}
+function hydPlan(k=S.day){const H=hydS(),d=H.day[k]||{},ty=hydTypes(k),hot=!!d.hot,kg=kgNow(),m=hydTrainMin(k);
+  const base=Math.min(4000,Math.max(1600,33*kg));
+  const types=ty.types.slice();
+  // anything you logged counts even if you didn't tick it
+  if(m.lift&&!types.includes('lift'))types.push('lift');if(m.cardio&&!types.includes('cardio'))types.push('cardio');if(m.run&&!types.includes('hard'))types.push('hard');
+  // each activity: logged minutes when you have them, otherwise a typical session
+  const segs=types.map(t=>{const T=HYD_TYPES.find(x=>x[0]===t),lm=HYD_ACT[t]?m[HYD_ACT[t]]:0,mins=lm||T[3],ml=T[2]*(hot?1.3:1)*mins/60*1000;
+    return {t,label:T[1],mins,logged:!!lm,ml,oz:ozR(ml/ML_OZ)}});
+  const mins=segs.reduce((a,x)=>a+x.mins,0),sweat=segs.reduce((a,x)=>a+x.ml,0),heat=hot?500:0,total=base+sweat+heat,rate=mins?sweat/mins*60/1000:0;
+  const big=types.includes('hard')||types.includes('long');
+  const naPerH=hot||mins>=90||(big&&mins>=60)?(types.includes('long')||hot?600:400):0,naGoal=Math.round(naPerH*mins/60/50)*50;
+  const type=types.length?(types.length>1?'multi':types[0]):'rest';
+  return {type,types,label:hydLabel(types),segs,hot,auto:ty.auto,base,sweat,heat,total,mins,rate,kg,naGoal,logged:segs.some(x=>x.logged),
+    oz:{total:ozR(base/ML_OZ)+segs.reduce((a,x)=>a+x.oz,0)+ozR(heat/ML_OZ),base:ozR(base/ML_OZ),sweat:ozR((sweat+heat)/ML_OZ),pre:[ozR(5*kg/ML_OZ),ozR(7*kg/ML_OZ)],during:mins>=45?[4,8]:null,wake:16}}}
 function hydDay(k=S.day){const l=hydS().log[k]||[];return {list:l,oz:l.reduce((a,x)=>a+(+x.oz||0),0),na:l.reduce((a,x)=>a+(+x.na||0),0)}}
 function hydAdd(oz,kind='water',na=0,k=S.day,label){oz=Math.round(+oz*10)/10;if(!(oz>0)&&!(na>0))return;const H=hydS();(H.log[k]=H.log[k]||[]).push({id:uid(),t:Date.now(),oz,kind,...(na?{na:Math.round(na)}:{}),...(label?{l:label}:{})});save();
   const p=hydPlan(k),d=hydDay(k);toast(`+${r1(oz)} oz · ${fmt(d.oz)} of ${fmt(p.oz.total)} oz today`,()=>{const L=H.log[k];L.pop();save();renderHyd();renderTodayRows()});renderHyd();renderTodayRows()}
@@ -3718,7 +3728,7 @@ function openDrink(){let kind='water';
   $('dkX').onclick=closeSheet;
   $('dkOk').onclick=()=>{const oz=+$('dkO').value||0,na=+$('dkN').value||0;if(!(oz>0)&&!(na>0)){$('dkO').focus();return}closeSheet();hydAdd(oz,kind,na)}}
 function renderHyd(){const el=$('pg-hyd');if(!el||!pgStack||!pgStack.includes('hyd'))return;const H=hydS(),k=S.day,p=hydPlan(k),d=hydDay(k),pct=Math.min(100,Math.round(d.oz/Math.max(1,p.oz.total)*100));
-  const left=Math.max(0,p.oz.total-d.oz),kgTxt=`${r0(p.kg/.4536)} lb`,T=HYD_TYPES.find(x=>x[0]===p.type);
+  const left=Math.max(0,p.oz.total-d.oz),kgTxt=`${r0(p.kg/.4536)} lb`;
   const tips=[[`On waking`,`${p.oz.wake} oz before coffee. You lose water overnight through breathing.`]];
   if(p.type!=='rest'){tips.push([`2–4 hours before training`,`${p.oz.pre[0]}–${p.oz.pre[1]} oz (5–7 mL per kg of body weight). If you’ve barely peed or it’s dark, add another 8–12 oz about 2 hours before.`]);
     tips.push([`During`,p.oz.during?`About ${p.oz.during[0]}–${p.oz.during[1]} oz every 15–20 minutes, or to thirst. Aim to lose no more than 2% of body weight (${r1(p.kg/.4536*.02)} lb for you).${p.naGoal?' Use an electrolyte drink, since this session is long or hot.':''}`:'Sip to thirst. Under 45 minutes you don’t need a plan.']);
@@ -3726,14 +3736,14 @@ function renderHyd(){const el=$('pg-hyd');if(!el||!pgStack||!pgStack.includes('h
   tips.push([`Rest of the day`,`Spread the other ${fmt(Math.max(0,p.oz.total-p.oz.wake-(p.type!=='rest'?p.oz.pre[1]:0)))} oz through the day. Front-load it so you aren’t up at night; ease off 1–2 hours before bed.`]);
   const na=p.naGoal?`Plan on about <b>${fmt(p.naGoal)} mg sodium</b> around today’s training (300–600 mg per hour for sessions over an hour or in heat). You’ve had <b>${fmt(d.na)} mg</b> from drinks so far.`:`Today doesn’t need extra electrolytes; normal meals cover it. Add them if you sweat heavily, see salt stains on your shirt, or train over an hour or in heat.`;
   el.innerHTML=`<div class="card hy-top"><div class="hy-ring" style="--p:${pct}"><div><b class="num">${fmt(d.oz)}</b><span>of ${fmt(p.oz.total)} oz</span></div></div>
-      <div class="hy-sum"><div class="eyebrow">${k===todayKey()?'Today':esc(niceDate(k,{weekday:'short',month:'short',day:'numeric'}))} · ${esc(T[1])}${p.hot?' · hot':''}</div><h2>${left?`${fmt(left)} oz to go`:'Target hit 💧'}</h2>
-      <p class="note">${fmt(p.oz.base)} oz baseline for ${kgTxt}${p.oz.sweat?` + ${fmt(p.oz.sweat)} oz for ${p.mins} min of ${p.logged?'logged training':esc(T[1].toLowerCase())}${p.hot?' in the heat':''}`:''}.${d.na?` Sodium from drinks: ${fmt(d.na)} mg.`:''}</p></div></div>
+      <div class="hy-sum"><div class="eyebrow">${k===todayKey()?'Today':esc(niceDate(k,{weekday:'short',month:'short',day:'numeric'}))} · ${esc(p.label)}${p.hot?' · hot':''}</div><h2>${left?`${fmt(left)} oz to go`:'Target hit 💧'}</h2>
+      <p class="note">${fmt(p.oz.base)} oz baseline for ${kgTxt}${p.segs.map(x=>` + ${fmt(x.oz)} oz for ${x.mins} min of ${esc(x.label.toLowerCase())}${x.logged?' (logged)':''}`).join('')}${p.heat?` + ${fmt(ozR(p.heat/ML_OZ))} oz for the heat`:''}.${d.na?` Sodium from drinks: ${fmt(d.na)} mg.`:''}</p></div></div>
     <div class="card"><div class="glabel" style="margin:0 0 8px">Add water</div>
       <div class="hy-q" id="hyQ">${[8,12,16,24,32].map(v=>`<button type="button" class="hy-b" data-oz="${v}"><b>+${v}</b><span>oz</span></button>`).join('')}</div>
       ${H.bottles.length?`<div class="glabel" style="margin:14px 0 8px">Your bottles</div><div class="hy-bt" id="hyBt">${H.bottles.map(b=>`<div class="hy-bo"><button type="button" class="hy-b wide" data-boz="${b.id}"><b>${esc(b.name)}</b><span>full · ${r1(b.oz)} oz</span></button><button type="button" class="hy-b half" data-bhalf="${b.id}"><b>½</b><span>${r1(b.oz/2)} oz</span></button><button type="button" class="link" data-bedit="${b.id}" aria-label="Edit ${esc(b.name)}">Edit</button></div>`).join('')}</div>`:''}
       <div class="row" style="flex-wrap:wrap;gap:8px;margin-top:14px"><button class="ghost" type="button" id="hyMore">＋ Electrolytes or other drink</button><button class="ghost" type="button" id="hyScan">📷 Scan a bottle</button><button class="link" type="button" id="hyNewB">Add bottle by size</button><input type="file" accept="image/*" id="hyScanIn" hidden></div><div class="status" id="hyScanSt"></div></div>
-    <div class="card"><div class="glabel" style="margin:0 0 8px">What kind of day is it?</div><div class="wn-acts" id="hyT">${HYD_TYPES.map(([v,l])=>`<button type="button" class="chip" data-t="${v}" aria-pressed="${p.type===v}">${l}</button>`).join('')}<button type="button" class="chip" data-hot aria-pressed="${p.hot}">☀️ Hot or humid</button></div>
-      <p class="note" style="margin:8px 0 0">${p.auto?(p.logged?'Picked from what you logged today. ':'Picked from your plan. ')+'Tap to change it.':'You set this for the day.'}${p.auto?'':' <button class="link" type="button" id="hyAuto">Back to automatic</button>'}</p></div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">What are you doing today?</div><div class="wn-acts" id="hyT">${HYD_TYPES.map(([v,l])=>`<button type="button" class="chip" data-t="${v}" aria-pressed="${v==='rest'?!p.types.length:p.types.includes(v)}">${l}</button>`).join('')}<button type="button" class="chip" data-hot aria-pressed="${p.hot}">☀️ Hot or humid</button></div>
+      <p class="note" style="margin:8px 0 0">Pick everything you’re doing, like lifting + cardio. ${p.auto?(p.logged?'Filled in from what you logged today.':p.types.length?'Filled in from your plan.':''):'You set this for the day.'}${p.auto?'':' <button class="link" type="button" id="hyAuto">Back to automatic</button>'}</p></div>
     <div class="card"><div class="glabel" style="margin:0 0 8px">Your plan today</div><ol class="hy-plan">${tips.map(([t,x])=>`<li><b>${t}</b><span>${x}</span></li>`).join('')}</ol></div>
     <div class="card"><div class="glabel" style="margin:0 0 8px">Electrolytes</div><p style="margin:0 0 10px">${na}</p>
       <ul class="hy-tips"><li><b>Easy DIY:</b> ¼ tsp table salt in a 32 oz bottle ≈ 575 mg sodium. A pinch is about 150 mg.</li><li><b>When:</b> in the 2 hours before a long or hot session, sipped during it, and with your post-workout meal or drink.</li><li><b>Potassium & magnesium:</b> food covers these well (potatoes, bananas, yogurt, beans, leafy greens). Sodium is the one sweat takes most of.</li><li><b>Sweat varies a lot:</b> 0.5–2+ L per hour, and 10–90 mmol sodium per liter. Weigh yourself before and after a typical session to learn your own rate (1 lb lost ≈ 16 oz).</li><li><b>Don’t overdo plain water:</b> drinking far more than you sweat during long sessions without sodium can dilute your blood sodium. Don’t finish a workout heavier than you started.</li><li><b>Check yourself:</b> pale-straw urine and little thirst mean you’re on track. Dark urine or a morning weight drop over 1% means drink more.</li></ul></div>
@@ -3745,9 +3755,9 @@ function renderHyd(){const el=$('pg-hyd');if(!el||!pgStack||!pgStack.includes('h
     if(t.dataset.bhalf){const b=H.bottles.find(x=>x.id===t.dataset.bhalf);if(b)hydAdd(b.oz/2,'water',0,S.day,'½ '+b.name);return}
     if(t.dataset.bedit)return openBottle({id:t.dataset.bedit});
     if(t.dataset.hdel){const L=H.log[k]||[];H.log[k]=L.filter(x=>x.id!==t.dataset.hdel);save();renderHyd();renderTodayRows();return}
-    if(t.dataset.t){H.day[k]={...(H.day[k]||{}),type:t.dataset.t};save();renderHyd();renderTodayRows();return}
+    if(t.dataset.t){const v=t.dataset.t,cur=hydTypes(k).types;let nt=v==='rest'?[]:cur.includes(v)?cur.filter(x=>x!==v):[...cur,v];const x={...(H.day[k]||{}),types:nt};delete x.type;H.day[k]=x;save();renderHyd();renderTodayRows();return}
     if(t.dataset.hot!=null){H.day[k]={...(H.day[k]||{}),hot:!p.hot};save();renderHyd();renderTodayRows();return}
-    if(t.id==='hyAuto'){const x=H.day[k]||{};delete x.type;H.day[k]=x;save();renderHyd();renderTodayRows();return}
+    if(t.id==='hyAuto'){const x=H.day[k]||{};delete x.type;delete x.types;H.day[k]=x;save();renderHyd();renderTodayRows();return}
     if(t.id==='hyMore')return openDrink();
     if(t.id==='hyNewB')return openBottle({});
     if(t.id==='hyScan')return $('hyScanIn').click()};
@@ -5050,7 +5060,7 @@ function renderTodayRows(){
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
   el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.oura||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP, Oura or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
     +(()=>{const tk=todayKey(),pm=prevYM();if(k!==tk||+tk.slice(8)>7||!monthHasData(pm))return '';const [y,m]=pm.split('-').map(Number);return grow({ga:'report',ic:'chart',c:'--good',t:`Your ${MON[m-1]} report is ready`,s:'How the month went: nutrition, vitamins, water, training, sleep',v:'New',vc:'on'})})()
-    +(()=>{const hp=hydPlan(k),hd=hydDay(k);return grow({pg:'hyd',ic:'drop',c:'--fat',t:'Hydration',s:`${fmt(hd.oz)} of ${fmt(hp.oz.total)} oz${hp.type!=='rest'?' · '+HYD_TYPES.find(x=>x[0]===hp.type)[1].toLowerCase()+' day':''}${hd.na?` · ${fmt(hd.na)} mg sodium`:''}`,v:hd.oz>=hp.oz.total?'✓':`${Math.round(hd.oz/Math.max(1,hp.oz.total)*100)}%`,vc:hd.oz>=hp.oz.total?'on':''})})()
+    +(()=>{const hp=hydPlan(k),hd=hydDay(k);return grow({pg:'hyd',ic:'drop',c:'--fat',t:'Hydration',s:`${fmt(hd.oz)} of ${fmt(hp.oz.total)} oz${hp.types.length?' · '+hp.label.toLowerCase():''}${hd.na?` · ${fmt(hd.na)} mg sodium`:''}`,v:hd.oz>=hp.oz.total?'✓':`${Math.round(hd.oz/Math.max(1,hp.oz.total)*100)}%`,vc:hd.oz>=hp.oz.total?'on':''})})()
     +grow({pg:'cook',ic:'book',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
     +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
