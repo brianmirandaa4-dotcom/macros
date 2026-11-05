@@ -739,6 +739,43 @@ details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:c
 .fr-me{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;border-top:1px solid var(--line);padding-top:12px}.fr-me b{display:block}.fr-me span{font-size:12.5px;color:var(--muted)}
 .fr-req{display:flex;flex-direction:column;gap:4px;border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
 .un{font-style:normal;font-weight:500;font-size:12px;color:var(--muted)}
+
+.lb li,.pd,.fe{cursor:pointer;transition:transform .12s ease,background .2s}
+.lb li:active,.pd:active,.fe:active{transform:scale(.98)}
+.lb li::after{content:"";width:8px;height:8px;border-right:2px solid var(--faint);border-top:2px solid var(--faint);transform:rotate(45deg);margin-right:4px}
+.lb li{grid-template-columns:22px 34px minmax(0,1fr) auto auto 10px}
+.fp-hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;border-radius:26px;padding:28px 16px 18px;background:linear-gradient(180deg,rgba(11,12,16,.3),rgba(11,12,16,.9) 60%),var(--bnr);border:1px solid rgba(255,255,255,.07)}
+.fp-hero h2{margin:8px 0 0;font:800 26px/1.1 var(--f-display)}.fp-hero p{margin:0;color:rgba(255,255,255,.75);font-size:14px}
+.fp-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;margin-top:14px}
+.fp-stats div{background:rgba(255,255,255,.06);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;gap:2px}
+.fp-stats b{font:800 19px var(--f-num)}.fp-stats span{font-size:11px;color:var(--muted)}
+.fp-today{display:grid;grid-template-columns:128px minmax(0,1fr);gap:18px;align-items:center}
+.fp-ring{position:relative;width:128px;height:128px}.fp-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fp-rc b{font:800 26px var(--f-num)}.fp-rc span{font-size:11.5px;color:var(--muted)}
+.fp-ms{display:flex;flex-direction:column;gap:10px;min-width:0}
+.fp-m span{font-size:13.5px;font-weight:600}.fp-m b{font-size:14px}.fp-m small{color:var(--muted);font-weight:500}
+.fp-m i{display:block;height:7px;border-radius:99px;background:var(--surface-2);margin-top:5px;overflow:hidden}.fp-m u{display:block;height:100%;border-radius:99px;background:var(--c)}
+.fp-foods{display:flex;flex-direction:column;gap:14px}.fp-meal b{font-family:var(--f-display)}
+.fp-f{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--line)}.fp-f:last-child{border-bottom:0}
+.fp-f i{color:var(--muted);font-style:normal;font-size:12px}.fp-f em{font-style:normal;font-size:12px}
+.fp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fp-tiles .tile{padding:12px}.fp-tiles .v{font-size:20px}
+.fp-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:120px;margin-bottom:14px}
+.fb{display:flex;flex-direction:column;align-items:center;gap:6px}.fb span{font-size:11px;color:var(--muted)}
+.fb-c{position:relative;flex:1;width:100%;max-width:26px;background:var(--surface-2);border-radius:8px;overflow:hidden}
+.fb-c u{position:absolute;left:0;right:0;bottom:0;border-radius:8px}.fb-c .g{position:absolute;left:-2px;right:-2px;height:2px;background:var(--fg);opacity:.55;z-index:1}
+.fp-t td,.fp-t th{padding:8px 6px}
+.fp-wks{display:flex;flex-direction:column;gap:8px}
+.fp-w{padding:0 14px}.fp-w summary{list-style:none;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;cursor:pointer}.fp-w summary::-webkit-details-marker{display:none}
+.fp-w .ing{padding-bottom:10px}
+.fp-w summary .pr{display:inline-block;width:auto;margin-left:6px;vertical-align:1px}
+.fp-lock{display:flex;gap:12px;align-items:center;padding:14px 16px}.fp-lock b{display:block;font-size:14.5px}.fp-lock span:not(.gi){font-size:12.5px;color:var(--muted)}
+/* smoother movement */
+.view:not([hidden]){animation:viewin .24s cubic-bezier(.2,.8,.2,1) both}
+@keyframes viewin{from{opacity:0;transform:translateY(8px)}}
+button,.gr,.chip,.tab{-webkit-tap-highlight-color:transparent}
+.gr:active,.chip:active,.primary:active,.ghost:active,.addt:active,.tpl:active{transform:scale(.97)}
+.gr,.chip,.primary,.ghost,.tpl{transition:transform .12s ease,background .2s,border-color .2s}
+html{scroll-behavior:smooth}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -972,6 +1009,7 @@ details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:c
     </div>
 </div>
   <div class="pg" id="pg-help"></div>
+  <div class="pg" id="pg-friend"></div>
   <div class="pg" id="pg-ideas"></div>
   <div class="pg" id="pg-prep"></div>
   <div class="pg" id="pg-account"></div>
@@ -2339,8 +2377,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -2351,6 +2389,10 @@ function pageBack(){const id=pgStack.pop();if(id)$('pageStore').appendChild($('p
   if(pgStack.length)showPage(pgStack[pgStack.length-1]);else{$('pageRoot').hidden=true;document.documentElement.classList.remove('locked');renderAll()}}
 function closePages(){while(pgStack.length)$('pageStore').appendChild($('pg-'+pgStack.pop()));$('pageRoot').hidden=true;document.documentElement.classList.remove('locked')}
 $('pgBack').onclick=pageBack;
+(()=>{let x0=null,y0=0,dx=0;const R=$('pageRoot'),B=$('pgBody');
+  R.addEventListener('touchstart',e=>{const t=e.touches[0];if(t.clientX<28){x0=t.clientX;y0=t.clientY;dx=0}else x0=null},{passive:true});
+  R.addEventListener('touchmove',e=>{if(x0==null)return;const t=e.touches[0];dx=t.clientX-x0;if(Math.abs(t.clientY-y0)>Math.abs(dx)&&dx<20){x0=null;B.style.transform='';return}if(dx>0)B.style.transform=`translateX(${dx}px)`},{passive:true});
+  R.addEventListener('touchend',()=>{if(x0==null)return;B.style.transition='transform .2s';if(dx>90){B.style.transform='translateX(100%)';setTimeout(()=>{B.style.transition='';B.style.transform='';pageBack()},180)}else{B.style.transform='';setTimeout(()=>B.style.transition='',220)}x0=null});})();
 const GACT={templates:()=>openTemplates(),plan:()=>{closePages();setView('plan')},apple:()=>openSetupChooser(),redo:()=>{closePages();openOnb()},builder:()=>{S.showBuilder=!S.showBuilder;renderPlan()},syncnow:()=>syncDevices(true)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-pg]');if(g){openPage(g.dataset.pg);return}const a=e.target.closest('[data-ga]');if(a&&GACT[a.dataset.ga])GACT[a.dataset.ga]()});
 function streak(){let k=todayKey(),n=0;if(!(S.days[k]||[]).length)k=addDays(k,-1);while((S.days[k]||[]).length){n++;k=addDays(k,-1)}return n}
@@ -2653,7 +2695,7 @@ async function socApi(path,body){const c=await ensureSync();const r=await fetch(
 let socT=null;
 function socSchedule(ms=15000){const c=socCfg();if(!c.on)return;clearTimeout(socT);socT=setTimeout(socPush,ms)}
 async function socPush(force){const c=socCfg();if(!c.on)return;if(!force&&c.lastPush&&Date.now()-c.lastPush<3*60000)return socSchedule(3*60000-(Date.now()-c.lastPush)+500);
-  try{const {stats,events}=myWeek();await socApi('stats',{stats,events});const n=socCfg();n.lastPush=Date.now();socSave(n)}catch(e){}}
+  try{const {stats,events}=myWeek();await socApi('stats',{stats,events,detail:myDetail()});const n=socCfg();n.lastPush=Date.now();socSave(n)}catch(e){}}
 async function socBoard(){const c=socCfg();if(!c.on)return null;try{const b=await socApi('board');const n=socCfg();n.board=b;n.boardAt=Date.now();n.code=b.me.code;n.username=b.me.username;n.phoneLast4=b.me.phoneLast4;socSave(n);return b}catch(e){return c.board||null}}
 const AV=(n,c,sz=40)=>`<span class="fav" style="--c:${esc(c||'#C7B6FF')};width:${sz}px;height:${sz}px;font-size:${sz*.38}px">${esc(initials(n))}</span>`;
 const METRICS=[['score','Points','pts'],['workouts','Workouts',''],['protein','Protein days','/7'],['steps','Steps',''],['streak','Streak','d']];
@@ -2669,7 +2711,7 @@ function renderFriends(){
       <div class="field"><label for="frP">Phone number <span style="font-weight:500;color:var(--faint)">so friends can find you</span></label><input id="frP" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 123-4567"></div>
       <p class="note" style="margin:0">Your number is stored scrambled and is never shown to anyone. Friends who type it in can send you a request.</p>
       <div class="field"><label>Your color</label><div class="wn-acts" id="frC">${ACCENTS.map(([v],i)=>`<button type="button" class="chip" data-v="${v}" aria-pressed="${i===0}"><i class="swatch" style="--c:${v};margin:0"></i></button>`).join('')}</div></div></div>
-      <div class="glabel">What friends can see</div><div class="glist" id="frShare">${shareRows({streak:true,workouts:true,protein:true,steps:true,meals:true,weight:false})}</div>
+      <div class="glabel">What friends can see</div><div class="glist" id="frShare">${shareRows({nutrition:true,foods:false,recovery:true,streak:true,workouts:true,protein:true,steps:true,meals:true,weight:false})}</div>
       <p class="note" style="padding:0 6px">Your weekly points are always shown so the leaderboard works. Your food log, weight and health data stay on your phone unless you switch them on above.</p>
       <button class="primary" id="frGo" style="padding:15px">Join Syncope Friends</button><span class="status" id="frErr"></span>`;
     $('frC').onclick=e=>{const b=e.target.closest('[data-v]');if(b)$('frC').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};
@@ -2690,10 +2732,11 @@ function renderFriends(){
   const pod=sorted.slice(0,3),order=[1,0,2].filter(i=>pod[i]);
   const feed=[...mine.events.map(e=>({...e,who:meRow,cheers:((me&&me.events)||[]).find(x=>x.id===e.id)?.cheers||[]})),...frs.flatMap(f=>(f.events||[]).map(e=>({...e,who:f})))].sort((a,b2)=>b2.t-a.t).slice(0,25);
   const cheered=new Set(c.cheered||[]);
-  el.innerHTML=`<div class="card fr-week"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Week of ${niceDate(ws,{month:'short',day:'numeric'})}</div><h2>${frs.length?`You're #${sorted.findIndex(r=>r.me)+1} of ${all.length}`:'Your week'}</h2><p class="note" style="margin:2px 0 0">${left>0?`${left} day${left>1?'s':''} left · resets Monday`:'Last day, finish strong'}</p></div><b class="fr-pts">${fmt(mine.stats.score)}<small>pts</small></b></div>
+  const needUp=c.share&&c.share.nutrition===undefined;
+  el.innerHTML=(needUp?`<div class="card fr-req"><div class="eyebrow" style="color:var(--good)">New</div><b style="font-size:16px">Let friends tap your profile</b><p class="note" style="margin:0">Share your daily calories, macros and recovery so friends can see them on your profile. You can change this anytime under Privacy.</p><div class="row" style="gap:8px"><button class="primary" id="frUp">Share calories & recovery</button><button class="ghost" id="frUpNo">Not now</button></div></div>`:'')+`<div class="card fr-week"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Week of ${niceDate(ws,{month:'short',day:'numeric'})}</div><h2>${frs.length?`You're #${sorted.findIndex(r=>r.me)+1} of ${all.length}`:'Your week'}</h2><p class="note" style="margin:2px 0 0">${left>0?`${left} day${left>1?'s':''} left · resets Monday`:'Last day, finish strong'}</p></div><b class="fr-pts">${fmt(mine.stats.score)}<small>pts</small></b></div>
       <div class="xp-f">${METRICS.map(([k,l])=>`<button type="button" class="chip" data-fm="${k}" aria-pressed="${met===k}">${l}</button>`).join('')}</div>
-      ${frs.length?`<div class="podium">${order.map(i=>{const r=pod[i];return `<div class="pd p${i+1}">${AV(r.name,r.color,i===0?62:50)}<b>${esc(r.me?'You':r.name.split(' ')[0])}</b><span>${fv(r)}${met==='score'?' pts':''}</span><i>${i+1}</i></div>`}).join('')}</div>
-      <ol class="lb">${sorted.map((r,i)=>`<li class="${r.me?'me':''}"><span class="rk">${i+1}</span>${AV(r.name,r.color,34)}<span class="ln"><b>${esc(r.me?'You':r.name)}${r.username&&!r.me?` <i class="un">@${esc(r.username)}</i>`:''}</b><span>${r.stats.streak!=null?`🔥 ${r.stats.streak}-day streak`:''}${r.stats.workouts!=null?` · ${r.stats.workouts} workouts`:''}</span></span><b class="lv">${fv(r)}</b>${r.me?'':`<button class="link fr-rm" data-rm="${esc(r.uid)}" aria-label="Remove ${esc(r.name)}">⋯</button>`}</li>`).join('')}</ol>`
+      ${frs.length?`<div class="podium">${order.map(i=>{const r=pod[i];return `<div class="pd p${i+1}" data-fp="${r.me?'me':esc(r.uid)}" role="button">${AV(r.name,r.color,i===0?62:50)}<b>${esc(r.me?'You':r.name.split(' ')[0])}</b><span>${fv(r)}${met==='score'?' pts':''}</span><i>${i+1}</i></div>`}).join('')}</div>
+      <ol class="lb">${sorted.map((r,i)=>`<li class="${r.me?'me':''}" data-fp="${r.me?'me':esc(r.uid)}" role="button" tabindex="0"><span class="rk">${i+1}</span>${AV(r.name,r.color,34)}<span class="ln"><b>${esc(r.me?'You':r.name)}${r.username&&!r.me?` <i class="un">@${esc(r.username)}</i>`:''}</b><span>${r.stats.streak!=null?`🔥 ${r.stats.streak}-day streak`:''}${r.stats.workouts!=null?` · ${r.stats.workouts} workouts`:''}</span></span><b class="lv">${fv(r)}</b>${r.me?'':`<button class="link fr-rm" data-rm="${esc(r.uid)}" aria-label="Remove ${esc(r.name)}">⋯</button>`}</li>`).join('')}</ol>`
       :`<div class="fr-empty">${AV(c.name,c.color,56)}<p>It's just you so far. Invite a friend to start competing.</p></div>`}
     </div>
     ${reqs.length?`<div class="card fr-req"><div class="eyebrow" style="color:var(--good)">Friend request${reqs.length>1?'s':''}</div>${reqs.map(r=>`<div class="fe" style="background:none;border:0;padding:6px 0">${AV(r.name,r.color,38)}<div class="fe-t"><p><b>${esc(r.name)}</b></p><span>${r.username?'@'+esc(r.username):''} wants to compete with you</span></div><div class="row" style="gap:6px;flex-wrap:nowrap"><button class="ghost" data-dec="${esc(r.uid)}" style="padding:8px 12px">Decline</button><button class="primary" data-acc="${esc(r.uid)}" style="padding:8px 14px">Accept</button></div></div>`).join('')}</div>`:''}
@@ -2702,24 +2745,26 @@ function renderFriends(){
       <div class="row" style="gap:8px">${'contacts' in navigator&&'select' in (navigator.contacts||{})?'<button class="ghost" id="frPick">Pick from contacts</button>':''}<button class="primary" id="frShareBtn">Invite with a link</button></div>
       <div class="fr-me">${AV(c.name,c.color,40)}<div><b>${esc(c.name||'You')}</b><span>${c.username?'@'+esc(c.username):''}${c.phoneLast4?` · phone ••${esc(c.phoneLast4)}`:' · no phone added'} · code ${esc(c.code||'')}</span></div><button class="link" id="frEdit">Edit</button></div></div>
     <div class="glabel">Today's points</div><div class="card fr-today">${(()=>{const d=dayPoints(todayKey());return `<ul class="todo">${POINTS.map(([k,v,l])=>`<li><button type="button" class="${d[k]?'done':''}" tabindex="-1"><span class="ck">${d[k]?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span><b>${l}</b></span><span class="gv">+${v}</span></button></li>`).join('')}</ul>`})()}</div>
-    <div class="glabel">Activity</div><div class="feed">${feed.length?feed.map(e=>{const n=(e.cheers||[]).length,mineEv=e.who.me,did=cheered.has(e.who.uid+'|'+e.id);return `<div class="fe">${AV(e.who.name,e.who.color,38)}<div class="fe-t"><p><b>${esc(mineEv?'You':e.who.name.split(' ')[0])}</b> ${evText(e)}</p><span>${ago(e.t,e.date)}${n?` · ${mineEv?'cheered by ':''}${mineEv?esc(e.cheers.slice(0,3).join(', ')):n+' cheer'+(n>1?'s':'')}`:''}</span></div>${mineEv?'':`<button type="button" class="cheer ${did?'on':''}" data-ch="${esc(e.who.uid)}|${esc(e.id)}" ${did?'disabled':''}>🔥${did?'':' Cheer'}</button>`}</div>`}).join(''):'<p class="note" style="padding:6px">Workouts, protein days and streaks from you and your friends show up here.</p>'}</div>
+    <div class="glabel">Activity</div><div class="feed">${feed.length?feed.map(e=>{const n=(e.cheers||[]).length,mineEv=e.who.me,did=cheered.has(e.who.uid+'|'+e.id);return `<div class="fe" data-fp="${e.who.me?'me':esc(e.who.uid)}">${AV(e.who.name,e.who.color,38)}<div class="fe-t"><p><b>${esc(mineEv?'You':e.who.name.split(' ')[0])}</b> ${evText(e)}</p><span>${ago(e.t,e.date)}${n?` · ${mineEv?'cheered by ':''}${mineEv?esc(e.cheers.slice(0,3).join(', ')):n+' cheer'+(n>1?'s':'')}`:''}</span></div>${mineEv?'':`<button type="button" class="cheer ${did?'on':''}" data-ch="${esc(e.who.uid)}|${esc(e.id)}" ${did?'disabled':''}>🔥${did?'':' Cheer'}</button>`}</div>`}).join(''):'<p class="note" style="padding:6px">Workouts, protein days and streaks from you and your friends show up here.</p>'}</div>
     <details class="steps card" style="padding:14px 18px"><summary>How points work</summary><ul class="ing" style="margin-top:8px">${POINTS.map(([,v,l])=>`<li><span>${l}</span><b>+${v}/day</b></li>`).join('')}</ul><p class="note">Up to ${POINTS.reduce((a,x)=>a+x[1],0)} points a day. Everyone's points are counted the same way from their own plan.</p></details>
     <div class="glabel">Privacy</div><div class="glist" id="frShare2">${shareRows(c.share||{})}</div>
     <button class="link" id="frLeave" style="color:var(--muted);align-self:center;padding:10px">Leave Syncope Friends</button>`;
 }
-function shareRows(sh){return [['streak','Logging streak','--carb','fire'],['workouts','Workouts & PRs','--pro','dumbbell'],['protein','Protein days','--pro','target'],['steps','Steps','--fat','watch'],['meals','Days on target','--good','list'],['weight','Weekly weight change','--kcal','scale']]
+function shareRows(sh){return [['nutrition','Calories & macros','--kcal','target'],['foods','Food log (what you ate)','--carb','list'],['recovery','Recovery & sleep','--good','heart'],['streak','Logging streak','--carb','fire'],['workouts','Workouts & PRs','--pro','dumbbell'],['protein','Protein days','--pro','target'],['steps','Steps','--fat','watch'],['meals','Days on target','--good','list'],['weight','Weekly weight change','--kcal','scale']]
   .map(([k,t,c,ic])=>grow({ic,c,t,ctl:`<input type="checkbox" class="sw" data-sh="${k}" ${sh[k]?'checked':''} aria-label="${t}">`})).join('')}
 $('frBody').addEventListener('click',async e=>{
   const m=e.target.closest('[data-fm]');if(m){S.frMetric=m.dataset.fm;renderFriends();return}
   if(e.target.closest('#frShareBtn')){const c=socCfg(),url=location.origin+location.pathname+'#join='+c.code,text=`Compete with me on Syncope${c.username?` (I'm @${c.username})`:''}. Tap the link to add me:`;
     try{if(navigator.share){await navigator.share({title:'Join me on Syncope',text,url});return}}catch(err){if(err&&err.name==='AbortError')return}
     try{await navigator.clipboard.writeText(text+' '+url);toast('Invite link copied')}catch(err){toast('Your code is '+esc(c.code))}return}
+  if(e.target.closest('#frUp')||e.target.closest('#frUpNo')){const yes=!!e.target.closest('#frUp');const c=socCfg();c.share={...c.share,nutrition:yes,recovery:yes,foods:false};socSave(c);try{await socApi('profile',{name:c.name,color:c.color,share:c.share});await socPush(true);await socBoard()}catch(err){toast(esc(err.message))}renderFriends();if(yes)toast('Friends can now see your calories & recovery');return}
   if(e.target.closest('#frAddBtn'))return addFriend($('frAdd').value.trim());
   if(e.target.closest('#frPick')){try{const cs=await navigator.contacts.select(['tel','name'],{multiple:false});const t=cs&&cs[0]&&cs[0].tel&&cs[0].tel[0];if(t){$('frAdd').value=t;addFriend(t)}}catch(err){}return}
   if(e.target.closest('#frEdit'))return editSoc();
   const ac=e.target.closest('[data-acc]'),dc=e.target.closest('[data-dec]');if(ac||dc){try{await socApi(ac?'accept':'decline',{uid:(ac||dc).dataset[ac?'acc':'dec']});await socBoard();renderFriends();if(ac)toast('Friend added')}catch(err){toast(esc(err.message))}return}
   const ch=e.target.closest('[data-ch]');if(ch){const [to,id]=ch.dataset.ch.split('|');ch.disabled=true;ch.classList.add('on');ch.textContent='🔥';
     try{await socApi('cheer',{to,id});const c=socCfg();c.cheered=[...(c.cheered||[]),to+'|'+id].slice(-300);socSave(c)}catch(err){toast(esc(err.message))}return}
+  const fp=e.target.closest('[data-fp]');if(fp&&!e.target.closest('[data-rm]')){openFriend(fp.dataset.fp);return}
   const rm=e.target.closest('[data-rm]');if(rm){const f=((socCfg().board||{}).friends||[]).find(x=>x.uid===rm.dataset.rm);
     sheet(`<div><div class="eyebrow">Friend</div><h3>${esc(f?f.name:'Friend')}</h3></div><p class="note">Removing them takes you off each other's leaderboards. You can add each other again with your codes.</p><div class="row" style="justify-content:flex-end"><button class="ghost" id="rmX">Cancel</button><button class="danger" id="rmOk">Remove friend</button></div>`,{nofocus:true});
     $('rmX').onclick=closeSheet;$('rmOk').onclick=async()=>{try{await socApi('remove',{uid:rm.dataset.rm});closeSheet();await socBoard();renderFriends()}catch(err){toast(esc(err.message))}};return}
@@ -2746,6 +2791,57 @@ function editSoc(){const c=socCfg();
     $('esErr').className='status';$('esErr').textContent='Saving…';
     try{const r=await socApi('profile',body);const n=socCfg();Object.assign(n,{name:r.name,username:r.username,phoneLast4:r.phoneLast4});socSave(n);closeSheet();renderFriends();toast('Profile saved')}catch(err){$('esErr').className='status err';$('esErr').textContent=err.message}};
 }
+
+/* ---- friend profiles ---- */
+function myDetail(){
+  const tk=todayKey(),daily=[];
+  for(let i=6;i>=0;i--){const d=addDays(tk,-i),t=dayTotals(d),g=goalsFor(d),h=hv(d);
+    daily.push({d,k:r0(t.k),p:r0(t.p),c:r0(t.c),f:r0(t.f),gk:goalKcal(g),gp:r0(g.p),gc:r0(g.c),gf:r0(g.f),n:t.n,steps:h.steps??null,sleep:h.sleep??null,rec:h.recovery??null,hrv:h.hrv??null,rhr:h.rhr??null,strain:h.strain??null,w:S.weights[d]??null})}
+  const foods=(S.days[tk]||[]).slice(0,40).map(e=>({n:e.n,a:e.a,m:e.meal||'snack',k:r0(e.k),p:r0(e.p),c:r0(e.c),f:r0(e.f)}));
+  const wks=trainFeed().filter(x=>x.date>=addDays(tk,-6)).slice(0,10).map(x=>{const w=x.log,d=x.dev;
+    return {name:w?w.name:d.name,d:x.date,min:w?Math.round((w.end-w.start)/60000):d.min,sets:w?w.ex.reduce((a,y)=>a+y.sets.length,0):null,vol:w?r0(w.ex.reduce((a,y)=>a+y.sets.reduce((b,z)=>b+setVol(z),0),0)):null,prs:w?(w.prs||[]).length:0,kcal:d?d.kcal:null,strain:d?d.strain:null,src:d?d.src:'',
+      ex:w?w.ex.map(y=>{const b=y.sets.reduce((a,z)=>e1rm(z.w,z.r)>e1rm(a.w,a.r)?z:a,y.sets[0]);return {n:y.n,sets:y.sets.length,top:b?`${b.w}×${b.r}`:''}}):[]}});
+  const pl=S.plan?`${S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}`:'';
+  return {daily,foods,wks,plan:pl}}
+let fpUid=null;
+function openFriend(uid){fpUid=uid;openPage('friend')}
+function ringMini(v,goal,col,size=128,stroke=12){const R=(size-stroke)/2,C=2*Math.PI*R,f=goal?Math.min(1,v/goal):0;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="${stroke}"/><circle cx="${size/2}" cy="${size/2}" r="${R}" fill="none" stroke="${col}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" transform="rotate(-90 ${size/2} ${size/2})"/></svg>`}
+function renderFriendPage(){
+  const c=socCfg(),b=c.board||{},isMe=fpUid==='me';
+  let F;if(isMe){const md=myDetail();F={name:c.name||'You',username:c.username,color:c.color,stats:myWeek().stats,detail:{...md,shares:c.share||{}},me:true}}
+  else F=(b.friends||[]).find(f=>f.uid===fpUid);
+  const el=$('pg-friend');if(!F){el.innerHTML='<p class="note">This friend is no longer on your list.</p>';return}
+  $('pgTitle').textContent=isMe?'What friends see':F.name.split(' ')[0];
+  const D=F.detail||{daily:[],shares:{}},sh=D.shares||{},tk=todayKey(),ws=weekStart(tk),st=F.stats&&F.stats.week===ws?F.stats:{score:0};
+  const days=D.daily||[],today=days.find(x=>x.d===tk)||{},hasN=today.k!=null;
+  const all=[...(b.friends||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0),myWeek().stats.score].sort((a,x)=>x-a),rank=all.indexOf(st.score)+1;
+  const locked=(what,key)=>`<div class="card fp-lock"><span class="gi" style="--c:var(--muted)">${GI.shield}</span><div><b>${what} isn't shared</b><span>${isMe?'Turn it on under Privacy on the Friends page.':`${esc(F.name.split(' ')[0])} can turn on “${key}” in Friends → Privacy.`}</span></div></div>`;
+  const macro=(l,v,g,col)=>{const pct=g?Math.min(100,v/g*100):0;return `<div class="fp-m" style="--c:var(${col})"><div class="row" style="justify-content:space-between"><span>${l}</span><b class="num">${r0(v)}<small> / ${r0(g)} g</small></b></div><i><u style="width:${pct}%"></u></i></div>`};
+  const left=hasN?today.gk-today.k:0;
+  let html=`<div class="fp-hero" style='--bnr:${bnr("plan")}'>${AV(F.name,F.color,84)}<h2>${esc(F.name)}</h2><p>${F.username?'@'+esc(F.username):''}${D.plan?` · ${esc(D.plan)}`:''}</p>
+      <div class="fp-stats"><div><b>${fmt(st.score||0)}</b><span>pts this week</span></div><div><b>#${rank||'—'}</b><span>rank</span></div><div><b>${st.streak??'—'}</b><span>day streak</span></div><div><b>${st.workouts??'—'}</b><span>workouts</span></div></div></div>`;
+  if(sh.nutrition||isMe){
+    html+=`<div class="glabel">Today</div><div class="card fp-today">${hasN?`<div class="fp-ring">${ringMini(today.k,today.gk,today.k>today.gk*1.1?'var(--over)':'var(--kcal)')}<div class="fp-rc"><b>${fmt(today.k)}</b><span>of ${fmt(today.gk)} kcal</span></div></div>
+      <div class="fp-ms">${macro('Protein',today.p,today.gp,'--pro')}${macro('Carbs',today.c,today.gc,'--carb')}${macro('Fat',today.f,today.gf,'--fat')}<p class="note" style="margin:0">${today.n?`${today.n} item${today.n>1?'s':''} logged · `:''}${left>=0?`${fmt(left)} kcal left`:`${fmt(-left)} kcal over`}</p></div>`:'<p class="note" style="margin:0">Nothing logged yet today.</p>'}</div>`;
+  }else html+=locked('Calories & macros','Calories & macros');
+  if(D.foods&&D.foods.length){const by={};D.foods.forEach(x=>(by[x.m]=by[x.m]||[]).push(x));
+    html+=`<div class="glabel">What ${isMe?'you':esc(F.name.split(' ')[0])} ate today</div><div class="card fp-foods">${MEALS.filter(([m])=>by[m]).map(([m,l])=>`<div class="fp-meal"><div class="row" style="justify-content:space-between"><b>${l}</b><span class="num">${fmt(by[m].reduce((a,x)=>a+x.k,0))} kcal</span></div>${by[m].map(x=>`<div class="fp-f"><span>${esc(x.n)} <i>${esc(x.a)}</i></span><span class="num">${fmt(x.k)} · <em style="color:var(--pro)">${x.p}P</em> <em style="color:var(--carb)">${x.c}C</em> <em style="color:var(--fat)">${x.f}F</em></span></div>`).join('')}</div>`).join('')}</div>`}
+  else if(!isMe&&!sh.foods&&sh.nutrition)html+='';
+  if((sh.recovery||isMe)&&days.some(x=>x.rec!=null||x.sleep!=null)){const r=days.slice().reverse().find(x=>x.rec!=null||x.sleep!=null)||{};
+    html+=`<div class="glabel">Recovery & sleep</div><div class="fp-tiles">${[['Recovery',r.rec!=null?r.rec+'%':'—','--good'],['Sleep',r.sleep!=null?r.sleep+'h':'—','--kcal'],['HRV',r.hrv??'—','--fat'],['Resting HR',r.rhr??'—','--pro'],['Strain',r.strain??'—','--carb'],['Steps',today.steps!=null?fmt(today.steps):'—','--good']].map(([l,v,c2])=>`<div class="tile" style="--c:var(${c2})"><div class="eyebrow">${l}</div><div class="v" style="color:var(${c2})">${v}</div></div>`).join('')}</div>`}
+  else if(!isMe&&!sh.recovery)html+=locked('Recovery & sleep','Recovery & sleep');
+  if(sh.nutrition||sh.steps||sh.recovery||isMe){const mx=Math.max(1,...days.map(x=>Math.max(x.k||0,x.gk||0)));
+    html+=`<div class="glabel">Last 7 days</div><div class="card"><div class="fp-bars">${days.map(x=>`<div class="fb" title="${x.d}"><div class="fb-c"><i class="g" style="bottom:${(x.gk||0)/mx*100}%"></i><u style="height:${(x.k||0)/mx*100}%;background:${x.k>x.gk*1.1?'var(--over)':x.k>=x.gk*.9?'var(--good)':'var(--kcal)'}"></u></div><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`).join('')}</div>
+      <table class="dtable fp-t"><thead><tr><th>Day</th>${sh.nutrition||isMe?'<th>kcal</th><th style="color:var(--pro)">P</th>':''}${sh.steps||isMe?'<th>Steps</th>':''}${sh.recovery||isMe?'<th style="color:var(--good)">Rec</th><th>Sleep</th>':''}</tr></thead><tbody>${days.slice().reverse().map(x=>`<tr><td>${niceDate(x.d,{weekday:'short',day:'numeric'})}</td>${sh.nutrition||isMe?`<td>${x.k!=null&&x.n?fmt(x.k):'—'}</td><td>${x.p!=null&&x.n?x.p:'—'}</td>`:''}${sh.steps||isMe?`<td>${x.steps!=null?fmt(x.steps):'—'}</td>`:''}${sh.recovery||isMe?`<td>${x.rec!=null?x.rec+'%':'—'}</td><td>${x.sleep!=null?x.sleep+'h':'—'}</td>`:''}</tr>`).join('')}</tbody></table></div>`}
+  if(D.wks&&D.wks.length)html+=`<div class="glabel">Workouts this week</div><div class="fp-wks">${D.wks.map(w=>`<details class="card fp-w"><summary><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(w.name)}${w.prs?` <span class="pr">${w.prs} PR</span>`:''}</b><span>${niceDate(w.d,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.strain!=null?` · strain ${w.strain}`:''}</span></span><span class="gv">${w.vol?fmt(w.vol)+' lb':w.kcal?fmt(w.kcal)+' kcal':''}</span></summary>${w.ex&&w.ex.length?`<ul class="ing">${w.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.sets} sets · top ${esc(e.top)}</b></li>`).join('')}</ul>`:'<p class="note">Watch session, no lifts logged.</p>'}</details>`).join('')}</div>`;
+  else if(!isMe&&!sh.workouts)html+=locked('Workouts','Workouts & PRs');
+  if(!isMe)html+=`<button class="link" data-rm="${esc(F.uid)}" style="color:var(--muted);align-self:center;padding:12px">Remove ${esc(F.name.split(' ')[0])}</button>`;
+  else html+=`<p class="note" style="text-align:center">This is exactly what your friends see when they tap you.</p>`;
+  el.innerHTML=html;
+}
+$('pg-friend')&&$('pg-friend').addEventListener('click',e=>{const rm=e.target.closest('[data-rm]');if(rm){closePages();setView('friends');setTimeout(()=>{const b=document.querySelector(`#frBody [data-rm="${CSS.escape(rm.dataset.rm)}"]`);if(b)b.click()},150)}});
+async function refreshFriend(){renderFriendPage();if(fpUid!=='me'){await socBoard();if(pgStack[pgStack.length-1]==='friend')renderFriendPage()}}
 async function openFriends(){renderFriends();const c=socCfg();if(c.on&&(!c.boardAt||Date.now()-c.boardAt>20000)){await socPush(true);await socBoard();if(S.view==='friends')renderFriends()}}
 function friendsRow(){const c=socCfg();if(!c.on)return grow({ga:'friends',ic:'user',c:'--good',t:'Compete with friends',s:'Weekly leaderboard, streaks and cheers'});
   const b=c.board,ws=weekStart(todayKey()),me=myWeek().stats.score,frs=((b&&b.friends)||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0),rank=1+frs.filter(x=>x>me).length,top=Math.max(0,...frs);

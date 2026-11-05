@@ -349,7 +349,7 @@ async function rawSample(user, env, day) {
 /* ---------------- Friends & leaderboard ----------------
    Opt-in. Each person stores one record: soc:<uid>. Friends see only what that person chose to share. */
 const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-const SHARE_KEYS = ['streak', 'workouts', 'protein', 'steps', 'weight', 'meals'];
+const SHARE_KEYS = ['streak', 'workouts', 'protein', 'steps', 'weight', 'meals', 'nutrition', 'foods', 'recovery'];
 const EVENT_SHARE = { workout: 'workouts', pr: 'workouts', protein: 'protein', streak: 'streak', steps: 'steps', weight: 'weight', day: 'meals', score: null };
 const clampN = (v, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : 0; };
 const cleanStr = (v, n) => String(v ?? '').replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, n);
@@ -374,7 +374,17 @@ function publicView(r, forSelf) {
   if (forSelf || sh.meals) stats.onTarget = st.onTarget || 0;
   const events = (r.events || []).filter(e => forSelf || EVENT_SHARE[e.type] === null || sh[EVENT_SHARE[e.type]]).slice(0, 15)
     .map(e => ({ ...e, cheers: ((r.cheers || {})[e.id] || []).map(c => c.name) }));
-  return { uid: r.uid, name: r.name, username: r.username, color: r.color, stats, events, updated: r.updated };
+  const dt = r.detail || {}, on = k => forSelf || sh[k];
+  const daily = (dt.daily || []).map(x => {
+    const o = { d: x.d };
+    if (on('nutrition')) Object.assign(o, { k: x.k, p: x.p, c: x.c, f: x.f, gk: x.gk, gp: x.gp, gc: x.gc, gf: x.gf, n: x.n });
+    if (on('steps')) o.steps = x.steps;
+    if (on('recovery')) Object.assign(o, { sleep: x.sleep, rec: x.rec, hrv: x.hrv, rhr: x.rhr, strain: x.strain });
+    if (on('weight')) o.w = x.w;
+    return o;
+  });
+  const detail = { daily, foods: on('foods') ? (dt.foods || []) : null, wks: on('workouts') ? (dt.wks || []) : null, plan: on('nutrition') ? dt.plan : null, shares: Object.fromEntries(SHARE_KEYS.map(k => [k, !!sh[k]])) };
+  return { uid: r.uid, name: r.name, username: r.username, color: r.color, stats, events, detail, updated: r.updated };
 }
 async function social(action, req, url, user, env, cors) {
   const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
@@ -420,6 +430,14 @@ async function social(action, req, url, user, env, cors) {
     const types = Object.keys(EVENT_SHARE);
     me.events = (Array.isArray(body.events) ? body.events : []).filter(e => e && types.includes(e.type)).slice(0, 20)
       .map(e => ({ id: cleanStr(e.id, 40), type: e.type, date: cleanStr(e.date, 10), t: clampN(e.t, 0, 9e15), n: clampN(e.n, -1e6, 1e6), s: cleanStr(e.s, 40) }));
+    const D = body.detail || {}, num = (v, hi) => v == null || v === '' ? null : clampN(v, -1e5, hi);
+    me.detail = {
+      daily: (Array.isArray(D.daily) ? D.daily : []).slice(0, 7).map(x => ({ d: cleanStr(x.d, 10), k: num(x.k, 2e4), p: num(x.p, 2e3), c: num(x.c, 3e3), f: num(x.f, 2e3), gk: num(x.gk, 2e4), gp: num(x.gp, 2e3), gc: num(x.gc, 3e3), gf: num(x.gf, 2e3), n: num(x.n, 500),
+        steps: num(x.steps, 2e5), sleep: num(x.sleep, 24), rec: num(x.rec, 100), hrv: num(x.hrv, 400), rhr: num(x.rhr, 250), strain: num(x.strain, 21), w: num(x.w, 1500) })),
+      foods: (Array.isArray(D.foods) ? D.foods : []).slice(0, 40).map(x => ({ n: cleanStr(x.n, 40), a: cleanStr(x.a, 24), m: cleanStr(x.m, 10), k: num(x.k, 5e3), p: num(x.p, 500), c: num(x.c, 800), f: num(x.f, 500) })),
+      wks: (Array.isArray(D.wks) ? D.wks : []).slice(0, 10).map(x => ({ name: cleanStr(x.name, 40), d: cleanStr(x.d, 10), min: num(x.min, 600), sets: num(x.sets, 300), vol: num(x.vol, 1e6), prs: num(x.prs, 50), kcal: num(x.kcal, 5e3), strain: num(x.strain, 21), src: cleanStr(x.src, 10),
+        ex: (Array.isArray(x.ex) ? x.ex : []).slice(0, 12).map(e => ({ n: cleanStr(e.n, 40), top: cleanStr(e.top, 20), sets: num(e.sets, 50) })) })),
+      plan: cleanStr(D.plan, 40) };
     const keep = new Set(me.events.map(e => e.id)); me.cheers = Object.fromEntries(Object.entries(me.cheers || {}).filter(([k]) => keep.has(k)));
     await socPut(env, me);
     return json({ ok: true }, 200, cors);
