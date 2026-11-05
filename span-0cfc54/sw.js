@@ -1,6 +1,6 @@
 /* SPAN service worker: cache-first, offline after first load. Bump VERSION when files change.
    Only reads and writes its own cache, and only for files inside its own folder, so it never touches SYNCOPE. */
-const VERSION = "span-v3-2026-11-05";
+const VERSION = "span-v4-2026-11-05";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png"];
 const SCOPE = new URL("./", self.location).pathname;
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
