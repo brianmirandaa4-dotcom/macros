@@ -4,7 +4,7 @@
 //
 // Bindings (set in Cloudflare → Workers → your worker → Settings):
 //   KV namespace:  MACROS_KV
-//   Secrets:       WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET
+//   Secrets:       WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET, OURA_CLIENT_ID, OURA_CLIENT_SECRET (optional)
 //   Variables:     APP_URL   (e.g. https://yourname.github.io/macros/)
 //   Cron trigger:  0 */6 * * *   (keeps WHOOP signed in and pre-loads data)
 
@@ -12,6 +12,10 @@ const WHOOP_AUTH = 'https://api.prod.whoop.com/oauth/oauth2/auth';
 const WHOOP_TOKEN = 'https://api.prod.whoop.com/oauth/oauth2/token';
 const WHOOP_API = 'https://api.prod.whoop.com/developer/v2';
 const WHOOP_SCOPES = 'offline read:profile read:recovery read:sleep read:workout read:cycles read:body_measurement';
+const OURA_AUTH = 'https://cloud.ouraring.com/oauth/authorize';
+const OURA_TOKEN = 'https://api.ouraring.com/oauth/token';
+const OURA_API = 'https://api.ouraring.com/v2/usercollection';
+const OURA_SCOPES = 'personal daily heartrate workout spo2Daily';
 const GARMIN_API = 'https://personal.connectapi.garmin.com';
 const GARMIN_TOKEN_PATH = '/personalapitoken-service/personal-api/personal-api-key/token';
 
@@ -26,12 +30,15 @@ export default {
       if (p === '/api/register' && req.method === 'POST') return json(await register(env), 200, cors);
       if (p === '/whoop/connect') return whoopConnect(url, env);
       if (p === '/whoop/callback') return whoopCallback(url, env);
+      if (p === '/oura/connect') return ouraConnect(url, env);
+      if (p === '/oura/callback') return ouraCallback(url, env);
 
       const user = await authUser(req, env);
       if (!user) return json({ error: 'Not signed in to the sync server. Reconnect in Syncope.' }, 401, cors);
 
       if (p === '/api/status') return json(status(user), 200, cors);
       if (p === '/api/whoop-link' && req.method === 'POST') { const lnk = rand(16); await env.MACROS_KV.put('lnk:' + lnk, user.id, { expirationTtl: 600 }); return json({ url: url.origin + '/whoop/connect?l=' + lnk }, 200, cors); }
+      if (p === '/api/oura-link' && req.method === 'POST') { const lnk = rand(16); await env.MACROS_KV.put('lnk:' + lnk, user.id, { expirationTtl: 600 }); return json({ url: url.origin + '/oura/connect?l=' + lnk }, 200, cors); }
       if (p === '/api/garmin' && req.method === 'POST') {
         const body = await req.json().catch(() => ({}));
         const key = String(body.apiKey || '').trim();
@@ -46,6 +53,7 @@ export default {
         const body = await req.json().catch(() => ({}));
         if (body.source === 'whoop') delete user.whoop;
         if (body.source === 'garmin') delete user.garmin;
+        if (body.source === 'oura') delete user.oura;
         if (body.source === 'all') { await env.MACROS_KV.delete('user:' + user.id); await env.MACROS_KV.delete('cache:' + user.id); return json({ ok: true }, 200, cors); }
         await saveUser(env, user);
         return json(status(user), 200, cors);
@@ -78,7 +86,7 @@ export default {
       const list = await env.MACROS_KV.list({ prefix: 'user:', cursor });
       for (const k of list.keys) {
         const user = await env.MACROS_KV.get(k.name, 'json');
-        if (!user || (!user.whoop && !user.garmin)) continue;
+        if (!user || (!user.whoop && !user.garmin && !user.oura)) continue;
         try {
           const data = await syncUser(user, env, 14);
           await env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data));
@@ -125,7 +133,7 @@ async function authUser(req, env) {
 }
 async function saveUser(env, user) { await env.MACROS_KV.put('user:' + user.id, JSON.stringify(user)); }
 function status(user) {
-  return { whoop: !!user.whoop?.refresh, garmin: !!user.garmin?.key, whoopSince: user.whoop?.since || null, garminSince: user.garmin?.since || null };
+  return { whoop: !!user.whoop?.refresh, garmin: !!user.garmin?.key, whoopSince: user.whoop?.since || null, garminSince: user.garmin?.since || null, oura: !!user.oura?.refresh, ouraSince: user.oura?.since || null };
 }
 
 /* ---------------- WHOOP ---------------- */
@@ -237,6 +245,91 @@ async function syncWhoop(user, env, days) {
   }).filter(w => w.date);
   return { days: clean(byDay), workouts };
 }
+/* ---------------- Oura Ring (official OAuth API v2) ---------------- */
+async function ouraConnect(url, env) {
+  const lnk = url.searchParams.get('l') || '';
+  const uid = lnk && await env.MACROS_KV.get('lnk:' + lnk);
+  if (!uid) return page('Link expired', 'Open Syncope and tap Connect Oura again.', env.APP_URL);
+  await env.MACROS_KV.delete('lnk:' + lnk);
+  if (!env.OURA_CLIENT_ID) return page('Oura not set up yet', 'Add OURA_CLIENT_ID and OURA_CLIENT_SECRET to this worker first.', env.APP_URL);
+  const state = rand(16);
+  await env.MACROS_KV.put('ostate:' + state, uid, { expirationTtl: 900 });
+  const q = new URLSearchParams({ response_type: 'code', client_id: env.OURA_CLIENT_ID, redirect_uri: url.origin + '/oura/callback', scope: OURA_SCOPES, state });
+  return Response.redirect(OURA_AUTH + '?' + q, 302);
+}
+async function ouraCallback(url, env) {
+  const state = url.searchParams.get('state') || '', code = url.searchParams.get('code');
+  if (url.searchParams.get('error')) return page('Oura not connected', 'You cancelled or Oura declined the request. You can try again from Syncope.', env.APP_URL);
+  const uid = await env.MACROS_KV.get('ostate:' + state);
+  if (!uid || !code) return page('Link expired', 'Open Syncope and tap Connect Oura again.', env.APP_URL);
+  await env.MACROS_KV.delete('ostate:' + state);
+  const r = await fetch(OURA_TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'authorization_code', code, redirect_uri: url.origin + '/oura/callback', client_id: env.OURA_CLIENT_ID, client_secret: env.OURA_CLIENT_SECRET }) });
+  if (!r.ok) return page('Oura not connected', 'Oura did not accept the sign-in (' + r.status + '). Check the redirect URI in your Oura app matches this server.', env.APP_URL);
+  const t = await r.json();
+  const user = await env.MACROS_KV.get('user:' + uid, 'json');
+  user.oura = { access: t.access_token, refresh: t.refresh_token, exp: Date.now() + (t.expires_in || 86400) * 1000, since: Date.now() };
+  await saveUser(env, user);
+  return page('Oura connected', 'Your readiness, sleep, HRV, steps and workouts will now flow into Syncope automatically.', env.APP_URL);
+}
+async function ouraAccess(user, env) {
+  const o = user.oura;
+  if (o.access && o.exp - Date.now() > 120000) return o.access;
+  // Oura refresh tokens are single-use: save the new one straight away.
+  const r = await fetch(OURA_TOKEN, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: o.refresh, client_id: env.OURA_CLIENT_ID, client_secret: env.OURA_CLIENT_SECRET }) });
+  if (!r.ok) throw new Error('Oura sign-in expired. Reconnect Oura in Syncope.');
+  const t = await r.json();
+  o.access = t.access_token; if (t.refresh_token) o.refresh = t.refresh_token; o.exp = Date.now() + (t.expires_in || 86400) * 1000;
+  await saveUser(env, user);
+  return o.access;
+}
+async function ouraList(kind, access, startDay, endDay, maxPages = 5) {
+  const out = []; let next = null;
+  for (let i = 0; i < maxPages; i++) {
+    const q = new URLSearchParams({ start_date: startDay, end_date: endDay }); if (next) q.set('next_token', next);
+    const r = await fetch(OURA_API + '/' + kind + '?' + q, { headers: { Authorization: 'Bearer ' + access } });
+    if (r.status === 401 || r.status === 403) throw new Error('Oura ' + kind + ' not allowed (' + r.status + '). Reconnect Oura, or renew your Oura membership.');
+    if (!r.ok) throw new Error('Oura ' + kind + ' failed (' + r.status + ')');
+    const j = await r.json();
+    out.push(...(j.data || []));
+    next = j.next_token; if (!next) break;
+  }
+  return out;
+}
+async function syncOura(user, env, days) {
+  const access = await ouraAccess(user, env);
+  const startDay = isoDate(new Date(Date.now() - days * 864e5)), endDay = isoDate(new Date(Date.now() + 864e5));
+  const soft = (p) => p.catch(e => { errs.push(e.message); return []; });
+  const errs = [];
+  const [rdy, dsl, slp, act, wko, spo] = await Promise.all([
+    ouraList('daily_readiness', access, startDay, endDay),
+    soft(ouraList('daily_sleep', access, startDay, endDay)),
+    soft(ouraList('sleep', access, startDay, endDay)),
+    soft(ouraList('daily_activity', access, startDay, endDay)),
+    soft(ouraList('workout', access, startDay, endDay)),
+    soft(ouraList('daily_spo2', access, startDay, endDay)),
+  ]);
+  const byDay = {}, d = (k) => (byDay[k] = byDay[k] || {});
+  for (const x of rdy) if (x.day) Object.assign(d(x.day), { recovery: x.score, skinTempDev: x.temperature_deviation != null ? r1(x.temperature_deviation) : undefined });
+  for (const x of dsl) if (x.day) d(x.day).sleepScore = x.score;
+  // Main sleep only (long_sleep); if several, keep the longest.
+  const best = {};
+  for (const x of slp) { if (!x.day || (x.type && x.type !== 'long_sleep')) continue; if (!best[x.day] || (x.total_sleep_duration || 0) > (best[x.day].total_sleep_duration || 0)) best[x.day] = x; }
+  for (const [k, x] of Object.entries(best)) Object.assign(d(k), {
+    sleepH: x.total_sleep_duration ? r1(x.total_sleep_duration / 3600) : undefined,
+    deepH: x.deep_sleep_duration ? r1(x.deep_sleep_duration / 3600) : undefined,
+    remH: x.rem_sleep_duration ? r1(x.rem_sleep_duration / 3600) : undefined,
+    sleepEff: x.efficiency, hrv: x.average_hrv != null ? Math.round(x.average_hrv) : undefined,
+    rhr: x.lowest_heart_rate, respRate: x.average_breath != null ? r1(x.average_breath) : undefined,
+  });
+  for (const x of act) if (x.day) Object.assign(d(x.day), { steps: x.steps, active: x.active_calories, kcal: x.total_calories });
+  for (const x of spo) if (x.day && x.spo2_percentage?.average != null) d(x.day).spo2 = r1(x.spo2_percentage.average);
+  const workouts = wko.map(w => ({ src: 'Oura', id: 'oura-' + w.id, date: w.day || (w.start_datetime || '').slice(0, 10), name: w.activity ? titleCase(w.activity) : 'Workout',
+    start: w.start_datetime, min: w.end_datetime && w.start_datetime ? Math.round((Date.parse(w.end_datetime) - Date.parse(w.start_datetime)) / 60000) : null,
+    kcal: w.calories != null ? Math.round(w.calories) : null, intensity: w.intensity || null })).filter(w => w.date);
+  return { days: clean(byDay), workouts, errors: errs };
+}
 const titleCase = (s) => String(s).replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
 /* ---------------- Garmin (Personal API) ---------------- */
@@ -320,8 +413,9 @@ function clean(byDay) {
   return byDay;
 }
 async function syncUser(user, env, days) {
-  const out = { at: Date.now(), days, whoop: null, garmin: null, errors: [] };
+  const out = { at: Date.now(), days, whoop: null, garmin: null, oura: null, errors: [] };
   if (user.whoop?.refresh) { try { out.whoop = await syncWhoop(user, env, days); } catch (e) { out.errors.push('WHOOP: ' + e.message); } }
+  if (user.oura?.refresh) { try { out.oura = await syncOura(user, env, days); if (out.oura.errors.length) out.errors.push(...out.oura.errors.map(x => 'Oura: ' + x)); } catch (e) { out.errors.push('Oura: ' + e.message); } }
   if (user.garmin?.key) { try { out.garmin = await syncGarmin(user, env, days); if (out.garmin.errors.length) out.errors.push(...out.garmin.errors.map(x => 'Garmin ' + x)); await saveUser(env, user); } catch (e) { out.errors.push('Garmin: ' + e.message); } }
   return out;
 }
@@ -341,6 +435,11 @@ async function rawSample(user, env, day) {
     const a = await whoopAccess(user, env);
     const w = async (p) => { const r = await fetch(WHOOP_API + p + '?limit=1', { headers: { Authorization: 'Bearer ' + a } }); return (await r.text()).slice(0, 1500); };
     out.whoop = { recovery: await w('/recovery'), sleep: await w('/activity/sleep'), cycle: await w('/cycle'), workout: await w('/activity/workout') };
+  }
+  if (user.oura?.refresh) {
+    const a = await ouraAccess(user, env);
+    const o = async (k) => { const r = await fetch(OURA_API + '/' + k + '?start_date=' + day + '&end_date=' + day, { headers: { Authorization: 'Bearer ' + a } }); return (await r.text()).slice(0, 1500); };
+    out.oura = { readiness: await o('daily_readiness'), sleep: await o('sleep'), activity: await o('daily_activity'), workout: await o('workout') };
   }
   return out;
 }
