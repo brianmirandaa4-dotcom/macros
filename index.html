@@ -470,6 +470,9 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 .hy-tips{margin:0;padding-left:18px;display:grid;gap:8px;font-size:14px;line-height:1.45;color:var(--muted)}.hy-tips b{color:var(--fg)}
 .hy-src summary{cursor:pointer;font-weight:650}.hy-log li{align-items:center}
 @media (max-width:380px){.hy-top{flex-direction:column;align-items:flex-start}}
+.rp-months{margin-bottom:12px}.rp-hd h2{margin:2px 0 12px}.rp-l{margin:0;padding-left:18px;display:grid;gap:12px}.rp-l li{display:grid;gap:3px}.rp-l span{color:var(--muted);font-size:14px;line-height:1.45}
+.rp-m td{vertical-align:middle}.rp-st{font:700 10.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--surface-2)}
+.rp-st.low{color:var(--over);background:color-mix(in srgb,var(--over) 15%,transparent)}.rp-st.low-ish{color:var(--carb)}.rp-st.ok{color:var(--kcal)}.rp-st.good{color:var(--good)}.rp-foot{padding:0 4px 20px}
 .rs-up{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:4px 14px 12px}.rs-up .note{flex-basis:100%;margin:0}
 .rest .rest-lk{padding:5px 8px;font-size:13px}.rest .rest-lk[aria-pressed="true"]{border-color:var(--pro);background:color-mix(in srgb,var(--pro) 18%,var(--surface))}
 .mus-bars{display:flex;flex-direction:column;gap:10px}
@@ -1167,6 +1170,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
       <button class="icon-btn" id="mNext" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
     <div class="tiles" id="mTiles"></div>
+    <button class="ghost" type="button" id="mReport" style="padding:13px">See this month’s report</button>
     <div class="card">
       <div class="card-h"><div><div class="eyebrow">Calendar</div><h2>Each day against your calorie goal</h2></div>
         <div class="legend"><span><i style="background:var(--fat)"></i>Under 85%</span><span><i style="background:var(--good)"></i>85–110%</span><span><i style="background:var(--over)"></i>Over 110%</span></div></div>
@@ -1283,6 +1287,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
   <div class="pg" id="pg-prep"></div>
   <div class="pg" id="pg-cook"></div>
   <div class="pg" id="pg-hyd"></div>
+  <div class="pg" id="pg-report"></div>
   <div class="pg" id="pg-account"></div>
   <div class="pg" id="pg-prefs"></div>
   <div class="pg" id="pg-body">      <div class="card" style="display:flex;flex-direction:column;gap:16px">
@@ -1933,7 +1938,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.22';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.23';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2512,6 +2517,7 @@ function renderMonth(){renderTip('month');
   const top=[...m.values()].sort((a,b)=>b.c-a.c||b.k-a.k).slice(0,8),tk2=st.tot.reduce((a,t)=>a+t.k,0)||1;
   $('mTop').innerHTML=top.length?`<table class="dtable"><thead><tr><th>Food</th><th>Times</th><th>kcal total</th><th style="color:var(--pro)">Protein total</th><th>Share of kcal</th></tr></thead><tbody>${top.map(v=>`<tr><td>${esc(v.n)}</td><td>${v.c}</td><td>${fmt(v.k)}</td><td>${r0(v.p)} g</td><td>${r0(v.k/tk2*100)}%</td></tr>`).join('')}</tbody></table>`:'<p class="note">Your most frequent foods will show here once you log a few days.</p>';
 }
+$('mReport').onclick=()=>{S.repYM=S.monthRef;openPage('report')};
 $('mPrev').onclick=()=>{const [y,m]=S.monthRef.split('-').map(Number),d=new Date(y,m-2,1);S.monthRef=d.getFullYear()+'-'+pad(d.getMonth()+1);renderMonth()};
 $('mNext').onclick=()=>{const [y,m]=S.monthRef.split('-').map(Number),d=new Date(y,m,1);S.monthRef=d.getFullYear()+'-'+pad(d.getMonth()+1);renderMonth()};
 
@@ -3108,8 +3114,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={hyd:'Hydration',cook:'Meal ideas & recipes',fuel:'Fuel & timing',progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'Wearables',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={hyd:renderHyd,cook:renderCook,fuel:renderFuel,progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={report:'Monthly report',hyd:'Hydration',cook:'Meal ideas & recipes',fuel:'Fuel & timing',progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'Wearables',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={report:renderReport,hyd:renderHyd,cook:renderCook,fuel:renderFuel,progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');let bt=$('pgBig');if(!bt){bt=document.createElement('h1');bt.id='pgBig';bt.className='page-big'}$('pgBody').appendChild(bt);$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';bt.textContent=PG_T[id]||'';bt.hidden=id==='me';r.classList.remove('scrolled');
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -3239,7 +3245,7 @@ function hydPlan(k=S.day){const H=hydS(),d=H.day[k]||{},type=d.type||hydAutoType
   // minutes: what you logged today, else a typical session for the chosen day type
   const mins=type==='rest'?0:(m.all||T[3]);const rate=type==='rest'?0:(m.all?(m.lift*.5+m.cardio*.8+m.run*1.0)/Math.max(1,m.all):T[2])*(hot?1.3:1);
   const sweat=rate*mins/60*1000,heat=hot?500:0,total=base+sweat+heat;
-  const naPerH=mins>=60||hot?(type==='long'||hot?600:400):0,naGoal=Math.round(naPerH*mins/60/50)*50;
+  const naPerH=hot||mins>=90||((type==='hard'||type==='long')&&mins>=60)?(type==='long'||hot?600:400):0,naGoal=Math.round(naPerH*mins/60/50)*50;
   return {type,hot,auto:!d.type,base,sweat,heat,total,mins,rate,kg,naGoal,logged:!!m.all,
     oz:{total:ozR(total/ML_OZ),base:ozR(base/ML_OZ),sweat:ozR((sweat+heat)/ML_OZ),pre:[ozR(5*kg/ML_OZ),ozR(7*kg/ML_OZ)],during:mins>=45?[4,8]:null,wake:16}}}
 function hydDay(k=S.day){const l=hydS().log[k]||[];return {list:l,oz:l.reduce((a,x)=>a+(+x.oz||0),0),na:l.reduce((a,x)=>a+(+x.na||0),0)}}
@@ -3311,6 +3317,126 @@ function renderHyd(){const el=$('pg-hyd');if(!el||!pgStack||!pgStack.includes('h
     if(t.id==='hyNewB')return openBottle({});
     if(t.id==='hyScan')return $('hyScanIn').click()};
   $('hyScanIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)scanBottle(f)}}
+
+/* ================= MONTHLY REPORT =================
+   Looks at a whole calendar month: food (calories, macros and, via USDA SR28, 15 vitamins/minerals), hydration,
+   training, sleep and recovery from WHOOP/Oura/Garmin. Wins and improvements come from fixed thresholds, so
+   it only says "improve" when a number is actually off, and says so plainly when nothing is. */
+let MDB=null,MDBp=null,MIDX=null;const MCACHE={};
+function microDB(){if(MDB)return Promise.resolve(MDB);return MDBp||(MDBp=fetch('./micro-db.json').then(r=>r.ok?r.json():null).catch(()=>null).then(j=>{if(!j)return null;
+  MDB=j.rows.map(r=>{const o={n:r[0],l:r[0].toLowerCase()};j.cols.forEach((c,i)=>o[c]=r[i+1]);o.t=new Set(o.l.replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(Boolean).map(stemW));return o});
+  MIDX={};MDB.forEach((r,i)=>r.t.forEach(t=>{(MIDX[t]=MIDX[t]||[]).push(i)}));return MDB}))}
+const M_ODD=['canned','frozen','dehydrated','dried','powder','infant','babyfood','imitation','reduced','unenriched','low sodium','buttermilk','concentrate','fast food','restaurant','school','prepared from'];
+const M_CAT=new Set(['fish','beverage','nut','bean','cereal','spice','seed','oil','soup','snack','candy','candie','crustacean','mollusk','game','fast','babyfood','sauce','salad dressing']);
+const M_STOP=new Set(['and','with','of','the','a','in','on','my','fresh','homemade','plain','large','small','medium','serving','piece','slice','cup','bowl','photo','g','oz']);
+function microMatch(e){if(!MDB||!e||!e.n)return null;const g=+e.g||0;if(!(g>0))return null;const kd=e.k/g*100,key=String(e.n).toLowerCase()+'|'+Math.round(kd/20);
+  if(key in MCACHE)return MCACHE[key];
+  const toks=String(e.n).toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>1&&!M_STOP.has(w)).map(stemW);if(!toks.length)return MCACHE[key]=null;
+  const cand=new Map();toks.forEach(t=>(MIDX[t]||[]).forEach(i=>cand.set(i,(cand.get(i)||0)+1)));let best=null,bs=-1e9;
+  for(const [i,hit] of cand){const r=MDB[i];if(hit<Math.min(2,toks.length))continue;const first=r.l.split(',')[0];
+    const fx=first.replace(/[^a-z ]/g,' ').split(/\s+/).filter(w=>w.length>2).map(stemW).filter(w=>!toks.includes(w)&&!M_CAT.has(w)).length,ql=String(e.n).toLowerCase(),catHit=M_CAT.has(stemW(first.split(' ')[0]))&&toks.some(t=>r.l.split(',')[1]&&r.l.split(',')[1].includes(t));
+    let sc=hit*10-(toks.length-hit)*6+(toks.some(t=>first.includes(t))||catHit?5:0)-fx*7-r.t.size*.6-(/[A-Z]{3,}/.test(r.n)?6:0)-M_ODD.filter(w=>r.l.includes(w)&&!ql.includes(w)).length*5;
+    if(r.kcal>0&&kd>0)sc-=14*Math.abs(Math.log(r.kcal/kd));if(/raw/.test(r.l)&&!/raw/.test(e.n.toLowerCase())&&/cooked|roasted|grilled|baked|boiled/.test(r.l)===false)sc-=2;
+    if(r.vd==null)sc-=2;if(sc>bs){bs=sc;best=r}}
+  return MCACHE[key]=best&&bs>-8?best:null}
+// Daily intakes for adults (National Academies DRIs; sodium = Chronic Disease Risk Reduction level)
+function microTargets(){const c=S.calc||{},f=c.sex==='f',age=+c.age||30,kc=goalKcal(goalsFor(todayKey()));
+  return {fiber:{l:'Fiber',u:'g',t:Math.round(14*kc/1000)},ca:{l:'Calcium',u:'mg',t:(f&&age>50)||age>70?1200:1000},fe:{l:'Iron',u:'mg',t:f&&age<=50?18:8},mg:{l:'Magnesium',u:'mg',t:f?(age<31?310:320):(age<31?400:420)},
+    k:{l:'Potassium',u:'mg',t:f?2600:3400},zn:{l:'Zinc',u:'mg',t:f?8:11},se:{l:'Selenium',u:'µg',t:55},vc:{l:'Vitamin C',u:'mg',t:f?75:90},fol:{l:'Folate',u:'µg',t:400},b12:{l:'Vitamin B12',u:'µg',t:2.4},
+    va:{l:'Vitamin A',u:'µg',t:f?700:900},ve:{l:'Vitamin E',u:'mg',t:15},vd:{l:'Vitamin D',u:'µg',t:age>70?20:15},vk:{l:'Vitamin K',u:'µg',t:f?90:120}}}
+const MICRO_FOOD={fiber:'oats, beans and lentils, berries, chia, whole-grain bread, vegetables',ca:'milk, yogurt, cheese, fortified plant milk, calcium-set tofu, sardines',fe:'red meat, beans and lentils, spinach, fortified cereal (pair plant iron with vitamin C)',
+  mg:'pumpkin seeds, almonds, cashews, spinach, black beans, oats, dark chocolate',k:'potatoes, beans, bananas, avocado, spinach, yogurt, salmon, coconut water',zn:'beef, oysters, pumpkin seeds, chickpeas, dairy',se:'Brazil nuts (1–2 a day is plenty), tuna, eggs, chicken',
+  vc:'bell peppers, citrus, kiwi, strawberries, broccoli',fol:'leafy greens, beans, asparagus, avocado, fortified grains',b12:'meat, fish, eggs, dairy, fortified plant milk or nutritional yeast',va:'sweet potato, carrots, spinach, eggs',ve:'almonds, sunflower seeds, avocado, olive oil',
+  vd:'salmon, trout, sardines, eggs, fortified milk or yogurt, UV-exposed mushrooms, and midday sun when you can get it',vk:'leafy greens, broccoli, Brussels sprouts'};
+const MICRO_SUPP={vd:'Vitamin D3 is one of the most common supplements, often 1,000–2,000 IU a day. A 25-OH vitamin D blood test shows whether you actually need it.',
+  mg:'If food doesn’t close the gap, magnesium glycinate or citrate is a common choice.',b12:'If you eat little meat, fish, eggs or dairy, a B12 supplement is commonly recommended.',
+  fe:'Don’t take iron without a blood test first, since too much iron is harmful.',k:'Get potassium from food. Potassium pills need a doctor’s OK, especially with blood-pressure or kidney medication.',
+  ca:'Food first. If you can’t, calcium is best taken in doses of 500 mg or less.',fiber:'Psyllium husk is an easy way to add 5 g if meals don’t get you there.'};
+const med=a=>{if(!a.length)return null;const b=a.slice().sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2},avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null,
+  sd=a=>{if(a.length<2)return 0;const m=avg(a);return Math.sqrt(avg(a.map(x=>(x-m)**2)))};
+function monthKeys(ym){const [Y,M]=ym.split('-').map(Number),n=new Date(Y,M,0).getDate(),tk=todayKey();return [...Array(n)].map((_,i)=>keyOf(new Date(Y,M-1,i+1))).filter(k=>k<=tk)}
+function prevYM(ym=todayKey().slice(0,7)){const [Y,M]=ym.split('-').map(Number),d=new Date(Y,M-2,1);return d.getFullYear()+'-'+pad(d.getMonth()+1)}
+function monthHasData(ym){return monthKeys(ym).some(k=>(S.days[k]||[]).length||(S.workouts||[]).some(w=>w.date===k))}
+function buildReport(ym){const keys=monthKeys(ym),MT=microTargets(),out={ym,keys};
+  // nutrition: count a day when at least 2 meals are logged
+  const fd=keys.map(k=>{const l=S.days[k]||[],t=sumEntries(l),g=goalsFor(k),meals=new Set(l.map(e=>e.meal)).size;return {k,l,t,g,gk:goalKcal(g),meals}}).filter(x=>x.l.length&&(x.meals>=2||x.t.k>=goalKcal(x.g)*.6));
+  out.foodDays=fd.length;out.daysIn=keys.length;
+  if(fd.length){const kp=fd.map(x=>x.t.k/Math.max(1,x.gk));out.kAvg=avg(fd.map(x=>x.t.k));out.kGoal=avg(fd.map(x=>x.gk));out.kIn=fd.filter(x=>Math.abs(x.t.k/x.gk-1)<=.1).length;out.kUnder=kp.filter(p=>p<.85).length;out.kOver=kp.filter(p=>p>1.1).length;
+    out.pAvg=avg(fd.map(x=>x.t.p));out.pGoal=avg(fd.map(x=>x.g.p));out.pHit=fd.filter(x=>x.t.p>=x.g.p*.9).length;out.cAvg=avg(fd.map(x=>x.t.c));out.cGoal=avg(fd.map(x=>x.g.c));out.fAvg=avg(fd.map(x=>x.t.f));out.fGoal=avg(fd.map(x=>x.g.f));}
+  // micronutrients: only days where most calories matched a USDA food
+  const mi={},mDays=[];if(MDB)fd.forEach(x=>{let kc=0,tot={};x.l.forEach(e=>{const r=microMatch(e);if(!r)return;kc+=+e.k||0;const f=(+e.g||0)/100;Object.keys(MT).concat(['na','sat']).forEach(n=>{if(r[n]!=null)tot[n]=(tot[n]||0)+r[n]*f})});
+    if(x.t.k>0&&kc/x.t.k>=.6&&x.t.k>=x.gk*.6){const sc=x.t.k/kc;Object.keys(tot).forEach(n=>tot[n]*=sc);mDays.push({k:x.k,tot,kc:x.t.k})}});
+  out.microDays=mDays.length;out.micro=[];
+  if(mDays.length>=5){Object.entries(MT).forEach(([n,m])=>{const pcts=mDays.map(d=>(d.tot[n]||0)/m.t),lowDays=pcts.filter(p=>p<.7).length,md=med(pcts);
+      out.micro.push({n,...m,med:md,avg:avg(mDays.map(d=>d.tot[n]||0)),lowDays,share:lowDays/mDays.length,status:lowDays/mDays.length>=.6&&md<.75?'low':md>=1?'good':md>=.75?'ok':'low-ish'})});
+    const na=mDays.map(d=>d.tot.na||0);out.naMed=med(na);out.naHigh=na.filter(v=>v>3000).length;const sat=mDays.map(d=>(d.tot.sat||0)*9/d.kc);out.satMed=med(sat)}
+  // hydration
+  const hy=keys.map(k=>({k,d:hydDay(k),p:hydPlan(k)})).filter(x=>x.d.list.length);out.hyDays=hy.length;
+  if(hy.length){out.hyAvg=avg(hy.map(x=>x.d.oz));out.hyGoal=avg(hy.map(x=>x.p.oz.total));out.hyHit=hy.filter(x=>x.d.oz>=x.p.oz.total*.9).length;const ln=hy.filter(x=>x.p.naGoal);out.naNeed=ln.length;out.naMet=ln.filter(x=>x.d.na>=x.p.naGoal*.6).length}
+  // training
+  const wk=(S.workouts||[]).filter(w=>keys.includes(w.date)),dv=((S.dev&&S.dev.workouts)||[]).filter(d=>keys.includes(d.date)&&!wk.some(w=>w.devId===d.id));
+  out.lifts=wk.filter(w=>(w.ex||[]).some(x=>x.sets&&x.sets.length)).length;out.cardioMin=wk.reduce((t,w)=>t+(w.ex||[]).reduce((a,x)=>a+(x.cardio?+x.cardio.min||0:0),0),0)+dv.filter(d=>!/strength|weight|lift/i.test(String(d.type||d.name))).reduce((t,d)=>t+(d.min||0),0);
+  out.sessions=wk.length+dv.length;out.prs=wk.reduce((t,w)=>t+(w.prs||[]).length,0);out.weeks=Math.max(1,keys.length/7);out.perWeek=out.sessions/out.weeks;
+  const half=Math.ceil(keys.length/2),vol=ks=>wk.filter(w=>ks.includes(w.date)).reduce((t,w)=>t+(w.ex||[]).reduce((a,x)=>a+(x.sets||[]).reduce((b,s2)=>b+setVol(s2),0),0),0);out.vol1=vol(keys.slice(0,half));out.vol2=vol(keys.slice(half));
+  // sleep / recovery / steps
+  const h=keys.map(k=>({k,...hv(k)}));const pick=f=>h.map(x=>x[f]).filter(v=>v!=null&&v!=='').map(Number);
+  const sl=pick('sleep');out.sleepN=sl.length;out.sleepAvg=avg(sl);out.sleepSd=sd(sl);out.sleepShort=sl.filter(v=>v<7).length;
+  const two=f=>{const a=h.slice(0,half).map(x=>x[f]).filter(v=>v!=null).map(Number),b=h.slice(half).map(x=>x[f]).filter(v=>v!=null).map(Number);return a.length>=3&&b.length>=3?[avg(a),avg(b)]:null};
+  out.hrv=two('hrv');out.rhr=two('rhr');const rc=pick('recovery');out.recAvg=avg(rc);out.recN=rc.length;out.recLow=rc.filter(v=>v<34).length;
+  const st=pick('steps');out.stepsAvg=avg(st);out.stepsN=st.length;out.steps8=st.filter(v=>v>=8000).length;
+  // weight
+  const wks=keys.filter(k=>S.weights[k]!=null);if(wks.length>=4){const a=avg(wks.slice(0,3).map(k=>S.weights[k])),b=avg(wks.slice(-3).map(k=>S.weights[k]));out.wChg=b-a;out.wN=wks.length}
+  // wins & improvements, only from real thresholds
+  const W=[],I=[],pc=(a,b)=>Math.round(a/Math.max(1,b)*100);
+  if(out.foodDays<keys.length*.5&&keys.length>=7)I.push([9,`Log more days`,`You logged food on ${out.foodDays} of ${keys.length} days. Everything below is more reliable with at least 5 days a week, even rough entries.`]);
+  else if(out.foodDays>=keys.length*.8)W.push([6,`Consistent logging`,`Food logged on ${out.foodDays} of ${keys.length} days.`]);
+  if(out.foodDays>=5){const pr=out.pHit/out.foodDays;
+    if(pr>=.75)W.push([8,`Protein on point`,`You hit protein on ${out.pHit} of ${out.foodDays} logged days, averaging ${r0(out.pAvg)} g.`]);
+    else I.push([8,`Protein`,`You hit your ${r0(out.pGoal)} g protein target on only ${out.pHit} of ${out.foodDays} days (average ${r0(out.pAvg)} g). Put about ${r0(out.pGoal/4)} g in each meal so one big dinner isn’t doing all the work.`]);
+    const kr=out.kIn/out.foodDays;if(kr>=.6)W.push([7,`Calories dialed in`,`${out.kIn} of ${out.foodDays} days landed within 10% of your calorie target.`]);
+    else if(out.kOver>out.kUnder&&out.kOver>=out.foodDays*.3)I.push([7,`Calories running high`,`${out.kOver} days went more than 10% over target (average ${fmt(out.kAvg)} vs ${fmt(out.kGoal)} kcal). Check the days with takeout or late snacks first.`]);
+    else if(out.kUnder>=out.foodDays*.3)I.push([7,`Under-eating`,`${out.kUnder} days came in under 85% of target (average ${fmt(out.kAvg)} vs ${fmt(out.kGoal)} kcal). If that’s real and not missed logs, it can cost you muscle and recovery.`])}
+  const CONCERN=['vd','k','fiber','ca','mg'],lows=out.micro.filter(m=>m.status==='low').sort((a,b)=>(CONCERN.includes(a.n)?0:1)-(CONCERN.includes(b.n)?0:1)||a.med-b.med);
+  if(lows.length){const top=lows.slice(0,3);I.push([7.5,`Consistently low: ${top.map(m=>m.l).join(', ')}${lows.length>3?` (+${lows.length-3} more below)`:''}`,top.map(m=>`<b>${m.l}</b> was under 70% of your daily need (${m.t} ${m.u}) on ${m.lowDays} of ${out.microDays} tracked days, about ${m.avg>=100?fmt(m.avg):r1(m.avg)} ${m.u} on a typical day. Try ${MICRO_FOOD[m.n]}.${MICRO_SUPP[m.n]?' '+MICRO_SUPP[m.n]:''}`).join('<br><br>')])}
+  const goodM=out.micro.filter(m=>m.status==='good');if(out.micro.length&&!lows.length)W.push([6,`Vitamins & minerals covered`,`No nutrient was consistently low across ${out.microDays} tracked days.`]);
+  else if(goodM.length>=8)W.push([4,`Strong micronutrients`,`${goodM.slice(0,5).map(m=>m.l).join(', ')} and more met your needs on a typical day.`]);
+  if(out.naMed!=null&&out.naMed>3200)I.push([5,`Sodium is high`,`A typical day had about ${fmt(out.naMed)} mg from food (the target is under 2,300 mg unless you sweat a lot). Restaurant food, deli meat and sauces are the usual sources.`]);
+  if(out.satMed!=null&&out.satMed>.12)I.push([4,`Saturated fat`,`About ${Math.round(out.satMed*100)}% of calories came from saturated fat (aim for under 10%). Swap some butter, cheese and fatty meat for olive oil, fish and lean cuts.`]);
+  if(out.hyDays>=5){const r=out.hyHit/out.hyDays;if(r>=.7)W.push([6,`Hydrated`,`You hit your water target on ${out.hyHit} of ${out.hyDays} days you tracked.`]);else I.push([6,`Hydration`,`You reached your water target on ${out.hyHit} of ${out.hyDays} tracked days (average ${fmt(out.hyAvg)} of ${fmt(out.hyGoal)} oz). Keep a bottle in sight and finish one by lunch.`]);
+    if(out.naNeed>=3&&out.naMet<out.naNeed*.5)I.push([4,`Electrolytes on long/hot days`,`${out.naNeed} days needed extra sodium for training, and you covered it on ${out.naMet}. Add ¼ tsp salt or an electrolyte packet to your training bottle.`])}
+  else if(keys.length>=10&&out.hyDays<3)I.push([3,`Track water`,`You barely tracked water this month. A few taps a day is enough to see whether you’re short.`]);
+  if(out.sessions){if(out.perWeek>=3)W.push([7,`Training consistency`,`${out.sessions} sessions, about ${r1(out.perWeek)} a week${out.prs?`, with ${out.prs} new PR${out.prs>1?'s':''}`:''}.`]);else if(keys.length>=14)I.push([6,`Train more often`,`${out.sessions} sessions this month (about ${r1(out.perWeek)} a week). Two to three a week is where progress gets reliable.`]);
+    if(out.vol1>0&&out.vol2>out.vol1*1.08)W.push([5,`Volume going up`,`Second half of the month had ${Math.round((out.vol2/out.vol1-1)*100)}% more lifting volume than the first.`]);
+    if(out.prs>=3)W.push([5,`PRs`,`${out.prs} new personal records.`])}
+  else if(keys.length>=14)I.push([6,`No training logged`,`No workouts were logged or synced this month. Even 2 short sessions a week counts.`]);
+  if(out.sleepN>=7){if(out.sleepAvg>=7.2&&out.sleepShort<=out.sleepN*.25)W.push([7,`Sleep`,`Averaged ${r1(out.sleepAvg)} h a night.`]);else I.push([8,`Sleep`,`Averaged ${r1(out.sleepAvg)} h, with ${out.sleepShort} of ${out.sleepN} nights under 7 h. Pick a fixed lights-out time and protect the last hour before it.`]);
+    if(out.sleepSd>1.1)I.push([5,`Sleep schedule`,`Your sleep varied a lot night to night (±${r1(out.sleepSd)} h). A steady schedule matters almost as much as total hours.`])}
+  if(out.hrv){const ch=(out.hrv[1]/out.hrv[0]-1)*100;if(ch>=5)W.push([5,`HRV trending up`,`Average HRV rose ${Math.round(ch)}% from the first half of the month to the second.`]);else if(ch<=-8)I.push([6,`HRV trending down`,`Average HRV fell ${Math.round(-ch)}% across the month. That usually means more stress or training than you’re recovering from. Look at sleep and add a lighter week.`])}
+  if(out.rhr){const ch=out.rhr[1]-out.rhr[0];if(ch<=-2)W.push([4,`Resting heart rate down`,`Down ${r0(-ch)} bpm across the month, a sign of improving fitness.`]);else if(ch>=3)I.push([5,`Resting heart rate up`,`Up ${r0(ch)} bpm across the month, often from short sleep, alcohol, illness or overreaching.`])}
+  if(out.recN>=7&&out.recLow>=out.recN*.3)I.push([5,`Recovery`,`${out.recLow} of ${out.recN} days were in the red. Stack your hardest sessions on green days and keep red days easy.`]);
+  if(out.stepsN>=7){if(out.stepsAvg>=8000)W.push([4,`Daily movement`,`About ${fmt(out.stepsAvg)} steps a day.`]);else I.push([4,`Steps`,`About ${fmt(out.stepsAvg)} steps a day. A 10–15 minute walk after meals is an easy way to add 2–3k.`])}
+  if(out.wChg!=null&&S.plan){const t=S.plan.type,ch=out.wChg;if((t==='cut'&&ch<=-1)||(t==='bulk'&&ch>=.5))W.push([7,`Weight moving the right way`,`${ch>0?'+':''}${r1(ch)} lb across the month on your ${t}.`]);else if((t==='cut'&&ch>-.3)||(t==='bulk'&&ch<.2))I.push([7,`Weight stalled`,`${ch>0?'+':''}${r1(ch)} lb across the month on a ${t}. ${t==='cut'?'Tighten logging on weekends or drop ~150 kcal a day.':'Add ~150 kcal a day, mostly carbs around training.'}`])}
+  out.wins=W.sort((a,b)=>b[0]-a[0]).slice(0,4);out.imps=I.sort((a,b)=>b[0]-a[0]).slice(0,5);return out}
+async function renderReport(){const el=$('pg-report');if(!el)return;S.repYM=S.repYM||(todayKey().slice(8)<='07'?prevYM():todayKey().slice(0,7));
+  el.innerHTML='<p class="note" style="padding:20px">Building your report…</p>';await microDB();if(!pgStack.includes('report'))return;
+  const ym=S.repYM,R=buildReport(ym),[Y,M]=ym.split('-').map(Number),title=`${MON[M-1]} ${Y}`,cur=ym===todayKey().slice(0,7);
+  const months=[];for(let i=0,x=todayKey().slice(0,7);i<12;i++,x=prevYM(x))if(monthHasData(x)||x===todayKey().slice(0,7))months.push(x);
+  const tile=(v,l,c)=>`<div style="--c:var(${c})"><b>${v}</b><span>${l}</span></div>`,li=a=>`<li><b>${a[1]}</b><span>${a[2]}</span></li>`;
+  const micro=R.micro.length?`<table class="dtable rp-m"><thead><tr><th>Nutrient</th><th>Typical day</th><th>Need</th><th></th></tr></thead><tbody>${R.micro.slice().sort((a,b)=>a.med-b.med).map(m=>`<tr><td>${m.l}</td><td class="num">${m.avg>=100?fmt(m.avg):r1(m.avg)} ${m.u}</td><td class="num dim">${m.t} ${m.u}</td><td><span class="rp-st ${m.status}">${m.status==='low'?'Low':m.status==='low-ish'?'A bit low':m.status==='ok'?'Close':'Good'}</span></td></tr>`).join('')}</tbody></table>
+      <p class="note">From ${R.microDays} days where most of what you logged matched a USDA food. It can’t see supplements, fortified versions or sunlight, so treat “low” as a nudge to check, not a diagnosis.</p>`
+    :`<p class="note">Not enough fully logged days yet (needs 5+ days where most food matches the USDA database). Keep logging and this fills in.</p>`;
+  el.innerHTML=`<div class="wn-acts rp-months">${months.map(x=>{const [y,m]=x.split('-').map(Number);return `<button class="chip" type="button" data-ym="${x}" aria-pressed="${x===ym}">${MON[m-1].slice(0,3)}${y!==+todayKey().slice(0,4)?' '+y:''}</button>`}).join('')}</div>
+    <div class="card rp-hd"><div class="eyebrow">${cur?'Month so far':'Monthly report'}</div><h2>${title}</h2>
+      <div class="live">${tile(`${R.foodDays}/${R.daysIn}`,'food days','--kcal')}${tile(R.sessions,'workouts','--pro')}${tile(R.sleepN?r1(R.sleepAvg)+'h':'—','avg sleep','--good')}${tile(R.hyDays?fmt(R.hyAvg)+' oz':'—','avg water','--fat')}</div></div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">✅ What went well</div>${R.wins.length?`<ul class="rp-l">${R.wins.map(li).join('')}</ul>`:'<p class="note" style="margin:0">Nothing stood out as a clear win this month. The list below is where to start.</p>'}</div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">🎯 What to improve</div>${R.imps.length?`<ul class="rp-l">${R.imps.map(li).join('')}</ul>`:`<p style="margin:0"><b>Honestly, nothing major.</b> Every number we track was on target. Keep doing what you’re doing.</p>`}</div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">Nutrition</div>${R.foodDays?`<ul class="ml-items"><li><span>Calories</span><span class="num">${fmt(R.kAvg)} <span class="dim">/ ${fmt(R.kGoal)} kcal</span></span></li><li><span>Protein</span><span class="num">${r0(R.pAvg)} <span class="dim">/ ${r0(R.pGoal)} g · hit ${R.pHit}/${R.foodDays} days</span></span></li><li><span>Carbs</span><span class="num">${r0(R.cAvg)} <span class="dim">/ ${r0(R.cGoal)} g</span></span></li><li><span>Fat</span><span class="num">${r0(R.fAvg)} <span class="dim">/ ${r0(R.fGoal)} g</span></span></li><li><span>Days within 10% of calories</span><span class="num">${R.kIn}/${R.foodDays}</span></li>${R.wChg!=null?`<li><span>Weight change</span><span class="num">${R.wChg>0?'+':''}${r1(R.wChg)} lb</span></li>`:''}</ul>`:'<p class="note" style="margin:0">No food logged this month.</p>'}</div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">Vitamins & minerals</div>${micro}</div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">Hydration</div>${R.hyDays?`<ul class="ml-items"><li><span>Average</span><span class="num">${fmt(R.hyAvg)} <span class="dim">/ ${fmt(R.hyGoal)} oz</span></span></li><li><span>Days at target</span><span class="num">${R.hyHit}/${R.hyDays}</span></li>${R.naNeed?`<li><span>Long or hot days with electrolytes</span><span class="num">${R.naMet}/${R.naNeed}</span></li>`:''}</ul>`:'<p class="note" style="margin:0">No water tracked this month.</p>'}</div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">Training</div><ul class="ml-items"><li><span>Sessions</span><span class="num">${R.sessions} <span class="dim">· ${r1(R.perWeek)}/week</span></span></li><li><span>Lifting sessions</span><span class="num">${R.lifts}</span></li><li><span>Cardio</span><span class="num">${fmt(R.cardioMin)} min</span></li><li><span>New PRs</span><span class="num">${R.prs}</span></li>${R.vol1||R.vol2?`<li><span>Volume, 1st vs 2nd half</span><span class="num">${fmt(R.vol1)} → ${fmt(R.vol2)} lb</span></li>`:''}</ul></div>
+    <div class="card"><div class="glabel" style="margin:0 0 8px">Sleep & recovery</div>${R.sleepN||R.hrv||R.stepsN?`<ul class="ml-items">${R.sleepN?`<li><span>Sleep</span><span class="num">${r1(R.sleepAvg)} h <span class="dim">· ${R.sleepShort} nights under 7 h · ±${r1(R.sleepSd)} h</span></span></li>`:''}${R.hrv?`<li><span>HRV, 1st vs 2nd half</span><span class="num">${r0(R.hrv[0])} → ${r0(R.hrv[1])} ms</span></li>`:''}${R.rhr?`<li><span>Resting HR, 1st vs 2nd half</span><span class="num">${r0(R.rhr[0])} → ${r0(R.rhr[1])} bpm</span></li>`:''}${R.recN?`<li><span>Recovery</span><span class="num">${r0(R.recAvg)} <span class="dim">avg · ${R.recLow} red days</span></span></li>`:''}${R.stepsN?`<li><span>Steps</span><span class="num">${fmt(R.stepsAvg)} <span class="dim">/day · ${R.steps8} days 8k+</span></span></li>`:''}</ul>`:'<p class="note" style="margin:0">Connect WHOOP, Oura or Garmin (or add sleep by hand) to see this.</p>'}</div>
+    <p class="note rp-foot">Suggestions here are general wellness information, not medical advice. Talk to your doctor before starting supplements or making big changes, especially with a health condition or medication.</p>`;
+  el.onclick=e=>{const b=e.target.closest('[data-ym]');if(b){S.repYM=b.dataset.ym;renderReport()}}}
 
 /* ================= ART: illustrated food & gym scenes, plus optional photos ================= */
 function rng(seed){let x=seed>>>0||1;return ()=>((x=Math.imul(x^x>>>15,x|1),x^=x+Math.imul(x^x>>>7,x|61),((x^x>>>14)>>>0)/4294967296))}
@@ -4423,6 +4549,7 @@ function renderTodayRows(){
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
   el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.oura||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP, Oura or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
+    +(()=>{const tk=todayKey(),pm=prevYM();if(k!==tk||+tk.slice(8)>7||!monthHasData(pm))return '';const [y,m]=pm.split('-').map(Number);return grow({ga:'report',ic:'chart',c:'--good',t:`Your ${MON[m-1]} report is ready`,s:'How the month went: nutrition, vitamins, water, training, sleep',v:'New',vc:'on'})})()
     +(()=>{const hp=hydPlan(k),hd=hydDay(k);return grow({pg:'hyd',ic:'drop',c:'--fat',t:'Hydration',s:`${fmt(hd.oz)} of ${fmt(hp.oz.total)} oz${hp.type!=='rest'?' · '+HYD_TYPES.find(x=>x[0]===hp.type)[1].toLowerCase()+' day':''}${hd.na?` · ${fmt(hd.na)} mg sodium`:''}`,v:hd.oz>=hp.oz.total?'✓':`${Math.round(hd.oz/Math.max(1,hp.oz.total)*100)}%`,vc:hd.oz>=hp.oz.total?'on':''})})()
     +grow({pg:'cook',ic:'book',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
     +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
@@ -4448,10 +4575,12 @@ function renderHelp(){$('pg-help').innerHTML=`<div class="faq">${FAQ.map(([q,a],
   <div class="glist">${grow({ga:'tipsreset',ic:'info',c:'--kcal',t:'Show tips again',s:'Bring back the hints on each screen'})}${grow({ga:'redo',ic:'refresh',c:'--muted',t:'Redo welcome setup'})}</div>`}
 GACT.tipsreset=()=>{S.prefs.tipsSeen={};S.prefs.skipSetup=false;S.prefs.hideCoach=false;save();toast('Tips are back');closePages();setView('today')};
 GACT.foods=()=>{closePages();setView('foods')};
+GACT.report=()=>{const tk=todayKey();S.repYM=+tk.slice(8)<=7&&monthHasData(prevYM())?prevYM():tk.slice(0,7);openPage('report')};
 function renderPlanRows(){
   const el=$('planRows');if(!el)return;const lw=latestWeight(),bl=bodyLine();
   el.innerHTML=grow({pg:'body',ic:'body',c:'--fat',t:'Body metrics',s:bl?'Used for every target':'Fill these in first',v:bl||'Not set',vc:bl?'':'warn'})
     +grow({pg:'weigh',ic:'scale',c:'--carb',t:'Weigh-ins',s:'Your trend vs the plan',v:lw?`${r1(lw.w)} lb`:'None yet'})
+    +grow({ga:'report',ic:'chart',c:'--good',t:'Monthly reports',s:'Wins, fixes, vitamins & minerals, sleep and training by month'})
     +grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:S.plan?'Set by your plan':'Set grams yourself',v:S.plan?'Auto':fmt(goalKcal(S.goals))+' kcal'})
     +grow({pg:'method',ic:'book',c:'--good',t:'The science',s:'Why your macros change'})
     +(S.plan?grow({ga:'builder',ic:'refresh',c:'--kcal',t:S.showBuilder?'Hide plan builder':'Change or rebuild plan',s:'Switch goal, pace or start date'}):'');
