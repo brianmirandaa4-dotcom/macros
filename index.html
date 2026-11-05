@@ -2356,7 +2356,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.31';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.32';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3626,7 +3626,7 @@ function renderPrefs(){
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}
       ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Your music keeps playing and dips while it sounds.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">${v==='none'?'🔇':'▶'} ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
-      <div class="gopts">${[['dip','Play over my music (ringer on)'],['pause','Always play, even on silent (pauses music for the sound)']].map(([v,l])=>`<button type="button" class="chip" data-pk="alertStyle" data-pv="${v}" aria-pressed="${alertStyle()===v}">${l}</button>`).join('')}<button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
+      <div class="gopts">${[['dip','Play over my music (ringer on)'],['pause','Always play, even on silent (music pauses for the beep, then resumes)']].map(([v,l])=>`<button type="button" class="chip" data-pk="alertStyle" data-pv="${v}" aria-pressed="${alertStyle()===v}">${l}</button>`).join('')}<button type="button" class="chip" id="rsTest">▶ Test with my music (3 s)</button></div>
       <p class="note" style="padding:0 14px;margin:0">On iPhone, web apps can’t dim other apps’ music. “Play over my music” keeps your music going but is muted when your ringer is off. “Always play” works on silent but pauses the music while the sound plays.</p>
       <div class="rs-up"><button type="button" class="ghost" id="rsUp">${cm?'Replace your sound':'＋ Upload your own sound'}</button>${cm?'<button type="button" class="link" id="rsDel" style="color:var(--over)">Remove</button>':''}<input type="file" id="rsIn" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden><span class="note" id="rsSt">${cm?`${esc(cm.name)} · ${r1(cm.sec)} s`:'Any short clip (MP3, M4A, WAV): a hype line, a horn, your coach. It plays at full quality and its real length.'}</span></div>`})()}</div>
     <div class="glabel">Look</div><div class="glist">
@@ -5629,8 +5629,8 @@ async function rsLoadCustom(){if(RS_CUSTOM||!rsCustomStored())return RS_CUSTOM;t
   const ac=restCtx();if(!ac)return null;const buf=await new Promise((res,rej)=>{const p=ac.decodeAudioData(u8.buffer,res,rej);if(p&&p.then)p.then(res,rej)});
   // keep the clip exactly as recorded; only trim leading silence so it fires right on zero, and cap very long files at 15 s
   const sr=buf.sampleRate,ch=[...Array(buf.numberOfChannels)].map((_,c)=>buf.getChannelData(c));let st=0;const lim=Math.min(buf.length,sr*2);while(st<lim&&ch.every(d=>Math.abs(d[st])<.004))st++;
-  const len=Math.min(buf.length-st,Math.round(15*sr)),out=ac.createBuffer(ch.length,Math.max(1,len),sr);ch.forEach((d,c)=>out.getChannelData(c).set(d.subarray(st,st+len)));
-  RS_CUSTOM={buf:out,sec:len/sr};return RS_CUSTOM}catch(e){return null}}
+  let en=buf.length;while(en>st+1&&ch.every(d=>Math.abs(d[en-1])<.004))en--;const len=Math.min(en-st,Math.round(15*sr)),out=ac.createBuffer(ch.length,Math.max(1,len),sr);ch.forEach((d,c)=>out.getChannelData(c).set(d.subarray(st,st+len)));
+  RS_CUSTOM={buf:out,sec:len/sr,lead:st/sr};return RS_CUSTOM}catch(e){return null}}
 function rsBuffer(ac,id=restSoundId()){if(id==='none')return null;if(id==='custom'&&RS_CUSTOM)return RS_CUSTOM.buf;const d=synthSound(id==='custom'?'beep':id,ac.sampleRate),b=ac.createBuffer(1,d.length,ac.sampleRate);b.getChannelData(0).set(d);return b}
 function rsDur(){const id=restSoundId();return id==='none'?0:id==='custom'&&RS_CUSTOM?RS_CUSTOM.sec:({beep:.42,chime:1.2,bell:1.9,whistle:.8,horn:.95,rise:.75,drum:1.05}[id]||.5)}
 // Play now, or at an exact moment on the audio clock. Music is ducked just before and restored right after.
@@ -5649,11 +5649,23 @@ function rsElement(id=restSoundId()){if(id==='none')return null;let src;if(id===
 // call from a tap: lets the element play later without a tap
 function rsUnlock(){const el=rsElement();if(!el)return;sessType('ambient');try{el.muted=true;const p=el.play();if(p&&p.then)p.then(()=>{el.pause();el.currentTime=0;el.muted=false}).catch(()=>{el.muted=false});else{el.pause();el.muted=false}}catch(e){el.muted=false}}
 function rsCancel(){clearTimeout(rsT1);clearTimeout(rsT2);clearTimeout(rsT3);if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}if(rsEl&&!rsEl.paused&&!rsEl.muted){try{rsEl.pause()}catch(e){}}sessType('ambient')}
+/* After the sound: stop and unload it, pause our Web Audio, and drop the session right away so iOS tells
+   Spotify / Apple Music the interruption is over and they resume on their own (no lingering, no gap). */
+function rsRelease(){clearTimeout(rsT2);clearTimeout(rsT3);const el=rsEl;
+  if(el){try{el.onended=null;el.pause();if(alertStyle()==='pause'){if(el._u)URL.revokeObjectURL(el._u);el.removeAttribute('src');el.load();rsEl=null;rsElKey=''}}catch(e){}}
+  if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}
+  try{if(restAC&&restAC.state==='running'&&!(restLockOn()&&restAudio))restAC.suspend()}catch(e){}
+  sessType('auto');setTimeout(()=>sessType('ambient'),60)}
 function rsFire(id){id=id||restSoundId();if(id==='none')return;const el=rsElement(id);restBeeped=Date.now();
-  const back=()=>{clearTimeout(rsT2);rsT2=setTimeout(()=>sessType('ambient'),300)};
+  if(id==='custom'&&!RS_CUSTOM)rsLoadCustom();
+  const C=id==='custom'?RS_CUSTOM:null,lead=C?C.lead||0:0,dur=C?C.sec:rsDur();
+  const back=()=>rsRelease();
   sessType(alertStyle()==='pause'?'playback':'transient');
-  if(el){try{el.muted=false;el.currentTime=0;el.onended=back;const p=el.play();if(p&&p.catch)p.catch(()=>{webAudioNow(id);back()});return}catch(e){}}
-  webAudioNow(id);back()}
+  if(el){try{el.muted=false;el.currentTime=lead;el.onended=back;const p=el.play();
+      // end exactly when the sound ends (skips silence at the end of your clip)
+      clearTimeout(rsT3);rsT3=setTimeout(back,Math.round(dur*1000)+40);
+      if(p&&p.catch)p.catch(()=>{webAudioNow(id);clearTimeout(rsT3);rsT3=setTimeout(back,Math.round(dur*1000)+40)});return}catch(e){}}
+  webAudioNow(id);clearTimeout(rsT3);rsT3=setTimeout(back,Math.round(dur*1000)+40)}
 function webAudioNow(id){const ac=restCtx();if(!ac)return;const go=()=>{try{const b=rsBuffer(ac,id);if(!b)return;const src=ac.createBufferSource();src.buffer=b;src.connect(ac.destination);src.start();rsSrc=src}catch(e){}};
   if(id==='custom'&&!RS_CUSTOM)rsLoadCustom().then(go);else go()}
 // play now (preview) or exactly at a time (rest end)
