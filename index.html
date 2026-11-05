@@ -922,6 +922,17 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .zone{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:999px;padding:2px 7px;align-self:flex-start}
 .tpl .zone{margin-bottom:2px}
 .tgt{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;margin:-4px 0 8px;font-size:12.5px;color:var(--muted)}.tgt b{color:var(--fg);font-family:var(--f-num)}
+
+/* ===== fuel & timing ===== */
+.micro{display:flex;flex-wrap:wrap;gap:5px}.micro span{font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--c);background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:999px;padding:3px 8px}
+.pchk{font-size:11px;font-weight:700;color:var(--pro);white-space:nowrap}.pchk.ok{color:var(--good)}
+.fuel-hero{display:flex;flex-direction:column;gap:12px;border-color:color-mix(in srgb,var(--good) 35%,var(--line))}.fuel-hero h2{margin:2px 0 0;font:800 22px var(--f-display)}
+.fuel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fuel-grid div{background:var(--surface-2);border-radius:14px;padding:12px;border-left:3px solid var(--c)}
+.fuel-grid b{display:block;font:800 19px var(--f-num);color:var(--c)}.fuel-grid span{font-size:12px;color:var(--muted)}
+.fuel-tl{display:flex;flex-direction:column;gap:0;padding:6px 18px}
+.ft-step{position:relative;padding:12px 0 12px 22px;border-left:2px solid var(--line);margin-left:6px}.ft-step::before{content:"";position:absolute;left:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--kcal);box-shadow:0 0 0 3px var(--surface)}
+.ft-step b{font:700 15px var(--f-display)}.ft-step p{margin:3px 0 0;color:var(--muted);font-size:13.5px;line-height:1.5}
+.pspread{display:grid;grid-template-columns:80px 1fr 52px;gap:10px;align-items:center;padding:6px 0;font-size:14px}.pspread i{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}.pspread u{display:block;height:100%;border-radius:99px}.pspread b{font:700 14px var(--f-num);text-align:right}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -1155,6 +1166,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
     </div>
 </div>
   <div class="pg" id="pg-help"></div>
+  <div class="pg" id="pg-fuel"></div>
   <div class="pg" id="pg-progs"></div>
   <div class="pg" id="pg-ftpl"></div>
   <div class="pg" id="pg-lifts"></div>
@@ -1705,7 +1717,7 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
   $('meals').innerHTML=MEALS.map(([m,l])=>{
     const es=list.filter(e=>(e.meal||'snack')===m),mt=sumEntries(es),ms=mt.p*4+mt.c*4+mt.f*9||1;
     const pe=prev.filter(e=>(e.meal||'snack')===m);
-    return `<div class="card meal"><div class="meal-h"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>`:'Empty'}</div></div>
+    return `<div class="card meal"><div class="meal-h"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>${m!=='snack'?(mt.p>=proteinPerMealTarget()?' <span class="pchk ok">✓ protein</span>':` <span class="pchk">+${proteinPerMealTarget()-r0(mt.p)} g protein</span>`):''}`:'Empty'}</div></div>
       <button class="meal-add" data-addto="${m}" aria-label="Add food to ${l}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <div class="k"><b>${fmt(mt.k)}</b><small>kcal</small>${es.length?`<div class="mini"><i style="width:${mt.p*4/ms*100}%;background:var(--pro)"></i><i style="width:${mt.c*4/ms*100}%;background:var(--carb)"></i><i style="width:${mt.f*9/ms*100}%;background:var(--fat)"></i></div>`:''}</div></div>
       ${es.length?`<ul class="entries">${es.map(e=>`<li><button class="entry" data-edit="${e.id}"><span class="n">${esc(e.n)}${e.src==='guess'?'<span class="tag">check</span>':''}</span><span class="kc">${fmt(e.k)}</span><span class="a">${esc(e.a)}${e.g?` · ${r0(e.g)} g`:''}</span><span class="mc"><span style="--c:var(--pro)">${r0(e.p)}P</span><span style="--c:var(--carb)">${r0(e.c)}C</span><span style="--c:var(--fat)">${r0(e.f)}F</span></span></button></li>`).join('')}</ul><div class="meal-f"><button class="save-meal" data-savemeal="${m}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save as a meal</button></div>`
@@ -2558,8 +2570,8 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
-const PG_R={progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
+const PG_T={fuel:'Fuel & timing',progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'WHOOP & Garmin',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_R={fuel:renderFuel,progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');let bt=$('pgBig');if(!bt){bt=document.createElement('h1');bt.id='pgBig';bt.className='page-big'}$('pgBody').appendChild(bt);$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';bt.textContent=PG_T[id]||'';bt.hidden=id==='me';r.classList.remove('scrolled');
   $('pgBackT').textContent=pgStack.length>1?PG_T[pgStack[pgStack.length-2]]:'Back';(PG_R[id]||(()=>{}))();
@@ -2594,6 +2606,7 @@ function renderMe(){
       ${grow({pg:'weigh',ic:'scale',c:'--carb',t:'Weigh-ins',s:'Log weight and see your trend',v:lw?`${r1(lw.w)} lb`:''})}
       ${grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:'Set protein, carbs and fat yourself',v:S.plan?'From plan':fmt(goalKcal(S.goals))+' kcal'})}
       ${grow({pg:'ideas',ic:'fire',c:'--good',t:'Meals that fit',s:'Ideas sized to your remaining macros'})}
+      ${grow({pg:'fuel',ic:'heart',c:'--carb',t:'Fuel & timing',s:'What to eat before and after training'})}
       ${grow({pg:'prep',ic:'list',c:'--carb',t:'Weekly meal prep',s:'New high-protein recipes every Sunday'})}</div>
     <div class="glabel">Friends</div><div class="glist">${friendsRow()}</div>
     <div class="glabel">Connections</div><div class="glist">
@@ -2708,40 +2721,44 @@ function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySe
   pn.style.setProperty('--bnr',bnr(kind))}
 /* ================= MEAL IDEAS: meals sized to close your remaining macros ================= */
 // name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Syncope adjusts the amount, x = fixed)
-const IDEA_SRC=`Greek yogurt power bowl|bs|3|greek yogurt:p:cup:1:0.5:2.5;granola:c:cup:0.25:0:1;blueberries:c:cup:0.5:0:1.5;honey:c:tbsp:1:0:2;almonds:f:oz:0.5:0:1.5
-Protein oats|b|8|oats:c:cup:0.5:0.25:1.5;whey:p:scoop:1:0:2;banana:c:each:1:0:2;peanut butter:f:tbsp:1:0:2.5
-Egg white scramble & toast|b|10|egg white:p:each:4:0:10;egg:f:each:1:0:3;wheat bread:c:slice:2:0:4;spinach:x:cup:1:1:1;salsa:x:tbsp:2:2:2
-Bagel, eggs & turkey|b|10|bagel:c:each:1:0.5:1.5;egg:f:each:2:0:3;turkey slices:p:oz:3:0:6;cheese:f:oz:0.5:0:1
-Protein pancakes|b|15|pancake:c:each:2:1:5;whey:p:scoop:1:0:2;blueberries:x:cup:0.5:0.5:0.5;maple syrup:c:tbsp:1:0:3;butter:f:tbsp:0.5:0:1
-Cottage cheese & fruit|bs|2|cottage cheese:p:cup:1:0.5:2;pineapple:c:cup:0.75:0:2;almonds:f:oz:0.5:0:1.5
-Overnight oats & berries|b|5|oats:c:cup:0.5:0.25:1.25;greek yogurt:p:cup:0.75:0:1.5;skim milk:c:cup:0.5:0:1;strawberries:c:cup:0.5:0:1.5;chia seeds:f:tbsp:1:0:2
-Sweet potato & egg whites|bd|20|sweet potato:c:each:1:0.5:2.5;egg white:p:each:5:0:10;egg:f:each:1:0:2;spinach:x:cup:1:1:1
-Chicken burrito bowl|ld|20|chicken breast:p:oz:6:3:12;white rice:c:cup:1:0:2.5;black beans:c:cup:0.5:0:1;salsa:x:tbsp:3:3:3;avocado:f:each:0.25:0:0.75;cheese:f:oz:0.5:0:1.5
-Salmon, rice & broccoli|ld|25|salmon:p:oz:6:3:10;white rice:c:cup:1:0:2.5;broccoli:x:cup:1:1:1;olive oil:f:tsp:1:0:3
-Turkey taco bowl|ld|20|ground turkey:p:oz:6:3:10;white rice:c:cup:1:0:2.5;corn:c:cup:0.25:0:1;salsa:x:tbsp:3:3:3;cheese:f:oz:0.5:0:1.5;salad:x:cup:1:1:1
-Steak, sweet potato & green beans|d|30|steak:p:oz:6:3:10;sweet potato:c:each:1:0:2.5;green beans:x:cup:1:1:1;butter:f:tbsp:0.5:0:1.5
-Shrimp stir-fry|ld|20|shrimp:p:oz:6:3:12;white rice:c:cup:1:0:2.5;bell pepper:x:each:0.5:0.5:0.5;broccoli:x:cup:1:1:1;soy sauce:x:tbsp:1:1:1;olive oil:f:tsp:2:0:4
-Chicken pasta marinara|ld|20|chicken breast:p:oz:5:3:10;pasta:c:cup:1:0.5:3;marinara:x:cup:0.5:0.5:0.5;parmesan:f:tbsp:1:0:3
-Lean beef & potatoes|d|30|ground beef 90/10:p:oz:5:3:9;potato:c:each:1:0:2.5;green beans:x:cup:1:1:1;olive oil:f:tsp:1:0:3
-Tuna wrap|ls|5|tuna:p:oz:4:2:8;tortilla:c:each:1:1:2;mayo:f:tbsp:0.5:0:2;salad:x:cup:1:1:1;tomato:x:each:0.5:0.5:0.5
-Grilled chicken sandwich|l|10|chicken breast:p:oz:5:3:9;wheat bread:c:slice:2:2:3;cheese:f:oz:0.5:0:1.5;mayo:f:tbsp:0.5:0:1.5;tomato:x:each:0.5:0.5:0.5
-Tofu & edamame rice bowl|ld|20|tofu:p:oz:6:3:12;edamame:p:cup:0.5:0:1;brown rice:c:cup:1:0:2.5;soy sauce:x:tbsp:1:1:1;olive oil:f:tsp:1:0:3
-Cod, quinoa & asparagus|d|25|cod:p:oz:7:4:12;quinoa:c:cup:0.75:0:2;asparagus:x:cup:1:1:1;olive oil:f:tsp:2:0:4
-Chicken thigh & couscous|d|25|chicken thigh:p:each:1.5:1:3;couscous:c:cup:1:0:2;carrots:x:cup:0.5:0.5:0.5;olive oil:f:tsp:0:0:2
-Lean egg fried rice|ld|15|egg white:p:each:4:0:10;white rice:c:cup:1:0:2.5;peas:c:cup:0.5:0:1;egg:f:each:1:0:2;soy sauce:x:tbsp:1:1:1
-Chicken & rice, plain and simple|ld|20|chicken breast:p:oz:6:3:12;white rice:c:cup:1:0:3;broccoli:x:cup:1:1:1
-Protein shake & banana|s|2|whey:p:scoop:1:0.5:2;banana:c:each:1:0:2;skim milk:c:cup:1:0:2;peanut butter:f:tbsp:0:0:2
+const IDEA_SRC=`Greek yogurt power bowl|bsR|3|greek yogurt:p:cup:1:0.5:2.5;granola:c:cup:0.25:0:1;blueberries:c:cup:0.5:0:1.5;honey:c:tbsp:1:0:2;almonds:f:oz:0.5:0:1.5
+Protein oats|bPR|8|oats:c:cup:0.5:0.25:1.5;whey:p:scoop:1:0:2;banana:c:each:1:0:2;peanut butter:f:tbsp:1:0:2.5
+Egg white scramble & toast|bR|10|egg white:p:each:4:0:10;egg:f:each:1:0:3;wheat bread:c:slice:2:0:4;spinach:x:cup:1:1:1;salsa:x:tbsp:2:2:2
+Bagel, eggs & turkey|bR|10|bagel:c:each:1:0.5:1.5;egg:f:each:2:0:3;turkey slices:p:oz:3:0:6;cheese:f:oz:0.5:0:1
+Protein pancakes|bPR|15|pancake:c:each:2:1:5;whey:p:scoop:1:0:2;blueberries:x:cup:0.5:0.5:0.5;maple syrup:c:tbsp:1:0:3;butter:f:tbsp:0.5:0:1
+Cottage cheese & fruit|bsR|2|cottage cheese:p:cup:1:0.5:2;pineapple:c:cup:0.75:0:2;almonds:f:oz:0.5:0:1.5
+Overnight oats & berries|bR|5|oats:c:cup:0.5:0.25:1.25;greek yogurt:p:cup:0.75:0:1.5;skim milk:c:cup:0.5:0:1;strawberries:c:cup:0.5:0:1.5;chia seeds:f:tbsp:1:0:2
+Sweet potato & egg whites|bdR|20|sweet potato:c:each:1:0.5:2.5;egg white:p:each:5:0:10;egg:f:each:1:0:2;spinach:x:cup:1:1:1
+Chicken burrito bowl|ldR|20|chicken breast:p:oz:6:3:12;white rice:c:cup:1:0:2.5;black beans:c:cup:0.5:0:1;salsa:x:tbsp:3:3:3;avocado:f:each:0.25:0:0.75;cheese:f:oz:0.5:0:1.5
+Salmon, rice & broccoli|ldR|25|salmon:p:oz:6:3:10;white rice:c:cup:1:0:2.5;broccoli:x:cup:1:1:1;olive oil:f:tsp:1:0:3
+Turkey taco bowl|ldR|20|ground turkey:p:oz:6:3:10;white rice:c:cup:1:0:2.5;corn:c:cup:0.25:0:1;salsa:x:tbsp:3:3:3;cheese:f:oz:0.5:0:1.5;salad:x:cup:1:1:1
+Steak, sweet potato & green beans|dR|30|steak:p:oz:6:3:10;sweet potato:c:each:1:0:2.5;green beans:x:cup:1:1:1;butter:f:tbsp:0.5:0:1.5
+Shrimp stir-fry|ldR|20|shrimp:p:oz:6:3:12;white rice:c:cup:1:0:2.5;bell pepper:x:each:0.5:0.5:0.5;broccoli:x:cup:1:1:1;soy sauce:x:tbsp:1:1:1;olive oil:f:tsp:2:0:4
+Chicken pasta marinara|ldPR|20|chicken breast:p:oz:5:3:10;pasta:c:cup:1:0.5:3;marinara:x:cup:0.5:0.5:0.5;parmesan:f:tbsp:1:0:3
+Lean beef & potatoes|dR|30|ground beef 90/10:p:oz:5:3:9;potato:c:each:1:0:2.5;green beans:x:cup:1:1:1;olive oil:f:tsp:1:0:3
+Tuna wrap|lsR|5|tuna:p:oz:4:2:8;tortilla:c:each:1:1:2;mayo:f:tbsp:0.5:0:2;salad:x:cup:1:1:1;tomato:x:each:0.5:0.5:0.5
+Grilled chicken sandwich|lR|10|chicken breast:p:oz:5:3:9;wheat bread:c:slice:2:2:3;cheese:f:oz:0.5:0:1.5;mayo:f:tbsp:0.5:0:1.5;tomato:x:each:0.5:0.5:0.5
+Tofu & edamame rice bowl|ldR|20|tofu:p:oz:6:3:12;edamame:p:cup:0.5:0:1;brown rice:c:cup:1:0:2.5;soy sauce:x:tbsp:1:1:1;olive oil:f:tsp:1:0:3
+Cod, quinoa & asparagus|dR|25|cod:p:oz:7:4:12;quinoa:c:cup:0.75:0:2;asparagus:x:cup:1:1:1;olive oil:f:tsp:2:0:4
+Chicken thigh & couscous|dR|25|chicken thigh:p:each:1.5:1:3;couscous:c:cup:1:0:2;carrots:x:cup:0.5:0.5:0.5;olive oil:f:tsp:0:0:2
+Lean egg fried rice|ldPR|15|egg white:p:each:4:0:10;white rice:c:cup:1:0:2.5;peas:c:cup:0.5:0:1;egg:f:each:1:0:2;soy sauce:x:tbsp:1:1:1
+Chicken & rice, plain and simple|ldPR|20|chicken breast:p:oz:6:3:12;white rice:c:cup:1:0:3;broccoli:x:cup:1:1:1
+Protein shake & banana|sPR|2|whey:p:scoop:1:0.5:2;banana:c:each:1:0:2;skim milk:c:cup:1:0:2;peanut butter:f:tbsp:0:0:2
 Turkey roll-ups & crackers|s|3|turkey slices:p:oz:3:1:6;cheese:f:oz:0.5:0:1.5;crackers:c:serving:1:0:2
 Rice cakes, PB & jerky|s|2|rice cake:c:each:2:0:5;peanut butter:f:tbsp:1:0:2;beef jerky:p:oz:1:0:3
-Premier Protein & apple|s|1|premier protein:p:each:1:1:2;apple:c:each:1:0:2
-Bagel & jam|bs|3|bagel:c:each:1:0.5:1.5;jam:c:tbsp:1:0:3;skim milk:p:cup:1:0:2
-Fruit, rice cakes & honey|s|2|rice cake:c:each:2:0:5;banana:c:each:1:0:2;honey:c:tbsp:1:0:2;egg white:p:each:0:0:6
-Skyr & granola|bs|2|skyr:p:cup:1:0.5:2;granola:c:cup:0.25:0:0.75;raspberries:c:cup:0.5:0:1`;
+Premier Protein & apple|sPR|1|premier protein:p:each:1:1:2;apple:c:each:1:0:2
+Bagel & jam|bsPR|3|bagel:c:each:1:0.5:1.5;jam:c:tbsp:1:0:3;skim milk:p:cup:1:0:2
+Fruit, rice cakes & honey|sP|2|rice cake:c:each:2:0:5;banana:c:each:1:0:2;honey:c:tbsp:1:0:2;egg white:p:each:0:0:6
+Skyr & granola|bsPR|2|skyr:p:cup:1:0.5:2;granola:c:cup:0.25:0:0.75;raspberries:c:cup:0.5:0:1
+Chocolate milk & banana|sPR|1|chocolate milk:p:cup:2:1:3;banana:c:each:1:0:2
+Toast, banana & honey|bsP|3|bread:c:slice:2:1:3;banana:c:each:1:0:1.5;honey:c:tbsp:1:0:2;greek yogurt:p:cup:0.5:0:1
+Whey & a bagel|sPR|3|whey:p:scoop:1:0.5:2;bagel:c:each:1:0.5:1.5;jam:c:tbsp:1:0:2
+Tuna & rice bowl|ldPR|10|tuna:p:oz:5:3:8;white rice:c:cup:1:0.5:2.5;soy sauce:x:tbsp:1:1:1;cucumber:x:each:0.5:0.5:0.5`;
 const STEP={oz:.5,cup:.25,tbsp:.5,tsp:.5,each:.5,slice:1,scoop:.5,g:10,serving:.5};
 const IDEAS=IDEA_SRC.split('\n').map(l=>{const [name,slots,min,ing]=l.split('|');return {name,slots,min:+min,ing:ing.split(';').map(x=>{const [food,role,unit,d,lo,hi]=x.split(':');return {food,role,unit,d:+d,lo:+lo,hi:+hi}})}});
 function ingFood(a){const [fd]=matchFood(a);return fd}
 function fq(q){const w=Math.floor(q+1e-9),r=q-w,fr=Math.abs(r-.25)<.01?'¼':Math.abs(r-.5)<.01?'½':Math.abs(r-.75)<.01?'¾':r>.01?String(r1(r)).slice(1):'';return w?(fr&&!fr.startsWith('.')?w+fr:w+(fr.startsWith('.')?fr:'')):(fr.startsWith('.')?'0'+fr:fr||'0')}
-function ingEntry(i,q){const fd=ingFood(i.food);if(!fd||q<=0)return null;const e=entryFor(fd,q,i.unit,i.food);const u=i.unit==='each'?'':' '+(UNIT_LABEL(i.unit,q,fd)||i.unit);e.a=fq(q)+u;return e}
+function ingEntry(i,q){const fd=ingFood(i.food);if(!fd||q<=0)return null;const e=entryFor(fd,q,i.unit,i.food);const u=i.unit==='each'?'':' '+(UNIT_LABEL(i.unit,q<=1?1:q,fd)||i.unit);e.a=fq(q)+u;return e}
 function unitMac(i){const e=ingEntry(i,1);return e?{p:e.p,c:e.c,f:e.f,k:e.k}:{p:0,c:0,f:0,k:0}}
 function fitIdea(idea,T){
   const ing=idea.ing.map(i=>({...i,m:unitMac(i),q:i.d}));
@@ -2763,20 +2780,22 @@ function ideaTarget(mode){
   const nowIdx=!isToday?0:h<10.5?0:h<15.5?1:2;
   const left=order.filter((m,i)=>i>=nowIdx&&!logged.has(m));const n=Math.max(1,left.length);
   const slot=S.ideaSlot||left[0]||(isToday&&h>=21?'snack':'snack');
-  const share=mode==='day'?1:slot==='snack'?Math.min(1,.5/n):1/n;
-  return {R,T:{p:R.p*share,c:R.c*share,f:R.f*share},n,slot,left};
+  const share=mode==='day'?1:slot==='snack'?Math.min(1,.5/n):1/n;const fs=fuelState(),ft=mode==='day'?null:fuelTarget(fs.mode,R);
+  const T=ft||{p:R.p*share,c:R.c*share,f:R.f*share};if(!ft&&slot!=='snack'&&mode!=='day')T.p=Math.max(T.p,Math.min(Math.max(R.p,0),proteinPerMealTarget()));
+  return {R,T,n,slot,left,fuel:ft?fs.mode:'reg',fs};
 }
-const _miC={};function mealIdeas(mode,slot){const {T}=ideaTarget(mode);const s=SLOT_OF[slot]||'l',key=s+'|'+r0(T.p)+'|'+r0(T.c)+'|'+r0(T.f);if(_miC[key])return _miC[key];
-  return _miC[key]=IDEAS.filter(i=>i.slots.includes(s)).map(i=>fitIdea(i,T)).sort((a,b)=>b.fit-a.fit)}
+const _miC={};function mealIdeas(mode,slot){const {T,fuel}=ideaTarget(mode);const s=SLOT_OF[slot]||'l',tg=fuel==='pre'?'P':fuel==='post'?'R':null,key=(tg||s)+'|'+r0(T.p)+'|'+r0(T.c)+'|'+r0(T.f);if(_miC[key])return _miC[key];
+  return _miC[key]=IDEAS.filter(i=>tg?i.slots.includes(tg):i.slots.includes(s)).map(i=>fitIdea(i,T)).sort((a,b)=>b.fit-a.fit)}
 function fmtQ(e){return e.a}
 function renderIdeasCard(){
   const el=$('ideasCard');if(!el)return;const g=goalsFor(S.day),t=dayTotals(S.day);
   const R={p:g.p-t.p,c:g.c-t.c,f:g.f-t.f},rk=R.p*4+R.c*4+Math.max(0,R.f)*9;
   if(rk<120&&R.p<10){el.hidden=true;return}
-  const {slot,T}=ideaTarget(S.ideaMode||'meal'),best=mealIdeas(S.ideaMode||'meal',slot)[0];if(!best){el.hidden=true;return}
+  const {slot,T,fuel,fs}=ideaTarget(S.ideaMode||'meal'),best=mealIdeas(S.ideaMode||'meal',slot)[0];if(!best){el.hidden=true;return}
+  const fl=fuel==='post'?(fs.left?`After training · ${Math.max(1,Math.round(fs.left/60000))} min left in the 2-hour window`:'After training'):fuel==='pre'?'Before training':null;
   el.hidden=false;
-  el.innerHTML=`<div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot==='snack'?'snack':slot)}'></div><div class="idea-t"><div class="eyebrow">${mealName(slot)} idea · fits your macros</div><h2>${esc(best.idea.name)}</h2><p>${best.entries.map(e=>`${esc(e.a)} ${esc(e.n.toLowerCase())}`).join(' · ')}</p></div></div>
-    <div class="idea-mac">${macPill('P',best.got.p,T.p,'--pro')}${macPill('C',best.got.c,T.c,'--carb')}${macPill('F',best.got.f,T.f,'--fat')}<span class="idea-fit">${Math.round(best.fit*100)}% match</span></div>
+  el.innerHTML=`<div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot==='snack'?'snack':slot)}'></div><div class="idea-t"><div class="eyebrow" ${fl?'style="color:var(--good)"':''}>${fl||mealName(slot)+' idea · fits your macros'}</div><h2>${esc(best.idea.name)}</h2><p>${best.entries.map(e=>`${esc(e.a)} ${esc(e.n.toLowerCase())}`).join(' · ')}</p></div></div>
+    <div class="idea-mac">${macPill('P',best.got.p,T.p,'--pro')}${macPill('C',best.got.c,T.c,'--carb')}${macPill('F',best.got.f,T.f,'--fat')}<span class="idea-fit">${Math.round(best.fit*100)}% match</span></div>${microChips(best.entries)}${fl?`<p class="note" style="margin:0">${FUEL_TXT[fuel].s}</p>`:''}
     <div class="row" style="gap:8px"><button class="primary" type="button" data-ilog="0">Log it to ${mealName(slot).toLowerCase()}</button><button class="ghost" type="button" data-pg="ideas">More ideas</button></div>`;
   el.dataset.slot=slot;el._best=best;
 }
@@ -2789,18 +2808,20 @@ function renderIdeas(){
       <div class="rems">${bar('Protein',R.p,g.p,'--pro')}${bar('Carbs',R.c,g.c,'--carb')}${bar('Fat',R.f,g.f,'--fat')}</div>
       ${R.f<0?`<p class="note" style="margin:0;color:var(--carb)">You're ${r0(-R.f)} g over on fat, so these ideas keep fat as low as possible.</p>`:''}
       <div class="seg2" role="group" aria-label="Size"><button type="button" data-im="meal" aria-pressed="${mode==='meal'}">${n>1?`Next meal (1 of ${n})`:'Next meal'}</button><button type="button" data-im="day" aria-pressed="${mode==='day'}">Rest of the day</button></div>
+      <div class="seg2" role="group" aria-label="Timing" style="max-width:none">${['reg','pre','post'].map(m=>`<button type="button" data-fp2="${m}" aria-pressed="${(ideaTarget(mode).fuel)===m}">${m==='reg'?'Regular':m==='pre'?'Before lifting':'After lifting'}</button>`).join('')}</div>
+      <p class="note" style="margin:0">${FUEL_TXT[ideaTarget(mode).fuel].s}</p>
       <div class="xp-f" style="margin:0">${['breakfast','lunch','dinner','snack'].map(m=>`<button type="button" class="chip" data-isl="${m}" aria-pressed="${slot===m}">${mealName(m)}</button>`).join('')}</div>
       ${T.p*4+T.c*4+Math.max(0,T.f)*9>1300?'<p class="note" style="margin:0;color:var(--carb)">That\'s more than one normal meal. These get you most of the way; a snack later covers the rest.</p>':''}
       <p class="note" style="margin:0">Aiming for <b>${r0(Math.max(0,T.p))} g protein · ${r0(Math.max(0,T.c))} g carbs · ${r0(Math.max(0,T.f))} g fat</b> ${mode==='day'?'in one meal':`this meal${n>1?`, leaving room for ${n-1} more`:''}`}. Amounts are sized to fit.</p></div>
     ${list.map((x,i)=>`<div class="card idea" style="display:flex;flex-direction:column;gap:12px">
       <div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot)}'></div><div class="idea-t"><div class="eyebrow">${x.idea.min} min · ${r0(x.got.k)} kcal</div><h2>${esc(x.idea.name)}</h2></div><span class="idea-fit ${x.fit>=.85?'hi':''}">${Math.round(x.fit*100)}%</span></div>
       <ul class="ing">${x.entries.map(e=>`<li><span>${esc(e.n)}</span><b>${esc(e.a)}</b></li>`).join('')}</ul>
-      <div class="idea-mac">${macPill('P',x.got.p,T.p,'--pro')}${macPill('C',x.got.c,T.c,'--carb')}${macPill('F',x.got.f,T.f,'--fat')}</div>
+      <div class="idea-mac">${macPill('P',x.got.p,T.p,'--pro')}${macPill('C',x.got.c,T.c,'--carb')}${macPill('F',x.got.f,T.f,'--fat')}</div>${microChips(x.entries)}
       <button class="primary" type="button" data-ilog2="${i}">Log to ${mealName(slot).toLowerCase()}</button></div>`).join('')}
-    <p class="note" style="padding:0 6px">Match % is how close the meal lands to your target protein, carbs and fat, with protein counted most. Amounts round to easy measures like ½ cup or 1 oz.</p>`;
+    <p class="note" style="padding:0 6px"><button class="link" type="button" data-pg="fuel">When to eat what, and why →</button><br>Match % is how close the meal lands to your target protein, carbs and fat, with protein counted most. Amounts round to easy measures like ½ cup or 1 oz.</p>`;
   const P=$('pg-ideas');P._list=list;P._slot=slot;
 }
-$('pg-ideas')&&$('pg-ideas').addEventListener('click',e=>{const m=e.target.closest('[data-im]');if(m){S.ideaMode=m.dataset.im;renderIdeas();return}
+$('pg-ideas')&&$('pg-ideas').addEventListener('click',e=>{const fp=e.target.closest('[data-fp2]');if(fp){S.fuelPick=fp.dataset.fp2==='reg'?{m:'reg',t:Date.now()}:{m:fp.dataset.fp2,t:Date.now()};for(const k in _miC)delete _miC[k];renderIdeas();return}const m=e.target.closest('[data-im]');if(m){S.ideaMode=m.dataset.im;renderIdeas();return}
   const s=e.target.closest('[data-isl]');if(s){S.ideaSlot=s.dataset.isl;renderIdeas();return}
   const l=e.target.closest('[data-ilog2]');if(l){const P=$('pg-ideas'),x=P._list[+l.dataset.ilog2];if(x){addEntries(x.entries.map(y=>({...y,id:uid(),t:Date.now()})),S.day,P._slot);renderIdeas()}}});
 
@@ -3247,6 +3268,52 @@ function tplFor(name,exNames){return S.templates.find(t=>t.name===name&&t.ex.len
 function restLbl(sec){return sec%60?`${sec} sec`:`${sec/60} min`}
 function topRep(r){const m=String(r||'').match(/(\d+)\D*$/);return m?+m[1]:null}
 function lowRep(r){const m=String(r||'').match(/^(\d+)/);return m?+m[1]:null}
+
+/* ================= FUEL & TIMING =================
+   Thomas, Erdman & Burke (2016). Nutrition and Athletic Performance — joint position statement of the Academy of Nutrition
+   and Dietetics, Dietitians of Canada and the ACSM. Med Sci Sports Exerc 48(3):543–568.
+   • Protein 1.2–2.0 g/kg/day, as ~0.3 g/kg (15–25 g) high-quality protein after training (0–2 h) and every 3–5 h; dairy proteins excel (leucine).
+   • Carbs scale with training load (3–5 g/kg light, 5–7 moderate ~1 h/day); 1–4 g/kg in the 1–4 h before hard sessions, low in fat/fiber;
+     after training, 0.8 g/kg carbs + 0.4 g/kg protein restores glycogen as well as 1.2 g/kg carbs alone.
+   • Fat 20–35% of energy; going under 20% doesn't help performance. Keep fat lower right around training (slows digestion).
+   • Micronutrients of key interest: iron (heme, or plant iron + vitamin C), vitamin D, calcium (1,500 mg/d with vitamin D for bone), antioxidants from food.
+   • Fluids: 5–10 mL/kg 2–4 h before; replace 1.25–1.5 L per kg lost after. */
+function kgNow(){const lw=latestWeight();return ((lw&&lw.w)||(S.calc&&S.calc.wt)||165)*.4536}
+function fuelState(){const now=Date.now(),tk=todayKey();if(S.day!==tk)return {mode:'reg'};
+  const pk=S.fuelPick;if(pk&&pk.t&&now-pk.t<3*36e5)return {mode:pk.m,manual:true};
+  if(S.active)return {mode:'post',active:true};
+  const ends=trainFeed().filter(x=>x.date===tk).map(x=>x.log?x.log.end:(x.dev&&x.dev.start?Date.parse(x.dev.start)+(x.dev.min||60)*60000:0)).filter(Boolean);
+  const last=ends.length?Math.max(...ends):0;if(last&&now>=last&&now-last<2*36e5)return {mode:'post',left:2*36e5-(now-last),ago:now-last};
+  return {mode:'reg'}}
+function fuelTarget(mode,R){const kg=kgNow();
+  if(mode==='post')return {p:Math.max(20,Math.min(40,.3*kg)),c:Math.min(.8*kg,Math.max(25,R.c)),f:Math.max(0,Math.min(12,R.f))};
+  if(mode==='pre')return {p:Math.max(10,Math.min(25,.2*kg)),c:Math.min(1*kg,Math.max(25,R.c)),f:Math.max(0,Math.min(8,R.f))};return null}
+const FUEL_TXT={pre:{t:'Before training',s:'Carbs first, a little protein, low fat and fiber so it digests fast. Eat it 1–3 hours out.'},
+  post:{t:'After training',s:'High-quality protein (dairy, whey, eggs, meat) plus carbs within about 2 hours to rebuild muscle and refill glycogen.'},
+  reg:{t:'Regular meal',s:'Hit at least ~0.3 g of protein per kg in every meal, and put most of your fats in meals away from training.'}};
+const MICRO=[['iron','Iron','--over',/steak|beef|lamb|turkey|spinach|kale|lentil|bean|chickpea|tofu|edamame|oats|egg/],['calcium','Calcium','--fat',/milk|yogurt|skyr|kefir|cheese|mozzarella|parmesan|feta|cottage|tofu|sardine|almond/],
+  ['vitd','Vitamin D','--carb',/salmon|sardine|tuna|egg|milk|mushroom/],['vitc','Vitamin C','--good',/orange|strawberr|kiwi|pepper|broccoli|tomato|pineapple|mango|salsa|berr|potato|brussels|cauliflower/],
+  ['omega','Omega-3','--kcal',/salmon|sardine|tuna|chia|flax|walnut/]];
+function microOf(list){const names=(list||[]).map(e=>String(e.n||'').toLowerCase()).join(' ');return MICRO.filter(([,,,re])=>re.test(names)).map(m=>m[0])}
+function microChips(list){const has=microOf(list);return has.length?`<div class="micro">${MICRO.filter(m=>has.includes(m[0])).map(([,l,c])=>`<span style="--c:var(${c})">${l}</span>`).join('')}</div>`:''}
+function microRow(){const k=S.day,list=S.days[k]||[];if(list.length<2)return '';const has=microOf(list),miss=MICRO.filter(m=>!has.includes(m[0])&&m[0]!=='omega');
+  const tip={iron:'lean beef, spinach, beans (pair plants with vitamin C)',calcium:'Greek yogurt, milk, cheese',vitd:'salmon, eggs, fortified milk',vitc:'berries, peppers, oranges, broccoli'};
+  return grow({pg:'fuel',ic:'heart',c:'--good',t:miss.length?`Micronutrients: add ${miss.map(m=>m[1].toLowerCase()).join(', ')}`:'Micronutrients covered today',s:miss.length?`Try ${tip[miss[0][0]]}`:'Iron, calcium, vitamin D and vitamin C all have a food source today',v:`${4-miss.length}/4`,vc:miss.length?'':'on'})}
+function proteinPerMealTarget(){return Math.round(Math.max(15,Math.min(40,.3*kgNow())))}
+function renderFuel(){const kg=kgNow(),g=goalsFor(todayKey()),fs=fuelState(),pm=proteinPerMealTarget(),lb=r0(kg/.4536);
+  const day=MEALS.filter(([m])=>m!=='snack').map(([m,l])=>{const es=(S.days[todayKey()]||[]).filter(e=>(e.meal||'snack')===m),t=sumEntries(es);return [l,t.p,es.length]});
+  $('pg-fuel').innerHTML=`<div class="card fuel-hero"><div class="eyebrow" style="color:var(--good)">Your numbers at ${lb} lb</div><h2>When to eat what</h2>
+    <div class="fuel-grid"><div style="--c:var(--pro)"><b>${pm} g</b><span>protein per meal, every 3–5 h</span></div><div style="--c:var(--carb)"><b>${r0(.8*kg)}–${r0(1*kg)} g</b><span>carbs before or after lifting</span></div><div style="--c:var(--fat)"><b>${r0(g.f*9/Math.max(1,goalKcal(g))*100)}%</b><span>of calories from fat (aim 20–35%)</span></div><div style="--c:var(--fat)"><b>${r1(kg*7.5/1000*33.8)} oz</b><span>water 2–4 h before training</span></div></div></div>
+    <div class="glabel">Around a workout</div>
+    <div class="card fuel-tl"><div class="ft-step"><b>1–4 h before</b><p>~${r0(1*kg)} g carbs with ~${r0(.2*kg)} g protein. Keep fat and fiber low so it settles: oats with banana, a bagel with jam, rice with chicken.</p></div>
+      <div class="ft-step"><b>During</b><p>Lifting under about an hour needs only water. For 1–2+ hours of hard activity, 30–60 g carbs an hour helps.</p></div>
+      <div class="ft-step"><b>0–2 h after</b><p>~${pm} g high-quality protein plus ~${r0(.8*kg)} g carbs. Dairy proteins (milk, Greek yogurt, whey) work especially well. Training twice in a day? Push carbs to ~${r0(kg)} g an hour for the first few hours.</p></div>
+      <div class="ft-step"><b>Rest of the day</b><p>Spread protein every 3–5 hours across 4 or more meals. Put most of your fats and fiber in meals away from training.</p></div>
+      <div class="ft-step"><b>Fluids</b><p>Drink ~${r1(kg*7.5/1000*33.8)} oz 2–4 h before. After, replace about 20–24 oz for every pound you lost in sweat.</p></div></div>
+    <div class="glabel">Today's protein spread</div><div class="card">${day.map(([l,p,n])=>`<div class="pspread"><span>${l}</span><i><u style="width:${Math.min(100,p/pm*100)}%;background:${p>=pm?'var(--good)':'var(--pro)'}"></u></i><b>${n?r0(p)+' g':'—'}</b></div>`).join('')}<p class="note" style="margin:8px 0 0">Each main meal should reach ~${pm} g of protein to keep muscle building all day.</p></div>
+    <div class="glabel">Micronutrients that matter for training</div><div class="card"><ul class="ing">${MICRO.slice(0,4).map(([id,l])=>{const has=microOf(S.days[todayKey()]||[]).includes(id);return `<li><span>${has?'✓ ':''}${l}</span><b style="font-family:var(--f-body);font-weight:500;color:var(--muted);text-align:right">${{iron:'Red meat, beans, spinach + vitamin C',calcium:'Dairy, tofu · ~1,500 mg/day for bone',vitd:'Salmon, eggs, fortified milk, sun',vitc:'Berries, peppers, citrus, broccoli'}[id]}</b></li>`}).join('')}</ul>
+      <p class="note" style="margin:8px 0 0">A ✓ means you ate a good source today. This is a food-group check, not exact milligrams. Iron, vitamin D and calcium are the ones athletes most often run low on.</p></div>
+    <p class="note" style="padding:0 6px">Source: Thomas, Erdman &amp; Burke (2016), <i>Nutrition and Athletic Performance</i>, the joint position statement of the Academy of Nutrition and Dietetics, Dietitians of Canada and the American College of Sports Medicine. General guidance for healthy adults, not medical advice.</p>`}
 /* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
 function openAdd(){
   const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
@@ -3315,7 +3382,7 @@ function renderTodayRows(){
   const el=$('todayRows');if(!el)return;const k=S.day,h=hv(k),c=S.checkins[k],cfg=syncCfg();
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
-  el.innerHTML=liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
+  el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
     +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
 const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like “2 eggs and toast”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
@@ -3327,7 +3394,7 @@ const TIPS={today:['Welcome to Syncope','Type what you ate in plain words, like 
 function renderTip(v){const el=$('tip-'+v);if(!el)return;const P=S.prefs||{};if((P.tipsSeen||{})[v]||!TIPS[v]){el.hidden=true;return}
   el.hidden=false;el.innerHTML=`<span class="tic">i</span><div class="tx"><b class="tt">${TIPS[v][0]}</b><span>${TIPS[v][1]}</span><br><button type="button" data-tipx="${v}">Got it</button></div>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tipx]');if(!b)return;S.prefs.tipsSeen={...(S.prefs.tipsSeen||{}),[b.dataset.tipx]:true};save();renderTip(b.dataset.tipx)});
-const FAQ=[['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
+const FAQ=[['When should I eat carbs, protein and fat?','Carbs before and after training, protein (~0.3 g per kg, about 20–30 g) after training and every 3–5 hours, and most of your fat in meals away from training. Meal ideas switch to pre- or post-workout picks automatically when you have just trained. Details in Profile → Fuel & timing.'],['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
   ['Where do my calorie and macro targets come from?','From your body stats and goal. Syncope estimates what you burn, then sets a gradual weekly plan. Protein stays high to protect muscle. You can see every week in Plan.'],
   ['What is the + button?','A shortcut for logging anything: food, a photo, a saved meal, your weight, a workout or your daily check-in.'],
   ['How do WHOOP and Garmin work?','Connect once in Profile → WHOOP & Garmin. After that, sleep, recovery, strain and workouts come in on their own whenever you open the app.'],
