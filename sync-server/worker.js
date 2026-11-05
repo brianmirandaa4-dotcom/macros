@@ -452,6 +452,8 @@ const SHARE_KEYS = ['streak', 'workouts', 'protein', 'steps', 'weight', 'meals',
 const EVENT_SHARE = { workout: 'workouts', pr: 'workouts', protein: 'protein', streak: 'streak', steps: 'steps', weight: 'weight', day: 'meals', score: null };
 const clampN = (v, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : 0; };
 const cleanStr = (v, n) => String(v ?? '').replace(/[<>\u0000-\u001f]/g, '').trim().slice(0, n);
+// Profile picture: a built-in character id, or a small square JPEG (data URL, under ~24 KB).
+const cleanAv = (v) => typeof v === 'string' && (/^[a-z]{2,14}$/.test(v) || (/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v) && v.length < 24000)) ? v : null;
 async function socGet(env, uid) { return env.MACROS_KV.get('soc:' + uid, 'json'); }
 async function socPut(env, rec) { rec.updated = Date.now(); await env.MACROS_KV.put('soc:' + rec.uid, JSON.stringify(rec)); }
 async function phoneKey(env, raw) {
@@ -483,7 +485,7 @@ function publicView(r, forSelf) {
     return o;
   });
   const detail = { daily, foods: on('foods') ? (dt.foods || []) : null, wks: on('workouts') ? (dt.wks || []) : null, tpls: (forSelf || sh.templates !== false) ? (dt.tpls || []) : null, plan: on('nutrition') ? dt.plan : null, shares: Object.fromEntries(SHARE_KEYS.map(k => [k, k === 'templates' ? sh[k] !== false : !!sh[k]])) };
-  return { uid: r.uid, name: r.name, username: r.username, color: r.color, stats, events, detail, updated: r.updated };
+  return { uid: r.uid, name: r.name, username: r.username, color: r.color, av: r.av || null, stats, events, detail, updated: r.updated };
 }
 async function social(action, req, url, user, env, cors) {
   const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
@@ -523,6 +525,7 @@ async function social(action, req, url, user, env, cors) {
   }
   if (!me) return json({ error: 'Set up your Syncope profile first.' }, 400, cors);
   if (action === 'stats') {
+    if (body.av !== undefined) me.av = cleanAv(body.av);
     const st = body.stats || {};
     me.stats = { week: cleanStr(st.week, 10), score: clampN(st.score, 0, 5000), streak: clampN(st.streak, 0, 3650), workouts: clampN(st.workouts, 0, 50), prs: clampN(st.prs, 0, 200),
       protein: clampN(st.protein, 0, 7), steps: clampN(st.steps, 0, 2e6), onTarget: clampN(st.onTarget, 0, 7), days: clampN(st.days, 0, 7), wchg: st.wchg == null ? null : clampN(st.wchg, -30, 30) };
@@ -563,7 +566,7 @@ async function social(action, req, url, user, env, cors) {
       if (me.reqs) delete me.reqs[fid]; await socPut(env, me); await socPut(env, fr);
       return json({ ok: true, name: fr.name }, 200, cors);
     }
-    fr.reqs = fr.reqs || {}; fr.reqs[me.uid] = { name: me.name, username: me.username || '', color: me.color, t: Date.now() };
+    fr.reqs = fr.reqs || {}; fr.reqs[me.uid] = { name: me.name, username: me.username || '', color: me.color, av: me.av || null, t: Date.now() };
     await env.MACROS_KV.put('soc:' + fr.uid, JSON.stringify(fr));
     return json({ ok: true, requested: true, name: fr.name }, 200, cors);
   }
