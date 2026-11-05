@@ -833,6 +833,18 @@ html.scrolled .top{border-bottom-color:var(--line)!important}
 .coach-next{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:1px solid color-mix(in srgb,var(--kcal) 45%,transparent);background:color-mix(in srgb,var(--kcal) 8%,var(--surface-2));border-radius:13px;padding:11px 12px;color:var(--fg);font-size:14px}
 .coach-next .dim{display:block;font-size:12.5px;color:var(--muted)}
 .todo{animation:viewin var(--t-base) var(--ease-out)}
+
+/* ===== Batch C ===== */
+.qa{margin:0}.qa .rchip{flex:none}
+.bump{color:var(--good)!important;font-weight:700;white-space:nowrap}
+.bump-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 8px;padding:8px 12px;border-radius:12px;background:color-mix(in srgb,var(--good) 9%,transparent);border:1px solid color-mix(in srgb,var(--good) 30%,transparent);font-size:13px;color:var(--muted)}
+#maType,#maScan{min-height:50px;display:flex;align-items:center;justify-content:center;gap:8px}#maScan svg{width:19px;height:19px}
+html.kb .tabbar{display:none!important}
+html.kb main{padding-bottom:24px}
+.scrim{top:var(--vvt,0);height:var(--vvh,100%);bottom:auto}
+.sheet{max-height:calc(var(--vvh,100vh) - 24px)}
+.sheet.tall{height:min(calc(var(--vvh,90dvh) - 24px),820px)}
+.ex-f{flex-wrap:wrap;gap:6px 14px}
 .wnow{border-color:color-mix(in srgb,var(--good) 45%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,var(--good) 8%,var(--surface)),var(--surface));display:flex;flex-direction:column;gap:12px}
 .wnow h2{margin:0;font:800 22px/1.15 var(--f-display)}
 .wn-top{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
@@ -1626,7 +1638,7 @@ $('dToday').onclick=()=>{S.day=todayKey();renderToday()};
 $('dPick').onchange=e=>{if(e.target.value){S.day=e.target.value;renderToday()}};
 $('meals').addEventListener('click',e=>{
   const b=e.target.closest('[data-edit]');if(b)return openEdit(b.dataset.edit);
-  const ad=e.target.closest('[data-addto]');if(ad){S.mealSel=ad.dataset.addto;renderToday();const c=document.querySelector('.composer');c.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('foodIn').focus({preventScroll:true}),250);return}
+  const ad=e.target.closest('[data-addto]');if(ad){openMealAdd(ad.dataset.addto);return}
   const sm=e.target.closest('[data-savemeal]');if(sm)return openSaveMeal(sm.dataset.savemeal);
   const r=e.target.closest('[data-repeat]');if(r){const m=r.dataset.repeat;const src=(S.days[addDays(S.day,-1)]||[]).filter(x=>(x.meal||'snack')===m);addEntries(src.map(x=>({...x,id:uid(),t:Date.now()})),S.day,m)}
 });
@@ -2934,6 +2946,31 @@ function friendsRow(){const c=socCfg();if(!c.on)return grow({ga:'friends',ic:'us
   const b=c.board,ws=weekStart(todayKey()),me=myWeek().stats.score,frs=((b&&b.friends)||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0),rank=1+frs.filter(x=>x>me).length,top=Math.max(0,...frs);
   return grow({ga:'friends',ic:'user',c:'--good',t:frs.length?`You're #${rank} of ${frs.length+1} this week`:'Friends',s:frs.length?(rank===1?`Leading by ${fmt(me-Math.max(0,...frs.filter(x=>x<=me)))} pts`:`${fmt(top-me)} pts behind first`):'Invite friends to start competing',v:`${fmt(me)} pts`,vc:'on'})}
 GACT.friends=()=>{closePages();setView('friends')};
+
+/* ---- quick add: saved meals + usual foods in 2 taps ---- */
+function quickItems(){const seen=new Map(),cutoff=addDays(todayKey(),-45);
+  Object.keys(S.days).filter(k=>k>=cutoff).forEach(k=>(S.days[k]||[]).forEach(e=>{const key=e.n+'|'+e.a;const v=seen.get(key);if(v)v.c++;else seen.set(key,{e,c:1})}));
+  return {meals:S.meals.slice(0,6),top:[...seen.values()].sort((a,b)=>b.c-a.c).slice(0,8).map(x=>x.e)}}
+function quickChips(){const q=quickItems();if(!q.meals.length&&!q.top.length)return '';
+  return `<div class="glabel" style="margin:0">One tap to log</div><div class="xp-f qa">${q.meals.map((m,i)=>`<button type="button" class="rchip meal-chip" data-qm="${i}">★ ${esc(m.name)} <span>${fmt(m.items.reduce((a,x)=>a+x.k,0))}</span></button>`).join('')}${q.top.map((e,i)=>`<button type="button" class="rchip" data-qt="${i}">+ ${esc(e.n)} <span>${esc(e.a)}</span></button>`).join('')}</div>`}
+function quickLog(el,meal){const b=el.closest('[data-qm],[data-qt]');if(!b)return false;const q=quickItems();
+  if(b.dataset.qm!=null){const ml=q.meals[+b.dataset.qm];if(ml){closeSheet();addEntries(mealEntries(ml,1),S.day,meal)}}
+  else{const e=q.top[+b.dataset.qt];if(e){closeSheet();addEntries([{...e,id:uid(),t:Date.now(),src:e.src==='guess'?'db':e.src}],S.day,meal)}}return true}
+function openMealAdd(m){const l=mealName(m),q=quickItems();
+  sheet(`<div><div class="eyebrow">${niceDate(S.day,{weekday:'long',month:'short',day:'numeric'})}</div><h3>Add to ${l.toLowerCase()}</h3></div>
+    <div class="row" style="gap:8px"><button class="primary" type="button" id="maType" style="flex:1">Type it</button><button class="ghost" type="button" id="maScan" style="flex:1">${GI.camera} Photo</button></div>
+    ${q.meals.length?`<div class="glabel" style="margin:0">Saved meals</div><div class="glist">${q.meals.map((ml,i)=>`<button class="gr" type="button" data-qm="${i}"><span class="gi" style="--c:var(--carb)">${GI.copy}</span><span class="gt"><b>${esc(ml.name)}</b><span>${esc(ml.items.map(x=>x.n).join(', '))}</span></span><span class="gv">${fmt(ml.items.reduce((a,x)=>a+x.k,0))} kcal</span><span></span></button>`).join('')}</div>`:''}
+    ${q.top.length?`<div class="glabel" style="margin:0">You often eat</div><div class="glist">${q.top.map((e,i)=>`<button class="gr" type="button" data-qt="${i}"><span class="gi" style="--c:var(--kcal)">${GI.plus}</span><span class="gt"><b>${esc(e.n)}</b><span>${esc(e.a)} · P ${r0(e.p)} C ${r0(e.c)} F ${r0(e.f)}</span></span><span class="gv">${fmt(e.k)}</span><span></span></button>`).join('')}</div>`:'<p class="note">Foods you log often will show up here for one-tap logging.</p>'}`,{nofocus:true});
+  const sh=$('sheetRoot').querySelector('.sheet');
+  sh.addEventListener('click',e=>{if(quickLog(e.target,m))return});
+  $('maType').onclick=()=>{closeSheet();S.mealSel=m;renderToday();document.querySelector('.composer').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('foodIn').focus({preventScroll:true}),260)};
+  $('maScan').onclick=()=>{closeSheet();S.mealSel=m;$('photoIn').click()};
+}
+/* ---- keyboard: keep inputs and sheets above the iPhone keyboard ---- */
+(()=>{const vv=window.visualViewport;if(!vv)return;const R=document.documentElement;
+  const upd=()=>{const kb=Math.max(0,innerHeight-vv.height-vv.offsetTop);R.style.setProperty('--vvh',vv.height+'px');R.style.setProperty('--vvt',vv.offsetTop+'px');R.classList.toggle('kb',kb>120)};
+  vv.addEventListener('resize',upd);vv.addEventListener('scroll',upd);upd();
+  document.addEventListener('focusin',e=>{const t=e.target;if(!t.matches||!t.matches('input:not([type=checkbox]):not([type=file]),textarea'))return;setTimeout(()=>{try{t.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}},320)});})();
 /* ================= QUICK LOG (+), TODAY COACH, TIPS, HELP ================= */
 function openAdd(){
   const w=S.active?{t:'Back to workout',s:`${esc(S.active.name)} in progress`}:{t:'Workout',s:'Start lifting or add the lifts to a WHOOP session'};
@@ -2941,7 +2978,9 @@ function openAdd(){
     ['meal','--carb',GI.copy,'Saved meal','Your regulars, one tap'],['weight','--fat',GI.scale,'Weight','Morning weigh-in'],
     ['workout','--good',GI.dumbbell,w.t,w.s],['checkin','--over',GI.heart,'Check-in','Energy, hunger, sleep, notes'],['ideas','--good',GI.target,'Meals that fit','Sized to your macros left'],['prep','--carb',GI.list,'Meal prep','This week\'s high-protein recipes']];
   sheet(`<div><div class="eyebrow">${niceDate(S.day,{weekday:'long',month:'short',day:'numeric'})}</div><h3>What do you want to log?</h3></div>
+    ${quickChips()}
     <div class="addgrid">${tiles.map(([k,c,ic,t,sub])=>`<button type="button" class="addt" data-add="${k}" style="--c:var(${c})"><span class="gi" style="--c:var(${c})">${ic}</span><span><b>${t}</b><br><span>${sub}</span></span></button>`).join('')}</div>`,{nofocus:true});
+  const qa=$('sheetRoot').querySelector('.qa');if(qa)qa.onclick=e=>quickLog(e.target,autoMeal());
   $('sheetRoot').querySelector('.addgrid').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;const k=b.dataset.add;
     if(k==='scan'){closeSheet();$('photoIn').click();return}
     closeSheet();
@@ -3247,9 +3286,9 @@ function saveActive(){clearTimeout(saveActive.t);saveActive.t=setTimeout(save,40
 function renderActive(){
   const a=S.active;
   $('trainActive').innerHTML=`<div class="wk-bar"><input id="wkName" value="${esc(a.name)}" aria-label="Workout name"><span class="wk-time" id="wkTime">${a.wStart?(a.orig?'Editing':'From watch'):clock(Date.now()-a.start)}</span><button class="primary" id="wkFinish" style="padding:9px 16px">Finish</button></div>
-  ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id)||[];return `<div class="card ex-card"><div class="ex-h"><h3>${esc(x.n)}</h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exswap="${i}">Swap</button><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>
+  ${a.ex.map((x,i)=>{const prev=lastFor(x.n,a.id)||[];return `<div class="card ex-card"><div class="ex-h"><h3>${esc(x.n)}</h3><span class="mus">${esc(musOf(x.n))}</span><button class="link" data-exswap="${i}">Swap</button><button class="link" data-exdel="${i}" style="color:var(--muted)">Remove</button></div>${(()=>{const pv=lastFor(x.n,a.id)||[];if(pv.length<2||!pv.every(z=>+z.r>=10&&+z.w>0)||x.sets.every(z=>z.done))return '';const nw=+pv[0].w+(+pv[0].w>=100?5:2.5);return `<div class="bump-row"><span>You got 10+ reps on every set last time.</span><button class="link bump" type="button" data-bump="${i}|${nw}">Try ${nw} lb</button></div>`})()}
     <table class="sets"><thead><tr><th>Set</th><th>Last</th><th>lb</th><th>Reps</th><th></th></tr></thead><tbody>${x.sets.map((s,j)=>{const p=prev[j];return `<tr class="${s.done?'done':''}"><td class="setn">${j+1}</td><td class="prev">${p?`${p.w}×${p.r}`:'—'}</td><td><input type="number" inputmode="decimal" data-w="${i}.${j}" value="${esc(s.w)}" placeholder="${p?esc(p.w):''}" aria-label="Weight, set ${j+1}"></td><td><input type="number" inputmode="numeric" data-r="${i}.${j}" value="${esc(s.r)}" placeholder="${p?esc(p.r):''}" aria-label="Reps, set ${j+1}"></td><td><button class="chk" data-done="${i}.${j}" aria-pressed="${!!s.done}" aria-label="Mark set ${j+1} done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></button></td></tr>`}).join('')}</tbody></table>
-    <div class="ex-f"><button class="link" data-addset="${i}">+ Add set</button>${x.sets.length>1?`<button class="link" data-rmset="${i}" style="color:var(--muted)">Remove last set</button>`:''}</div></div>`}).join('')}
+    <div class="ex-f"><button class="link" data-addset="${i}">+ Add set</button>${x.sets.some(z=>!z.done)&&prev.length?`<button class="link" data-allset="${i}">✓ Log all like last time</button>`:''}${x.sets.length>1?`<button class="link" data-rmset="${i}" style="color:var(--muted)">Remove last set</button>`:''}</div></div>`}).join('')}
   <button class="ghost" id="wkAddEx" style="padding:14px">+ Add exercise</button>
   <div class="row" style="justify-content:space-between"><button class="danger" id="wkDiscard">Discard workout</button><button class="ghost" id="wkTpl">Save as template</button></div>`;
   renderRest();
@@ -3258,6 +3297,8 @@ $('trainActive').addEventListener('input',e=>{const t=e.target,a=S.active;if(!a)
   if(t.id==='wkName'){a.name=t.value;saveActive();return}
   const k=t.dataset.w||t.dataset.r;if(!k)return;const [i,j]=k.split('.').map(Number);a.ex[i].sets[j][t.dataset.w?'w':'r']=t.value;saveActive()});
 $('trainActive').addEventListener('click',e=>{const a=S.active;if(!a)return;const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.allset!=null){const x=a.ex[+b.dataset.allset],prev=lastFor(x.n,a.id)||[];x.sets.forEach((z,j)=>{const p=prev[j]||prev[prev.length-1];if(!z.done&&p){if(z.w==='')z.w=String(p.w);if(z.r==='')z.r=String(p.r);if(z.r!=='')z.done=true}});save();renderActive();startRest();return}
+  if(b.dataset.bump!=null){const [i,w]=b.dataset.bump.split('|');a.ex[+i].sets.forEach(z=>{if(!z.done)z.w=w});save();renderActive();return}
   if(b.dataset.done){const [i,j]=b.dataset.done.split('.').map(Number),s=a.ex[i].sets[j],prev=(lastFor(a.ex[i].n,a.id)||[])[j];
     if(!s.done){if(s.w===''&&prev)s.w=String(prev.w);if(s.r===''&&prev)s.r=String(prev.r);if(s.r===''){toast('Enter reps first');return}s.done=true;startRest()}else s.done=false;save();renderActive();return}
   if(b.dataset.addset!=null){const x=a.ex[+b.dataset.addset];x.sets.push({w:x.sets.length?x.sets[x.sets.length-1].w:'',r:'',done:false});save();renderActive();return}
