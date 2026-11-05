@@ -1906,7 +1906,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.18';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.19';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4790,9 +4790,9 @@ function applyHealth(h){
   save();renderAll();return k;
 }
 function renderHealth(){
-  const el=$('healthCard');if(!el)return;const h=hv(S.day),m=S.health[S.day]||{},shown=H_FIELDS.filter(([k])=>h[k]!=null),c=syncCfg(),conn=!!(c.url&&c.uid);
+  const el=$('healthCard');if(!el)return;const h=hv(S.day),m=S.health[S.day]||{},shown=H_FIELDS.filter(([k])=>h[k]!=null&&!(k==='bodyBattery'&&h.garminBB)),c=syncCfg(),conn=!!(c.url&&c.uid);
   $('hGrid').hidden=!shown.length;
-  $('hGrid').innerHTML=shown.map(([k,l,u,col])=>`<div class="hm" style="--c:${col}"><small>${k==='recovery'&&h.ouraReady?'Readiness':l}</small><b>${k==='steps'||k==='active'?fmt(h[k]):h[k]}${u?`<span> ${u}</span>`:''}</b></div>`).join('');
+  $('hGrid').innerHTML=shown.map(([k,l,u,col])=>`<div class="hm" style="--c:${col}"><small>${k==='recovery'&&h.ouraReady?'Readiness':k==='recovery'&&h.garminBB?'Body Battery':l}</small><b>${k==='steps'||k==='active'?fmt(h[k]):h[k]}${u&&!(k==='recovery'&&h.garminBB)?`<span> ${u}</span>`:''}</b></div>`).join('');
   $('hSync').textContent=conn?'Sync now':'Sync';
   $('hSrc').textContent=h.src.length?h.src.join(' + '):(conn?'WHOOP · Oura · Garmin':'WHOOP, Oura, Garmin or Apple Watch');
   const x=h.extra||{},bits=[];
@@ -4904,7 +4904,7 @@ async function syncDevices(force){
 }
 function mergeDevice(d){
   S.dev=S.dev||{days:{},workouts:[]};
-  const put=(src,days)=>Object.entries(days||{}).forEach(([k,v])=>{S.dev.days[k]=S.dev.days[k]||{};S.dev.days[k][src]=v;if(src==='g'&&v.weightLb&&!S.weights[k])S.weights[k]=v.weightLb});
+  const put=(src,days)=>Object.entries(days||{}).forEach(([k,v])=>{S.dev.days[k]=S.dev.days[k]||{};S.dev.days[k][src]={...(S.dev.days[k][src]||{}),...v};if(src==='g'&&v.weightLb&&!S.weights[k])S.weights[k]=v.weightLb});
   if(d.whoop)put('w',d.whoop.days);if(d.oura)put('o',d.oura.days);if(d.garmin)put('g',d.garmin.days);
   const ws=[...(d.whoop?d.whoop.workouts:[]),...(d.oura?d.oura.workouts:[]),...(d.garmin?d.garmin.workouts:[])];
   const map=new Map(S.dev.workouts.map(w=>[w.id,w]));ws.forEach(w=>map.set(w.id,w));
@@ -4915,10 +4915,10 @@ function mergeDevice(d){
 function hv(k){
   const m=S.health[k]||{},dv=(S.dev&&S.dev.days[k])||{},w=dv.w||{},o=dv.o||{},g=dv.g||{};
   const f=(...xs)=>xs.find(x=>x!=null&&x!=='');
-  return {recovery:f(m.recovery,w.recovery,o.recovery),sleep:f(m.sleep,w.sleepH,o.sleepH,g.sleepH),sleepScore:f(m.sleepScore,w.sleepPerf,o.sleepScore,g.sleepScore),hrv:f(m.hrv,w.hrv,o.hrv,g.hrv),rhr:f(m.rhr,w.rhr,o.rhr,g.rhr),
+  return {recovery:f(m.recovery,w.recovery,o.recovery,g.bodyBattery),sleep:f(m.sleep,w.sleepH,o.sleepH,g.sleepH),sleepScore:f(m.sleepScore,w.sleepPerf,o.sleepScore,g.sleepScore),hrv:f(m.hrv,w.hrv,o.hrv,g.hrv),rhr:f(m.rhr,w.rhr,o.rhr,g.rhr),
     strain:f(m.strain,w.strain),bodyBattery:f(m.bodyBattery,g.bodyBattery),steps:f(m.steps,w.steps,o.steps,g.steps),active:f(m.active,o.active,g.activeKcal),
     workouts:m.workouts,src:[w.recovery!=null||w.sleepH!=null?'WHOOP':'',Object.keys(o).length?'Oura':'',Object.keys(g).length?'Garmin':'',Object.keys(m).some(x=>x!=='t'&&x!=='workouts')?'manual':''].filter(Boolean),
-    ouraReady:m.recovery==null&&w.recovery==null&&o.recovery!=null,extra:{deep:f(w.deepH,o.deepH),rem:f(w.remH,o.remH),resp:f(w.respRate,o.respRate),spo2:f(w.spo2,o.spo2),stress:g.stress,hrvStatus:g.hrvStatus,eff:f(w.sleepEff,o.sleepEff),tempDev:o.skinTempDev}};
+    ouraReady:m.recovery==null&&w.recovery==null&&o.recovery!=null,garminBB:m.recovery==null&&w.recovery==null&&o.recovery==null&&g.bodyBattery!=null,extra:{deep:f(w.deepH,o.deepH),rem:f(w.remH,o.remH),resp:f(w.respRate,o.respRate),spo2:f(w.spo2,o.spo2),stress:g.stress,hrvStatus:g.hrvStatus,eff:f(w.sleepEff,o.sleepEff),tempDev:o.skinTempDev}};
 }
 function setConnStatus(t){const e=$('connSyncing');if(e)e.textContent=t}
 function renderConn(){
