@@ -453,6 +453,7 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 @media (max-width:780px){.rest{bottom:calc(86px + env(safe-area-inset-bottom,0px))}}
 .rest b{font:700 18px var(--f-num);color:var(--pro);min-width:52px}
 .rest button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
+.rest .rest-lk{padding:5px 8px;font-size:13px}.rest .rest-lk[aria-pressed="true"]{border-color:var(--pro);background:color-mix(in srgb,var(--pro) 18%,var(--surface))}
 .mus-bars{display:flex;flex-direction:column;gap:10px}
 .mb{display:grid;grid-template-columns:86px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:13px}
 .mb .track{height:12px;border-radius:6px;background:var(--surface-2);position:relative;overflow:hidden}
@@ -1913,7 +1914,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.20';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.21';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4781,15 +4782,48 @@ function editTemplate(d){
     const nt={};d.ex.forEach(x=>{const v=exNote(d,x);if(v)nt[noteKey(x)]=v});const t={...(d.i>=0?S.templates[d.i]:{}),id:d.id||'t'+uid(),name:n,ex:d.ex,xm:d.xm||{},notes:nt};if(d.i>=0)S.templates[d.i]=t;else S.templates.push(t);save();renderTrain();openTemplates();toast(`Saved “${esc(n)}”`)};
 }
 /* rest timer */
-function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};renderRest()}
+/* rest timer. When it ends: a soft double beep + a short buzz (Android; iPhone doesn't let web apps vibrate).
+   Lock-screen timer (optional): plays a silent track as long as the rest with two beeps at the very end, so the
+   countdown shows in the lock screen's Now Playing and the beep still sounds while the phone is locked. */
+let restAC=null,restAudio=null,restWake=null,restBeeped=0,restTail=0;
+const restLockOn=()=>!!(S.prefs&&S.prefs.restLock);
+function restCtx(){try{restAC=restAC||new (window.AudioContext||window.webkitAudioContext)();if(restAC.state==='suspended')restAC.resume()}catch(e){}return restAC}
+function restBeep(){const ac=restCtx();if(!ac)return;const t=ac.currentTime+0.02;[0,0.2].forEach(d=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=880;
+  g.gain.setValueAtTime(0.0001,t+d);g.gain.exponentialRampToValueAtTime(0.3,t+d+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.13);o.connect(g);g.connect(ac.destination);o.start(t+d);o.stop(t+d+0.15)})}
+function restBuzz(){try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
+function restWav(sec){const sr=8000,b0=Math.round(sec*sr),n=b0+Math.round(0.45*sr),buf=new Uint8Array(44+n),dv=new DataView(buf.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)buf[o+i]=t.charCodeAt(i)};
+  w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);
+  buf.fill(128,44);for(const [a,z] of [[0,.13],[.2,.33]])for(let i=Math.round(a*sr);i<Math.round(z*sr);i++){const env=Math.min(1,(i-a*sr)/40,(z*sr-i)/40);buf[44+b0+i]=128+Math.round(70*env*Math.sin(2*Math.PI*880*i/sr))}
+  return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
+function restLockStop(){if(restAudio){try{restAudio.pause()}catch(e){}URL.revokeObjectURL(restAudio._u);restAudio=null}try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}}catch(e){}}
+function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;const left=(S.rest.end-Date.now())/1000;if(left<2)return;
+  const u=restWav(left),au=new Audio(u);au._u=u;au.setAttribute('playsinline','');restAudio=au;
+  au.onended=()=>{if(restAudio===au){restBeeped=S.rest?S.rest.end:Date.now();restLockStop()}};
+  au.play().catch(()=>{});
+  try{if('mediaSession' in navigator){const at=new Date(S.rest.end).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+    navigator.mediaSession.metadata=new MediaMetadata({title:`Rest · next set at ${at}`,artist:(S.active&&S.active.name)||'Syncope',album:'Syncope rest timer',artwork:[{src:'./icon-512.png',sizes:'512x512',type:'image/png'}]});
+    navigator.mediaSession.playbackState='playing';
+    ['pause','stop'].forEach(k=>{try{navigator.mediaSession.setActionHandler(k,()=>{S.rest=null;save();renderRest()})}catch(e){}});
+    try{navigator.mediaSession.setPositionState({duration:left+0.45,position:0,playbackRate:1})}catch(e){}}}catch(e){}}
+async function restWakeOn(){try{if(!restWake&&navigator.wakeLock&&document.visibilityState==='visible'){restWake=await navigator.wakeLock.request('screen');restWake.addEventListener('release',()=>{restWake=null})}}catch(e){}}
+function restWakeOff(){try{restWake&&restWake.release()}catch(e){}restWake=null}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.rest){restWakeOn();renderRest()}});
+function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();restLockStart();restWakeOn();renderRest()}
 function renderRest(){
   let el=$('restBar');
-  if(!S.rest||!S.active){if(el)el.remove();return}
+  if(!S.rest||!S.active){if(el)el.remove();if(Date.now()>restTail)restLockStop();restWakeOff();return}
   if(!el){el=document.createElement('div');el.id='restBar';el.className='rest';document.body.appendChild(el);
-    el.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save()}else S.rest=null;renderRest()}}
+    el.onclick=e=>{const b=e.target.closest('button');if(!b||!S.rest)return;restCtx();
+      if(b.dataset.lock!=null){S.prefs=S.prefs||{};S.prefs.restLock=!restLockOn();save();
+        if(restLockOn()){restLockStart();toast('Lock-screen timer on · pauses music while resting')}else{restLockStop();toast('Lock-screen timer off')}
+        renderRest();return}
+      if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save();restLockStart()}else S.rest=null;renderRest()}}
   const left=S.rest.end-Date.now();
-  if(left<=0){S.rest=null;el.remove();toast('Rest is over. Next set!');try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return}
-  el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button aria-label="Skip rest">Skip</button>`;
+  if(left<=0){const end=S.rest.end,late=Date.now()-end;S.rest=null;el.remove();restWakeOff();
+    const au=restAudio,playing=au&&!au.paused&&!au.ended;restBuzz();
+    if(playing){restTail=Date.now()+900;setTimeout(()=>{if(restAudio===au)restLockStop()},900)}else{if(late<4000&&restBeeped!==end)restBeep();restLockStop()}
+    toast('Rest is over. Next set!');return}
+  el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
 }
 setInterval(()=>{if(S.active&&!S.active.wStart){const t=$('wkTime');if(t)t.textContent=clock(Date.now()-S.active.start)}if(S.rest)renderRest()},1000);
 
