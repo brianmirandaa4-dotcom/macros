@@ -604,6 +604,18 @@ button:active{transform:translateY(0) scale(.98)}
 .gv.on{color:var(--good)}.gv.warn{color:var(--carb)}
 .chev{color:var(--subtle);width:12px;height:12px}
 .gopts{display:flex;flex-wrap:wrap;gap:8px;padding:2px 14px 14px 58px}
+.acc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:10px 6px;padding:4px 14px 16px 58px}
+.acc{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer;padding:0}
+.acc i{width:34px;height:34px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18);transition:transform var(--t-fast) var(--ease-out),box-shadow var(--t-fast)}
+.acc[aria-pressed="true"] i{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--c);transform:scale(1.04)}.acc[aria-pressed="true"]{color:var(--fg)}
+@media (max-width:420px){.acc-grid{padding-left:14px}}
+.avatar span.pic{padding:0;overflow:hidden;background:#1B1E27}.avatar span.pic svg,.avatar span.pic img{width:100%;height:100%;display:block;object-fit:cover}
+.avatar{position:relative}.av-ed{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:var(--kcal);color:#0B0C10;display:grid;place-items:center;font-style:normal;font-size:14px;font-weight:800;box-shadow:0 0 0 3px var(--bg)}
+.avg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 10px}
+.avt{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:11.5px;font-weight:600;cursor:pointer}
+.avt svg{width:100%;aspect-ratio:1;border-radius:18px;display:block;transition:transform var(--t-fast) var(--ease-out),box-shadow var(--t-fast)}
+.avt[aria-pressed="true"] svg{box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--kcal);transform:scale(1.03)}.avt[aria-pressed="true"]{color:var(--fg)}
+.av-up{display:inline-flex;align-items:center;cursor:pointer}
 .me-hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:6px 0 0}
 .me-hero .avatar{width:88px;height:88px;padding:3px}.me-hero .avatar span{font-size:28px}
 .me-hero h2{margin:8px 0 0;font:800 27px/1.1 var(--f-display)}
@@ -1592,7 +1604,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.10';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.11';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2593,7 +2605,49 @@ function checkBackup(){
 function initials(n){const s=(n||'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();return s||'ME'}
 function firstName(){return ((S.profile.name||'').trim().split(/\s+/)[0])||''}
 function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
-function renderProfileBtn(){const b=$('profBtn');if(!b)return;b.innerHTML=`<span>${esc(initials(S.profile.name))}</span>`;b.title=S.profile.name||'Profile'}
+/* Profile pictures: original illustrated characters (Syncope's own), your photo, or initials */
+const AVT=(()=>{const E=(x,y,r=6,c='#14161C')=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x+r*.35}" cy="${y-r*.35}" r="${r*.32}" fill="#fff"/>`,
+  eyes=(y,sp=14,r=6)=>E(50-sp,y,r)+E(50+sp,y,r),smile=(y,w=10,c='#14161C')=>`<path d="M${50-w} ${y}q${w} ${w*.9} ${w*2} 0" fill="none" stroke="${c}" stroke-width="3.4" stroke-linecap="round"/>`,
+  cheeks=(y,c='#FF8FA3')=>`<circle cx="30" cy="${y}" r="5" fill="${c}" opacity=".55"/><circle cx="70" cy="${y}" r="5" fill="${c}" opacity=".55"/>`;
+  return [
+  ['fox','Fox','#2B5D7C',`<path d="M24 22l14 22-18 6z" fill="#E8742C"/><path d="M76 22L62 44l18 6z" fill="#E8742C"/><circle cx="50" cy="56" r="28" fill="#F08A3C"/><path d="M28 60q22 30 44 0q-8 22-22 22t-22-22z" fill="#FFF3E6"/>${eyes(52,13,5)}<ellipse cx="50" cy="66" rx="5" ry="3.6" fill="#14161C"/>`],
+  ['bear','Bear','#3E6B4F',`<circle cx="28" cy="32" r="11" fill="#8A5A3B"/><circle cx="72" cy="32" r="11" fill="#8A5A3B"/><circle cx="28" cy="32" r="5" fill="#C99572"/><circle cx="72" cy="32" r="5" fill="#C99572"/><circle cx="50" cy="56" r="29" fill="#9C6A47"/><ellipse cx="50" cy="66" rx="13" ry="10" fill="#D9AE8A"/>${eyes(50,13,5)}<ellipse cx="50" cy="62" rx="5" ry="3.6" fill="#14161C"/>${smile(68,5)}`],
+  ['cat','Cat','#6B3F7C',`<path d="M26 20l8 26-16 2z" fill="#9AA1AE"/><path d="M74 20l-8 26 16 2z" fill="#9AA1AE"/><circle cx="50" cy="56" r="28" fill="#AEB5C2"/>${eyes(52,13,5.5)}<path d="M47 63h6l-3 3z" fill="#FF8FA3"/><path d="M20 62h16M20 68h16M64 62h16M64 68h16" stroke="#5B6170" stroke-width="2" stroke-linecap="round"/>`],
+  ['panda','Panda','#2F7A6B',`<circle cx="27" cy="31" r="11" fill="#1B1D22"/><circle cx="73" cy="31" r="11" fill="#1B1D22"/><circle cx="50" cy="56" r="29" fill="#F6F6F4"/><ellipse cx="37" cy="52" rx="8" ry="10" fill="#1B1D22" transform="rotate(-20 37 52)"/><ellipse cx="63" cy="52" rx="8" ry="10" fill="#1B1D22" transform="rotate(20 63 52)"/>${E(37,52,3.5,'#fff')}${E(63,52,3.5,'#fff')}<ellipse cx="50" cy="64" rx="5" ry="3.5" fill="#1B1D22"/>${smile(69,5)}`],
+  ['bunny','Bunny','#7C3A55',`<ellipse cx="38" cy="22" rx="8" ry="20" fill="#F2EEF2"/><ellipse cx="62" cy="22" rx="8" ry="20" fill="#F2EEF2"/><ellipse cx="38" cy="22" rx="3.5" ry="14" fill="#FFB3C7"/><ellipse cx="62" cy="22" rx="3.5" ry="14" fill="#FFB3C7"/><circle cx="50" cy="60" r="26" fill="#F7F3F7"/>${eyes(56,11,4.5)}${cheeks(64)}<path d="M47 63h6l-3 3z" fill="#FF8FA3"/>`],
+  ['frog','Frog','#264A7A',`<circle cx="33" cy="34" r="12" fill="#5CC46A"/><circle cx="67" cy="34" r="12" fill="#5CC46A"/><ellipse cx="50" cy="60" rx="33" ry="24" fill="#5CC46A"/>${E(33,34,6)}${E(67,34,6)}<path d="M28 62q22 18 44 0" fill="none" stroke="#1E5E2A" stroke-width="3.4" stroke-linecap="round"/>${cheeks(58,'#FF9A7A')}`],
+  ['robot','Robot','#4B2E6E',`<path d="M50 14v10" stroke="#C8CDD8" stroke-width="3"/><circle cx="50" cy="13" r="4" fill="#FF6B6B"/><rect x="22" y="26" width="56" height="50" rx="12" fill="#C8CDD8"/><rect x="29" y="38" width="42" height="16" rx="8" fill="#1B1D22"/><rect x="34" y="43" width="10" height="6" rx="3" fill="#6EE7F0"/><rect x="56" y="43" width="10" height="6" rx="3" fill="#6EE7F0"/><rect x="38" y="62" width="24" height="5" rx="2.5" fill="#7A8090"/><rect x="16" y="44" width="6" height="14" rx="3" fill="#9AA1AE"/><rect x="78" y="44" width="6" height="14" rx="3" fill="#9AA1AE"/>`],
+  ['alien','Alien','#1F2A44',`<path d="M38 22l-6-10M62 22l6-10" stroke="#7EE8B4" stroke-width="3" stroke-linecap="round"/><circle cx="31" cy="11" r="4" fill="#7EE8B4"/><circle cx="69" cy="11" r="4" fill="#7EE8B4"/><path d="M50 20c20 0 30 14 30 30 0 18-16 32-30 32S20 68 20 50c0-16 10-30 30-30z" fill="#7EE8B4"/><ellipse cx="37" cy="50" rx="9" ry="12" fill="#14161C" transform="rotate(-25 37 50)"/><ellipse cx="63" cy="50" rx="9" ry="12" fill="#14161C" transform="rotate(25 63 50)"/><circle cx="39" cy="45" r="2.6" fill="#fff"/><circle cx="65" cy="45" r="2.6" fill="#fff"/>${smile(70,6,'#1E5E4A')}`],
+  ['ghost','Ghost','#3A2F6B',`<path d="M24 82V46a26 26 0 0 1 52 0v36l-8.7-7-8.6 7-8.7-7-8.7 7-8.6-7z" fill="#F4F4F6"/>${eyes(48,11,5.5)}<ellipse cx="50" cy="62" rx="5" ry="6" fill="#14161C"/>${cheeks(57)}`],
+  ['monster','Monster','#7A2F2F',`<path d="M30 30l-6-14 14 8zM70 30l6-14-14 8z" fill="#F7E36B"/><path d="M50 22c22 0 30 16 30 34s-10 26-30 26-30-8-30-26 8-34 30-34z" fill="#B38CFF"/><circle cx="50" cy="48" r="13" fill="#fff"/>${E(50,49,7)}<path d="M36 66q14 12 28 0" fill="#14161C"/><path d="M42 67l3 5 3-5M52 67l3 5 3-5" fill="#fff"/>`],
+  ['astronaut','Astronaut','#14213D',`<circle cx="50" cy="52" r="32" fill="#E9ECF2"/><rect x="26" y="34" width="48" height="34" rx="17" fill="#26324F"/><path d="M34 42q8-6 16-4" stroke="#7CC4FF" stroke-width="4" stroke-linecap="round" fill="none" opacity=".8"/><circle cx="64" cy="58" r="3" fill="#7CC4FF" opacity=".6"/><rect x="44" y="80" width="12" height="6" rx="3" fill="#FF6B6B"/>`],
+  ['penguin','Penguin','#2C5E8A',`<circle cx="50" cy="54" r="30" fill="#1F2229"/><path d="M50 34c14 0 22 10 22 22s-8 24-22 24-22-12-22-24 8-22 22-22z" fill="#F6F6F4"/>${eyes(50,10,4.5)}<path d="M44 58h12l-6 7z" fill="#FF9F43"/>${cheeks(60)}`],
+  ['dino','Dino','#5A3A1F',`<path d="M38 22l5-9 5 9M50 20l5-9 5 9M62 24l5-8 4 9" fill="#3ED598"/><path d="M22 52c0-18 12-30 30-30s28 12 28 28v10c0 12-10 20-24 20H40c-12 0-18-10-18-28z" fill="#3ED598"/>${E(40,46,5)}<circle cx="66" cy="58" r="2" fill="#1E5E4A"/><circle cx="72" cy="58" r="2" fill="#1E5E4A"/><path d="M34 66q14 8 30 0" fill="none" stroke="#1E5E4A" stroke-width="3.2" stroke-linecap="round"/>`],
+  ['tiger','Tiger','#1E3A5F',`<circle cx="27" cy="31" r="10" fill="#F59E2E"/><circle cx="73" cy="31" r="10" fill="#F59E2E"/><circle cx="50" cy="56" r="29" fill="#F7A83A"/><path d="M50 27v10M40 29l2 8M60 29l-2 8M22 50h9M22 58h8M78 50h-9M78 58h-8" stroke="#2A1A10" stroke-width="3.2" stroke-linecap="round"/><ellipse cx="50" cy="68" rx="14" ry="10" fill="#FFF3E6"/>${eyes(51,12,5)}<ellipse cx="50" cy="63" rx="5" ry="3.5" fill="#2A1A10"/>`],
+  ['owl','Owl','#2E4A3A',`<path d="M26 26l10 10M74 26L64 36" stroke="#7A5233" stroke-width="5" stroke-linecap="round"/><ellipse cx="50" cy="56" rx="30" ry="29" fill="#9C6A47"/><circle cx="37" cy="50" r="12" fill="#F4E6D2"/><circle cx="63" cy="50" r="12" fill="#F4E6D2"/>${E(37,50,6)}${E(63,50,6)}<path d="M45 60h10l-5 8z" fill="#F2BF4C"/>`],
+  ['koala','Koala','#3D5A6B',`<circle cx="24" cy="38" r="15" fill="#9AA1AE"/><circle cx="76" cy="38" r="15" fill="#9AA1AE"/><circle cx="24" cy="38" r="8" fill="#E7DCE6"/><circle cx="76" cy="38" r="8" fill="#E7DCE6"/><circle cx="50" cy="56" r="27" fill="#B5BCC8"/><ellipse cx="50" cy="61" rx="8" ry="11" fill="#2A2D35"/>${eyes(50,15,4.5)}`],
+  ['lion','Lion','#6B2F3F',`<circle cx="50" cy="54" r="36" fill="#C46A1E"/><circle cx="50" cy="56" r="25" fill="#F2BF4C"/>${eyes(52,10,4.5)}<ellipse cx="50" cy="62" rx="5" ry="3.5" fill="#5A3412"/>${smile(68,5,'#5A3412')}`],
+  ['octopus','Octopus','#14404A',`<path d="M24 52a26 26 0 0 1 52 0v8c0 4-3 6-6 6s-4-6-7-6-4 8-7 8-4-8-6-8-3 8-6 8-4-8-7-8-3 6-7 6-6-2-6-6z" fill="#FF8FC7"/>${eyes(46,11,5.5)}${smile(56,5)}<circle cx="38" cy="30" r="3" fill="#fff" opacity=".4"/>`],
+  ['sun','Sunny','#2B4A7A',`<g stroke="#F7E36B" stroke-width="5" stroke-linecap="round"><path d="M50 8v10M50 82v10M8 50h10M82 50h10M20 20l7 7M73 73l7 7M80 20l-7 7M27 73l-7 7"/></g><circle cx="50" cy="50" r="26" fill="#F7E36B"/>${eyes(46,9,4)}${smile(56,8)}${cheeks(54,'#FF9F43')}`],
+  ['cactus','Cactus','#7A3F2A',`<rect x="38" y="20" width="24" height="58" rx="12" fill="#3ED598"/><path d="M38 52H28a6 6 0 0 1-6-6V36" stroke="#3ED598" stroke-width="10" stroke-linecap="round" fill="none"/><path d="M62 46h10a6 6 0 0 0 6-6v-8" stroke="#3ED598" stroke-width="10" stroke-linecap="round" fill="none"/><rect x="32" y="74" width="36" height="14" rx="4" fill="#D9A27A"/>${E(45,40,3.5)}${E(55,40,3.5)}${smile(48,4,'#1E5E4A')}<circle cx="50" cy="18" r="4" fill="#FF8FC7"/>`],
+  ['ninja','Ninja','#5A1F2F',`<circle cx="50" cy="52" r="30" fill="#22252D"/><rect x="22" y="42" width="56" height="16" rx="8" fill="#E8C3A0"/>${E(40,50,4.5)}${E(60,50,4.5)}<path d="M78 46l12-6M78 50l12 2" stroke="#FF6B6B" stroke-width="4" stroke-linecap="round"/><rect x="20" y="40" width="60" height="4" rx="2" fill="#FF6B6B"/>`],
+  ['blob','Blobby','#3A3F7A',`<path d="M50 20c18 0 30 12 30 30 0 20-12 32-30 32S20 70 20 50c0-18 12-30 30-30z" fill="#6EE7F0"/>${eyes(48,11,5.5)}${smile(60,7)}${cheeks(58)}<circle cx="38" cy="30" r="4" fill="#fff" opacity=".5"/>`],
+  ['shark','Shark','#0F3B57',`<path d="M50 14l10 16H40z" fill="#7C8A9E"/><ellipse cx="50" cy="56" rx="32" ry="28" fill="#8E9CB0"/><path d="M26 62q24 22 48 0q-6 18-24 18t-24-18z" fill="#F4F4F6"/>${eyes(48,15,5)}<path d="M34 64l4 5 4-5 4 5 4-5 4 5 4-5 4 5 4-5" fill="none" stroke="#14161C" stroke-width="2.4" stroke-linejoin="round"/>`],
+  ['wizard','Wizard','#2A1F4A',`<path d="M50 6l18 34H32z" fill="#7A5CFF"/><circle cx="56" cy="22" r="3" fill="#F7E36B"/><rect x="26" y="38" width="48" height="6" rx="3" fill="#5A3FD8"/><circle cx="50" cy="58" r="20" fill="#F0C9A4"/>${eyes(55,8,3.5)}<path d="M32 64q18 30 36 0q-4 20-18 22-14-2-18-22z" fill="#F4F4F6"/>`]
+  ].map(([id,n,bg,g])=>({id,n,bg,svg:`<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="${bg}"/><circle cx="50" cy="100" r="60" fill="#fff" opacity=".06"/>${g}</svg>`}))})();
+function avatarInner(){const P=S.profile||{};if(P.photo)return `<img src="${P.photo}" alt="">`;const a=P.avatar&&AVT.find(x=>x.id===P.avatar);return a?a.svg:`${esc(initials(P.name))}`}
+function avatarCls(){const P=S.profile||{};return P.photo||(P.avatar&&AVT.some(x=>x.id===P.avatar))?' pic':''}
+function renderProfileBtn(){const b=$('profBtn');if(!b)return;b.innerHTML=`<span class="${avatarCls().trim()}">${avatarInner()}</span>`;b.title=S.profile.name||'Profile'}
+function openAvatarPicker(){const P=S.profile||{};
+  sheet(`<div><div class="eyebrow">Profile picture</div><h3>Who's training?</h3><p class="note">Pick a character, use your own photo, or keep your initials.</p></div>
+    <div class="avg" id="avG">${AVT.map(a=>`<button type="button" class="avt" data-av="${a.id}" aria-pressed="${P.avatar===a.id&&!P.photo}" aria-label="${a.n}">${a.svg}<span>${a.n}</span></button>`).join('')}</div>
+    <div class="row" style="gap:8px;flex-wrap:wrap"><label class="ghost av-up" for="avF">Use a photo</label><input id="avF" type="file" accept="image/*" hidden><button class="ghost" type="button" id="avI">Use initials (${esc(initials(P.name))})</button></div>
+    <div class="row" style="justify-content:flex-end"><button class="primary" type="button" id="avOk">Done</button></div>`,{nofocus:true});
+  const done=()=>{save();renderProfileBtn();if(typeof renderMe==='function'&&pgStack&&pgStack.includes('me'))renderMe();if(pgStack&&pgStack.includes('account'))renderAccount();};
+  $('avG').onclick=e=>{const b=e.target.closest('[data-av]');if(!b)return;S.profile.avatar=b.dataset.av;delete S.profile.photo;$('avG').querySelectorAll('[data-av]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));done()};
+  $('avI').onclick=()=>{delete S.profile.avatar;delete S.profile.photo;$('avG').querySelectorAll('[data-av]').forEach(x=>x.setAttribute('aria-pressed','false'));done();toast('Showing your initials')};
+  $('avF').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{const c=document.createElement('canvas'),z=192,m=Math.min(img.width,img.height);c.width=c.height=z;c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,z,z);URL.revokeObjectURL(u);S.profile.photo=c.toDataURL('image/jpeg',.82);$('avG').querySelectorAll('[data-av]').forEach(x=>x.setAttribute('aria-pressed','false'));done();toast('Photo set')};img.onerror=()=>toast('Couldn’t read that image');img.src=u};
+  $('avOk').onclick=closeSheet}
 /* ================= PAGES (profile, settings, details) ================= */
 const sv=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const GI={user:sv('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),body:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 9.5a5 5 0 0 1 7 0L12 13z"/>'),
@@ -2631,7 +2685,7 @@ window.addEventListener('scroll',()=>document.documentElement.classList.toggle('
   R.addEventListener('touchstart',e=>{const t=e.touches[0];if(t.clientX<28){x0=t.clientX;y0=t.clientY;dx=0}else x0=null},{passive:true});
   R.addEventListener('touchmove',e=>{if(x0==null)return;const t=e.touches[0];dx=t.clientX-x0;if(Math.abs(t.clientY-y0)>Math.abs(dx)&&dx<20){x0=null;B.style.transform='';return}if(dx>0)B.style.transform=`translateX(${dx}px)`},{passive:true});
   R.addEventListener('touchend',()=>{if(x0==null)return;B.style.transition='transform .2s';if(dx>90){B.style.transform='translateX(100%)';setTimeout(()=>{B.style.transition='';B.style.transform='';pageBack()},180)}else{B.style.transform='';setTimeout(()=>B.style.transition='',220)}x0=null});})();
-const GACT={templates:()=>openTemplates(),plan:()=>{closePages();setView('plan')},apple:()=>openSetupChooser(),redo:()=>{closePages();openOnb()},builder:()=>{S.showBuilder=!S.showBuilder;renderPlan()},syncnow:()=>syncDevices(true)};
+const GACT={avatar:()=>openAvatarPicker(),templates:()=>openTemplates(),plan:()=>{closePages();setView('plan')},apple:()=>openSetupChooser(),redo:()=>{closePages();openOnb()},builder:()=>{S.showBuilder=!S.showBuilder;renderPlan()},syncnow:()=>syncDevices(true)};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-pg]');if(g){openPage(g.dataset.pg);return}const a=e.target.closest('[data-ga]');if(a&&GACT[a.dataset.ga])GACT[a.dataset.ga]()});
 function streak(){let k=todayKey(),n=0;if(!(S.days[k]||[]).length)k=addDays(k,-1);while((S.days[k]||[]).length){n++;k=addDays(k,-1)}return n}
 function bodyLine(){const c=S.calc||{},lw=latestWeight(),w=(lw&&lw.w)||c.wt;if(!c.age&&!w)return '';return [c.ht?`${Math.floor(c.ht/12)}′${r0(c.ht%12)}″`:'',w?`${r1(w)} lb`:'',c.age?`${c.age} y`:''].filter(Boolean).join(' · ')}
@@ -2639,7 +2693,7 @@ function planLabel(){if(!S.plan)return 'No plan';return S.plan.type==='cut'?'Cut
 function renderMe(){
   const c=syncCfg(),st=c.st||{},lw=latestWeight(),g=goalsFor(todayKey()),nWk=trainFeed().length,nd=Object.keys(S.days).filter(k=>(S.days[k]||[]).length).length,sk=streak();
   const conn=[st.whoop?'WHOOP':'',st.oura?'Oura':'',st.garmin?'Garmin':''].filter(Boolean);
-  $('pg-me').innerHTML=`<div class="me-hero art" style='--bnr:${bnr("plan")}'><div class="avatar"><span>${esc(initials(S.profile.name))}</span></div><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p></div>
+  $('pg-me').innerHTML=`<div class="me-hero art" style='--bnr:${bnr("plan")}'><button class="avatar" type="button" data-ga="avatar" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p></div>
     <div class="live"><div style="--c:var(--carb)"><b>${sk}</b><span>day streak</span></div><div style="--c:var(--kcal)"><b>${nd}</b><span>days logged</span></div><div style="--c:var(--pro)"><b>${nWk}</b><span>workouts</span></div><div style="--c:var(--fat)"><b>${lw?r1(lw.w):'—'}</b><span>latest lb</span></div></div>
     <div class="glabel">Account</div><div class="glist">
       ${grow({pg:'account',ic:'user',c:'--kcal',t:'Personal info',s:'Name and the devices you wear',v:esc(S.profile.name||'')})}
@@ -2670,15 +2724,19 @@ function renderMe(){
 }
 function renderAccount(){
   const wear=S.profile.wear||[];
-  $('pg-account').innerHTML=`<div class="me-hero"><div class="avatar"><span>${esc(initials(S.profile.name))}</span></div></div>
+  $('pg-account').innerHTML=`<div class="me-hero"><button class="avatar" type="button" id="acAv" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button></div>
     <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="field"><label for="acN">Name</label><input id="acN" type="text" value="${esc(S.profile.name||'')}" placeholder="Your name" autocomplete="name"></div>
     <div class="field"><label>What you wear</label><div class="wn-acts" id="acW">${WEAR.map(([v,l])=>`<button type="button" class="chip" data-w="${v}" aria-pressed="${wear.includes(v)}">${l}</button>`).join('')}</div></div>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="acSave">Save</button></div></div>
     <p class="note" style="padding:0 6px">Your profile and everything you log live only on this phone. Anyone else who opens the Syncope link gets their own separate copy.</p>`;
+  $('acAv').onclick=openAvatarPicker;
   $('acW').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;const on=b.getAttribute('aria-pressed')!=='true';if(b.dataset.w==='none'&&on)$('acW').querySelectorAll('[data-w]').forEach(x=>x.setAttribute('aria-pressed','false'));else if(on)$('acW').querySelector('[data-w="none"]').setAttribute('aria-pressed','false');b.setAttribute('aria-pressed',String(on))};
   $('acSave').onclick=()=>{S.profile.name=$('acN').value.trim();S.profile.wear=[...$('acW').querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.w);save();renderProfileBtn();toast('Saved');pageBack()};
 }
-const ACCENTS=[['#C7B6FF','Lavender'],['#C9F26B','Lime'],['#4FC8D8','Teal'],['#FF9A7A','Coral'],['#F2BF4C','Gold']];
+const ACCENTS=[['#C7B6FF','Lavender'],['#C9F26B','Lime'],['#4FC8D8','Teal'],['#FF9A7A','Coral'],['#F2BF4C','Gold'],
+  ['#9AA8FF','Periwinkle'],['#B38CFF','Violet'],['#E08CFF','Orchid'],['#FF8FC7','Pink'],['#FF7A9C','Rose'],['#FF6B6B','Red'],['#FF9F43','Tangerine'],
+  ['#FFC09F','Peach'],['#F7E36B','Lemon'],['#9BE15D','Grass'],['#3ED598','Emerald'],['#7EE8B4','Mint'],['#2FD1B0','Jade'],['#6EE7F0','Aqua'],
+  ['#7CC4FF','Sky'],['#5FA8FF','Ocean'],['#BFE6FF','Ice'],['#E5C99A','Sand'],['#D9A27A','Caramel'],['#C8CDD8','Silver'],['#F4F4F6','White']];
 function applyPrefs(){const P=S.prefs||{};document.documentElement.style.setProperty('--kcal',P.accent||'#C7B6FF')}
 function renderPrefs(){
   const P=S.prefs||(S.prefs={}),cutDef=S.plan&&S.plan.type==='cut'?50:75,pct=P.fuelPct??cutDef;
@@ -2690,7 +2748,8 @@ function renderPrefs(){
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}</div>
     <div class="glabel">Look</div><div class="glist">
-      ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="gopts">${ACCENTS.map(([v,l])=>`<button type="button" class="chip" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}"><i class="swatch" style="--c:${v}"></i>${l}</button>`).join('')}</div>
+      ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="acc-grid">${ACCENTS.map(([v,l])=>`<button type="button" class="acc" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}" aria-label="${l}" title="${l}" style="--c:${v}"><i></i><span>${l}</span></button>`).join('')}</div>
+      ${grow({ga:'avatar',ic:'user',c:'--pro',t:'Profile picture',s:'Pick a character or use your own photo',v:''})}
       ${grow({ic:'camera',c:'--carb',t:'Food photos',s:'Photo headers from Unsplash (needs internet)',ctl:`<input type="checkbox" class="sw" data-tog="photos" ${P.photos!==false?'checked':''} aria-label="Food photos">`})}
       ${grow({ic:'cal',c:'--fat',t:'Week starts on',ctl:' '})}${chips('wkSun',[[0,'Monday'],[1,'Sunday']],P.wkSun?1:0)}</div>
     <div class="glabel">Sync</div><div class="glist">
