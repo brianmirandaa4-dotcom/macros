@@ -1940,7 +1940,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.24';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.25';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3196,8 +3196,8 @@ function renderPrefs(){
     <div class="glabel">Today screen</div><div class="glist">${grow({ic:'list',c:'--kcal',t:'Daily checklist',s:'Weigh in, meals, protein, train, check-in',ctl:`<input type="checkbox" class="sw" data-tog="showCoach" ${!P.hideCoach?'checked':''} aria-label="Daily checklist">`})}</div>
     <div class="glabel">Training</div><div class="glist">
       ${grow({ic:'timer',c:'--pro',t:'Rest timer',s:'Starts when you tick off a set',ctl:' '})}${chips('restSec',[[60,'1:00'],[90,'1:30'],[120,'2:00'],[180,'3:00'],[240,'4:00']],S.restSec||120)}
-      ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Plays when rest ends, even with the lock-screen timer on.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">▶ ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
-      <div class="rs-up"><button type="button" class="ghost" id="rsUp">${cm?'Replace your sound':'＋ Upload your own sound'}</button>${cm?'<button type="button" class="link" id="rsDel" style="color:var(--over)">Remove</button>':''}<input type="file" id="rsIn" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden><span class="note" id="rsSt">${cm?`${esc(cm.name)} · ${r1(cm.sec)} s`:'Any 1–5 second clip (MP3, M4A, WAV): a hype line, a horn, your coach. Longer clips use the first 5 seconds.'}</span></div>`})()}</div>
+      ${grow({ic:'bell',c:'--kcal',t:'Rest-over sound',s:'Tap one to hear it. Your music keeps playing and dips while it sounds.',ctl:' '})}${(()=>{const cm=rsCustomMeta(),cur=restSoundId();return `<div class="gopts">${REST_SOUNDS.map(([v,l])=>`<button type="button" class="chip" data-pk="restSound" data-pv="${v}" aria-pressed="${cur===v}">${v==='none'?'🔇':'▶'} ${l}</button>`).join('')}${cm?`<button type="button" class="chip" data-pk="restSound" data-pv="custom" aria-pressed="${cur==='custom'}">▶ ${esc(cm.name)}</button>`:''}</div>
+      <div class="rs-up"><button type="button" class="ghost" id="rsUp">${cm?'Replace your sound':'＋ Upload your own sound'}</button>${cm?'<button type="button" class="link" id="rsDel" style="color:var(--over)">Remove</button>':''}<input type="file" id="rsIn" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" hidden><span class="note" id="rsSt">${cm?`${esc(cm.name)} · ${r1(cm.sec)} s`:'Any short clip (MP3, M4A, WAV): a hype line, a horn, your coach. It plays at full quality and its real length.'}</span></div>`})()}</div>
     <div class="glabel">Look</div><div class="glist">
       ${grow({ic:'palette',c:'--kcal',t:'Accent color',s:'Tabs, buttons and the calorie ring',ctl:' '})}<div class="acc-grid">${ACCENTS.map(([v,l])=>`<button type="button" class="acc" data-pk="accent" data-pv="${v}" aria-pressed="${(P.accent||'#C7B6FF')===v}" aria-label="${l}" title="${l}" style="--c:${v}"><i></i><span>${l}</span></button>`).join('')}</div>
       ${grow({ga:'avatar',ic:'user',c:'--pro',t:'Profile picture',s:'Pick a character or use your own photo',v:''})}
@@ -3210,7 +3210,7 @@ function renderPrefs(){
   el.onchange=e=>{const t=e.target.closest('[data-tog]');if(!t)return;if(t.dataset.tog==='showCoach')S.prefs.hideCoach=!t.checked;else S.prefs[t.dataset.tog]=t.checked;save();renderPrefs()};
   if($('rsUp')){$('rsUp').onclick=()=>{restCtx();$('rsIn').click()};
     $('rsIn').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const st=$('rsSt');
-      if(f.size>900e3){st.textContent='That file is too big. Use a clip of about 5 seconds (under 900 KB).';return}
+      if(f.size>1.5e6){st.textContent='That file is too big. Use a clip under about 15 seconds (1.5 MB).';return}
       st.textContent='Loading…';const url=await readDataURL(f).catch(()=>null);if(!url){st.textContent='Couldn’t read that file.';return}
       const prev=localStorage.getItem(RS_KEY);try{localStorage.setItem(RS_KEY,JSON.stringify({name:(f.name||'My sound').replace(/\.[a-z0-9]+$/i,'').slice(0,24),data:url,sec:0}))}catch(er){st.textContent='Not enough room to save that clip on this phone. Try a shorter one.';return}
       RS_CUSTOM=null;const c=await rsLoadCustom();
@@ -5141,9 +5141,14 @@ function editTemplate(d){
    countdown shows in the lock screen's Now Playing and the beep still sounds while the phone is locked. */
 let restAC=null,restAudio=null,restWake=null,restBeeped=0,restTail=0;
 const restLockOn=()=>!!(S.prefs&&S.prefs.restLock);
-function restCtx(){try{restAC=restAC||new (window.AudioContext||window.webkitAudioContext)();if(restAC.state==='suspended')restAC.resume()}catch(e){}return restAC}
+/* Music-friendly audio: Syncope's audio session stays "ambient" (mixes with Spotify/Apple Music and never pauses it).
+   For the rest-over sound it switches to "transient", which ducks the music, then switches back so it comes up again. */
+const ASess=()=>navigator.audioSession||null;
+function sessType(t){try{const a=ASess();if(a&&a.type!==t)a.type=t}catch(e){}}
+sessType('ambient');
+function restCtx(){try{if(!restLockOn()||!restAudio)sessType('ambient');restAC=restAC||new (window.AudioContext||window.webkitAudioContext)();if(restAC.state==='suspended')restAC.resume()}catch(e){}return restAC}
 /* Rest-over sounds: synthesized on the phone (no downloads), or your own 1-5 s clip. */
-const REST_SOUNDS=[['beep','Soft beep'],['chime','Chime'],['bell','Boxing bell'],['whistle','Coach whistle'],['horn','Air horn'],['rise','Level up'],['drum','Drums']];
+const REST_SOUNDS=[['none','Off'],['beep','Soft beep'],['chime','Chime'],['bell','Boxing bell'],['whistle','Coach whistle'],['horn','Air horn'],['rise','Level up'],['drum','Drums']];
 const RS_KEY='syncope.restsound';let RS_CUSTOM=null;
 const restSoundId=()=>{const v=(S.prefs&&S.prefs.restSound)||'beep';return v==='custom'&&!rsCustomStored()?'beep':v};
 function rsCustomStored(){try{return !!localStorage.getItem(RS_KEY)}catch(e){return false}}
@@ -5166,21 +5171,34 @@ function synthSound(id,sr){
   let pk=0;for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(o[i]));if(pk>0)for(let i=0;i<n;i++)o[i]*=.9/pk;return o}
 function resamp(src,from,to){if(from===to)return src;const n=Math.floor(src.length*to/from),o=new Float32Array(n),r=from/to;for(let i=0;i<n;i++){const x=i*r,j=Math.floor(x),f=x-j;o[i]=(src[j]||0)*(1-f)+(src[j+1]||0)*f}return o}
 async function rsLoadCustom(){if(RS_CUSTOM||!rsCustomStored())return RS_CUSTOM;try{const j=JSON.parse(localStorage.getItem(RS_KEY));const bin=atob(j.data.split(',')[1]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
-  const ac=restCtx()||new (window.AudioContext||window.webkitAudioContext)();const buf=await new Promise((res,rej)=>{const p=ac.decodeAudioData(u8.buffer,res,rej);if(p&&p.then)p.then(res,rej)});
-  const sr=buf.sampleRate,len=Math.min(buf.length,Math.round(5*sr)),mono=new Float32Array(len);for(let c=0;c<buf.numberOfChannels;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++)mono[i]+=d[i]/buf.numberOfChannels}
-  const fade=Math.round(.08*sr);for(let i=0;i<fade&&i<len;i++)mono[len-1-i]*=i/fade;RS_CUSTOM={sr,data:mono,sec:len/sr};return RS_CUSTOM}catch(e){return null}}
-function rsSamples(sr,id=restSoundId()){if(id==='custom'&&RS_CUSTOM)return resamp(RS_CUSTOM.data,RS_CUSTOM.sr,sr);return synthSound(id==='custom'?'beep':id,sr)}
-function rsDur(){const id=restSoundId();return id==='custom'&&RS_CUSTOM?RS_CUSTOM.sec:({beep:.42,chime:1.2,bell:1.9,whistle:.8,horn:.95,rise:.75,drum:1.05}[id]||.5)}
-function playRestSound(id){const ac=restCtx();if(!ac)return;const go=()=>{try{const d=rsSamples(ac.sampleRate,id),b=ac.createBuffer(1,d.length,ac.sampleRate);b.getChannelData(0).set(d);const src=ac.createBufferSource();src.buffer=b;src.connect(ac.destination);src.start()}catch(e){}};
-  if((id||restSoundId())==='custom'&&!RS_CUSTOM)rsLoadCustom().then(go);else go()}
+  const ac=restCtx();if(!ac)return null;const buf=await new Promise((res,rej)=>{const p=ac.decodeAudioData(u8.buffer,res,rej);if(p&&p.then)p.then(res,rej)});
+  // keep the clip exactly as recorded; only trim leading silence so it fires right on zero, and cap very long files at 15 s
+  const sr=buf.sampleRate,ch=[...Array(buf.numberOfChannels)].map((_,c)=>buf.getChannelData(c));let st=0;const lim=Math.min(buf.length,sr*2);while(st<lim&&ch.every(d=>Math.abs(d[st])<.004))st++;
+  const len=Math.min(buf.length-st,Math.round(15*sr)),out=ac.createBuffer(ch.length,Math.max(1,len),sr);ch.forEach((d,c)=>out.getChannelData(c).set(d.subarray(st,st+len)));
+  RS_CUSTOM={buf:out,sec:len/sr};return RS_CUSTOM}catch(e){return null}}
+function rsBuffer(ac,id=restSoundId()){if(id==='none')return null;if(id==='custom'&&RS_CUSTOM)return RS_CUSTOM.buf;const d=synthSound(id==='custom'?'beep':id,ac.sampleRate),b=ac.createBuffer(1,d.length,ac.sampleRate);b.getChannelData(0).set(d);return b}
+function rsDur(){const id=restSoundId();return id==='none'?0:id==='custom'&&RS_CUSTOM?RS_CUSTOM.sec:({beep:.42,chime:1.2,bell:1.9,whistle:.8,horn:.95,rise:.75,drum:1.05}[id]||.5)}
+// Play now, or at an exact moment on the audio clock. Music is ducked just before and restored right after.
+let rsSrc=null,rsT1=0,rsT2=0;
+function rsCancel(){clearTimeout(rsT1);clearTimeout(rsT2);if(rsSrc){try{rsSrc.stop()}catch(e){}rsSrc=null}sessType('ambient')}
+function playRestSound(id,atMs){const ac=restCtx();if(!ac)return;id=id||restSoundId();if(id==='none')return;
+  const go=()=>{try{rsCancel();const b=rsBuffer(ac,id);if(!b)return;const wait=Math.max(0,((atMs||Date.now())-Date.now())/1000),src=ac.createBufferSource();src.buffer=b;src.connect(ac.destination);
+    const dur=b.duration;rsT1=setTimeout(()=>sessType('transient'),Math.max(0,wait*1000-150));src.start(ac.currentTime+wait);rsSrc=src;
+    src.onended=()=>{if(rsSrc===src)rsSrc=null;rsT2=setTimeout(()=>sessType('ambient'),250)};restBeeped=atMs||Date.now()}catch(e){}};
+  if(id==='custom'&&!RS_CUSTOM)rsLoadCustom().then(go);else go()}
 function restBeep(){playRestSound()}
-function restWav(sec){const sr=11025,b0=Math.round(sec*sr),tail=rsSamples(sr),n=b0+tail.length+Math.round(.1*sr),buf=new Uint8Array(44+n),dv=new DataView(buf.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)buf[o+i]=t.charCodeAt(i)};
-  w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);
-  buf.fill(128,44);for(let i=0;i<tail.length;i++)buf[44+b0+i]=128+Math.max(-127,Math.min(127,Math.round(120*tail[i])));
+function restBuzz(){try{navigator.vibrate&&navigator.vibrate([90,70,90])}catch(e){}}
+async function rsTail(sr){const id=restSoundId();if(id==='none')return new Float32Array(0);if(id==='custom'){await rsLoadCustom();if(RS_CUSTOM){const b=RS_CUSTOM.buf;
+    try{const oc=new (window.OfflineAudioContext||window.webkitOfflineAudioContext)(1,Math.ceil(b.duration*sr)+1,sr),src=oc.createBufferSource();src.buffer=b;src.connect(oc.destination);src.start();const r=await oc.startRendering();return r.getChannelData(0)}catch(e){}}}
+  return synthSound(id==='custom'?'beep':id,sr)}
+async function restWav(sec){const sr=22050,b0=Math.round(sec*sr),tail=await rsTail(sr),n=b0+tail.length+Math.round(.1*sr),buf=new ArrayBuffer(44+n*2),dv=new DataView(buf),w=(o,t)=>{for(let i=0;i<t.length;i++)dv.setUint8(o+i,t.charCodeAt(i))};
+  w(0,'RIFF');dv.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,'data');dv.setUint32(40,n*2,true);
+  for(let i=0;i<tail.length;i++)dv.setInt16(44+(b0+i)*2,Math.max(-32767,Math.min(32767,Math.round(32767*tail[i]))),true);
   return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
-function restLockStop(){if(restAudio){try{restAudio.pause()}catch(e){}URL.revokeObjectURL(restAudio._u);restAudio=null}try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}}catch(e){}}
-function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;const left=(S.rest.end-Date.now())/1000;if(left<2)return;
-  const u=restWav(left),au=new Audio(u);au._u=u;au.setAttribute('playsinline','');restAudio=au;
+function restLockStop(){if(restAudio){try{restAudio.pause()}catch(e){}URL.revokeObjectURL(restAudio._u);restAudio=null;sessType('ambient')}try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}}catch(e){}}
+async function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;const end0=S.rest.end;sessType('playback');const u=await restWav(Math.max(0,(end0-Date.now())/1000));if(!S.rest||S.rest.end!==end0||!restLockOn()){URL.revokeObjectURL(u);return}
+  const left=(S.rest.end-Date.now())/1000;if(left<1){URL.revokeObjectURL(u);return}
+  const au=new Audio(u);au._u=u;au.setAttribute('playsinline','');restAudio=au;
   au.onended=()=>{if(restAudio===au){restBeeped=S.rest?S.rest.end:Date.now();restLockStop()}};
   au.play().catch(()=>{});
   try{if('mediaSession' in navigator){const at=new Date(S.rest.end).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
@@ -5190,21 +5208,22 @@ function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;const l
     try{navigator.mediaSession.setPositionState({duration:left+rsDur()+0.1,position:0,playbackRate:1})}catch(e){}}}catch(e){}}
 async function restWakeOn(){try{if(!restWake&&navigator.wakeLock&&document.visibilityState==='visible'){restWake=await navigator.wakeLock.request('screen');restWake.addEventListener('release',()=>{restWake=null})}}catch(e){}}
 function restWakeOff(){try{restWake&&restWake.release()}catch(e){}restWake=null}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.rest){restWakeOn();renderRest()}});
-function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();restLockStart();restWakeOn();renderRest()}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){sessType(restAudio?'playback':'ambient');if(S.rest){restWakeOn();if(S.rest.end-Date.now()>300)restArm();renderRest()}}});
+function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else playRestSound(null,S.rest.end)}
+function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();if(restSoundId()==='custom')rsLoadCustom();restArm();restLockStart();restWakeOn();renderRest()}
 function renderRest(){
   let el=$('restBar');
-  if(!S.rest||!S.active){if(el)el.remove();if(Date.now()>restTail)restLockStop();restWakeOff();return}
+  if(!S.rest||!S.active){if(el)el.remove();if(Date.now()>restTail){restLockStop();if(!S.rest&&rsSrc&&restBeeped>Date.now())rsCancel()}restWakeOff();return}
   if(!el){el=document.createElement('div');el.id='restBar';el.className='rest';document.body.appendChild(el);
     el.onclick=e=>{const b=e.target.closest('button');if(!b||!S.rest)return;restCtx();
       if(b.dataset.lock!=null){S.prefs=S.prefs||{};S.prefs.restLock=!restLockOn();save();
-        if(restLockOn()){restLockStart();toast('Lock-screen timer on · pauses music while resting')}else{restLockStop();toast('Lock-screen timer off')}
+        if(restLockOn()){rsCancel();restLockStart();toast('Lock-screen timer on · pauses music while resting')}else{restLockStop();restArm();toast('Lock-screen timer off · music keeps playing')}
         renderRest();return}
-      if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save();restLockStart()}else S.rest=null;renderRest()}}
+      if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save();restArm();restLockStart()}else{S.rest=null;rsCancel()}renderRest()}}
   const left=S.rest.end-Date.now();
   if(left<=0){const end=S.rest.end,late=Date.now()-end;S.rest=null;el.remove();restWakeOff();
     const au=restAudio,playing=au&&!au.paused&&!au.ended;restBuzz();
-    if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&restBeeped!==end)restBeep();restLockStop()}
+    if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&restBeeped!==end&&!rsSrc)restBeep();restLockStop()}
     toast('Rest is over. Next set!');return}
   el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
 }
