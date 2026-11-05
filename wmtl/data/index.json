@@ -1,0 +1,834 @@
+{
+ "schema": "wmtl.index.v1",
+ "built_utc": "2026-11-05T13:53Z",
+ "brand": "whomadethisline",
+ "slates": [
+  {
+   "id": "nfl-2026-wk08",
+   "sport": "NFL",
+   "path": "data/nfl/2026-wk08.json",
+   "label": "Week 8",
+   "date": "2026-11-01",
+   "date_label": "Sun Nov 1 – Mon Nov 2",
+   "week": 8,
+   "start_utc": "2026-11-01T18:00:00.000Z",
+   "end_utc": "2026-11-03T01:15:00.000Z",
+   "n_games": 13,
+   "n_props": 44,
+   "priced": 44,
+   "bets": 0,
+   "watch": 4,
+   "leans": 0,
+   "model_version": "v2.3",
+   "generated_et": "Fri Oct 30, 6:28 PM ET",
+   "prices_et": "Fri Oct 30 PM (FanDuel pages + web; partial board)",
+   "results": {
+    "status": "graded",
+    "graded": 43,
+    "bets": {
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0.0,
+     "risked": 0.0,
+     "roi": null
+    },
+    "by_tier": {
+     "bet": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "live": {
+      "w": 1,
+      "l": 3,
+      "p": 0,
+      "units": -2.12,
+      "risked": 4.0,
+      "roi": -0.5307
+     },
+     "lean": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "check": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "pass": {
+      "w": 19,
+      "l": 20,
+      "p": 0,
+      "units": -3.32,
+      "risked": 39.0,
+      "roi": -0.085
+     }
+    },
+    "by_market": {
+     "atd": {
+      "label": "Anytime TD",
+      "w": 8,
+      "l": 10,
+      "p": 0,
+      "units": -3.2,
+      "risked": 18.0,
+      "roi": -0.1779
+     },
+     "pass_yds": {
+      "label": "Passing yards",
+      "w": 1,
+      "l": 3,
+      "p": 0,
+      "units": -2.12,
+      "risked": 4.0,
+      "roi": -0.5307
+     },
+     "qb_rush": {
+      "label": "QB rushing yards",
+      "w": 2,
+      "l": 2,
+      "p": 0,
+      "units": -0.34,
+      "risked": 4.0,
+      "roi": -0.0854
+     },
+     "rec_yds": {
+      "label": "Receiving yards",
+      "w": 4,
+      "l": 3,
+      "p": 0,
+      "units": 0.51,
+      "risked": 7.0,
+      "roi": 0.0727
+     },
+     "receptions": {
+      "label": "Receptions",
+      "w": 4,
+      "l": 3,
+      "p": 0,
+      "units": 0.84,
+      "risked": 7.0,
+      "roi": 0.1204
+     },
+     "rush_yds": {
+      "label": "Rushing yards",
+      "w": 1,
+      "l": 2,
+      "p": 0,
+      "units": -1.12,
+      "risked": 3.0,
+      "roi": -0.3743
+     }
+    },
+    "lines": {
+     "won": 10,
+     "lost": 29,
+     "push": 0
+    },
+    "calib_bins": [
+     {
+      "lo": 0,
+      "hi": 0.3,
+      "n": 8,
+      "pred": 0.1709,
+      "hit": 0.0
+     },
+     {
+      "lo": 0.3,
+      "hi": 0.4,
+      "n": 4,
+      "pred": 0.3598,
+      "hit": 0.75
+     },
+     {
+      "lo": 0.4,
+      "hi": 0.45,
+      "n": 3,
+      "pred": 0.431,
+      "hit": 0.3333
+     },
+     {
+      "lo": 0.45,
+      "hi": 0.5,
+      "n": 5,
+      "pred": 0.475,
+      "hit": 0.6
+     },
+     {
+      "lo": 0.5,
+      "hi": 0.55,
+      "n": 19,
+      "pred": 0.5097,
+      "hit": 0.4737
+     },
+     {
+      "lo": 0.55,
+      "hi": 0.6,
+      "n": 4,
+      "pred": 0.5663,
+      "hit": 1.0
+     }
+    ]
+   }
+  },
+  {
+   "id": "nba-2026-11-02",
+   "sport": "NBA",
+   "path": "data/nba/2026-11-02.json",
+   "label": "Mon Nov 2",
+   "date": "2026-11-02",
+   "date_label": "Mon Nov 2",
+   "week": 1,
+   "start_utc": "2026-11-02T23:00:00.000Z",
+   "end_utc": "2026-11-03T02:00:00.000Z",
+   "n_games": 15,
+   "n_props": 1184,
+   "priced": 33,
+   "bets": 0,
+   "watch": 31,
+   "leans": 0,
+   "model_version": "nba v2.2",
+   "generated_et": "Mon Nov 2, 6:46 PM ET",
+   "prices_et": "Mon Nov 2, ~5:40 PM ET (consensus game lines; FanDuel prop boards for 4 players)",
+   "results": {
+    "status": "graded",
+    "graded": 33,
+    "bets": {
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0.0,
+     "risked": 0.0,
+     "roi": null
+    },
+    "by_tier": {
+     "bet": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "live": {
+      "w": 0,
+      "l": 1,
+      "p": 0,
+      "units": -1.0,
+      "risked": 1.0,
+      "roi": -1.0
+     },
+     "lean": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "check": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "pass": {
+      "w": 16,
+      "l": 16,
+      "p": 0,
+      "units": -0.18,
+      "risked": 32.0,
+      "roi": -0.0057
+     }
+    },
+    "by_market": {
+     "ast": {
+      "label": "Assists",
+      "w": 3,
+      "l": 1,
+      "p": 0,
+      "units": 1.88,
+      "risked": 4.0,
+      "roi": 0.4706
+     },
+     "blk": {
+      "label": "Blocks",
+      "w": 0,
+      "l": 1,
+      "p": 0,
+      "units": -1.0,
+      "risked": 1.0,
+      "roi": -1.0
+     },
+     "pa": {
+      "label": "Pts + Ast",
+      "w": 2,
+      "l": 2,
+      "p": 0,
+      "units": -0.18,
+      "risked": 4.0,
+      "roi": -0.0453
+     },
+     "pr": {
+      "label": "Pts + Reb",
+      "w": 3,
+      "l": 1,
+      "p": 0,
+      "units": 1.82,
+      "risked": 4.0,
+      "roi": 0.4562
+     },
+     "pra": {
+      "label": "Pts + Reb + Ast",
+      "w": 1,
+      "l": 3,
+      "p": 0,
+      "units": -2.18,
+      "risked": 4.0,
+      "roi": -0.5451
+     },
+     "pts": {
+      "label": "Points",
+      "w": 2,
+      "l": 2,
+      "p": 0,
+      "units": -0.04,
+      "risked": 4.0,
+      "roi": -0.0096
+     },
+     "ra": {
+      "label": "Reb + Ast",
+      "w": 1,
+      "l": 3,
+      "p": 0,
+      "units": -1.94,
+      "risked": 4.0,
+      "roi": -0.485
+     },
+     "reb": {
+      "label": "Rebounds",
+      "w": 3,
+      "l": 1,
+      "p": 0,
+      "units": 1.77,
+      "risked": 4.0,
+      "roi": 0.4426
+     },
+     "stl": {
+      "label": "Steals",
+      "w": 1,
+      "l": 0,
+      "p": 0,
+      "units": 1.68,
+      "risked": 1.0,
+      "roi": 1.68
+     },
+     "tpm": {
+      "label": "Threes made",
+      "w": 0,
+      "l": 3,
+      "p": 0,
+      "units": -3.0,
+      "risked": 3.0,
+      "roi": -1.0
+     }
+    },
+    "lines": {
+     "won": 22,
+     "lost": 23,
+     "push": 0
+    },
+    "calib_bins": [
+     {
+      "lo": 0.4,
+      "hi": 0.45,
+      "n": 3,
+      "pred": 0.4203,
+      "hit": 0.6667
+     },
+     {
+      "lo": 0.45,
+      "hi": 0.5,
+      "n": 6,
+      "pred": 0.4883,
+      "hit": 0.6667
+     },
+     {
+      "lo": 0.5,
+      "hi": 0.55,
+      "n": 15,
+      "pred": 0.5155,
+      "hit": 0.4
+     },
+     {
+      "lo": 0.55,
+      "hi": 0.6,
+      "n": 9,
+      "pred": 0.5596,
+      "hit": 0.4444
+     }
+    ]
+   }
+  },
+  {
+   "id": "cfb-2026-wk08",
+   "sport": "CFB",
+   "path": "data/cfb/2026-wk08.json",
+   "label": "Week 8 Saturday",
+   "date": "2026-10-24",
+   "date_label": "Sat Oct 24",
+   "week": 8,
+   "start_utc": "2026-10-24T16:00:00.000Z",
+   "end_utc": "2026-10-25T02:15:00.000Z",
+   "n_games": 44,
+   "n_props": 1138,
+   "priced": 1137,
+   "bets": 2,
+   "watch": 121,
+   "leans": 84,
+   "model_version": "v2.2",
+   "generated_et": "Sat Oct 24, 10:32 AM ET",
+   "prices_et": "Sat Oct 24, 10:14 AM ET",
+   "results": {
+    "status": "graded",
+    "graded": 983,
+    "bets": {
+     "w": 1,
+     "l": 1,
+     "p": 0,
+     "units": -0.13,
+     "risked": 2.0,
+     "roi": -0.0652
+    },
+    "by_tier": {
+     "bet": {
+      "w": 1,
+      "l": 1,
+      "p": 0,
+      "units": -0.13,
+      "risked": 2.0,
+      "roi": -0.0652
+     },
+     "live": {
+      "w": 55,
+      "l": 62,
+      "p": 0,
+      "units": -14.97,
+      "risked": 117.0,
+      "roi": -0.1279
+     },
+     "lean": {
+      "w": 29,
+      "l": 44,
+      "p": 0,
+      "units": -18.5,
+      "risked": 73.0,
+      "roi": -0.2534
+     },
+     "check": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "pass": {
+      "w": 301,
+      "l": 490,
+      "p": 0,
+      "units": -70.05,
+      "risked": 791.0,
+      "roi": -0.0886
+     }
+    },
+    "by_market": {
+     "atd": {
+      "label": "Anytime TD",
+      "w": 148,
+      "l": 361,
+      "p": 0,
+      "units": -78.65,
+      "risked": 509.0,
+      "roi": -0.1545
+     },
+     "kicker": {
+      "label": "Kicking points",
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "pass_yds": {
+      "label": "Passing yards",
+      "w": 18,
+      "l": 23,
+      "p": 0,
+      "units": -7.15,
+      "risked": 41.0,
+      "roi": -0.1743
+     },
+     "qb_rush": {
+      "label": "QB rushing yards",
+      "w": 15,
+      "l": 11,
+      "p": 0,
+      "units": 2.18,
+      "risked": 26.0,
+      "roi": 0.0837
+     },
+     "rec_yds": {
+      "label": "Receiving yards",
+      "w": 81,
+      "l": 100,
+      "p": 0,
+      "units": -28.68,
+      "risked": 181.0,
+      "roi": -0.1585
+     },
+     "receptions": {
+      "label": "Receptions",
+      "w": 82,
+      "l": 74,
+      "p": 0,
+      "units": 0.09,
+      "risked": 156.0,
+      "roi": 0.0005
+     },
+     "rush_yds": {
+      "label": "Rushing yards",
+      "w": 42,
+      "l": 28,
+      "p": 0,
+      "units": 8.57,
+      "risked": 70.0,
+      "roi": 0.1225
+     }
+    },
+    "lines": {
+     "won": 63,
+     "lost": 67,
+     "push": 2
+    },
+    "calib_bins": [
+     {
+      "lo": 0,
+      "hi": 0.3,
+      "n": 346,
+      "pred": 0.2003,
+      "hit": 0.2225
+     },
+     {
+      "lo": 0.3,
+      "hi": 0.4,
+      "n": 94,
+      "pred": 0.3506,
+      "hit": 0.3191
+     },
+     {
+      "lo": 0.4,
+      "hi": 0.45,
+      "n": 53,
+      "pred": 0.4271,
+      "hit": 0.5094
+     },
+     {
+      "lo": 0.45,
+      "hi": 0.5,
+      "n": 158,
+      "pred": 0.4851,
+      "hit": 0.5253
+     },
+     {
+      "lo": 0.5,
+      "hi": 0.55,
+      "n": 264,
+      "pred": 0.5142,
+      "hit": 0.4811
+     },
+     {
+      "lo": 0.55,
+      "hi": 0.6,
+      "n": 50,
+      "pred": 0.5685,
+      "hit": 0.6
+     },
+     {
+      "lo": 0.6,
+      "hi": 0.65,
+      "n": 17,
+      "pred": 0.6198,
+      "hit": 0.6471
+     },
+     {
+      "lo": 0.65,
+      "hi": 0.7,
+      "n": 1,
+      "pred": 0.652,
+      "hit": 1.0
+     }
+    ]
+   }
+  },
+  {
+   "id": "cfb-2026-wk07",
+   "sport": "CFB",
+   "path": "data/cfb/2026-wk07.json",
+   "label": "Week 7 Saturday",
+   "date": "2026-10-17",
+   "date_label": "Sat Oct 17",
+   "week": 7,
+   "start_utc": "2026-10-17T16:00:00.000Z",
+   "end_utc": "2026-10-18T03:00:00.000Z",
+   "n_games": 52,
+   "n_props": 1270,
+   "priced": 1270,
+   "bets": 2,
+   "watch": 137,
+   "leans": 91,
+   "model_version": "v2.2",
+   "generated_et": "Sat Oct 17, 8:48 AM ET",
+   "prices_et": "Sat Oct 17, 8:29 AM ET",
+   "results": {
+    "status": "graded",
+    "graded": 1072,
+    "bets": {
+     "w": 1,
+     "l": 1,
+     "p": 0,
+     "units": -0.13,
+     "risked": 2.0,
+     "roi": -0.0652
+    },
+    "by_tier": {
+     "bet": {
+      "w": 1,
+      "l": 1,
+      "p": 0,
+      "units": -0.13,
+      "risked": 2.0,
+      "roi": -0.0652
+     },
+     "live": {
+      "w": 68,
+      "l": 58,
+      "p": 0,
+      "units": 0.66,
+      "risked": 126.0,
+      "roi": 0.0052
+     },
+     "lean": {
+      "w": 42,
+      "l": 42,
+      "p": 0,
+      "units": -4.12,
+      "risked": 84.0,
+      "roi": -0.0491
+     },
+     "check": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "pass": {
+      "w": 320,
+      "l": 540,
+      "p": 0,
+      "units": -44.91,
+      "risked": 860.0,
+      "roi": -0.0522
+     }
+    },
+    "by_market": {
+     "atd": {
+      "label": "Anytime TD",
+      "w": 177,
+      "l": 388,
+      "p": 0,
+      "units": -16.78,
+      "risked": 565.0,
+      "roi": -0.0297
+     },
+     "kicker": {
+      "label": "Kicking points",
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0.0,
+      "risked": 0.0,
+      "roi": null
+     },
+     "pass_yds": {
+      "label": "Passing yards",
+      "w": 23,
+      "l": 29,
+      "p": 0,
+      "units": -8.9,
+      "risked": 52.0,
+      "roi": -0.1711
+     },
+     "qb_rush": {
+      "label": "QB rushing yards",
+      "w": 16,
+      "l": 17,
+      "p": 0,
+      "units": -3.12,
+      "risked": 33.0,
+      "roi": -0.0944
+     },
+     "rec_yds": {
+      "label": "Receiving yards",
+      "w": 97,
+      "l": 102,
+      "p": 0,
+      "units": -17.01,
+      "risked": 199.0,
+      "roi": -0.0855
+     },
+     "receptions": {
+      "label": "Receptions",
+      "w": 70,
+      "l": 80,
+      "p": 0,
+      "units": -19.78,
+      "risked": 150.0,
+      "roi": -0.1319
+     },
+     "rush_yds": {
+      "label": "Rushing yards",
+      "w": 48,
+      "l": 25,
+      "p": 0,
+      "units": 17.08,
+      "risked": 73.0,
+      "roi": 0.2339
+     }
+    },
+    "lines": {
+     "won": 76,
+     "lost": 76,
+     "push": 2
+    },
+    "calib_bins": [
+     {
+      "lo": 0,
+      "hi": 0.3,
+      "n": 376,
+      "pred": 0.1906,
+      "hit": 0.2394
+     },
+     {
+      "lo": 0.3,
+      "hi": 0.4,
+      "n": 113,
+      "pred": 0.3498,
+      "hit": 0.3274
+     },
+     {
+      "lo": 0.4,
+      "hi": 0.45,
+      "n": 60,
+      "pred": 0.4252,
+      "hit": 0.4
+     },
+     {
+      "lo": 0.45,
+      "hi": 0.5,
+      "n": 149,
+      "pred": 0.486,
+      "hit": 0.4899
+     },
+     {
+      "lo": 0.5,
+      "hi": 0.55,
+      "n": 294,
+      "pred": 0.5156,
+      "hit": 0.5306
+     },
+     {
+      "lo": 0.55,
+      "hi": 0.6,
+      "n": 59,
+      "pred": 0.5702,
+      "hit": 0.6102
+     },
+     {
+      "lo": 0.6,
+      "hi": 0.65,
+      "n": 16,
+      "pred": 0.6195,
+      "hit": 0.6875
+     },
+     {
+      "lo": 0.65,
+      "hi": 0.7,
+      "n": 3,
+      "pred": 0.6673,
+      "hit": 0.6667
+     },
+     {
+      "lo": 0.7,
+      "hi": 0.8,
+      "n": 2,
+      "pred": 0.732,
+      "hit": 1.0
+     }
+    ]
+   }
+  }
+ ],
+ "players": {
+  "NFL": "data/players/nfl.json",
+  "NBA": "data/players/nba.json",
+  "CFB": "data/players/cfb.json"
+ },
+ "results": {
+  "NFL": "data/nfl/results-2026.json"
+ },
+ "sports": {
+  "NFL": {
+   "status": "live"
+  },
+  "CFB": {
+   "status": "live"
+  },
+  "NBA": {
+   "status": "live"
+  },
+  "MLB": {
+   "status": "offseason",
+   "note": "One board exists (NLCS Game 3, Oct 14) as a PDF only. It was never exported as data, so it is not in the app. The season is over."
+  },
+  "NHL": {
+   "status": "not_built",
+   "note": "No NHL model exists yet. Nothing here is a pick."
+  }
+ },
+ "upcoming": [
+  {
+   "sport": "NFL",
+   "label": "Week 9",
+   "first": "2026-11-06T01:15:00Z",
+   "games": 15,
+   "note": "On the schedule. The model has not been run for this week yet, so there are no picks."
+  }
+ ]
+}
