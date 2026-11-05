@@ -314,6 +314,11 @@ details.weeks .tbl-wrap{max-height:420px;overflow:auto;margin-top:10px}
 .meal-chip{border-style:solid;border-color:color-mix(in srgb,var(--kcal) 45%,transparent);color:var(--kcal)}
 .ml-items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .ml-items li{display:flex;justify-content:space-between;gap:10px;background:var(--surface-2);border-radius:10px;padding:9px 12px;font-size:14px}
+.te-l li{align-items:center;padding:6px 8px 6px 6px}
+.te-x{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:none;color:inherit;text-align:left;padding:6px 4px;cursor:pointer;font:inherit}
+.te-x>span{min-width:0;display:flex;flex-direction:column}.te-x b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.te-x .dim{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.te-a{display:flex;align-items:center;gap:2px;flex:none}.te-a .link{padding:6px 7px;font-size:15px}.te-a .pill-btn{padding:6px 12px;font-size:13px}.te-sp{width:29px}
+.ee-keep{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.4;background:var(--surface-2);border-radius:12px;padding:12px}.ee-keep input{margin-top:3px;width:18px;height:18px;accent-color:var(--kcal);flex:none}
 .dim{color:var(--subtle)}
 .ci-grid{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px;align-items:start}
 @media (max-width:640px){.ci-grid{grid-template-columns:1fr}}
@@ -1587,7 +1592,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[]};
 let storageOK=true;
-const APP_VER='syncope-2.8';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.9';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3685,6 +3690,7 @@ const MUSCLES=[...new Set(LIB.map(e=>e.m))].filter(m=>m!=='Cardio');
 const MUS_ALL=[...new Set(LIB.map(e=>e.m))];
 function customLift(n){return (S.customLifts||[]).find(c=>c.n.toLowerCase()===(n||'').toLowerCase())}
 function musOf(n){const c=customLift(n);return c?c.m:MUS_OF[(n||'').toLowerCase()]||'Other'}
+function headOf(n){const c=customLift(n);return c&&c.h||''}
 function eqOf(n){const c=customLift(n);if(c)return c.eq;const e=LIB_BY[(n||'').toLowerCase()];return e?e.eq:'Other'}
 const DEF_TPL=[['Push','Bench press|Incline dumbbell press|Overhead press|Lateral raise|Tricep pushdown'],['Pull','Pull-up|Barbell row|Lat pulldown|Face pull|Barbell curl'],['Legs','Back squat|Romanian deadlift|Leg press|Leg curl|Standing calf raise'],['Upper','Bench press|Barbell row|Dumbbell shoulder press|Lat pulldown|Hammer curl|Skull crusher'],['Lower','Back squat|Romanian deadlift|Bulgarian split squat|Leg extension|Seated calf raise'],['Full body','Back squat|Bench press|Barbell row|Overhead press|Romanian deadlift']];
 function e1rm(w,r){w=+w;r=+r;if(!(w>0&&r>0))return 0;return r===1?w:w*(1+Math.min(r,12)/30)}
@@ -3830,7 +3836,7 @@ function openExPicker(o={}){
     $('xpL').innerHTML=html;
     if(multi){const g=$('xpGo');g.disabled=!sel.length;g.textContent=sel.length?`Add ${sel.length} exercise${sel.length>1?'s':''}`:'Select exercises'}};
   const done=()=>{const out=sel.slice();closeSheet();o.onDone&&o.onDone(out)};
-  $('xpQ').oninput=draw;$('xpX').onclick=closeSheet;if(multi)$('xpGo').onclick=done;
+  $('xpQ').oninput=draw;$('xpX').onclick=()=>{closeSheet();o.onCancel&&o.onCancel()};if(multi)$('xpGo').onclick=done;
   $('xpM').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;mus=b.dataset.m;$('xpM').querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw()};
   $('xpE').onclick=e=>{const b=e.target.closest('[data-e]');if(!b)return;eq=b.dataset.e;$('xpE').querySelectorAll('[data-e]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw()};
   $('xpL').onclick=e=>{const f=e.target.closest('[data-fav]');if(f){const n=f.dataset.fav,k=n.toLowerCase();S.favLifts=(S.favLifts||[]).some(x=>x.toLowerCase()===k)?S.favLifts.filter(x=>x.toLowerCase()!==k):[...(S.favLifts||[]),n];save();draw();return}
@@ -3929,14 +3935,48 @@ function openTemplates(){
   $('tRestore').onclick=()=>{const have=new Set(S.templates.map(t=>t.name.toLowerCase()));DEF_TPL.forEach(([n,x])=>{if(!have.has(n.toLowerCase()))S.templates.push({id:'t'+uid(),name:n,ex:x.split('|')})});save();openTemplates();renderTrain()};
   $('tDone').onclick=closeSheet;
 }
+/* Edit one exercise in place: rename, muscle, muscle head, equipment, or swap from the library. Position is kept. */
+const HEADS={Chest:['Upper chest','Mid chest','Lower chest'],Back:['Lats','Upper back','Mid back','Traps','Lower back'],Shoulders:['Front delts','Side delts','Rear delts'],
+  Quads:['Rectus femoris','Vastus lateralis','Vastus medialis'],'Hamstrings & glutes':['Hamstrings','Glute max','Glute med','Adductors'],Calves:['Gastrocnemius','Soleus'],
+  Biceps:['Long head','Short head','Brachialis','Brachioradialis'],Triceps:['Long head','Lateral head','Medial head'],Forearms:['Flexors','Extensors'],Core:['Upper abs','Lower abs','Obliques'],'Full body':[],Cardio:[]};
+function openExEdit(d,j){const old=d.ex[j],st={n:old,m:musOf(old),eq:eqOf(old),h:headOf(old)};const back=()=>editTemplate(d);
+  const draw=()=>{const heads=HEADS[st.m]||[],hs=st.h?st.h.split(', '):[];
+    sheet(`<div><div class="eyebrow">${esc(d.name||'Template')} · exercise ${j+1}</div><h3>Edit exercise</h3></div>
+      <div class="field"><label for="eeN">Name</label><input id="eeN" type="text" value="${esc(st.n)}" autocomplete="off"></div>
+      <button class="ghost" type="button" id="eeSwap" style="padding:12px">Swap for another exercise from the library</button>
+      <div class="field"><label>Muscle group</label><div class="wn-acts" id="eeM">${MUS_ALL.filter(m=>m!=='Cardio').map(m=>`<button type="button" class="chip" data-v="${esc(m)}" aria-pressed="${m===st.m}">${esc(m)}</button>`).join('')}</div></div>
+      ${heads.length?`<div class="field"><label>Muscle head or focus <span class="dim">(pick any)</span></label><div class="wn-acts" id="eeH">${heads.map(h=>`<button type="button" class="chip" data-v="${esc(h)}" aria-pressed="${hs.includes(h)}">${esc(h)}</button>`).join('')}</div></div>`:''}
+      <div class="field"><label>Equipment</label><div class="wn-acts" id="eeE">${EQ_LIST.map(m=>`<button type="button" class="chip" data-v="${esc(m)}" aria-pressed="${m===st.eq}">${esc(m)}</button>`).join('')}</div></div>
+      <label class="ee-keep"><input type="checkbox" id="eeKeep" checked><span><b>Keep my history</b><br><span class="dim">If you rename it, past workouts and your other templates use the new name too, so your progress chart and last weights carry over.</span></span></label>
+      <div class="row" style="justify-content:space-between"><button class="ghost" type="button" id="eeX">Cancel</button><button class="primary" type="button" id="eeOk">Save exercise</button></div>`);
+    const keepN=()=>{st.n=$('eeN').value};
+    $('eeM').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;keepN();if(st.m!==b.dataset.v){st.m=b.dataset.v;st.h=''}draw()};
+    if($('eeH'))$('eeH').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;const on=b.getAttribute('aria-pressed')==='true';b.setAttribute('aria-pressed',String(!on));st.h=[...$('eeH').querySelectorAll('[aria-pressed="true"]')].map(x=>x.dataset.v).join(', ')};
+    $('eeE').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;st.eq=b.dataset.v;$('eeE').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};
+    $('eeSwap').onclick=()=>openExPicker({multi:false,eyebrow:d.name||'Template',title:`Swap ${old}`,onCancel:draw,onDone:ns=>{const n=ns[0];if(!n)return draw();Object.assign(st,{n,m:musOf(n),eq:eqOf(n),h:headOf(n)});draw()}});
+    $('eeX').onclick=back;
+    $('eeOk').onclick=()=>{const n=cap($('eeN').value.trim());if(!n){$('eeN').focus();return}
+      const lib=LIB_BY[n.toLowerCase()],same=lib&&lib.m===st.m&&lib.eq===st.eq&&!st.h;
+      S.customLifts=(S.customLifts||[]).filter(c=>c.n.toLowerCase()!==n.toLowerCase());if(!same)S.customLifts.push({n,m:st.m,eq:st.eq,...(st.h?{h:st.h}:{})});
+      const renamed=n.toLowerCase()!==old.toLowerCase();
+      if(d.ex.some((x,k)=>k!==j&&x.toLowerCase()===n.toLowerCase())){toast(`“${esc(n)}” is already in this template`);return}
+      d.ex[j]=n;
+      if(renamed&&$('eeKeep').checked){const lo=old.toLowerCase();let w=0;
+        S.workouts.forEach(wk=>(wk.ex||[]).forEach(x=>{if(String(x.n).toLowerCase()===lo){x.n=n;w++}}));
+        S.templates.forEach((t,k)=>{if(k!==d.i)t.ex=t.ex.map(x=>x.toLowerCase()===lo?n:x)});
+        if(S.active)(S.active.ex||[]).forEach(x=>{if(String(x.n).toLowerCase()===lo)x.n=n});
+        S.favLifts=(S.favLifts||[]).map(x=>x.toLowerCase()===lo?n:x);if(w)setTimeout(()=>toast(`Renamed in ${w} past session${w>1?'s':''}`),50)}
+      if(d.i>=0){S.templates[d.i]={...S.templates[d.i],ex:d.ex.slice()}}
+      save();renderTrain();back()};
+  };draw()}
 function editTemplate(d){
   sheet(`<div><div class="eyebrow">${d.i>=0?'Edit template':'New template'}</div><h3>${esc(d.name||'Untitled')}</h3></div>
     <div class="field"><label for="teN">Name</label><input id="teN" type="text" value="${esc(d.name)}" placeholder="e.g. Push A"></div>
-    <ul class="ml-items" id="teL">${d.ex.map((n,j)=>`<li><span><b>${esc(n)}</b><br><span class="dim" style="font-size:12.5px">${esc(musOf(n))} · ${esc(eqOf(n))}</span></span><span class="row" style="gap:4px">${j?`<button class="link" data-up="${j}" aria-label="Move up">↑</button>`:''}<button class="link" data-rm="${j}" style="color:var(--over)">Remove</button></span></li>`).join('')||'<li class="note">No exercises yet.</li>'}</ul>
+    <ul class="ml-items te-l" id="teL">${d.ex.map((n,j)=>`<li><button class="te-x" type="button" data-exed="${j}"><i class="tpl-n">${j+1}</i><span><b>${esc(n)}</b><span class="dim">${esc(musOf(n))}${headOf(n)?` · ${esc(headOf(n))}`:''} · ${esc(eqOf(n))}</span></span></button><span class="te-a"><button class="pill-btn" type="button" data-exed="${j}">Edit</button>${j?`<button class="link" type="button" data-up="${j}" aria-label="Move ${esc(n)} up">↑</button>`:'<span class="te-sp"></span>'}<button class="link" type="button" data-rm="${j}" aria-label="Remove ${esc(n)}" style="color:var(--over)">✕</button></span></li>`).join('')||'<li class="note">No exercises yet.</li>'}</ul>
     <button class="ghost" id="teAdd" type="button" style="padding:13px">+ Add exercises</button>
     <div class="row" style="justify-content:space-between">${d.i>=0?'<div class="row" style="gap:8px"><button class="danger" id="teDel">Delete</button><button class="ghost" id="teDup">Duplicate</button></div>':'<span></span>'}<div class="row"><button class="ghost" id="teX">Cancel</button><button class="primary" id="teOk">Save</button></div></div>`,{nofocus:d.i>=0});
   const keep=()=>{d.name=$('teN').value};
-  $('teL').onclick=e=>{const u=e.target.closest('[data-up]'),r=e.target.closest('[data-rm]');keep();if(u){const j=+u.dataset.up;[d.ex[j-1],d.ex[j]]=[d.ex[j],d.ex[j-1]];editTemplate(d)}if(r){d.ex.splice(+r.dataset.rm,1);editTemplate(d)}};
+  $('teL').onclick=e=>{const u=e.target.closest('[data-up]'),r=e.target.closest('[data-rm]'),x=e.target.closest('[data-exed]');keep();if(x){openExEdit(d,+x.dataset.exed);return}if(u){const j=+u.dataset.up;[d.ex[j-1],d.ex[j]]=[d.ex[j],d.ex[j-1]];editTemplate(d)}if(r){d.ex.splice(+r.dataset.rm,1);editTemplate(d)}};
   $('teAdd').onclick=()=>{keep();openExPicker({eyebrow:d.name||'Template',title:'Add exercises',onDone:ns=>{ns.forEach(n=>{if(!d.ex.includes(n))d.ex.push(n)});editTemplate(d)}})};
   $('teX').onclick=openTemplates;
   if($('teDup'))$('teDup').onclick=()=>{keep();editTemplate({name:`${d.name.trim()||'Workout'} copy`,ex:d.ex.slice(),i:-1});toast('Copied. Add or remove lifts, rename it, then Save')};
