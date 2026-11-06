@@ -163,14 +163,14 @@ function ticket(p, d){ const r = resultOf(d, p); const sp = d.sport.toLowerCase(
   <div class="bc-top"><span style="display:flex;align-items:center;gap:6px;min-width:0;color:var(--${sp})">${Icon.svg(sp, {size: 16})}<span class="t2" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(winWord(p.window))}${p._g ? esc(dayET(p._g.kick_utc).split(',')[0]) + ' ' + kickET(p._g.kick_utc) : esc(p.window || '')}</span></span><span class="pill pill-bet">Bet</span></div>
   <div class="bc-main">${Charts.ring({p: p.p, be: p.break_even, size: 88, stroke: 9})}<div style="min-width:0"><div class="bc-sel">${esc(selText(p))}</div><div class="bc-who">${esc(p.player)} · ${teamOpp(p)}</div>
     <div class="bc-px"><span class="num">${od(p.odds)}</span><span><b>${esc(p.book || '')}</b></span><span class="pill pill-edge">Edge ${sg(p.edge_pts)}</span>${isNum(p.units) ? `<span class="t2 b13">${p.units}u</span>` : ''}</div></div></div>
-  <div class="bc-foot"><span>${lossLine(p.p)}</span><span style="display:flex;align-items:center;gap:8px">${res}</span></div></button>`; }
+  <div class="bc-foot"><span>${lossLine(p.p)}</span><span style="display:flex;align-items:center;gap:8px">${res}</span></div><div class="bkrow">${bookBtns(p)}</div></button>`; }
 function viewCard(d){ const m = d.meta, info = slateInfo(d.id) || {}; const st = slateStatus(info);
   const inWin = p => S.win === 'all' || p.window === S.win;
   const bets = d.props.filter(p => p.tier === 'bet').sort((a, b) => (b.edge_pts || 0) - (a.edge_pts || 0));
   const leans = d.props.filter(p => p.tier === 'lean').sort((a, b) => (b.edge_pts ?? -99) - (a.edge_pts ?? -99));
   const bw = bets.filter(inWin), lw = leans.filter(inWin);
   const R = d.results && d.results.summary;
-  const verdict = bets.length ? `<div class="verdict"><span class="label">The card</span><div class="big"><span class="num" data-count="${bets.length}">${bets.length}</span> bet${bets.length > 1 ? 's' : ''} pass${bets.length > 1 ? '' : 'es'} the model</div><p>Each one cleared both keys: a strong 25D report card with the pattern check, and an edge of 5 or more points after the market check at the best price.</p></div>`
+  const verdict = bets.length ? `<div class="verdict"><span class="label">The card</span><div class="big"><span class="num" data-count="${bets.length}">${bets.length}</span> bet${bets.length > 1 ? 's' : ''} pass${bets.length > 1 ? '' : 'es'} the model</div><p>${isV4(d) ? 'Each one cleared the model: an edge of 3+ points over the break-even of the best price across DraftKings, FanDuel, BetMGM, BetRivers and Caesars, a bootstrap interval that stays above break-even, and a market where the model beat the line in the 2026 priced backtest. Max 1u each, 15u per slate. Tap FanDuel or DK to copy the bet and open the app.' : 'Each one cleared both keys: a strong 25D report card with the pattern check, and an edge of 5 or more points after the market check at the best price.'}</p></div>`
     : topPicksHTML(d, m);
   return `<div class="view">
     <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(m.label || '')}</span><h1>${esc(m.date_label || 'The card')}</h1><p>${esc(st.word)} · prices ${esc(m.prices_et || 'Not available')}</p></div>
@@ -182,6 +182,15 @@ function viewCard(d){ const m = d.meta, info = slateInfo(d.id) || {}; const st =
     ${prosHTML(d)}
     <section class="sec"><div class="sub">Model ${esc(m.model_version || '')} · built ${esc(m.generated_et || 'Not available')} · injuries ${esc(m.injuries_et || 'Not available')} · ${(m.sims_per_game || 10000).toLocaleString()} replays per game</div></section>
   </div>`; }
+const BOOKURL = {FanDuel: 'https://sportsbook.fanduel.com/', DraftKings: 'https://sportsbook.draftkings.com/'};
+function bookOffer(p, book){ const o = (p.offers || []).find(x => x.book === book); if(!o) return null; const pr = p.side === 'under' ? o.under : o.over; return {line: o.line, price: pr}; }
+function betText(p, book){ const o = bookOffer(p, book); const ln_ = o ? o.line : p.line; const pr = o && isNum(o.price) ? ' ' + od(o.price) : '';
+  return `${p.player} ${p.side === 'under' ? 'Under' : 'Over'} ${ln(ln_)} ${STATWORD[p.market] || p.market_label} · ${book}${pr}`; }
+function bookBtns(p){ if(!p || p.no_prediction || !p.side) return ''; return ['FanDuel', 'DraftKings'].map(b => { const o = bookOffer(p, b);
+  return `<span class="bkbtn ${b === 'FanDuel' ? 'fd' : 'dk'}" role="button" tabindex="0" data-book="${b}" data-bp="${esc(p.id)}">${b === 'FanDuel' ? 'FanDuel' : 'DK'}${o && isNum(o.price) ? ' ' + od(o.price) : ''}</span>`; }).join(''); }
+async function openBook(d, id, book){ const p = d.props.find(x => x.id === id); if(!p) return; const t = betText(p, book);
+  try{ await navigator.clipboard.writeText(t); toast('Copied: ' + t); }catch(e){ toast(t); }
+  setTimeout(() => { location.href = BOOKURL[book]; }, 450); }
 const prosOn = (d, p) => ((d.cappers || {}).picks || []).filter(k => k.model && k.model.prop === p.id && k.model.agree).map(k => k.capper);
 const rankKey = (d, p) => pSide(p) + (prosOn(d, p).length ? .03 : 0);
 const pSide = p => isNum(p.p) ? p.p : isNum(p.p_raw) ? p.p_raw : null;
@@ -197,7 +206,7 @@ function sidesHTML(d, inWin){ const all = d.props.filter(p => !p.no_prediction &
     <p class="note" style="margin:0">The trained model's side and chance on every prop with a line, best first. A is 60%+, B is 55–60%, C is under 55%. These are model predictions, not bets: a bet also needs an edge at a real price whose interval clears break-even.</p>
     ${L.slice(0, n).map(p => sideRow(p, d)).join('')}${L.length > n ? `<button class="link" data-leanall>Show all ${L.length}</button>` : ''}</section>`; }
 function sideRow(p, d){ const r = resultOf(d, p); const x = pSide(p); const g = grade(x);
-  return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · proj ${ln(p.projection)} · ${esc(p.window || '')}${prosOn(d, p).length ? ` · <span class="proag">Pro agrees: ${esc(prosOn(d, p).map(n => n.split(' ').pop()).join(', '))}</span>` : ''}</span></span><span class="r"><span class="grade g${g}">${g}</span> <b class="num">${pc(x)}</b><br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : isNum(p.odds) ? od(p.odds) + ' ' + esc(p.book || '') : 'no price'}</span></span></button>`; }
+  return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · proj ${ln(p.projection)} · ${esc(p.window || '')}${prosOn(d, p).length ? ` · <span class="proag">Pro agrees: ${esc(prosOn(d, p).map(n => n.split(' ').pop()).join(', '))}</span>` : ''}</span></span><span class="r"><span class="grade g${g}">${g}</span> <b class="num">${pc(x)}</b><br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : isNum(p.odds) ? od(p.odds) + ' ' + esc(p.book || '') : 'no price'}</span><span class="bkrow">${bookBtns(p)}</span></span></button>`; }
 function prosHTML(d, only){ const C = d.cappers; if(!C || !(C.picks || []).length) return ''; const R = Object.fromEntries((C.records || []).map(r => [r.name, r]));
   const ps = only ? C.picks.filter(k => k.model && k.model.prop === only) : C.picks; if(!ps.length) return '';
   const t = s => new Date(s).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit'}) + ' ET';
@@ -219,7 +228,7 @@ function wireCard(d){ const m = $('#main'); bindTaps(m, d);
 function swipeWindows(el, d, get, set){ const W = ['all', ...(d.meta.windows || [])]; if(W.length < 3) return; let x0 = null, y0 = null;
   el.ontouchstart = e => { if(e.touches.length !== 1) return; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; };
   el.ontouchend = e => { if(x0 == null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null; if(Math.abs(dx) < 70 || Math.abs(dy) > 45 || e.target.closest('.seg,.chips,.ladder,.gl,.tbl,.room')) return; const i = W.indexOf(get()); const j = Math.max(0, Math.min(W.length - 1, i + (dx < 0 ? 1 : -1))); if(j !== i) set(W[j]); }; }
-function bindTaps(root, d){ $$('[data-prop]', root).forEach(b => b.onclick = () => openProp(d, b.dataset.prop)); $$('[data-player]', root).forEach(b => b.onclick = () => openPlayer(d.sport, b.dataset.player, d)); $$('[data-log]', root).forEach(b => b.onclick = e => { e.stopPropagation(); logBet(d, d.props.find(p => p.id === b.dataset.log)); }); }
+function bindTaps(root, d){ $$('[data-book]', root).forEach(b => b.onclick = e => { e.stopPropagation(); e.preventDefault(); openBook(d, b.dataset.bp, b.dataset.book); }); $$('[data-prop]', root).forEach(b => b.onclick = () => openProp(d, b.dataset.prop)); $$('[data-player]', root).forEach(b => b.onclick = () => openPlayer(d.sport, b.dataset.player, d)); $$('[data-log]', root).forEach(b => b.onclick = e => { e.stopPropagation(); logBet(d, d.props.find(p => p.id === b.dataset.log)); }); }
 
 /* ================================================================ props */
 function marketsOf(d){ return [...new Set(d.props.map(p => p.market))].sort((a, b) => MKT_ORDER.indexOf(a) - MKT_ORDER.indexOf(b)); }
@@ -400,6 +409,7 @@ async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p)
         <div class="rc-px">${isNum(p.odds) ? `<span class="num">${od(p.odds)}</span><b>${esc(p.book || '')}</b>` : `<span>${isNum(p.line) ? `Line <b class="num" style="color:var(--t1)">${ln(p.line)}</b> at <b>${esc(p.book || '')}</b> · ` : ''}<span class="na">price not posted</span></span>`}</div></div></div>
       ${isNum(pm) ? Charts.meter({p: pm, be: isNum(p.break_even) ? p.break_even : null, label: isNum(p.break_even) ? `Price needs ${pc(p.break_even, 1)}` : modelOnly ? 'Model chance, before the market check' : 'Model chance'}) : ''}
       <div class="rc-nums"><div><span class="label">Projection</span><span class="num">${ln(p.projection)}</span></div><div><span class="label">Edge</span><span class="num" style="color:${isNum(p.edge_pts) && p.edge_pts >= 5 ? 'var(--edge)' : isNum(p.edge_pts) && p.edge_pts < 0 ? 'var(--loss)' : 'var(--t1)'}">${sg(p.edge_pts)}</span></div><div><span class="label">25D</span><span class="num" style="color:${cardKind(p) === 'strong' ? 'var(--edge)' : cardKind(p) === 'weak' ? 'var(--loss)' : 'var(--t1)'}">${sg(p.score25, 2)}</span></div></div>
+      ${p.side && !p.no_prediction ? `<div class="bkrow big">${bookBtns(p)}</div>` : ''}
       ${isNum(pm) ? `<div class="lossline">${lossLine(pm)}${isNum(p.pctile) ? ` · report card beats ${Math.round(p.pctile * 100)}% of history` : ''}</div>` : ''}
     </div>
     ${modelOnly && !yes && !p.no_prediction ? `<section class="sec"><div class="hd"><h2>Check a price</h2><span class="sub">DraftKings price not on ESPN</span></div><div class="calc"><div class="fgrid"><div class="fld"><label for="pc-odds">Price you see on the ${p.side === 'under' ? 'under' : 'over'} ${ln(p.line)}</label><input id="pc-odds" inputmode="numeric" type="text" placeholder="−115"></div><div class="fld"><label>Model chance</label><input value="${pc(pm, 1)}" disabled></div></div><div id="pc-out" class="b15 t2">Enter a price to see what it needs.</div><p class="note" style="margin:0">This compares the price with the model's own replays only. The model's market check needs both sides' prices, so a prop priced here can't become a bet on the card.</p></div></section>` : ''}

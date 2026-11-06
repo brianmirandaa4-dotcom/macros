@@ -54,7 +54,7 @@ EH, EA = (gg.home_score - gg.ih).values, (gg.away_score - gg.ia).values; RHO_GAM
 CAL = json.load(open(f'{W}/calibrated_2026.json'))
 K = {mk: list(CAL[mk][CHOSEN[mk]]['k_by_week'].values())[-1] for mk in CHOSEN}
 # ---------------- fit final models on every completed game and simulate
-out_props = []; sims = {}
+out_props = []; sims = {}; CTX = {}
 for mk, cfg in MO.MK.items():
     cols = FE.feats(mk); tr = done[cfg['ok'](done) & done[cfg['e']].notna()]; te = up[cfg['ok'](up) & up[cfg['e']].notna()].copy()
     if mk == 'pass_yds': te = up[(up.pos == 'QB') & up.pid.isin(set(UP.home_qb_id) | set(UP.away_qb_id)) & up[cfg['e']].notna()].copy()
@@ -83,6 +83,7 @@ for mk, cfg in MO.MK.items():
                               q=[float(x) for x in np.percentile(S[i], [5, 25, 50, 75, 95])], tg_sh=float(r.f_tg_sh) if pd.notna(r.f_tg_sh) else 0.0,
                               ood=ood, ood_hard=hard, questionable=bool(r.f_questionable),
                               up=[(cols[j], float(c[j])) for j in o[::-1][:3] if c[j] > 0], down=[(cols[j], float(c[j])) for j in o[:3] if c[j] < 0]))
+    CTX[mk] = (tr, Ztr, te, Zte, cfg)
     print(mk, len(te), 'rows', flush=True)
 PR = pd.DataFrame(out_props)
 # ---------------- DraftKings lines (ESPN) for this week
@@ -131,6 +132,66 @@ for _, r in PR.iterrows():
     props.append(dict(r.drop(['q']).to_dict(), q=r.q, line=None if pd.isna(line) else float(line), pov_raw=pov_raw, pov=pov, side=side, p_side=ps, tier=tier, no_prediction=bool(nopred), rejected=bool(rej), team_check_failed=(r.game_id, r.team, r.market) in capped, share_scale=round(SCALE[(r.game_id, r.team)], 3),
                       hist=np.histogram(D, bins=24, range=(0, max(1, np.percentile(D, 98))))[0].tolist(), hist_top=float(max(1, np.percentile(D, 98))), draws_key=f'{r.game_id}|{r.pid}|{r.market}'))
     sims[('draw', r.game_id, r.pid, r.market)] = D
+# ---------------- prices (Action Network: book lines + prices), edge vs break-even and no-vig, game-bootstrap interval, reduced Kelly
+# Methods: Brill, Yurko & Wyner (bootstrap by game); Kaunitz et al. / Levitt (market benchmark, net of vig);
+# Kelly (1956) with Baker & McHale (2013) shrinkage; Hubacek et al. (2019) model-vs-line correlation; Lopez et al. (2018) ceiling.
+import re as _re, unicodedata as _ud
+def _nm(x): return _re.sub(r'[^a-z ]', '', _ud.normalize('NFKD', str(x)).encode('ascii', 'ignore').decode().lower()).replace(' jr', '').replace(' iii', '').replace(' ii', '').strip()
+BOOKS = {68: 'DraftKings', 69: 'FanDuel', 75: 'BetMGM', 71: 'BetRivers', 49: 'Caesars'}
+AP = pd.read_parquet(f'{W}/an_props_wk{WEEK:02d}.parquet') if os.path.exists(f'{W}/an_props_wk{WEEK:02d}.parquet') else pd.DataFrame(columns=['market'])
+OFF = {}
+for (mk, nm_, tm, bid), g in AP[AP.book_id.isin(list(BOOKS) + [30])].groupby(['market', AP.player.map(_nm), 'team', 'book_id']):
+    o = g[g.side == 'over']; u = g[g.side == 'under']
+    if len(o) and len(u) and o.value.iloc[0] == u.value.iloc[0]: OFF.setdefault((mk, nm_, tm), {})[int(bid)] = (float(o.value.iloc[0]), float(o.odds.iloc[0]), float(u.odds.iloc[0]))
+def be(o): return -o / (-o + 100) if o < 0 else 100 / (o + 100)
+def dec(o): return 1 + (100 / -o if o < 0 else o / 100)
+# bootstrap by game for the hierarchical model (receptions, rec_yds): refit on games resampled with replacement
+NB_ = 30; BOOT = {}; MIN_EDGE = 0.03   # edge threshold: 3 points over break-even (2026 weeks 1-8 priced backtest, work/backtest_priced.json)
+for mk in ('receptions', 'rec_yds'):
+    if mk not in CTX: continue
+    tr, Ztr, te, Zte, cfg = CTX[mk]; gids = tr.game_id.values; ug = np.unique(gids); rngb = np.random.default_rng(dseed(SEED, 'boot', mk))
+    pos = {g: np.where(gids == g)[0] for g in ug}; draws = []
+    for b in range(NB_):
+        idx = np.concatenate([pos[g] for g in rngb.choice(ug, len(ug))])
+        Bb = MO.fit_B(Ztr[idx], tr[cfg['v']].values[idx].astype(float), tr[cfg['y']].values[idx].astype(float), tr[cfg['e']].values[idx], mk)
+        MO.NS = 2000; draws.append(MO.samp_B(Bb, Zte, te[cfg['e']].values, rngb)); MO.NS = NS
+    for i, (_, r) in enumerate(te.iterrows()): BOOT[(r.game_id, r.pid, mk)] = [d_[i] for d_ in draws]
+pidx = {(p['game_id'], p['pid'], p['market']): k for k, p in enumerate(props)}
+hub = {}
+for p in props:
+    p['offers'] = []; p['best'] = None; p['interval'] = None; p['kelly'] = None; p['ceiling'] = False
+    offs = OFF.get((p['market'], _nm(p['name']), p['team']), {})
+    if not offs or p['no_prediction']: continue
+    D = sims[('draw', p['game_id'], p['pid'], p['market'])] * 1.0; f = p.get('share_scale', 1.0)
+    for bid, (ln_, ov, un) in offs.items():
+        po_raw = float(((D > ln_).sum() + .5) / (NS + 1)); po = float(sgm(K[p['market']] * lg(po_raw)))
+        bo, bu = be(ov), be(un); nv = bo / (bo + bu)
+        p['offers'].append(dict(book='Open' if bid == 30 else BOOKS[bid], line=ln_, over=ov, under=un, p_over=round(po, 4), novig_over=round(nv, 4),
+                                edge_over=round(po - bo, 4), edge_under=round((1 - po) - bu, 4)))
+    live = [o for o in p['offers'] if o['book'] != 'Open']
+    if not live: continue
+    cand = [(o['edge_over'], 'over', o) for o in live] + [(o['edge_under'], 'under', o) for o in live]
+    e_, sd_, o_ = max(cand, key=lambda x: x[0]); price = o_[sd_]; ps = o_['p_over'] if sd_ == 'over' else 1 - o_['p_over']
+    p['best'] = dict(book=o_['book'], side=sd_, line=o_['line'], odds=price, p=round(ps, 4), break_even=round(be(price), 4), edge=round(e_, 4), novig=round(o_['novig_over'] if sd_ == 'over' else 1 - o_['novig_over'], 4))
+    hub.setdefault(p['market'], []).append((p['median'], o_['line'], o_['p_over'], o_['novig_over']))
+    bk = BOOT.get((p['game_id'], p['pid'], p['market']))
+    if bk:
+        pb = []
+        for Db in bk:
+            Db = Db * f; q = float(((Db > o_['line']).sum() + .5) / (len(Db) + 1)); q = float(sgm(K[p['market']] * lg(q))); pb.append(q if sd_ == 'over' else 1 - q)
+        lo, hi = np.percentile(pb, [10, 90]); p['interval'] = [round(float(lo), 4), round(float(hi), 4)]
+        var = float(np.var(pb)); b_ = dec(price) - 1; fk = max(0.0, (ps * b_ - (1 - ps)) / b_); edge2 = max(e_, 0) ** 2
+        shrink = edge2 / (edge2 + var) if edge2 > 0 else 0.0
+        p['kelly'] = dict(full=round(fk, 4), shrink=round(shrink, 3), stake=round(fk * shrink, 4))
+    p['ceiling'] = bool(ps > .75)
+    # tier: a bet needs a validated market, no flags, lower interval bound above break-even, and not above the ceiling
+    if p['tier'] == 'lean' or (p['market'] in VALIDATED and not p['ood'] and not p.get('team_check_failed')):
+        if p['interval'] and p['interval'][0] > p['best']['break_even'] and e_ >= MIN_EDGE and not p['ceiling'] and p['market'] in VALIDATED and not p['ood'] and not p.get('team_check_failed'):
+            p['tier'] = 'bet'
+        elif p['tier'] == 'lean' and e_ <= 0: p['tier'] = 'pass'
+HUB = {mk: dict(n=len(v), corr_median_line=round(float(np.corrcoef([a for a, _, _, _ in v], [b for _, b, _, _ in v])[0, 1]), 3),
+                corr_p_novig=round(float(np.corrcoef([c for _, _, c, _ in v], [d_ for _, _, _, d_ in v])[0, 1]), 3)) for mk, v in hub.items() if len(v) > 5}
+print('priced props', sum(bool(p['offers']) for p in props), 'bets', sum(p['tier'] == 'bet' for p in props), 'hubacek', HUB)
 # ---------------- same-game parlays from the joint simulation (pairs of leans)
 par = []; LE = [p for p in props if p['tier'] == 'lean']
 for i in range(len(LE)):
@@ -145,7 +206,7 @@ for i in range(len(LE)):
 par.sort(key=lambda x: -x['p_joint_raw'])
 for p in props:
     p['up'] = [(a, round(b, 2)) for a, b in p['up']]; p['down'] = [(a, round(b, 2)) for a, b in p['down']]
-json.dump(dict(season=SEASON, week=WEEK, chosen=CHOSEN, validated=sorted(VALIDATED), K=K, rho=RHO, rho_game=RHO_GAME, games=games_out, props=props, parlays=par[:12], log=log),
+json.dump(dict(season=SEASON, week=WEEK, chosen=CHOSEN, validated=sorted(VALIDATED), K=K, rho=RHO, rho_game=RHO_GAME, games=games_out, props=props, parlays=par[:12], log=log, hubacek=HUB, prices_file=sorted(os.listdir(f'{H}/raw/an'))[-1] if os.path.isdir(f'{H}/raw/an') else None),
           open(f'{W}/slate_{SEASON}_{WEEK:02d}.json', 'w'), default=lambda o: None if (isinstance(o, float) and np.isnan(o)) else (o.item() if hasattr(o, 'item') else str(o)))
 open(f'{W}/invariants_{SEASON}_{WEEK:02d}.log', 'w').write('\n'.join(log) or 'no violations')
 print('props', len(props), 'with line', sum(p['line'] is not None for p in props), 'leans', len(LE), 'no-prediction', sum(p['no_prediction'] for p in props), 'parlays', len(par), 'log', len(log))

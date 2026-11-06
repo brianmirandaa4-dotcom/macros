@@ -327,3 +327,6 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .pro .pos{color:var(--edge)}.pro .neg{color:var(--loss)}
 .pro-play .num{white-space:nowrap;flex:none}
 .proag{color:var(--edge);font-weight:600}
+.bkrow{display:flex;gap:6px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}.bkrow.big{justify-content:flex-start}
+.bkbtn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;font:600 12px/1 var(--f-ui);cursor:pointer;white-space:nowrap}
+.bkbtn.fd{background:#1493ff;color:#fff}.bkbtn.dk{background:#53d337;color:#000}.bkrow.big .bkbtn{padding:10px 14px;font-size:14px}

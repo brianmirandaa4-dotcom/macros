@@ -1,6 +1,6 @@
 {
  "schema": "wmtl.index.v1",
- "built_utc": "2026-11-06T00:55Z",
+ "built_utc": "2026-11-06T01:09Z",
  "brand": "whomadethisline",
  "slates": [
   {
@@ -217,15 +217,15 @@
    "start_utc": "2026-11-08T14:30:00.000Z",
    "end_utc": "2026-11-10T01:15:00.000Z",
    "n_games": 14,
-   "n_props": 301,
-   "priced": 0,
-   "lines": 301,
-   "bets": 0,
+   "n_props": 317,
+   "priced": 306,
+   "lines": 317,
+   "bets": 15,
    "watch": 0,
    "leans": 56,
-   "model_version": "v4.0 · trained model (nflverse 2018–2026)",
-   "generated_et": "Thu Nov 5, 7:55 PM ET",
-   "prices_et": "DraftKings prop lines via ESPN (no prices) · game lines: closing market via nflverse",
+   "model_version": "v4.1 · trained model + Action Network prices",
+   "generated_et": "Thu Nov 5, 8:09 PM ET",
+   "prices_et": "Action Network · Thu Nov 5, 7:57 PM ET",
    "results": {
     "status": "pending"
    }
