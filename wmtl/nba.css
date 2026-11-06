@@ -1,0 +1,73 @@
+/* tail. NBA layer + two-lane header ticker. Colour comes only from scheme tokens
+   (--s0..--s4, --t1..--t3, --hair, --hair2, --edge, --loss, --live, --act); team chips use the team colour like teams.css. */
+
+/* ---------------- header: two labelled lanes, one item at a time (NFL rolls up, NBA rolls down) */
+.ticker.tkl2{height:auto!important;overflow:hidden}
+.ticker.tkl2 .tk-track{display:block;width:auto;height:auto;animation:none!important}
+.tkl{position:relative;display:flex;align-items:center;gap:8px;height:26px;padding-inline:max(var(--side),env(safe-area-inset-left,0px)) max(var(--side),env(safe-area-inset-right,0px))}
+.tkl+.tkl{box-shadow:inset 0 1px 0 var(--hair)}
+.tkl-b{flex:none;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:4px;width:50px;height:18px;padding:0;border:0;border-radius:6px;background:var(--s2);color:var(--t1);font:800 10px/1 var(--f-ui);letter-spacing:.07em;box-shadow:inset 0 0 0 1px var(--hair2);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tkl-b svg{flex:none;color:var(--act)}
+.tkl-pz{display:none;width:7px;height:8px;box-sizing:border-box;border-inline:2px solid var(--act)}
+.tkl.paused .tkl-b{background:var(--s3);color:var(--t2)}
+.tkl.paused .tkl-b svg{display:none}.tkl.paused .tkl-pz{display:block}
+.tkl-vp{position:relative;flex:1;min-width:0;height:26px;overflow:hidden;perspective:260px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tkl-it{position:absolute;inset:0;display:flex;align-items:center;min-width:0;border-radius:6px;transform-origin:50% 50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  transition:transform .5s cubic-bezier(.2,.75,.2,1),opacity .42s ease}
+.tkl-it.enter{transition:none}
+.tkl[data-dir=up] .tkl-it.enter{transform:translateY(100%) rotateX(-72deg);opacity:0}
+.tkl[data-dir=up] .tkl-it.leave{transform:translateY(-100%) rotateX(72deg);opacity:0}
+.tkl[data-dir=down] .tkl-it.enter{transform:translateY(-100%) rotateX(72deg);opacity:0}
+.tkl[data-dir=down] .tkl-it.leave{transform:translateY(100%) rotateX(-72deg);opacity:0}
+.tkl-it .tk{display:block;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 2px;font:600 12.5px/26px var(--f-ui);color:var(--t2);font-variant-numeric:tabular-nums}
+.tkl-it .tk b{color:var(--t1);font-weight:700;font-variant-numeric:tabular-nums}
+.tkl-it .tk i{display:inline-block;font:800 9.5px/1 var(--f-ui);font-style:normal;letter-spacing:.06em;padding:3px 5px;border-radius:4px;margin-right:6px;background:var(--s3);color:var(--t2);vertical-align:1px}
+.tkl-it .tk-live i{background:var(--loss);color:var(--s0)}
+.tkl-it .tk-pre i{background:var(--s3);color:var(--t1)}
+.tkl-it .tk-win,.tkl-it .tk-win b{color:var(--edge)}
+.tkl-it .tk-sum i{background:var(--edge);color:var(--s0)}
+.tkl-it .tk-wx{color:var(--t1)}
+.tkl-it .tk-bet,.tkl-it .tk-bet b{color:var(--loss)}
+.tkl-it .tk-bet i{background:var(--loss);color:var(--s0);animation:tkbet 1.1s ease-in-out infinite}
+.tkl-it.k-bet{background:linear-gradient(90deg,color-mix(in srgb,var(--loss) 18%,transparent),transparent 75%)}
+.tkl-it .tl.xs{width:16px;height:16px;margin:0 4px 0 1px;vertical-align:-4px}
+.tkl-it.flash{animation:tkflash 1.5s ease-out}
+.tkl-it.pulse .tk b{display:inline-block;animation:tkpulse .95s ease-out}
+.tkl-n{flex:none;display:inline-flex;align-items:center;justify-content:flex-end;gap:2px;min-width:38px;height:22px;padding:0;border:0;background:none;color:var(--t3);font:600 10.5px/1 var(--f-ui);font-variant-numeric:tabular-nums;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tkl.single .tkl-n{visibility:hidden}
+@keyframes tkflash{0%{background:color-mix(in srgb,var(--edge) 42%,transparent)}100%{background:transparent}}
+@keyframes tkpulse{0%{transform:scale(1)}30%{transform:scale(1.3);color:var(--live)}100%{transform:scale(1)}}
+@keyframes tkbet{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){
+  .tkl-it{transition:opacity .35s ease!important}
+  .tkl[data-dir] .tkl-it.enter,.tkl[data-dir] .tkl-it.leave{transform:none!important}
+  .tkl-it.pulse .tk b,.tkl-it .tk-bet i{animation:none}
+  .tkl-it.pulse .tk b{color:var(--live)}
+}
+
+/* ---------------- shared bits */
+.tl.xs{width:16px;height:16px;margin-right:4px;box-shadow:inset 0 0 0 1px var(--hair2)}
+.nb-tag{display:inline-flex;align-items:center;gap:4px;margin-right:8px;padding:4px 7px;border-radius:6px;background:var(--s3);color:var(--t1);font:800 11px/1 var(--f-ui)!important;letter-spacing:.06em!important;vertical-align:4px}
+.nb-tag svg{color:var(--act)}
+.nb-n{margin-left:6px;font:600 11px/1 var(--f-num);color:var(--t3)}
+.x-chip[disabled]{opacity:.4}
+.nb-home{display:contents}
+#nba-home[hidden]{display:none}
+
+/* ---------------- Live Now: NFL | NBA */
+.lvseg{margin:2px 0 4px}
+.lvseg button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.lvseg button svg{color:var(--t3)}
+.lvseg button[aria-pressed=true]{background:var(--s4);color:var(--t1);box-shadow:inset 0 0 0 1px var(--hair2)}
+.lvseg button[aria-pressed=true] svg{color:var(--act)}
+.lvseg button .n{color:var(--loss)}
+
+/* ---------------- search: sport + contract badges */
+.sbg{display:inline-flex;align-items:center;gap:3px;margin-left:7px;padding:3px 6px;border-radius:5px;background:var(--s3);color:var(--t2);font:800 9.5px/1 var(--f-ui);letter-spacing:.06em;vertical-align:2px}
+.sbg svg{width:10px;height:10px;color:var(--act)}
+.sbg.ct{background:transparent;color:var(--act);box-shadow:inset 0 0 0 1px var(--hair2);letter-spacing:.02em}
+#ures .mt .tl.xs{vertical-align:-4px}
+
+/* ---------------- player card */
+.nb-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.nb-tags:empty{display:none}
+.x-tag.nb-ct{background:var(--s3);color:var(--act);box-shadow:inset 0 0 0 1px var(--hair2)}

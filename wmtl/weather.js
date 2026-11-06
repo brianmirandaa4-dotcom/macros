@@ -50,7 +50,8 @@ function emoji(h){ const f = (h.sf || '').toLowerCase();
 const windy = w => (w || 0) >= 15;
 
 /* conditions over a game window (kick-1h .. kick+3.5h) */
-async function game(away, home, kick){ const V = await venues(); const s = site(away, home, V); if(!s) return null;
+const indoorSport = sp => !!sp && sp !== 'NFL';   /* NBA (and any other indoor sport): never ask api.weather.gov */
+async function game(away, home, kick, sport){ if(indoorSport(sport)) return {site: {name: 'Arena', indoor: true}, kind: 'dome'}; const V = await venues(); const s = site(away, home, V); if(!s) return null;
   if(s.abroad || s.neutral) return {site: s, kind: s.abroad ? 'abroad' : 'neutral'};
   if(s.roof === 'dome') return {site: s, kind: 'dome'};
   let H; try{ H = await hourly(s); }catch(e){ return {site: s, kind: 'error'}; }
@@ -69,7 +70,7 @@ const chipHTML = w => { if(!w) return ''; if(w.kind === 'dome') return '<span cl
 
 /* fill every [data-wx="AWAY@HOME|kickISO"] placeholder in a container */
 async function fill(root){ const els = [...(root || document).querySelectorAll('[data-wx]')]; await Promise.all(els.map(async el => { const [m, k] = el.dataset.wx.split('|'); const [a, h] = m.split('@');
-  try{ el.innerHTML = chipHTML(await game(a, h, k)); }catch(e){ el.innerHTML = ''; } })); }
+  try{ el.innerHTML = chipHTML(await game(a, h, k, el.dataset.wxs)); }catch(e){ el.innerHTML = ''; } })); }
 
 /* hourly chart: emoji row, rain/snow chance bars, wind + gust line, temp labels, kickoff + now markers */
 function chart(w, kick){ const H = w.win, n = H.length, W = 340, X0 = 26, X1 = W - 10, step = (X1 - X0) / Math.max(1, n - 1); const x = i => X0 + i * step;
@@ -98,7 +99,8 @@ function sentence(w){ const out = []; const hr = t => new Date(t).toLocaleTimeSt
   if(!out.length) out.push('No weather concerns in the forecast.'); return out.join(' '); }
 
 /* game screen Weather tab */
-async function renderGame(host, g){ host.innerHTML = '<p class="sub">Loading the forecast…</p>'; let w; try{ w = await game(g.away.abbr, g.home.abbr, g.kick_utc); }catch(e){ w = null; }
+async function renderGame(host, g){ if(indoorSport(g && g.sport)){ host.innerHTML = `<div class="wx-card"><div class="wx-big">🏟️</div><b>Indoors</b><p>Weather won't affect this game.</p></div>`; return; }
+  host.innerHTML = '<p class="sub">Loading the forecast…</p>'; let w; try{ w = await game(g.away.abbr, g.home.abbr, g.kick_utc); }catch(e){ w = null; }
   if(!w){ host.innerHTML = '<p class="sub">No stadium data for this game.</p>'; return; }
   if(w.kind === 'dome'){ host.innerHTML = `<div class="wx-card"><div class="wx-big">🏟️</div><b>${esc(w.site.name)} is indoors</b><p>Weather won't affect this game.</p></div>`; return; }
   if(w.kind === 'abroad' || w.kind === 'neutral'){ host.innerHTML = `<div class="wx-card"><div class="wx-big">${w.site.indoor ? '🏟️' : '🌍'}</div><b>${esc(w.site.name || 'Neutral site')}${w.site.city ? ', ' + esc(w.site.city) : ''}</b><p>${w.site.indoor ? "Indoors, so weather won't affect this game." : 'The National Weather Service only covers US stadiums, so there is no forecast for this site.'}</p></div>`; return; }
@@ -118,7 +120,7 @@ async function impact(host, w, g){ if(!host) return; const M = await model(); if
   host.innerHTML = window.WXIMPACT(M, w, g) || ''; }
 
 /* Home: games ranked by forecast exposure (data only: strongest wind, then rain/snow chance, then cold) */
-async function renderWatch(host, list){ if(!host) return; const rows = (await Promise.all(list.map(async ({g, d}) => { try{ const w = await game(g.away.abbr, g.home.abbr, g.kick_utc); return w && w.win ? {g, d, w} : null; }catch(e){ return null; } }))).filter(Boolean)
+async function renderWatch(host, list){ if(!host) return; const rows = (await Promise.all(list.filter(({g, d}) => !indoorSport((d && d.sport) || (g && g.sport))).map(async ({g, d}) => { try{ const w = await game(g.away.abbr, g.home.abbr, g.kick_utc); return w && w.win ? {g, d, w} : null; }catch(e){ return null; } }))).filter(Boolean)
     .filter(r => windy(r.w.maxWind) || r.w.maxPop >= 30 || r.w.minTemp <= 35 || r.w.alerts.length)
     .sort((a, b) => (b.w.alerts.length - a.w.alerts.length) || (b.w.maxWind - a.w.maxWind) || (b.w.maxPop - a.w.maxPop) || (a.w.minTemp - b.w.minTemp));
   if(!rows.length){ host.innerHTML = ''; return; }
@@ -126,7 +128,7 @@ async function renderWatch(host, list){ if(!host) return; const rows = (await Pr
   host.querySelectorAll('[data-game]').forEach(b => b.onclick = () => openGame(b.dataset.sl, b.dataset.game)); }
 
 /* ticker: active alerts + rain/snow onsets in the next 90 minutes for games today */
-let TK = []; async function refreshTicker(games){ const out = []; for(const {g} of games){ const k = new Date(g.kick_utc).getTime(); if(k - Date.now() > 12 * 3.6e6 || Date.now() - k > 4 * 3.6e6) continue;
+let TK = []; async function refreshTicker(games){ const out = []; for(const {g, d} of games){ if(indoorSport((d && d.sport) || (g && g.sport))) continue; const k = new Date(g.kick_utc).getTime(); if(k - Date.now() > 12 * 3.6e6 || Date.now() - k > 4 * 3.6e6) continue;
     try{ const w = await game(g.away.abbr, g.home.abbr, g.kick_utc); if(!w || !w.win) continue; for(const a of w.alerts) out.push(`<span class="tk tk-wx">⚠️ ${esc(a.event)} · ${esc(g.away.abbr)} @ ${esc(g.home.abbr)}</span>`);
       const soon = w.win.find(h => h.t > Date.now() && h.t - Date.now() < 90 * 60e3 && h.pop >= 50); if(soon) out.push(`<span class="tk tk-wx">${emoji(soon)} ${/snow|flurr/i.test(soon.sf) ? 'Snow' : 'Rain'} ${soon.pop}% within the hour · ${esc(g.away.abbr)} @ ${esc(g.home.abbr)}</span>`);
       if(windy(w.atK.wind) && Date.now() >= k - 3.6e6) out.push(`<span class="tk tk-wx">💨 ${w.atK.wind} mph wind · ${esc(g.away.abbr)} @ ${esc(g.home.abbr)}</span>`); }catch(e){} }

@@ -19,13 +19,13 @@ const od = o => isNum(o) ? (o > 0 ? '+' : '−') + Math.abs(Math.round(o)) : '�
 const am2p = o => o > 0 ? 100 / (o + 100) : -o / (-o + 100);
 const decOdds = o => o > 0 ? 1 + o / 100 : 1 + 100 / -o;
 const money = (x, d = 0) => isNum(x) ? (x < 0 ? '−$' : '$') + Math.abs(x).toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '—';
-const SPORTS = ['NFL'];   // NFL only for now; add sports back here when their models are in
+const SPORTS = ['NFL', 'NBA'];   // a sport shows in the picker only once data/index.json lists a slate for it (NBA: nba.js)
 const SPORTC = {NFL: 'var(--nfl)', CFB: 'var(--cfb)', NBA: 'var(--nba)', NHL: 'var(--nhl)', MLB: 'var(--mlb)'};
 const SPORTHEX = {NFL: '#A08BF7', CFB: '#E7C46A', NBA: '#EC9455', NHL: '#8FD0EE', MLB: '#63C7B2'};
 const FAM = {A: 'Role', B: 'Form', C: 'Matchup', D: 'Game setup', E: 'History'};
 const LPRICES = [-105, -115, -125, -140];
 const MKT_ORDER = ['pass_yds', 'rush_yds', 'rec_yds', 'receptions', 'qb_rush', 'atd', 'qb_atd', 'kicker', 'pts', 'reb', 'ast', 'tpm', 'pra', 'pr', 'pa', 'ra', 'stl', 'blk', 'tov'];
-const STATWORD = {rec_yds: 'rec yds', receptions: 'rec', rush_yds: 'rush yds', qb_rush: 'rush yds', pass_yds: 'pass yds', atd: 'TD', qb_atd: 'TD', kicker: 'kick pts', pts: 'pts', reb: 'reb', ast: 'ast', tpm: '3PM', pra: 'PRA', pr: 'P+R', pa: 'P+A', ra: 'R+A', stl: 'stl', blk: 'blk', tov: 'TO'};
+const STATWORD = {rec_yds: 'rec yds', receptions: 'rec', rush_yds: 'rush yds', qb_rush: 'rush yds', pass_yds: 'pass yds', atd: 'TD', qb_atd: 'TD', kicker: 'kick pts', pts: 'PTS', reb: 'REB', ast: 'AST', tpm: '3PM', pra: 'PRA', pr: 'P+R', pa: 'P+A', ra: 'R+A', stl: 'STL', blk: 'BLK', tov: 'TOV'};
 const ICON = new Proxy({}, {get: (_, k) => typeof k === 'string' ? Icon.svg(k) : undefined});
 function toast(msg){ const w = $('#toastw'), t = $('#toast'); t.innerHTML = Icon.svg('check', {size: 20}) + esc(msg); w.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(() => w.classList.remove('on'), 2000); }
 function countUp(el){ if(RM) return; $$('[data-count]', el).forEach(n => { const to = parseFloat(n.dataset.count); if(!isFinite(to)) return; const dp = (n.dataset.count.split('.')[1] || '').length; const t0 = performance.now(), D = 520;
@@ -109,15 +109,16 @@ function drawSlateBtn(){ const b = $('#slatebtn'); const s = S.slate && slateInf
   b.setAttribute('aria-label', `${s.sport} ${s.label}. Change slate`); }
 const SB2_ICON = {NFL: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="12" rx="9.5" ry="6" transform="rotate(-35 12 12)"/><path d="M9.2 14.8l5.6-5.6M10.6 11.4l2 2M12.4 9.6l2 2"/></svg>', CFB: null};
 SB2_ICON.CFB = SB2_ICON.NFL;
+SB2_ICON.NBA = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 2.5v19M2.5 12h19M5.6 5.2c2.4 2.2 3.6 4.4 3.6 6.8s-1.2 4.6-3.6 6.8M18.4 5.2c-2.4 2.2-3.6 4.4-3.6 6.8s1.2 4.6 3.6 6.8"/></svg>';
 
 async function render(){ const m = $('#main'); const v = S.tab;
   if(v !== 'lobby' && window.World && World.ready) World.pause(true);
-  if(v === 'lobby'){ if(window.viewHome2){ m.innerHTML = '<div class="view"><p class="sub">Loading…</p></div>'; await viewHome2(); applyProgress(m, SLATE[S.slate] || {props: []}); if(window.ENG) ENG.home(m); return; } m.innerHTML = viewLobby(); wireLobby(); return; }
+  if(v === 'lobby'){ if(window.viewHome2){ m.innerHTML = '<div class="view"><p class="sub">Loading…</p></div>'; await viewHome2(); applyProgress(m, SLATE[S.slate] || {props: []}); if(window.ENG) ENG.home(m); if(window.PICKEM) PICKEM.home(m); return; } m.innerHTML = viewLobby(); wireLobby(); return; }
   if(v === 'more'){ m.innerHTML = viewMore(); wireMore(); return; }
   if(v === 'club' && window.CLUB){ await CLUB.view(m); return; }
   if(v === 'live' && window.viewLiveNow2){ await viewLiveNow2(); return; }
   if(v === 'players' && window.viewPlayers2){ await viewPlayers2(); return; }
-  if(v === 'mybets'){ m.innerHTML = `<div class="view" id="mybets">${betsHTML()}</div>`; wireBetsIn(m, () => render()); if(window.ENG) ENG.mybets(m); return; }
+  if(v === 'mybets'){ m.innerHTML = `<div class="view" id="mybets">${betsHTML()}</div>`; wireBetsIn(m, () => render()); if(window.ENG) ENG.mybets(m); if(window.HIST) HIST.mybets(m); return; }
   let d; try{ d = await loadSlate(S.slate); }catch(e){ m.innerHTML = `<div class="view"><div class="lt"><h1>Not available</h1><p>This slate could not be loaded. Pull down to try again.</p></div></div>`; return; }
   if(S.tab !== v) return;
   if(v === 'board'){ const B = await loadBoard(d); if(S.tab !== v) return; m.innerHTML = viewBoard(d, B); wireBoard(d, B); return; }
@@ -277,13 +278,15 @@ async function loadPlayerIndex(){ if(!PIDX){ try{ PIDX = await getJSON('data/nfl
 async function openProfileByName(name, team){ const I = await loadPlayerIndex(); const k = nkey(name);
   const hit = I.players.find(r => nkey(r[1]) === k && (!team || r[2] === team)) || I.players.find(r => nkey(r[1]) === k);
   if(hit) return openProfile(hit[0]); toast('No profile found for ' + name); }
-function openSearch(){ pushSheet('Search', `<div class="body"><div class="lt"><h1>Find any player</h1><p>Every player on a 2026 NFL roster, including depth and practice squad.</p></div>
-  <div class="fld search"><label for="uq" class="sr">Player name or team</label>${Icon.svg('search', {size: 18})}<input id="uq" type="search" autocomplete="off" placeholder="Name, or team like PHI" autofocus></div><div id="ures" class="list"></div></div>`, async el => {
-    const I = await loadPlayerIndex(); const inp = $('#uq', el), out = $('#ures', el);
-    const draw = () => { const q = nkey(inp.value), up = inp.value.trim().toUpperCase(); if(q.length < 2 && up.length < 2){ out.innerHTML = `<p class="sub">${I.players.length.toLocaleString()} players. Start typing.</p>`; return; }
+function openSearch(){ pushSheet('Search', `<div class="body"><div class="lt"><h1>Find any player</h1><p>Every player on a 2026 NFL${window.NBA ? ' or NBA' : ''} roster, including depth${window.NBA ? ', practice squad, two-way and 10-day deals' : ' and practice squad'}.</p></div>
+  <div class="fld search"><label for="uq" class="sr">Player name or team</label>${Icon.svg('search', {size: 18})}<input id="uq" type="search" autocomplete="off" placeholder="Name, or team like PHI${window.NBA ? ' or NYK' : ''}" autofocus></div><div id="ures" class="list"></div></div>`, async el => {
+    const I = await loadPlayerIndex(); const NB = window.NBA ? await NBA.searchIndex() : []; const inp = $('#uq', el), out = $('#ures', el);
+    const draw = () => { const q = nkey(inp.value), up = inp.value.trim().toUpperCase(); if(q.length < 2 && up.length < 2){ out.innerHTML = `<p class="sub">${(I.players.length + NB.length).toLocaleString()} players. Start typing.</p>`; return; }
       const r = I.players.filter(p => nkey(p[1]).includes(q) || p[2] === up).sort((a, b) => (b[2] === up) - (a[2] === up)).slice(0, 60);
-      out.innerHTML = r.length ? r.map(p => `<button class="row" data-pid="${esc(p[0])}"><div><div class="nm">${esc(p[1])}</div><div class="mt">${esc(p[2] || 'FA')} · ${esc(p[3] || '')}${p[4] ? ' · #' + esc(p[4]) : ''}${p[5] && p[5] !== 'ACT' ? ' · ' + esc(p[5]) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`).join('') : `<p class="sub">No player matches “${esc(inp.value)}”.</p>`;
-      $$('[data-pid]', out).forEach(b => b.onclick = () => openProfile(b.dataset.pid)); };
+      const nf = r.map(p => `<button class="row" data-pid="${esc(p[0])}"><div><div class="nm">${esc(p[1])}${NB.length ? '<span class="sbg nfl">NFL</span>' : ''}</div><div class="mt">${esc(p[2] || 'FA')} · ${esc(p[3] || '')}${p[4] ? ' · #' + esc(p[4]) : ''}${p[5] && p[5] !== 'ACT' ? ' · ' + esc(p[5]) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`).join('');
+      const nb = window.NBA ? NBA.searchHTML(q, up) : {html: '', n: 0}; const nfT = r.some(p => p[2] === up);
+      out.innerHTML = r.length || nb.n ? (nb.team && !nfT ? nb.html + nf : nf + nb.html) : `<p class="sub">No player matches “${esc(inp.value)}”.</p>`;
+      $$('[data-pid]', out).forEach(b => b.onclick = () => openProfile(b.dataset.pid)); if(window.NBA) NBA.wireSearch(out); };
     inp.oninput = draw; draw(); setTimeout(() => inp.focus(), 350); }); }
 const STATCOLS = [['tgt', 'Tgt'], ['rec', 'Rec'], ['rec_yds', 'RecYd'], ['rec_td', 'RecTD'], ['car', 'Car'], ['rush_yds', 'RuYd'], ['rush_td', 'RuTD'], ['att', 'Att'], ['cmp', 'Cmp'], ['pass_yds', 'PaYd'], ['pass_td', 'PaTD'], ['sacks', 'Sk']];
 function statTable(rows, lead){ if(!rows || !rows.length) return '<p class="sub">No games.</p>'; const cols = STATCOLS.filter(([k]) => rows.some(r => isNum(r[k]) && r[k] !== 0));
@@ -399,7 +402,7 @@ function watchPlansHTML(d){ if(!LP || !LP.markets) return ''; const ps = d.props
 
 /* ---------------- Bet progress: faded bar behind every pick toward its line; green CASHED when it hits, red when an under is blown */
 const CASH_SEEN = new Set(); /* one cash animation per pick per session, not on every re-render */
-function applyProgress(root, d){ if(!root || !Object.keys(LV.games).length) return;
+function applyProgress(root, d){ if(d && d.sport === 'NBA'){ if(window.NBA) NBA.applyProgress(root, d); return; } if(!root || !Object.keys(LV.games).length) return;
   for(const el of root.querySelectorAll('[data-prop]')){ const p = d.props.find(x => x.id === el.dataset.prop); if(!p || !p.side || p.no_prediction) continue;
     const g = Object.values(LV.games).find(x => x.away === p.team || x.home === p.team); if(!g || g.state === 'pre') continue;
     const sk = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', rec_yds: 'rec_yds', receptions: 'receptions', pass_yds: 'pass_yds'}[p.market]; if(!sk) continue;
@@ -428,13 +431,16 @@ async function tickerLoop(){ clearTimeout(tickerLoop._t); if(document.visibility
   drawTicker(); if(window.onLiveTick) onLiveTick(); const live = Object.values(LV.games).some(g => g.state === 'in'); tickerLoop._t = setTimeout(tickerLoop, (live ? 15 : 60) * 1000); }
 function drawTicker(){ const el = $('#tktrack'); if(!el) return; const items = [];
   const G = Object.values(LV.games).sort((a, b) => (a.state === 'in' ? 0 : a.state === 'post' ? 1 : 2) - (b.state === 'in' ? 0 : b.state === 'post' ? 1 : 2));
-  for(const g of G){ if(g.state === 'pre') continue; items.push(`<span class="tk ${g.state === 'in' ? 'tk-live' : ''}"><i>${g.state === 'in' ? 'LIVE' : 'FINAL'}</i> ${esc(g.away)} <b>${g.as}</b> · ${esc(g.home)} <b>${g.hs}</b>${g.state === 'in' ? ' · ' + esc(g.detail) : ''}</span>`); }
+  const tl = (a) => window.TKL && window.TL ? TL(a, 'xs') : '';
+  for(const g of G){ if(g.state === 'pre') continue; items.push(`<span class="tk ${g.state === 'in' ? 'tk-live' : ''}" data-tkg="${esc(g.away)}|${esc(g.home)}" data-sc="${g.as}-${g.hs}"><i>${g.state === 'in' ? 'LIVE' : 'FINAL'}</i> ${tl(g.away)}${esc(g.away)} <b>${g.as}</b> · ${tl(g.home)}${esc(g.home)} <b>${g.hs}</b>${g.state === 'in' ? ' · ' + esc(g.detail) : ''}</span>`); }
   const seen = new Set(); let w = 0, l = 0;
   for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; for(const p of d.props){ if(p.no_prediction || !(p.tier === 'bet' || (pSide(p) || 0) >= .55)) continue; const st = pickState(p); if(!st) continue; const k = p.player + p.market;
     if(seen.has(k)) continue; seen.add(k); if(st.win){ w++; items.push(`<span class="tk tk-win" data-tkp="${esc(p.id)}">✓ ${esc(p.player)} ${esc(selText(p))} · ${ln(st.now)}${p.tier === 'bet' ? ' · BET' : ''}</span>`); } else if(st.loss) l++; } }
   if(window.WX) items.push(...WX.ticker());
   if(w + l) items.unshift(`<span class="tk tk-sum"><i>MODEL PICKS</i> ${w} cashed · ${l} missed</span>`);
-  if(!items.length){ const next = Object.values(LV.games).filter(g => g.state === 'pre').length; items.push(`<span class="tk">No NFL game live${next ? ` · ${next} game${next > 1 ? 's' : ''} still to play this week` : ''} · picks light up here as they cash</span>`); }
+  if(!items.length){ const next = Object.values(LV.games).filter(g => g.state === 'pre').length; if(window.TKL) items.push(`<span class="tk">No game live${next ? ` · <b>${next}</b> still to play this week` : ''}</span>`, '<span class="tk">Model picks light up here as they cash</span>');
+    else items.push(`<span class="tk">No NFL game live${next ? ` · ${next} game${next > 1 ? 's' : ''} still to play this week` : ''} · picks light up here as they cash</span>`); }
+  if(window.TKL) return TKL.nfl(items);   /* two-lane header (nba.js): NFL lane rolls these one at a time */
   const html = items.join('<span class="tk-dot">•</span>'); if(el.dataset.h === html) return; el.dataset.h = html;
   el.innerHTML = `<div class="tk-run">${html}<span class="tk-dot">•</span></div><div class="tk-run" aria-hidden="true">${html}<span class="tk-dot">•</span></div>`;
   const sp = Math.max(25, el.firstChild.scrollWidth / 45); el.style.setProperty('--tkdur', sp + 's');
@@ -839,7 +845,7 @@ function logBet(d, p, pre = {}){ if(!p) return; const books = [...new Set((p.off
 function wireBetsIn(el, draw){ $$('[data-del]', el).forEach(b => b.onclick = () => { if(b.dataset.armed){ store.d.bets = store.d.bets.filter(x => x.id !== b.dataset.del); store.save(); draw(); } else { b.dataset.armed = 1; b.textContent = 'Tap again to delete'; } });
   $$('[data-settle]', el).forEach(b => b.onclick = () => { const x = store.d.bets.find(y => y.id === b.dataset.id); if(!x) return; const r = b.dataset.settle; x.status = r; x.pl = r === 'won' ? +(x.stake * (decOdds(x.odds) - 1)).toFixed(2) : r === 'lost' ? -x.stake : 0; store.save(); draw(); });
   const ex = $('#b-export', el); if(ex) ex.onclick = exportData; const im = $('#b-import', el); if(im) im.onclick = importData; }
-function openBets(){ const el = pushSheet('My bets', `<div class="body" id="mybets"></div>`); const draw = () => { $('#mybets', el).innerHTML = betsHTML(); wire(); if(window.ENG) ENG.mybets(el); };
+function openBets(){ const el = pushSheet('My bets', `<div class="body" id="mybets"></div>`); const draw = () => { $('#mybets', el).innerHTML = betsHTML(); wire(); if(window.ENG) ENG.mybets(el); if(window.HIST) HIST.mybets($('#mybets', el)); };
   const wire = () => { $$('[data-del]', el).forEach(b => b.onclick = () => { if(b.dataset.armed){ store.d.bets = store.d.bets.filter(x => x.id !== b.dataset.del); store.save(); draw(); } else { b.dataset.armed = 1; b.textContent = 'Tap again to delete'; } });
     $$('[data-settle]', el).forEach(b => b.onclick = () => { const x = store.d.bets.find(y => y.id === b.dataset.id); if(!x) return; const r = b.dataset.settle; x.status = r; x.pl = r === 'won' ? +(x.stake * (decOdds(x.odds) - 1)).toFixed(2) : r === 'lost' ? -x.stake : 0; store.save(); draw(); });
     const ex = $('#b-export', el); if(ex) ex.onclick = exportData; const im = $('#b-import', el); if(im) im.onclick = importData; };
@@ -951,5 +957,5 @@ function slatePicker(){ const by = {}; INDEX.slates.forEach(s => (by[s.sport] = 
       <span class="sp2-end">${st.k === 'live' ? '<span class="sp2-st live"><i></i>Live</span>' : st.k === 'up' ? `<span class="sp2-st">${esc(st.word.replace('Starts in ', 'in '))}</span>` : rec(s) || '<span class="sp2-st">Final</span>'}${cur ? '<span class="sp2-cur" aria-label="Current slate"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' : ''}</span></button>`; };
   modal(`<div class="sp2"><h2>Slates</h2><p class="sp2-sub">Pick a slate to see its games, picks and props.</p>${SPORTS.filter(sp => by[sp]).map(sp => `<div class="sp2-sec"><h3>${sp}</h3><div class="sp2-list">${by[sp].sort((a, b) => a.start_utc < b.start_utc ? 1 : -1).map(row).join('')}</div></div>`).join('')}
     <div class="sp2-sec sp2-look"><h3>Look</h3><div class="sp2-seg">${[['lounge', 'Lounge'], ['bank', 'Private bank'], ['signal', 'Signal'], ['lounge2', 'Whiskey']].map(([k, l]) => `<button data-look="${k}" aria-pressed="${(window.TAIL_SCHEME || 'bank') === k}">${l}</button>`).join('')}</div></div>
-    <button class="sp2-imp" id="pick-imp">${ICON.import}Import a slate</button></div>`, (C, close) => { $$('[data-pick]', C).forEach(b => b.onclick = () => { close(); setSlate(b.dataset.pick, S.tab === 'lobby' || S.tab === 'more' ? 'card' : S.tab); }); $('#pick-imp', C).onclick = () => { close(); setTimeout(openImport, 250); }; $$('[data-look]', C).forEach(b => b.onclick = () => { const k = b.dataset.look; try{ localStorage.setItem('tail.scheme', k); }catch(e){} window.TAIL_SCHEME = k; $('#scheme').href = `schemes/${k}.css?v=${APP_VERSION}`; const m = $('meta[name=theme-color]'); if(m && window.TAIL_SCHEMES) m.content = TAIL_SCHEMES[k]; $$('[data-look]', C).forEach(x => x.setAttribute('aria-pressed', x.dataset.look === k)); }); }); }
+    <button class="sp2-imp" id="pick-imp">${ICON.import}Import a slate</button></div>`, (C, close) => { if(window.HIST) HIST.picker(C, close); $$('[data-pick]', C).forEach(b => b.onclick = () => { close(); setSlate(b.dataset.pick, S.tab === 'lobby' || S.tab === 'more' ? 'card' : S.tab); }); $('#pick-imp', C).onclick = () => { close(); setTimeout(openImport, 250); }; $$('[data-look]', C).forEach(b => b.onclick = () => { const k = b.dataset.look; try{ localStorage.setItem('tail.scheme', k); }catch(e){} window.TAIL_SCHEME = k; $('#scheme').href = `schemes/${k}.css?v=${APP_VERSION}`; const m = $('meta[name=theme-color]'); if(m && window.TAIL_SCHEMES) m.content = TAIL_SCHEMES[k]; $$('[data-look]', C).forEach(x => x.setAttribute('aria-pressed', x.dataset.look === k)); }); }); }
 boot();

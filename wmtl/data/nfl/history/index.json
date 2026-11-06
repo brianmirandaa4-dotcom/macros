@@ -1,0 +1,641 @@
+{
+ "schema": "wmtl.history.v1",
+ "season": 2026,
+ "sport": "NFL",
+ "built_utc": "2026-11-06T04:17Z",
+ "source_note": "Reconstructed from the model's walk-forward backtest (predictions made with data available before kickoff)",
+ "method": "History back-fill \u00b7 2026 Weeks 1-8 from the model's leak-free walk-forward backtest.\n\n    python3 tools/build_history.py [/home/claude/nfl] [data]\n\nWrites data/nfl/history/2026-wk01..08.json (schema wmtl.slate.v2 plus a graded results block) and data/nfl/history/index.json.\nCopies or recomputes only what the pipeline already stores; it invents nothing:\n  * predictions   work/backtest_props.parquet  (week w fit on games strictly before week w; 25-quantile grid qg_A / qg_B)\n  * temperature   work/calibrated_2026.json    (k_by_week, fit on earlier weeks only)\n  * prices        work/an_props_2026.parquet   (Action Network last stored pre-game price; 68 DK, 69 FD, 75 BetMGM, 71 BetRivers, 49 Caesars; 30 = opener)\n  * OOD flags     work/feat_player.parquet     (n_prior, f_gap, qb_change, qb_new, training range per market and week)\n  * results       work/player_games.parquet    (nflverse box scores) and work/games.parquet (finals, closing spread/total)\nSelection is the same code path as src/backtest_priced.py (probability at each book's line) and src/slate.py + src/export_overlay.py\n(validated market, stale-price guard, edge >= 3 pts at the best price, ceiling 75%, no OOD flag, top 15 by edge, 1u cap).\nNot reproducible from stored outputs and therefore NOT applied: the game-bootstrap interval test and the receivers-vs-QB team check\n(bootstrap refits were never stored for past weeks). Stakes are therefore a flat 1u, the backtest's own convention.",
+ "weeks": [
+  {
+   "week": 1,
+   "id": "nfl-2026-wk01-hist",
+   "path": "data/nfl/history/2026-wk01.json",
+   "label": "Week 1",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-09-09",
+   "end": "2026-09-14",
+   "n_games": 16,
+   "n_props": 414,
+   "priced": 404,
+   "bets": {
+    "w": 2,
+    "l": 13,
+    "p": 0,
+    "units": -10.37,
+    "risked": 15.0,
+    "roi": -0.6913
+   },
+   "model_sides": {
+    "w": 190,
+    "l": 205,
+    "p": 0,
+    "units": -27.65,
+    "risked": 395.0,
+    "roi": -0.07,
+    "hit": 0.481
+   },
+   "edge3": {
+    "w": 106,
+    "l": 119,
+    "p": 0,
+    "units": -16.37,
+    "risked": 225.0,
+    "roi": -0.0728,
+    "hit": 0.4711,
+    "n": 225
+   },
+   "days": {
+    "2026-09-09": {
+     "games": 1,
+     "bets": {
+      "w": 1,
+      "l": 1,
+      "p": 0,
+      "units": 0.37,
+      "risked": 2.0,
+      "roi": 0.185
+     }
+    },
+    "2026-09-10": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 1,
+      "p": 0,
+      "units": -1.0,
+      "risked": 1.0,
+      "roi": -1.0
+     }
+    },
+    "2026-09-13": {
+     "games": 13,
+     "bets": {
+      "w": 1,
+      "l": 11,
+      "p": 0,
+      "units": -9.74,
+      "risked": 12.0,
+      "roi": -0.8117
+     }
+    },
+    "2026-09-14": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0,
+      "risked": 0.0,
+      "roi": null
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 2,
+   "id": "nfl-2026-wk02-hist",
+   "path": "data/nfl/history/2026-wk02.json",
+   "label": "Week 2",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-09-17",
+   "end": "2026-09-21",
+   "n_games": 16,
+   "n_props": 439,
+   "priced": 421,
+   "bets": {
+    "w": 7,
+    "l": 8,
+    "p": 0,
+    "units": 1.67,
+    "risked": 15.0,
+    "roi": 0.1113
+   },
+   "model_sides": {
+    "w": 183,
+    "l": 191,
+    "p": 0,
+    "units": -8.31,
+    "risked": 374.0,
+    "roi": -0.0222,
+    "hit": 0.4893
+   },
+   "edge3": {
+    "w": 47,
+    "l": 45,
+    "p": 0,
+    "units": 9.23,
+    "risked": 92.0,
+    "roi": 0.1003,
+    "hit": 0.5109,
+    "n": 92
+   },
+   "days": {
+    "2026-09-17": {
+     "games": 1,
+     "bets": {
+      "w": 2,
+      "l": 0,
+      "p": 0,
+      "units": 2.67,
+      "risked": 2.0,
+      "roi": 1.335
+     }
+    },
+    "2026-09-20": {
+     "games": 14,
+     "bets": {
+      "w": 5,
+      "l": 8,
+      "p": 0,
+      "units": -1.0,
+      "risked": 13.0,
+      "roi": -0.0769
+     }
+    },
+    "2026-09-21": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0,
+      "risked": 0.0,
+      "roi": null
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 3,
+   "id": "nfl-2026-wk03-hist",
+   "path": "data/nfl/history/2026-wk03.json",
+   "label": "Week 3",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-09-24",
+   "end": "2026-09-28",
+   "n_games": 16,
+   "n_props": 458,
+   "priced": 444,
+   "bets": {
+    "w": 5,
+    "l": 10,
+    "p": 0,
+    "units": -2.25,
+    "risked": 15.0,
+    "roi": -0.15
+   },
+   "model_sides": {
+    "w": 193,
+    "l": 211,
+    "p": 0,
+    "units": -18.66,
+    "risked": 404.0,
+    "roi": -0.0462,
+    "hit": 0.4777
+   },
+   "edge3": {
+    "w": 54,
+    "l": 50,
+    "p": 0,
+    "units": 12.01,
+    "risked": 104.0,
+    "roi": 0.1155,
+    "hit": 0.5192,
+    "n": 104
+   },
+   "days": {
+    "2026-09-24": {
+     "games": 1,
+     "bets": {
+      "w": 2,
+      "l": 1,
+      "p": 0,
+      "units": 2.1,
+      "risked": 3.0,
+      "roi": 0.7
+     }
+    },
+    "2026-09-27": {
+     "games": 14,
+     "bets": {
+      "w": 3,
+      "l": 8,
+      "p": 0,
+      "units": -3.35,
+      "risked": 11.0,
+      "roi": -0.3045
+     }
+    },
+    "2026-09-28": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 1,
+      "p": 0,
+      "units": -1.0,
+      "risked": 1.0,
+      "roi": -1.0
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 4,
+   "id": "nfl-2026-wk04-hist",
+   "path": "data/nfl/history/2026-wk04.json",
+   "label": "Week 4",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-10-01",
+   "end": "2026-10-05",
+   "n_games": 16,
+   "n_props": 462,
+   "priced": 419,
+   "bets": {
+    "w": 7,
+    "l": 8,
+    "p": 0,
+    "units": 2.43,
+    "risked": 15.0,
+    "roi": 0.162
+   },
+   "model_sides": {
+    "w": 198,
+    "l": 191,
+    "p": 0,
+    "units": 9.17,
+    "risked": 389.0,
+    "roi": 0.0236,
+    "hit": 0.509
+   },
+   "edge3": {
+    "w": 43,
+    "l": 45,
+    "p": 0,
+    "units": 8.96,
+    "risked": 88.0,
+    "roi": 0.1018,
+    "hit": 0.4886,
+    "n": 88
+   },
+   "days": {
+    "2026-10-01": {
+     "games": 1,
+     "bets": {
+      "w": 1,
+      "l": 1,
+      "p": 0,
+      "units": 0.2,
+      "risked": 2.0,
+      "roi": 0.1
+     }
+    },
+    "2026-10-04": {
+     "games": 14,
+     "bets": {
+      "w": 6,
+      "l": 6,
+      "p": 0,
+      "units": 3.23,
+      "risked": 12.0,
+      "roi": 0.2692
+     }
+    },
+    "2026-10-05": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 1,
+      "p": 0,
+      "units": -1.0,
+      "risked": 1.0,
+      "roi": -1.0
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 5,
+   "id": "nfl-2026-wk05-hist",
+   "path": "data/nfl/history/2026-wk05.json",
+   "label": "Week 5",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-10-08",
+   "end": "2026-10-12",
+   "n_games": 15,
+   "n_props": 423,
+   "priced": 415,
+   "bets": {
+    "w": 11,
+    "l": 4,
+    "p": 0,
+    "units": 9.68,
+    "risked": 15.0,
+    "roi": 0.6453
+   },
+   "model_sides": {
+    "w": 199,
+    "l": 195,
+    "p": 0,
+    "units": -2.65,
+    "risked": 394.0,
+    "roi": -0.0067,
+    "hit": 0.5051
+   },
+   "edge3": {
+    "w": 49,
+    "l": 52,
+    "p": 0,
+    "units": 1.38,
+    "risked": 101.0,
+    "roi": 0.0137,
+    "hit": 0.4851,
+    "n": 101
+   },
+   "days": {
+    "2026-10-08": {
+     "games": 1,
+     "bets": {
+      "w": 1,
+      "l": 0,
+      "p": 0,
+      "units": 0.98,
+      "risked": 1.0,
+      "roi": 0.98
+     }
+    },
+    "2026-10-11": {
+     "games": 13,
+     "bets": {
+      "w": 10,
+      "l": 4,
+      "p": 0,
+      "units": 8.7,
+      "risked": 14.0,
+      "roi": 0.6214
+     }
+    },
+    "2026-10-12": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0,
+      "risked": 0.0,
+      "roi": null
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 6,
+   "id": "nfl-2026-wk06-hist",
+   "path": "data/nfl/history/2026-wk06.json",
+   "label": "Week 6",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-10-15",
+   "end": "2026-10-19",
+   "n_games": 14,
+   "n_props": 438,
+   "priced": 427,
+   "bets": {
+    "w": 8,
+    "l": 7,
+    "p": 0,
+    "units": 4.23,
+    "risked": 15.0,
+    "roi": 0.282
+   },
+   "model_sides": {
+    "w": 199,
+    "l": 196,
+    "p": 0,
+    "units": 0.65,
+    "risked": 395.0,
+    "roi": 0.0016,
+    "hit": 0.5038
+   },
+   "edge3": {
+    "w": 52,
+    "l": 51,
+    "p": 0,
+    "units": 8.41,
+    "risked": 103.0,
+    "roi": 0.0817,
+    "hit": 0.5049,
+    "n": 103
+   },
+   "days": {
+    "2026-10-15": {
+     "games": 1,
+     "bets": {
+      "w": 2,
+      "l": 0,
+      "p": 0,
+      "units": 3.53,
+      "risked": 2.0,
+      "roi": 1.765
+     }
+    },
+    "2026-10-18": {
+     "games": 12,
+     "bets": {
+      "w": 6,
+      "l": 7,
+      "p": 0,
+      "units": 0.7,
+      "risked": 13.0,
+      "roi": 0.0538
+     }
+    },
+    "2026-10-19": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0,
+      "risked": 0.0,
+      "roi": null
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 7,
+   "id": "nfl-2026-wk07-hist",
+   "path": "data/nfl/history/2026-wk07.json",
+   "label": "Week 7",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-10-22",
+   "end": "2026-10-26",
+   "n_games": 14,
+   "n_props": 433,
+   "priced": 426,
+   "bets": {
+    "w": 8,
+    "l": 7,
+    "p": 0,
+    "units": 3.2,
+    "risked": 15.0,
+    "roi": 0.2133
+   },
+   "model_sides": {
+    "w": 223,
+    "l": 186,
+    "p": 0,
+    "units": 27.2,
+    "risked": 409.0,
+    "roi": 0.0665,
+    "hit": 0.5452
+   },
+   "edge3": {
+    "w": 53,
+    "l": 37,
+    "p": 0,
+    "units": 20.92,
+    "risked": 90.0,
+    "roi": 0.2324,
+    "hit": 0.5889,
+    "n": 90
+   },
+   "days": {
+    "2026-10-22": {
+     "games": 1,
+     "bets": {
+      "w": 2,
+      "l": 2,
+      "p": 0,
+      "units": 0.94,
+      "risked": 4.0,
+      "roi": 0.235
+     }
+    },
+    "2026-10-25": {
+     "games": 12,
+     "bets": {
+      "w": 6,
+      "l": 5,
+      "p": 0,
+      "units": 2.26,
+      "risked": 11.0,
+      "roi": 0.2055
+     }
+    },
+    "2026-10-26": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0,
+      "risked": 0.0,
+      "roi": null
+     }
+    }
+   },
+   "published": null
+  },
+  {
+   "week": 8,
+   "id": "nfl-2026-wk08-hist",
+   "path": "data/nfl/history/2026-wk08.json",
+   "label": "Week 8",
+   "source": "reconstructed",
+   "posted_live": false,
+   "start": "2026-10-29",
+   "end": "2026-11-02",
+   "n_games": 14,
+   "n_props": 420,
+   "priced": 413,
+   "bets": {
+    "w": 7,
+    "l": 8,
+    "p": 0,
+    "units": 0.06,
+    "risked": 15.0,
+    "roi": 0.004
+   },
+   "model_sides": {
+    "w": 189,
+    "l": 203,
+    "p": 0,
+    "units": -22.84,
+    "risked": 392.0,
+    "roi": -0.0583,
+    "hit": 0.4821
+   },
+   "edge3": {
+    "w": 49,
+    "l": 39,
+    "p": 0,
+    "units": 13.2,
+    "risked": 88.0,
+    "roi": 0.15,
+    "hit": 0.5568,
+    "n": 88
+   },
+   "days": {
+    "2026-10-29": {
+     "games": 1,
+     "bets": {
+      "w": 2,
+      "l": 1,
+      "p": 0,
+      "units": 0.98,
+      "risked": 3.0,
+      "roi": 0.3267
+     }
+    },
+    "2026-11-01": {
+     "games": 12,
+     "bets": {
+      "w": 5,
+      "l": 7,
+      "p": 0,
+      "units": -0.92,
+      "risked": 12.0,
+      "roi": -0.0767
+     }
+    },
+    "2026-11-02": {
+     "games": 1,
+     "bets": {
+      "w": 0,
+      "l": 0,
+      "p": 0,
+      "units": 0,
+      "risked": 0.0,
+      "roi": null
+     }
+    }
+   },
+   "published": {
+    "id": "nfl-2026-wk08",
+    "bets": 0,
+    "record": {
+     "w": 0,
+     "l": 0,
+     "p": 0,
+     "units": 0.0,
+     "risked": 0.0,
+     "roi": null
+    }
+   }
+  }
+ ],
+ "live_weeks": "Weeks with a posted slate (Week 9 onward) are read from data/index.json."
+}

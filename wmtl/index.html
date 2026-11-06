@@ -15,21 +15,24 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png?v=m1">
 <link rel="icon" href="icons/favicon-64.png?v=m1">
 <link rel="preload" href="data/index.json" as="fetch" crossorigin>
-<link rel="stylesheet" href="tokens.css?v=37">
-<link rel="stylesheet" href="components.css?v=37">
-<link rel="stylesheet" href="app.css?v=37">
-<link rel="stylesheet" href="theme.css?v=37">
-<link rel="stylesheet" href="mono.css?v=37">
-<link rel="stylesheet" href="teams.css?v=37">
-<link rel="stylesheet" href="weather.css?v=37">
-<link rel="stylesheet" id="scheme" href="schemes/bank.css?v=37">
-<script>(function(){var T={lounge:'#0A1517',bank:'#0E0C0A',signal:'#05070B',lounge2:'#0C0B0A'},s='bank';try{s=localStorage.getItem('tail.scheme')||s}catch(e){}if(!T[s])s='bank';document.getElementById('scheme').href='schemes/'+s+'.css?v=37';document.querySelector('meta[name=theme-color]').content=T[s];window.TAIL_SCHEMES=T;window.TAIL_SCHEME=s;})();</script>
-<link rel="stylesheet" href="welcome.css?v=37">
-<link rel="stylesheet" href="community.css?v=37">
-<link rel="stylesheet" href="polish.css?v=37">
-<link rel="stylesheet" href="audit-a.css?v=37">
-<link rel="stylesheet" href="audit-c.css?v=37">
-<link rel="stylesheet" href="engage.css?v=37">
+<link rel="stylesheet" href="tokens.css?v=38">
+<link rel="stylesheet" href="components.css?v=38">
+<link rel="stylesheet" href="app.css?v=38">
+<link rel="stylesheet" href="theme.css?v=38">
+<link rel="stylesheet" href="mono.css?v=38">
+<link rel="stylesheet" href="teams.css?v=38">
+<link rel="stylesheet" href="weather.css?v=38">
+<link rel="stylesheet" id="scheme" href="schemes/bank.css?v=38">
+<script>(function(){var T={lounge:'#0A1517',bank:'#0E0C0A',signal:'#05070B',lounge2:'#0C0B0A'},s='bank';try{s=localStorage.getItem('tail.scheme')||s}catch(e){}if(!T[s])s='bank';document.getElementById('scheme').href='schemes/'+s+'.css?v=38';document.querySelector('meta[name=theme-color]').content=T[s];window.TAIL_SCHEMES=T;window.TAIL_SCHEME=s;})();</script>
+<link rel="stylesheet" href="welcome.css?v=38">
+<link rel="stylesheet" href="community.css?v=38">
+<link rel="stylesheet" href="pickem.css?v=38">
+<link rel="stylesheet" href="polish.css?v=38">
+<link rel="stylesheet" href="audit-a.css?v=38">
+<link rel="stylesheet" href="audit-c.css?v=38">
+<link rel="stylesheet" href="engage.css?v=38">
+<link rel="stylesheet" href="history.css?v=38">
+<link rel="stylesheet" href="nba.css?v=38">
 </head>
 <body>
 <header class="top" id="top">
@@ -37,7 +40,7 @@
     <button class="wm" id="wm" aria-label="tail. home">
       <svg class="lockup" aria-hidden="true" viewBox="0 0 220 100"><circle cx="50" cy="50" r="44" fill="#FFFFFF"/><g fill="none" stroke="#000000" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"><path d="M46 19 V63 Q46 78 61 78 L69 76"/><path d="M29 44 L72 36.5"/></g><g fill="none" stroke="#FFFFFF" stroke-width="9.5" stroke-linecap="round"><circle cx="128" cy="62" r="17"/><path d="M145 46 V79"/><path d="M168 48 V79"/><path d="M190 20 V79"/></g><circle cx="168" cy="29" r="6" fill="#FFFFFF"/><circle cx="210" cy="78" r="6" fill="#FFFFFF"/></svg>
     </button>
-    <button class="srchbtn" id="srchbtn" aria-label="Search every NFL player"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg></button>
+    <button class="srchbtn" id="srchbtn" aria-label="Search every NFL and NBA player"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg></button>
     <button class="slatebtn" id="slatebtn" aria-label="Choose a slate" hidden><i></i><span></span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></button>
   </div>
   <div class="ticker" id="ticker" aria-label="Live scores and cashed picks"><div class="tk-track" id="tktrack"></div></div>
@@ -50,14 +53,18 @@
 <div class="toastfix" id="toastw" role="status"><span class="toast" id="toast"></span></div>
 <div class="logged" id="logged" aria-hidden="true"><div class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><b style="font:600 15px/1 var(--f-ui)">Bet logged</b></div></div>
 <div id="roomLabel"></div>
-<script src="welcome.js?v=37"></script>
-<script src="icons.js?v=37"></script>
-<script src="charts.js?v=37"></script>
-<script src="app.js?v=37"></script>
-<script src="teams.js?v=37"></script>
-<script src="weather.js?v=37"></script>
-<script src="community.js?v=37"></script>
-<script src="ui2.js?v=37"></script>
-<script src="engage.js?v=37"></script>
+<script src="welcome.js?v=38"></script>
+<script src="icons.js?v=38"></script>
+<script src="charts.js?v=38"></script>
+<script src="app.js?v=38"></script>
+<script src="teams.js?v=38"></script>
+<script src="wximpact.js?v=38"></script>
+<script src="weather.js?v=38"></script>
+<script src="community.js?v=38"></script>
+<script src="pickem.js?v=38"></script>
+<script src="ui2.js?v=38"></script>
+<script src="engage.js?v=38"></script>
+<script src="history.js?v=38"></script>
+<script src="nba.js?v=38"></script>
 </body>
 </html>

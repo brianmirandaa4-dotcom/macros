@@ -97,7 +97,7 @@ function wireClaim(root, done){ const i = root.querySelector('#cl-u'), b = root.
   i.oninput = check; check();
   b.onclick = async () => { if(!ok) return; b.disabled = true; b.textContent = 'Claiming…'; try{ await claim(i.value, (window.TAIL_MEMBER || {}).name); done && done(PROF); }catch(err){ b.disabled = false; b.textContent = 'Claim username'; msg.textContent = err.status === 409 ? 'Just taken. Try another.' : "Couldn't save. Try again."; msg.className = 'cl-msg bad'; } }; }
 
-window.CLUB = {view, sync, claimHTML, wireClaim, profile: () => PROF, auth, available, claim};
+window.CLUB = {view, sync, claimHTML, wireClaim, profile: () => PROF, auth, available, claim, api, me};
 
 /* ---------- tab registration */
 if(typeof TABS !== 'undefined' && !TABS.find(t => t[0] === 'club')) TABS.splice(4, 0, ['club', 'Club']);

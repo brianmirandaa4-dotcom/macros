@@ -1,0 +1,25 @@
+/* tail. BET NOW alerts card (push.js). Tokens only. */
+.pu{display:grid;grid-template-columns:auto 1fr;gap:var(--sp3) 14px;align-items:start;margin:var(--sp4) 0 var(--sp2);padding:var(--sp4) 18px;border-radius:20px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair2)}
+.cl > .pu{margin:0}
+.pu-ic{width:var(--tap);height:var(--tap);border-radius:14px;display:grid;place-items:center;color:var(--brass);background:var(--brass-wash);box-shadow:inset 0 0 0 1px var(--hair)}
+.pu-tx{display:grid;gap:6px;min-width:0;padding-top:2px}
+.pu-tx b{font:800 17px/1.2 var(--f-disp,var(--f-ui));letter-spacing:-.01em;color:var(--t1)}
+.pu-tx > span{font:500 14px/1.45 var(--f-ui);color:var(--t2)}
+.pu-msg{font:600 13px/1.35 var(--f-ui);font-style:normal;color:var(--t3)}
+.pu-btn{grid-column:1 / -1;min-height:52px;border:0;border-radius:14px;font:800 16px/1 var(--f-disp,var(--f-ui));color:var(--act-ink);background:linear-gradient(180deg,var(--pb-steel-hi,var(--act)),var(--act));cursor:pointer;transition:transform var(--d1) var(--ease-std)}
+.pu-btn:active{transform:scale(var(--press-scale))}
+.pu-btn:focus-visible{outline:2px solid var(--act);outline-offset:3px}
+.pu-btn:disabled{opacity:.55}
+.pu-btn.ghost{min-height:44px;background:transparent;color:var(--t2);box-shadow:inset 0 0 0 1px var(--hair2)}
+.pu-steps{grid-column:1 / -1;margin:0;padding:0;list-style:none;counter-reset:pu;display:grid;gap:var(--sp2)}
+.pu-steps li{counter-increment:pu;display:flex;align-items:center;gap:var(--sp3);min-height:var(--tap);padding:0 var(--sp3);border-radius:var(--r10);background:var(--s2);font:500 14.5px/1.35 var(--f-ui);color:var(--t2)}
+.pu-steps li::before{content:counter(pu);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 12px/1 var(--f-num);color:var(--brass-ink);background:var(--brass)}
+.pu-steps li>span{flex:1;min-width:0;padding:10px 0}
+.pu-steps b{color:var(--t1);font-weight:700}
+.pu-steps svg{flex:none;vertical-align:-3px;color:var(--act)}
+.pu-on .pu-ic{color:var(--edge);background:var(--edge-wash)}
+.pu-slim{align-items:center;padding:var(--sp3) var(--sp4);gap:var(--sp3)}
+.pu-slim .pu-ic{width:36px;height:36px;border-radius:var(--r10)}
+.pu-slim .pu-tx{padding:0;gap:2px}.pu-slim .pu-tx b{font-size:15px}.pu-slim .pu-tx > span{font-size:13px;color:var(--t3)}
+.pu-denied .pu-ic,.pu-unsupported .pu-ic{color:var(--t3);background:var(--s3)}
+@media (prefers-reduced-motion:reduce){.pu-btn{transition:none}}

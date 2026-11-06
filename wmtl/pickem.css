@@ -1,0 +1,81 @@
+/* tail. Pick'em — tokens only */
+/* Home tile: one compact row, last thing on Home */
+.pk-tile{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;margin:28px 0 8px;min-height:60px;padding:10px 12px;border:0;border-radius:16px;text-align:left;color:var(--t1);background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair);cursor:pointer}
+.pk-tile:active{transform:scale(var(--press-scale))}
+.pk-ti{flex:none;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--t2);background:var(--s3)}
+.pk-tt{flex:1;min-width:0;display:grid;gap:3px}
+.pk-tt b{font:700 15px/1.2 var(--f-ui)}
+.pk-tt span{font:500 13px/1.25 var(--f-ui);color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-tc{flex:none;font:700 13px/1 var(--f-ui);color:var(--t2);padding:8px 10px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--hair2)}
+.pk-club .pk-ti{width:44px;height:44px;border-radius:50%}
+
+/* sheet */
+.pk{display:grid;gap:20px;padding-bottom:40px}
+.pk-head h1{margin:6px 0 4px;font:800 30px/1.08 var(--f-disp);letter-spacing:-.03em}
+.pk-head p{margin:0;color:var(--t2);font:500 15px/1.45 var(--f-ui)}
+.pk-rules{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.pk-rules li{padding:12px 14px;border-radius:14px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair);font:500 14.5px/1.4 var(--f-ui);color:var(--t2)}
+.pk-rules b{color:var(--t1);font-weight:700}
+.pk-cta{width:100%}
+.pk-link{justify-self:center;min-height:44px;padding:0 14px;border:0;background:none;color:var(--t2);font:600 15px/1 var(--f-ui);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--hair2)}
+.pk-leave{display:grid;gap:2px;justify-items:center;text-align:center;margin-top:8px}
+.pk-leave p{margin:0;max-width:300px;font:500 12.5px/1.4 var(--f-ui);color:var(--t3)}
+
+.pk-days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--sp1));padding:2px var(--sp1)}
+.pk-days::-webkit-scrollbar{display:none}
+.pk-days button{flex:none;min-height:36px;padding:0 14px;border:0;border-radius:999px;font:700 13.5px/1 var(--f-ui);color:var(--t2);background:var(--s2);box-shadow:inset 0 0 0 1px var(--hair)}
+.pk-days button[aria-selected="true"]{color:var(--act-ink);background:var(--act)}
+
+.pk-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pk-sum div{min-width:0;display:grid;gap:4px;padding:12px;border-radius:16px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair)}
+.pk-sum span{font:var(--label);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t3)}
+.pk-sum b{font:800 22px/1 var(--f-num)}
+.pk-sum em{font:500 12px/1.25 var(--f-ui);font-style:normal;color:var(--t3);overflow-wrap:anywhere}
+.pk-badges{display:flex;flex-wrap:wrap;gap:8px}
+.pk-badge{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border-radius:999px;font:700 13px/1 var(--f-ui);color:var(--edge);background:var(--edge-wash)}
+.pk-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pk-badge.gold{color:var(--brass);background:var(--brass-wash)}
+
+.pk-list{display:grid;gap:10px}
+.pk-card{display:grid;gap:10px;padding:14px;border-radius:18px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair);transform-origin:50% 50%}
+.pk-top{display:flex;align-items:flex-start;gap:12px}
+.pk-who{flex:1;min-width:0;display:grid;gap:3px}
+.pk-who b{font:700 16px/1.2 var(--f-ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-who span{font:500 13px/1.25 var(--f-ui);color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-line{flex:none;text-align:right;display:grid;gap:2px}
+.pk-line b{font:800 20px/1 var(--f-num)}
+.pk-line span{font:600 11px/1 var(--f-ui);color:var(--t3)}
+.pk-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:14px;background:var(--s2)}
+.pk-seg button{min-height:44px;min-width:0;border:0;border-radius:10px;font:700 15px/1 var(--f-ui);color:var(--t2);background:transparent;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pk-seg button[aria-pressed="true"]{color:var(--act-ink);background:var(--act)}
+.pk-seg button:disabled{cursor:default}
+.pk-seg button:disabled:not([aria-pressed="true"]){opacity:.55}
+.pk-seg button:focus-visible{outline:2px solid var(--act);outline-offset:2px}
+.pk-seg.sm{padding:3px;border-radius:12px}
+.pk-seg.sm button{min-height:34px;padding:0 12px;font-size:13px}
+.pk-foot{display:flex;flex-wrap:wrap;gap:4px 12px;font:500 12.5px/1.3 var(--f-ui);color:var(--t3)}
+.pk-foot b{color:var(--t1);font-family:var(--f-num)}
+
+/* real outcomes only: a hit turns the card green, a miss goes quiet */
+.pk-card.hit{background:var(--edge-wash);box-shadow:inset 0 0 0 1.5px var(--edge)}
+.pk-card.hit .pk-seg button[aria-pressed="true"]{color:var(--s0);background:var(--edge)}
+.pk-card.miss .pk-seg button[aria-pressed="true"]{color:var(--t1);background:var(--s3);box-shadow:inset 0 0 0 1px var(--loss)}
+.pk-card.miss{opacity:.82}
+.pk-card.push .pk-seg button[aria-pressed="true"],.pk-card.void .pk-seg button[aria-pressed="true"]{color:var(--t1);background:var(--s3)}
+.pk-card.flip{animation:pk-flip var(--d4) var(--ease-out) both;animation-delay:calc(var(--i, 0) * var(--stagger))}
+@keyframes pk-flip{0%{transform:perspective(600px) rotateX(-90deg);opacity:.4}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.pk-card.flip{animation:none}}
+
+.pk-board{gap:12px}
+.pk-bh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.pk-bh .pk-seg{grid-template-columns:auto auto}
+.pk-row{display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 12px;border-radius:14px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair)}
+.pk-row.me{box-shadow:inset 0 0 0 1.5px var(--act)}
+.pk-rk{flex:none;width:24px;text-align:center;font:800 16px/1 var(--f-num);color:var(--t2)}
+.pk-rec{flex:none;display:grid;justify-items:end;gap:3px}
+.pk-rec b{font:800 17px/1 var(--f-num)}
+.pk-rec span{font:700 11.5px/1 var(--f-ui);color:var(--t3)}
+.pk-rec .up{color:var(--edge)}.pk-rec .dn{color:var(--loss)}
+.pk-vs{margin:0;font:500 13.5px/1.45 var(--f-ui);color:var(--t2)}
+.pk-vs b{color:var(--t1);font-family:var(--f-num)}
+.pk-note{margin:0;font:500 13px/1.4 var(--f-ui);color:var(--t3)}
