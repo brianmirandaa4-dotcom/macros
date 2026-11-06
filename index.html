@@ -1233,6 +1233,8 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .mt>b{grid-area:t;align-self:end;font-size:14px!important}.mt>em{grid-area:v;align-self:start;margin-top:0!important}
 .mt:not(:has(em))>b{grid-row:1/3;align-self:center}
 .mt>.mt-i{grid-area:i;width:30px!important;height:30px!important;border-radius:50%!important}.mt>.mt-i svg{width:15px!important;height:15px!important}
+.page-body{padding-top:6px;gap:14px}.page-big{margin:0 4px -2px}
+.fact{padding:10px 11px}.fact span{display:block;line-height:1.25;margin-top:3px}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -1516,9 +1518,9 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
         <div class="flow"><div class="st final"><small>DAILY CALORIES</small><b id="gK">—</b></div></div>
         <div class="row"><button class="primary" id="gSave">Save targets</button><span class="status" id="gStatus"></span></div>
         <div class="facts">
-          <div class="fact" style="--c:var(--pro)"><b>4</b><span>kcal per g protein</span></div>
-          <div class="fact" style="--c:var(--carb)"><b>4</b><span>kcal per g carbs</span></div>
-          <div class="fact" style="--c:var(--fat)"><b>9</b><span>kcal per g fat</span></div>
+          <div class="fact" style="--c:var(--pro)"><b>4</b><span>kcal/g protein</span></div>
+          <div class="fact" style="--c:var(--carb)"><b>4</b><span>kcal/g carbs</span></div>
+          <div class="fact" style="--c:var(--fat)"><b>9</b><span>kcal/g fat</span></div>
         </div>
       </div>
 </div>
@@ -2541,7 +2543,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.61';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.62';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3109,9 +3111,9 @@ function tilesHTML(st,total){
 function progTop(keys,isWeek){const tk=todayKey(),past=keys.filter(k=>k<=tk),st=rangeStats(keys),G=st.G,gk=goalKcal(G),nPast=past.length||keys.length;
   const on=st.onCal,fr=nPast?on/nPast:0,a=st.avg;
   const mac=(lab,v,goal,col)=>{const p2=goal?Math.min(v/goal,1):0;return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b>${r0(v)}</b><span>g avg</span></div><div class="bar"><i style="width:${p2*100}%"></i></div><div class="hm-g num">goal ${r0(goal)}</div></div>`};
-  const hero=`<div class="card hero v2"><div class="hv-top"><div class="hv-l"><div class="eyebrow">${isWeek?'Days on target this week':'Days on target this month'}</div>
+  const hero=`<div class="card hero v2"><div class="hv-top"><div class="hv-l"><div class="eyebrow">${isWeek?'On target this week':'On target this month'}</div>
       <div class="hv-big"><b class="num">${on}</b><small>/ ${nPast} days</small></div>
-      <div class="hv-sub num">${st.has?`avg ${fmt(a.k)} kcal · goal ${fmt(gk)}`:'Log a meal to start the count'}</div></div>
+      <div class="hv-sub num">${st.has?`avg ${fmt(a.k)} / ${fmt(gk)} kcal`:'Log a meal to start the count'}</div></div>
       <div class="gauge">${(()=>{const R=84,C=2*Math.PI*R;return `<svg viewBox="-14 -14 228 228"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--good)" stroke-width="16" stroke-linecap="round" stroke-dasharray="${fr*C} ${C}" transform="rotate(-90 100 100)"/></svg>`})()}<div class="c"><b class="num">${Math.round(fr*100)}</b><span>%</span></div></div></div>
     <div class="hv-mac">${mac('Protein',st.has?a.p:0,G.p,'--pro')}${mac('Carbs',st.has?a.c:0,G.c,'--carb')}${mac('Fat',st.has?a.f:0,G.f,'--fat')}</div>
     <div class="hv-pills"><span class="note" style="margin:0">${st.proHit} day${st.proHit===1?'':'s'} hit protein · ${st.logged.length} day${st.logged.length===1?'':'s'} logged</span></div></div>`;
