@@ -1,0 +1,113 @@
+/* tail. — members' club after dark. Loaded last; overrides the v2 screens.
+   Black canvas, royal violet only where it means something, gold for the brand and the model's calls.
+   Bodoni Moda for titles and names, Manrope (tabular) for everything you read or count. */
+@font-face{font-family:'Bodoni Moda';src:url(fonts/bodoni-moda-latin-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Bodoni Moda';src:url(fonts/bodoni-moda-latin-600-normal.woff2) format('woff2');font-weight:600 700;font-display:swap}
+@font-face{font-family:'Bodoni Moda';src:url(fonts/bodoni-moda-latin-500-italic.woff2) format('woff2');font-weight:500;font-style:italic;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/manrope-latin-500-normal.woff2) format('woff2');font-weight:400 500;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/manrope-latin-600-normal.woff2) format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/manrope-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Manrope';src:url(fonts/manrope-latin-800-normal.woff2) format('woff2');font-weight:800 900;font-display:swap}
+:root{
+  --f-ui:'Manrope',-apple-system,system-ui,sans-serif;
+  --f-num:'Manrope',-apple-system,system-ui,sans-serif;
+  --f-disp:'Bodoni Moda','Didot',Georgia,serif;
+  --s0:#050409; --s1:#0D0916; --s2:#120C1F; --s3:#1B1230; --s4:#261A42;
+  --rule:rgba(231,196,106,.14); --rule2:rgba(231,196,106,.3);
+  --foil:linear-gradient(135deg,#F6E2A1 0%,#B48A35 30%,#EED38A 52%,#8A6522 78%,#E7C46A 100%);
+  --act:#9A80FF; --act-wash:rgba(154,128,255,.16);
+}
+html,body{background:var(--s0)}
+body{font-family:var(--f-ui);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+
+/* header + ticker + tab bar: one black-violet frame around the content */
+.top{background:linear-gradient(180deg,rgba(24,12,52,.97),rgba(9,6,17,.95));box-shadow:inset 0 -1px 0 var(--rule)}
+body::before{background:#180C34}
+.ticker{background:#0B0715!important;box-shadow:inset 0 -1px 0 var(--rule)!important}
+.tabbar{background:rgba(5,4,9,.92)!important;box-shadow:inset 0 1px 0 var(--rule)!important}
+.tabbar button{position:relative;color:rgba(246,242,250,.42)}
+.tabbar button[aria-current=page],.tabbar button[aria-current=page] svg{color:var(--gold)}
+.tabbar button[aria-current=page]::after{content:"";position:absolute;top:0;left:50%;width:22px;height:2px;margin-left:-11px;border-radius:0 0 2px 2px;background:var(--gold)}
+
+/* type */
+.x-hero h1,.x-ch h1,.view>h1,.view h1.h{font-family:var(--f-disp);font-weight:600;letter-spacing:-.01em}
+.x-shead h2,.x-grp h3,.x-h3,.view h2{font-family:var(--f-disp);font-weight:500;letter-spacing:0}
+.x-shead h2{font-size:23px}
+.x-shead h2::before{display:none}
+.x-link,a,.link,.back{color:var(--gold)}
+.x-shead .x-link{font-weight:600;font-size:14px}
+
+/* ===== the member card: the one loud thing ===== */
+.t-card{position:relative;overflow:hidden;isolation:isolate;margin-top:10px;padding:20px 20px 18px;border-radius:22px;aspect-ratio:1.62/1;max-height:240px;display:flex;flex-direction:column;
+  border:1px solid transparent;background:radial-gradient(120% 90% at 85% 0%,#3A1C86 0%,#24115A 38%,#13092E 75%,#0B0619 100%) padding-box,var(--foil) border-box;
+  box-shadow:0 30px 60px -30px rgba(58,28,134,.9),0 2px 0 rgba(255,255,255,.04) inset}
+.t-card .t-guil{position:absolute;inset:0;width:100%;height:100%;z-index:-1;opacity:.5}
+.t-card .t-sheen{position:absolute;inset:-40% -60%;z-index:-1;background:linear-gradient(115deg,transparent 42%,rgba(246,226,161,.13) 50%,transparent 58%);transform:translateX(-30%);animation:t-sheen 2.4s .4s var(--ease-out) 1 both}
+@keyframes t-sheen{to{transform:translateX(30%)}}
+@media (prefers-reduced-motion:reduce){.t-card .t-sheen{animation:none;opacity:0}}
+.t-cardtop{display:flex;align-items:center;justify-content:space-between}
+.t-cardtop svg{width:40px;height:40px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.t-cardtop span{font:500 italic 15px/1 var(--f-disp);color:var(--gold)}
+.t-card h1{margin:auto 0 2px;font:600 46px/1 var(--f-disp)!important;color:#FBF6EA;letter-spacing:-.015em}
+.t-card p{margin:6px 0 0;font:600 13.5px/1.35 var(--f-ui);color:rgba(246,242,250,.72)}
+.t-cardfoot{display:flex;justify-content:space-between;margin-top:12px;font:600 12px/1 var(--f-ui);color:rgba(231,196,106,.8);letter-spacing:.02em}
+.t-cardfoot b{font:800 13px/1 var(--f-ui);color:var(--gold);letter-spacing:-.02em}
+
+/* shelves */
+.x-shelf{margin-top:30px}
+.x-row{gap:12px}
+
+/* game tickets: open, hairline frames, not boxes */
+.x-game{background:transparent;box-shadow:inset 0 0 0 1px rgba(154,128,255,.2);border-radius:16px;padding:12px 14px 11px}
+.x-game .x-team b{font:800 17px/1 var(--f-ui);letter-spacing:.01em}
+.x-game .x-team span{font:600 15px/1 var(--f-num);color:var(--t2)}
+.x-gtop{font:600 12px/1.2 var(--f-ui);color:rgba(231,196,106,.75)}
+.x-game.is-live{box-shadow:inset 0 0 0 1px rgba(255,90,95,.7)}
+
+/* model bets: dark cards with a gold foil top edge */
+.x-bet{background:linear-gradient(180deg,#140C26 0%,#0B0716 100%);box-shadow:inset 0 0 0 1px rgba(231,196,106,.16);border-radius:18px;padding:16px 16px 14px}
+.x-bet::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--foil)}
+.x-bname{font:600 21px/1.1 var(--f-disp)!important;letter-spacing:-.005em;margin-top:8px!important}
+.x-bsel{font:600 14px/1.3 var(--f-ui)!important}
+.x-chance{color:var(--gold)!important}
+.x-edge{height:2px;background:rgba(231,196,106,.12)}.x-edge span{background:var(--gold)}
+.x-tag{border-radius:999px;padding:5px 9px;font-weight:800;letter-spacing:0;text-transform:none}
+.x-tag.gold{background:var(--gold);color:#1A1205;letter-spacing:0;text-transform:none}
+
+/* lists: no boxes, gold hairlines */
+.x-list,.x-mkt,.x-grp{background:transparent;border-radius:0;box-shadow:inset 0 1px 0 var(--rule)}
+.x-li,.x-mrow{box-shadow:inset 0 -1px 0 var(--rule)!important;padding-inline:2px}
+.x-li b,.x-mwho b{font:600 18px/1.2 var(--f-disp)}
+.x-grp h3{padding:16px 2px 6px;color:var(--t1);font-size:17px}
+.x-pct{font:800 18px/1 var(--f-num)!important;color:var(--gold)!important}
+
+/* chips + segmented tabs */
+.x-chip{background:transparent;box-shadow:inset 0 0 0 1px rgba(246,242,250,.16);font-weight:600}
+.x-chip:active,.x-chip[aria-pressed=true]{background:var(--gold)!important;color:#1A1205!important;box-shadow:none}
+.x-tabs{background:var(--s0)}
+.x-tabs button{background:transparent;box-shadow:inset 0 0 0 1px rgba(246,242,250,.14);color:var(--t2)}
+.x-tabs button[aria-pressed=true]{background:var(--gold);color:#1A1205;box-shadow:none}
+.x-sub button[aria-pressed=true]{color:var(--gold);background:rgba(231,196,106,.1)}
+
+/* prices */
+.x-odd{background:#0E0A18;box-shadow:inset 0 0 0 1px rgba(154,128,255,.24);border-radius:12px}
+.x-odd.pick{background:#24115A;box-shadow:inset 0 0 0 1.5px var(--gold)}.x-odd.pick b{color:#FBF0CF}
+.x-model{color:var(--act)!important}.x-model.bet{color:var(--gold)!important}
+
+/* game + player screens: panels sit on s1 with a gold hairline */
+.x-gteams b,.x-bteams b{font-family:var(--f-ui);letter-spacing:.01em}
+.x-lines div,.x-sel,.x-hit,.x-match,.x-books,.x-more,.x-rates div{background:var(--s1);box-shadow:inset 0 0 0 1px var(--rule)}
+.x-rates div{background:transparent}
+.x-take{background:rgba(154,128,255,.1)}
+.x-take.bet{background:rgba(231,196,106,.1);box-shadow:inset 0 0 0 1px var(--rule2)}
+.x-ch h1{font-size:34px}
+.x-board,.x-sb.big{border:1px solid transparent;background:radial-gradient(120% 90% at 85% 0%,#33197A 0%,#1C0E48 45%,#0D0720 100%) padding-box,linear-gradient(135deg,rgba(246,226,161,.6),rgba(138,101,34,.35),rgba(231,196,106,.6)) border-box;box-shadow:none}
+.x-sb{background:var(--s1);box-shadow:inset 0 0 0 1px var(--rule)}
+.x-sbfoot{color:var(--gold)}
+
+/* legacy screens (board, picks, results) inherit the tokens; tighten their surfaces */
+.card,.panel,.sheet .card{background:var(--s1)}
+.btn.primary{background:var(--gold);color:#1A1205}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.x-shelf{margin-top:6px}
+.x-tabs{margin-bottom:4px}
