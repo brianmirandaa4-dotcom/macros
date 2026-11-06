@@ -146,7 +146,9 @@ def _nm(x): return _re.sub(r'[^a-z ]', '', _ud.normalize('NFKD', str(x)).encode(
 # line-only offers (pickem: true) and never enter edge, p, best, break-even, interval or Kelly.
 # `best` and the bet tier choose among BEST_SET only. The 3% MIN_EDGE gate was validated on the 5 original books; the max edge
 # over more books adds selection bias, so every run also records what core5 / core7 / all would give (slate book_set.compare).
-BEST_SET = 'all'
+# Week-9 dry run (2026-11-06, live Action Network): bets core5 56 -> all books 192 (stale-guarded 51 -> 158), far over +30%,
+# so `best` is restricted to the original 5 books plus bet365 and Fanatics (core7: 87, stale-guarded 73). No new threshold.
+BEST_SET = 'core7'
 BEST = set(BK.SETS[BEST_SET])
 AP = pd.read_parquet(f'{W}/an_props_wk{WEEK:02d}.parquet') if os.path.exists(f'{W}/an_props_wk{WEEK:02d}.parquet') else pd.DataFrame(columns=['market', 'player', 'team', 'book_id', 'side', 'value', 'odds'])
 AP = AP[AP.book_id.isin(set(BK.NAME) | {BK.OPEN})]
