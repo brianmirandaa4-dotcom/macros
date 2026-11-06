@@ -112,7 +112,7 @@ export default {
         if (cacheChanged(cached, data)) ctx.waitUntil(env.MACROS_KV.put('cache:' + user.id, JSON.stringify(data)));
         return json(data, 200, cors);
       }
-      if (p.startsWith('/api/social/')) return social(p.slice(12), req, url, user, env, cors);
+      if (p.startsWith('/api/social/')) return social(p.slice(12), req, url, user, env, cors); if (p === '/api/ai' && req.method === 'POST') return aiProxy(req, user, env, cors);
       if (p === '/api/raw') {
         // Troubleshooting: shows the raw shape returned by each source for one day.
         const day = url.searchParams.get('date') || isoDate(new Date());
@@ -163,7 +163,7 @@ const page = (title, body, appUrl) => new Response(`<!doctype html><meta charset
 const rand = (n) => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 async function sha(s) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join(''); }
 const isoDate = (d) => d.toISOString().slice(0, 10);
-const r1 = (n) => Math.round(n * 10) / 10;
+const r1 = (n) => Math.round(n * 10) / 10; async function aiProxy(req, user, env, cors) { if (!env.ANTHROPIC_KEY) return json({ error: 'Scanning is not set up on the server yet.' }, 503, cors); const b = await req.json().catch(() => null); if (!b || !Array.isArray(b.messages)) return json({ error: 'Bad scan request.' }, 400, cors); const day = isoDate(new Date()), per = +env.AI_PER_USER || 60, tot = +env.AI_PER_DAY || 600, uk = 'ai:' + day + ':' + user.id, tk = 'ai:' + day; const un = +(await env.MACROS_KV.get(uk)) || 0, tn = +(await env.MACROS_KV.get(tk)) || 0; if (un >= per) return json({ error: 'You have used all ' + per + ' scans for today. They reset overnight.' }, 429, cors); if (tn >= tot) return json({ error: 'Scanning is maxed out for today. Try again tomorrow.' }, 429, cors); const body = { model: /^claude-(sonnet|haiku)-/.test(b.model || '') ? b.model : 'claude-sonnet-5-5', max_tokens: Math.min(2000, +b.max_tokens || 1000), messages: b.messages.slice(0, 2) }; const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' }, body: JSON.stringify(body) }); if (r.ok) { await env.MACROS_KV.put(uk, String(un + 1), { expirationTtl: 172800 }); await env.MACROS_KV.put(tk, String(tn + 1), { expirationTtl: 172800 }); } return new Response(r.body, { status: r.status, headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }); }
 
 async function register(env) {
   const id = rand(12), secret = rand(24);
