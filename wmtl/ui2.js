@@ -2,7 +2,7 @@
    Reads the same data as the rest of the app (slate files, the week's prop board, the player library, defense-vs-position);
    every number shown is copied from those files or counted from game logs. Nothing here estimates anything. */
 (function(){
-const BOOKS = ['DK', 'FD', 'MGM', 'BR', 'CZR'], BOOKNAME = {DK: 'DraftKings', FD: 'FanDuel', MGM: 'BetMGM', BR: 'BetRivers', CZR: 'Caesars'};
+const BOOKS = ['DK', 'FD', 'MGM', 'CZR', 'BR', 'B365', 'FAN', 'HR', 'PARX', 'SCORE', 'POLY', 'KAL', 'NOVIG'], BOOKNAME = {DK: 'DraftKings', FD: 'FanDuel', MGM: 'BetMGM', BR: 'BetRivers', CZR: 'Caesars', B365: 'bet365', FAN: 'Fanatics', HR: 'Hard Rock', PARX: 'BetParx', SCORE: 'theScore', POLY: 'Polymarket', KAL: 'Kalshi', NOVIG: 'Novig'};
 const MKSTAT = {'Receptions': ['rec'], 'Receiving yards': ['rec_yds'], 'Rushing yards': ['rush_yds'], 'Carries': ['car'], 'Passing yards': ['pass_yds'], 'Completions': ['cmp'], 'Pass attempts': ['att'],
   'Passing TDs': ['pass_td'], 'Rush + rec yards': ['rush_yds', 'rec_yds'], 'Pass + rush yards': ['pass_yds', 'rush_yds'], 'Anytime TD': ['rec_td', 'rush_td']};
 const MKDEF = {'Receptions': 'rec', 'Receiving yards': 'rec_yds', 'Rushing yards': 'rush_yds', 'Carries': 'carries', 'Passing yards': 'pass_yds', 'Completions': 'cmp', 'Pass attempts': 'att', 'Passing TDs': 'pass_td'};
@@ -18,7 +18,7 @@ async function weekBoard(ds){ const d = ds[0]; if(!d) return null; const yr = (d
 function gameState(away, home){ return Object.values(LV.games).find(g => g.away === away && g.home === home) || null; }
 function bestPrice(e, side){ let b = null; for(const k of BOOKS){ const o = (e.books || {})[k]; if(!o) continue; const v = side === 'yes' ? o.yes : o[side]; if(!isNum(v)) continue; if(!b || decOdds(v) > decOdds(b.v)) b = {k, v, line: o.line}; } return b; }
 function mainLine(e){ const o = BOOKS.map(k => (e.books || {})[k]).find(x => x && isNum(x.line)); return o ? o.line : null; }
-const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${esc(b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
+const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${window.BOOK && BOOK.find(b.k) ? `<img class="bk-mini" src="${BOOK.find(b.k).logo}" alt="">` : ''}${esc(window.BOOK && BOOK.find(b.k) ? BOOK.find(b.k).short : b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
 
 /* ---------- Home */
 const TSEAL = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#FFFFFF"/><g fill="none" stroke="#000000" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"><path d="M46 19 V63 Q46 78 61 78 L69 76"/><path d="M29 44 L72 36.5"/></g></svg>`; window.TSEAL = TSEAL;
@@ -71,7 +71,7 @@ window.viewHome2 = async function(){ const m = $('#main'); const ds = await week
 async function openMarket(mkt){ const ds = await weekSlates(); const B = await weekBoard(ds); if(!B) return toast('Prop board not available');
   const rows = []; for(const g of B.games) for(const P of g.players) for(const e of P.props) if(e.market === mkt) rows.push({g, P, e});
   rows.sort((a, b) => ((b.e.model && b.e.model.tier === 'bet') - (a.e.model && a.e.model.tier === 'bet')) || ((b.e.model && b.e.model.p) || 0) - ((a.e.model && a.e.model.p) || 0));
-  pushSheet(mkt, `<div class="body"><div class="lt"><h1>${esc(mkt)}</h1><p>${rows.length} players this week. Best price across five books; model side where it has one.</p></div><div class="x-mkt">${rows.map(r => mktRow(r.g, r.P, r.e)).join('')}</div></div>`, el => wirePlayers(el)); }
+  pushSheet(mkt, `<div class="body"><div class="lt"><h1>${esc(mkt)}</h1><p>${rows.length} players this week. Best price across every book; model side where it has one.</p></div><div class="x-mkt">${rows.map(r => mktRow(r.g, r.P, r.e)).join('')}</div></div>`, el => wirePlayers(el)); }
 function mktRow(g, P, e){ const md = e.model && !e.model.no_prediction ? e.model : null; const ln_ = mainLine(e);
   return `<div class="x-mrow" data-pl="${esc(P.name)}|${esc(P.team || '')}|${esc(e.market)}"><div class="x-mwho"><b>${esc(P.name)}</b><span>${esc(P.team || '')} ${esc(P.pos || '')} · ${esc(g.away)} @ ${esc(g.home)}</span>${md ? `<span class="x-model ${md.tier === 'bet' ? 'bet' : ''}">${md.tier === 'bet' ? 'Bet · ' : 'Model · '}${md.side === 'under' ? 'Under' : 'Over'} ${pc(md.p)} · proj ${ln(md.projection)}</span>` : ''}</div>
     <div class="x-mline">${e.kind === 'yes' ? priceBtn('Yes', bestPrice(e, 'yes')) : `${priceBtn('O ' + (isNum(ln_) ? ln(ln_) : ''), bestPrice(e, 'over'), md && md.side === 'over' ? 'pick' : '')}${priceBtn('U ' + (isNum(ln_) ? ln(ln_) : ''), bestPrice(e, 'under'), md && md.side === 'under' ? 'pick' : '')}`}</div></div>`; }
@@ -119,7 +119,7 @@ window.openCard = async function(name, team, market){ const I = await loadPlayer
     ${props.length ? `<div class="x-tabs scroll">${props.map(e => `<button data-cm="${esc(e.market)}" aria-pressed="${e === sel}">${esc(e.market)}</button>`).join('')}</div>` : ''}<div id="x-cbody"></div>
     ${P ? `<details class="x-more"><summary>Bio, season and career</summary><div class="group pad pgrid">${[['Age', P.age], ['Height', P.height_ft], ['Weight', P.weight ? P.weight + ' lb' : null], ['College', P.college], ['Experience', isNum(P.exp) ? (P.exp ? P.exp + ' yr' : 'Rookie') : null], ['Draft', P.draft ? `${P.draft.club} #${P.draft.pick}` : null]].filter(x => x[1] != null && x[1] !== '').map(([a, b]) => `<div><span class="label">${a}</span><b>${esc(b)}</b></div>`).join('')}</div>
       <h3 class="x-h3">2026 game log</h3>${statTable((P.log || []).map(r => ({...r, g: `${r.wk} ${r.ha === '@' ? '@' : 'vs'} ${r.opp}`})), [['g', 'Wk'], ['res', 'Result']])}<h3 class="x-h3">Career</h3>${statTable((P.career || []).map(r => ({...r, tm: r.team || ''})), [['season', 'Yr'], ['tm', 'Tm'], ['g', 'G']])}</details>` : ''}
-    <p class="note">Stats: nflverse play-by-play. Prices: Action Network (five books). Matchup: 2026 defense vs position.</p></div>`;
+    <p class="note">Stats: nflverse play-by-play. Prices: Action Network (every book it carries). Matchup: 2026 defense vs position.</p></div>`;
   pushSheet(nm, html, el => { $$('[data-cm]', el).forEach(b => b.onclick = () => { sel = props.find(e => e.market === b.dataset.cm); draw(el); }); draw(el); }); };
 window.openProfileByName = (n, t) => openCard(n, t);
 window.openProfile = async pid => { const I = await loadPlayerIndex(); const r = I.players.find(x => x[0] === pid); if(r) openCard(r[1], r[2]); };
@@ -131,8 +131,7 @@ function cardBody(P, bp, e, games, opp, pos, ds){ if(!e) return `<p class="sub">
   let out = `${window.HIST ? HIST.nowHTML((P && P.name) || (bp && bp.name), (P && P.team) || (bp && bp.team), e, md, ds) : ''}<div class="x-sel"><div class="x-selh"><div><small>${esc(e.market)}</small><b>${e.kind === 'yes' ? 'To score' : isNum(line) ? ln(line) : '—'}</b></div>
     <div class="x-mline big">${e.kind === 'yes' ? priceBtn('Yes', bo) : `${priceBtn('Over', bo, md && md.side === 'over' ? 'pick' : '')}${priceBtn('Under', bu, md && md.side === 'under' ? 'pick' : '')}`}</div></div>
     ${md ? `<div class="x-take ${md.tier === 'bet' ? 'bet' : ''}" data-prop="${esc(md.prop)}"><div><small>${md.tier === 'bet' ? 'Model bet' : 'Model side'}</small><b>${md.side === 'under' ? 'Under' : 'Over'} ${ln(md.line)}</b></div><div><small>Chance</small><b>${pc(md.p)}</b></div><div><small>Projection</small><b>${ln(md.projection)}</b></div><div class="x-go">Report</div></div>` : e.model && e.model.no_prediction ? `<div class="x-take off"><b>No model prediction</b><small>${esc((e.model.flags || []).join(' · ') || 'outside what the model was trained on')}</small></div>` : ''}
-    ${['FD', 'DK'].map(b => { const o = (e.books || {})[b]; if(!o) return ''; const side = md ? md.side : 'over'; const pr = e.kind === 'yes' ? o.yes : o[side]; const t = `${bp ? bp.name : ''} ${e.kind === 'yes' ? 'Yes' : (side === 'under' ? 'Under' : 'Over') + ' ' + ln(o.line)} ${e.market} · ${BOOKNAME[b]} ${odds(pr)}`;
-      return `<button class="x-book ${b === 'FD' ? 'fd' : 'dk'}" data-copy="${esc(t)}" data-url="${b === 'FD' ? 'https://sportsbook.fanduel.com/' : 'https://sportsbook.draftkings.com/'}">Bet on ${BOOKNAME[b]} · ${e.kind === 'yes' ? '' : (side === 'under' ? 'U' : 'O') + ' ' + ln(o.line) + ' '}${odds(pr)}</button>`; }).join('')}</div>`;
+    ${window.BOOK ? BOOK.slip({label: `${bp ? bp.name : ''} ${e.kind === 'yes' ? 'Yes' : ((md ? md.side : 'over') === 'under' ? 'Under' : 'Over') + ' ' + ln(line)} ${e.market}`, side: e.kind === 'yes' ? 'yes' : (md ? md.side : 'over'), line, rows: e.books || {}}) : ''}</div>`;
   if(keys && games.length && (isNum(line) || e.kind === 'yes')){ const L = e.kind === 'yes' ? .5 : line; const vals = games.map(g => statOf(g, keys));
     const rate = n => { const v = vals.slice(0, n); return v.length ? v.filter(x => x > L).length / v.length : null; };
     const seasonV = (P.log || []).map(g => statOf(g, keys)); const sr = seasonV.length ? seasonV.filter(x => x > L).length / seasonV.length : null;
@@ -148,7 +147,7 @@ function cardBody(P, bp, e, games, opp, pos, ds){ if(!e) return `<p class="sub">
       <div class="x-rank"><b>${ln(x.pg)}</b><span>${x.rank}${['th', 'st', 'nd', 'rd'][(x.rank % 100 > 10 && x.rank % 100 < 14) ? 0 : Math.min(x.rank % 10, 4) % 4] || 'th'} most</span></div>
       <div class="x-mm">${isNum(x.last4) ? `<span>Last 4: <b>${ln(x.last4)}</b></span>` : ''}${isNum(lg) ? `<span>League: <b>${ln(lg)}</b></span>` : ''}</div></div>`; }
   else if(opp && dk && pg) out += `<div class="x-match off"><small>Matchup data for ${esc(opp)} is not available yet.</small></div>`;
-  out += `<div class="x-books"><h3 class="x-h3">Every book</h3>${BOOKS.filter(k => (e.books || {})[k]).map(k => { const o = e.books[k]; return `<div class="x-brow"><span>${BOOKNAME[k]}</span><span>${e.kind === 'yes' ? '' : ln(o.line)}</span><span class="x-odd sm">${e.kind === 'yes' ? odds(o.yes) : 'O ' + odds(o.over)}</span>${e.kind === 'yes' ? '' : `<span class="x-odd sm">U ${odds(o.under)}</span>`}</div>`; }).join('')}${(e.books || {}).Open ? `<div class="x-brow open"><span>Opened</span><span>${e.kind === 'yes' ? '' : ln(e.books.Open.line)}</span><span>${e.kind === 'yes' ? odds(e.books.Open.yes) : 'O ' + odds(e.books.Open.over)}</span>${e.kind === 'yes' ? '' : `<span>U ${odds(e.books.Open.under)}</span>`}</div>` : ''}</div>`;
+  out += `<div class="x-books"><h3 class="x-h3">Every book</h3>${window.BOOK ? BOOK.table({label: `${bp ? bp.name : ''} ${e.market}`, side: e.kind === 'yes' ? 'yes' : (md ? md.side : 'over'), line, rows: e.books || {}, open: (e.books || {}).Open}) : ''}</div>`;
   return out; }
 })();
 

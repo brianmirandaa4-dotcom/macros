@@ -183,7 +183,7 @@ const TKL = window.TKL = {
 function best(p, side){ const offs = (p.offers || []).filter(o => isNum(o[side])); const at = offs.filter(o => o.line === p.line); let b = null;
   for(const o of (at.length ? at : offs)){ if(!b || decOdds(o[side]) > decOdds(b.v)) b = {k: bk(o.book), v: o[side], line: o.line}; }
   if(!b && p.best && isNum(p.best[side])) b = {k: bk(p.best.book), v: p.best[side], line: p.best.line}; return b; }
-const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${esc(b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
+const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${window.BOOK && BOOK.find(b.k) ? `<img class="bk-mini" src="${BOOK.find(b.k).logo}" alt="">` : ''}${esc(window.BOOK && BOOK.find(b.k) ? BOOK.find(b.k).short : b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
 const mpick = p => !p.no_prediction && p.side && (isNum(p.p) || isNum(pSide(p)));
 const pidOf = p => p.pid ? String(p.pid) : String(p.pkey || '').startsWith('nba:') && !/^nba:x:/.test(p.pkey) ? String(p.pkey).split(':').pop() : '';
 function mrow(p, d){ const k = mkey(p.market), g = p._g || {}; const md = mpick(p);
@@ -309,9 +309,7 @@ function cardBody(P, x, log){ if(!x) return `<p class="sub">No props posted for 
   let out = `<div class="x-sel"><div class="x-selh"><div><small>${esc(MK[k] || p.market_label)}</small><b class="num">${ln(L)}</b></div><div class="x-mline big">${priceBtn('Over', bo, md && p.side === 'over' ? 'pick' : '')}${priceBtn('Under', bu, md && p.side === 'under' ? 'pick' : '')}</div></div>
     ${md ? `<div class="x-take ${p.tier === 'bet' ? 'bet' : ''}" data-prop="${esc(p.id)}" data-sl="${esc(d.id)}"><div><small>${p.tier === 'bet' ? 'Model bet' : 'Model side'}</small><b>${p.side === 'under' ? 'Under' : 'Over'} ${ln(L)}</b></div><div><small>Chance</small><b>${pc(pSide(p))}</b></div><div><small>Projection</small><b>${ln(p.projection)}</b></div><div class="x-go">Report</div></div>`
       : `<div class="x-take off"><b>No model prediction</b><small>${p.no_prediction ? esc((p.flags || []).join(' · ') || 'outside what the model was trained on') : 'The model has no side on this prop.'}</small></div>`}
-    ${['FanDuel', 'DraftKings'].map(b => { const o = (p.offers || []).find(z => z.book === b); if(!o) return ''; const side = md ? p.side : 'over'; const pr = o[side]; if(!isNum(pr)) return '';
-      const t = `${p.player} ${side === 'under' ? 'Under' : 'Over'} ${ln(o.line)} ${MK[k] || p.market_label} · ${b} ${odds(pr)}`;
-      return `<button class="x-book ${b === 'FanDuel' ? 'fd' : 'dk'}" data-copy="${esc(t)}" data-url="${b === 'FanDuel' ? 'https://sportsbook.fanduel.com/' : 'https://sportsbook.draftkings.com/'}">Bet on ${b} · ${side === 'under' ? 'U' : 'O'} ${ln(o.line)} ${odds(pr)}</button>`; }).join('')}</div>`;
+    ${window.BOOK ? BOOK.slip({label: `${p.player} ${(md ? p.side : 'over') === 'under' ? 'Under' : 'Over'} ${ln(L)} ${MK[k] || p.market_label}`, side: md ? p.side : 'over', line: L, rows: p.offers || []}) : ''}</div>`;
   const games = log.filter(r => !r.dnp && isNum(sv(r, k))).slice(0, 10);
   if(games.length && isNum(L)){ const vals = games.map(r => sv(r, k)); const rate = n => { const v = vals.slice(0, n); return v.length ? v.filter(z => z > L).length / v.length : null; };
     const all = log.filter(r => !r.dnp).map(r => sv(r, k)).filter(isNum); const sr = all.length ? all.filter(z => z > L).length / all.length : null;
@@ -320,7 +318,7 @@ function cardBody(P, x, log){ if(!x) return `<p class="sub">No props posted for 
     out += `<div class="x-hit"><div class="x-rates">${[['Last 5', rate(5)], ['Last 10', rate(10)], ['Season', sr]].map(([l, r]) => `<div class="${r == null ? '' : r >= .6 ? 'good' : r <= .4 ? 'bad' : ''}"><small>${l}</small><b>${r == null ? '—' : pc(r)}</b></div>`).join('')}</div>
       <svg class="x-chart" viewBox="0 0 ${W + 40} ${Hh}" role="img" aria-label="Last ${vals.length} games against the line"><line x1="0" x2="${W + 4}" y1="${ly}" y2="${ly}" class="ln"/>${bars}<text x="${W + 8}" y="${ly + 4}" class="lt" style="text-anchor:start">${ln(L)}</text></svg>
       <p class="note">${esc(MK[k] || p.market_label)} in his last ${vals.length} games, newest on the right. Green cleared the line of ${ln(L)}.</p></div>`; }
-  const offs = p.offers || []; if(offs.length) out += `<div class="x-books"><h3 class="x-h3">Every book</h3>${offs.map(o => `<div class="x-brow"><span>${esc(o.book)}</span><span>${ln(o.line)}</span><span class="x-odd sm">O ${odds(o.over)}</span><span class="x-odd sm">U ${odds(o.under)}</span></div>`).join('')}${p.opener && isNum(p.opener.line) ? `<div class="x-brow open"><span>Opened</span><span>${ln(p.opener.line)}</span><span>O ${odds(p.opener.over)}</span><span>U ${odds(p.opener.under)}</span></div>` : ''}</div>`;
+  const offs = p.offers || []; if(offs.length && window.BOOK) out += `<div class="x-books"><h3 class="x-h3">Every book</h3>${BOOK.table({label: `${p.player} ${MK[k] || p.market_label}`, side: md ? p.side : 'over', line: L, rows: offs, open: p.opener})}</div>`;
   return out; }
 async function openCard(id, team, market){ await loadIndex(); const ds = await slates(); const t0 = team ? nab(team) : '';
   const row = PIX.find(r => r.pid === String(id)) || PIX.find(r => nkey(r.name) === nkey(id) && (!t0 || r.team === t0)) || PIX.find(r => nkey(r.name) === nkey(id)) || null;
