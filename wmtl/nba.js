@@ -181,8 +181,8 @@ const TKL = window.TKL = {
 
 /* ------------------------------------------------------------ shared pieces (same markup and classes as the NFL screens) */
 function best(p, side){ const offs = (p.offers || []).filter(o => isNum(o[side])); const at = offs.filter(o => o.line === p.line); let b = null;
-  for(const o of (at.length ? at : offs)){ if(!b || decOdds(o[side]) > decOdds(b.v)) b = {k: bk(o.book), v: o[side], line: o.line}; }
-  if(!b && p.best && isNum(p.best[side])) b = {k: bk(p.best.book), v: p.best[side], line: p.best.line}; return b; }
+  for(const o of (at.length ? at : offs)){ if(!b || decOdds(o[side]) > decOdds(b.v)) b = {k: (window.BOOK && BOOK.find(o.book)) ? o.book : bk(o.book), v: o[side], line: o.line}; }
+  if(!b && p.best && isNum(p.best[side])) b = {k: (window.BOOK && BOOK.find(p.best.book)) ? p.best.book : bk(p.best.book), v: p.best[side], line: p.best.line}; return b; }
 const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${window.BOOK && BOOK.find(b.k) ? `<img class="bk-mini" src="${BOOK.find(b.k).logo}" alt="">` : ''}${esc(window.BOOK && BOOK.find(b.k) ? BOOK.find(b.k).short : b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
 const mpick = p => !p.no_prediction && p.side && (isNum(p.p) || isNum(pSide(p)));
 const pidOf = p => p.pid ? String(p.pid) : String(p.pkey || '').startsWith('nba:') && !/^nba:x:/.test(p.pkey) ? String(p.pkey).split(':').pop() : '';
