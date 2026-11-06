@@ -47,11 +47,13 @@ async function slates(){ const out = []; for(const s of currentRows()){ try{ out
 const loaded = () => { const ids = new Set(currentRows().map(s => s.id)); return Object.values(SLATE).filter(d => d && d.sport === 'NBA' && (ids.has(d.id) || d.id === S.slate)); };
 let PIX = null, TEAMS;
 const crow = r => Array.isArray(r) ? {pid: String(r[0]), name: r[1], team: nab(r[2]), pos: r[3] || '', jersey: r[4], status: r[5] || '', contract: r[6] || ''}
-  : {pid: String(r.pid ?? r.id ?? ''), name: r.name, team: nab(r.team), pos: r.pos || '', jersey: r.jersey, status: r.status || '', contract: r.contract || ''};
+  : {pid: String(r.pid ?? r.id ?? ''), name: r.name, team: nab(r.team), pos: r.pos || '', jersey: r.jersey, status: r.status || '', contract: r.contract_type || r.contract || '', gleague: r.gleague || null};
 async function loadIndex(){ if(!PIX){ try{ const I = await getJSON('data/nbap/index.json'); PIX = (I.players || []).map(crow).filter(p => p.pid && p.name); }catch(e){ PIX = []; } } return PIX; }
 async function loadTeams(){ if(TEAMS === undefined){ try{ TEAMS = await getJSON('data/nba/teams.json'); }catch(e){ TEAMS = null; } } return TEAMS; }
-const contractOf = p => { const s = [p && p.contract, p && p.status, p && p.status_label].filter(Boolean).join(' ');
-  return /two[\s_-]?way/i.test(s) ? 'Two-way' : /\b10[\s_-]?day|ten[\s_-]?day/i.test(s) ? '10-day' : /g[\s_-]?league|\bgl\b|assigned/i.test(s) ? 'G League' : null; };
+/* contract badge from what the library says: contract_type / contract{type,label} ("two_way", "10_day"…), or a G League assignment */
+const contractOf = p => { if(!p) return null; const c = p.contract && typeof p.contract === 'object' ? [p.contract.type, p.contract.label].join(' ') : p.contract;
+  const s = [c, p.contract_type, p.status, p.status_label].filter(Boolean).join(' ');
+  return /two[\s_-]?way/i.test(s) ? 'Two-way' : /\b10[\s_-]?day|ten[\s_-]?day/i.test(s) ? '10-day' : (p.gleague || /g[\s_-]?league|\bgl\b|assigned/i.test(s)) ? 'G League' : null; };
 const samePlayer = (p, pid, name, team) => (pid && (String(p.pid || '') === pid || String(p.pkey || '').split(':').pop() === pid)) || (nkey(p.player) === nkey(name) && (!team || nab(p.team) === team));
 
 /* ------------------------------------------------------------ live: ESPN scoreboard + box scores, every 10 s while a game is live */
@@ -333,9 +335,9 @@ async function openCard(id, team, market){ await loadIndex(); const ds = await s
     { const on = $('[data-cm][aria-pressed="true"]', el), rail = on && on.parentElement; if(rail) rail.scrollLeft = Math.max(0, on.offsetLeft - (rail.clientWidth - on.offsetWidth) / 2); }
     $$('[data-prop]', box).forEach(b => b.onclick = () => { const d = SLATE[b.dataset.sl]; if(d) openProp(d, b.dataset.prop); });
     $$('[data-copy]', box).forEach(b => b.onclick = async () => { const t = b.dataset.copy; try{ await navigator.clipboard.writeText(t); }catch(e){} toast('Copied: ' + t); setTimeout(() => { location.href = b.dataset.url; }, 450); }); };
-  const bio = P ? [['Age', P.age], ['Height', P.height_ft], ['Weight', P.weight ? P.weight + ' lb' : null], ['College', P.college || P.country], ['Experience', isNum(P.exp) ? (P.exp ? P.exp + ' yr' : 'Rookie') : null], ['Draft', P.draft ? [P.draft.year, P.draft.round ? 'R' + P.draft.round : null, P.draft.pick ? '#' + P.draft.pick : null].filter(Boolean).join(' ') : null], ['Contract', ct || P.contract || null]].filter(x => x[1] != null && x[1] !== '') : [];
+  const bio = P ? [['Age', P.age], ['Height', P.height_ft], ['Weight', P.weight ? P.weight + ' lb' : null], ['College', P.college || P.country], ['Experience', isNum(P.exp) ? (P.exp ? P.exp + ' yr' : 'Rookie') : null], ['Draft', P.draft ? [P.draft.year, P.draft.round ? 'R' + P.draft.round : null, P.draft.pick ? '#' + P.draft.pick : null].filter(Boolean).join(' ') : null], ['Contract', ct || (P.contract && typeof P.contract === 'object' ? P.contract.label : P.contract) || null], ['G League', P.gleague && typeof P.gleague === 'object' ? P.gleague.team || P.gleague.name : P.gleague]].filter(x => x[1] != null && x[1] !== '') : [];
   const html = `<div class="body"><div class="x-ch"><div><span class="sp" style="--c:var(--act)">NBA · ${esc(tm || 'FA')}</span><h1>${esc(name)}</h1><p>${esc(tm)} · ${esc(pos)}${jer != null && jer !== '' ? ' · #' + esc(jer) : ''}${opp ? ` · vs ${esc(opp)}` : ''}${gm ? ` · ${esc(kickET(gm.kick_utc))}` : ''}</p>
-      <div class="nb-tags">${inj ? `<span class="x-tag red">${esc(P.injury.status || 'Injury')}${P.injury.detail ? ' · ' + esc(P.injury.detail) : ''}</span>` : ''}${ct ? `<span class="x-tag nb-ct">${esc(ct)}</span>` : ''}</div></div></div>
+      <div class="nb-tags">${inj ? `<span class="x-tag red">${esc(P.injury.status || 'Injury')}${P.injury.reason || P.injury.detail ? ' · ' + esc(P.injury.reason || P.injury.detail) : ''}</span>` : ''}${ct ? `<span class="x-tag nb-ct">${esc(ct)}</span>` : ''}</div></div></div>
     ${props.length ? `<div class="x-tabs scroll">${props.map(x => `<button data-cm="${esc(x.p.id)}" aria-pressed="${x === sel}">${esc(MK[mkey(x.p.market)] || x.p.market_label)}</button>`).join('')}</div>` : ''}<div id="x-cbody"></div>
     ${!props.length && log.length ? `<h3 class="x-h3">Last 10 games</h3>${logTable(log.slice(0, 10))}` : ''}
     ${P ? `<details class="x-more"${props.length ? '' : ' open'}><summary>Bio, season and career</summary>${bio.length ? `<div class="group pad pgrid">${bio.map(([a, b]) => `<div><span class="label">${a}</span><b>${esc(b)}</b></div>`).join('')}</div>` : ''}
@@ -356,5 +358,7 @@ window.NBA = {poll: () => poll(), applyProgress: applyNBA, openCard, openGame: n
 /* ------------------------------------------------------------ start: lanes now, NBA data once the slate list is in */
 mountLanes(); try{ drawTicker(); }catch(e){} TKL.nba();
 const sb = $('#srchbtn'); if(sb){ sb.onclick = () => openSearch(); }
-(function start(){ if(!INDEX) return setTimeout(start, 250); slates().then(ds => { if(ds.length && S.tab === 'lobby') homeNBA(); }).catch(() => {}).finally(tick); loadIndex(); })();
+/* the first Home render can finish before this file runs (data/index.json is preloaded), so wait for it, then add the NBA shelf */
+const homeWhenReady = (n = 0) => { if(S.tab !== 'lobby' || n > 40) return; if($('#main .x-home') && !$('#nba-home')) return homeNBA(); if(!$('#nba-home')) setTimeout(() => homeWhenReady(n + 1), 250); };
+(function start(){ if(!INDEX) return setTimeout(start, 250); slates().catch(() => {}).finally(() => { homeWhenReady(); tick(); }); loadIndex(); })();
 })();

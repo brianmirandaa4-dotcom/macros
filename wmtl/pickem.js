@@ -50,9 +50,11 @@ function dayStats(day){ const card = ST.props.filter(p => p.day === day); let hi
 /* ---------- Home tile: compact, last thing on Home, gone after opt-out */
 let TILE = null;
 /* Home can be redrawn by other code; keep the tile present and last, without touching the shared render path */
-(function keep(){ const m = document.querySelector('#main'); if(!m || !window.MutationObserver) return; let q = 0;
-  new MutationObserver(() => { if(q) return; q = requestAnimationFrame(() => { q = 0; if(opt.get() === 'out') return; const v = m.querySelector('.x-home') || (typeof S !== 'undefined' && S.tab === 'lobby' && m.querySelector(':scope > .view')); if(!v) return;
-    const t = v.querySelector('#pk-tile'); if(!t) home(m); else if(v.lastElementChild !== t) v.appendChild(t); }); }).observe(m, {childList: true, subtree: true}); })();
+(function keep(){ const m = document.querySelector('#main'); if(!m) return; let q = 0;
+  const chk = () => { q = 0; if(opt.get() === 'out') return; const v = m.querySelector('.x-home') || (typeof S !== 'undefined' && S.tab === 'lobby' && m.querySelector(':scope > .view')); if(!v) return;
+    const t = v.querySelector('#pk-tile'); if(!t) home(m); else if(v.lastElementChild !== t) v.appendChild(t); };
+  if(window.MutationObserver) new MutationObserver(() => { if(!q) q = requestAnimationFrame(chk); }).observe(m, {childList: true, subtree: true});
+  q = requestAnimationFrame(chk); })();
 async function home(m){ const v = m.querySelector('.x-home') || m.querySelector('.view') || m; const old = v.querySelector('#pk-tile'); if(old) old.remove();
   const st = opt.get(); if(st === 'out') return;
   const t = document.createElement('button'); t.id = 'pk-tile'; t.className = 'pk-tile'; t.type = 'button';
