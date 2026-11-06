@@ -1,0 +1,12 @@
+/* team logo chip: glossy dark disc, soft glow in the team's colour */
+.tl{position:relative;display:inline-grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;margin-right:8px;vertical-align:middle;
+  background:radial-gradient(120% 120% at 30% 20%,rgba(255,255,255,.16) 0%,rgba(255,255,255,.04) 45%,rgba(0,0,0,0) 70%),radial-gradient(closest-side,color-mix(in srgb,var(--tc) 55%,transparent),color-mix(in srgb,var(--tc) 18%,transparent) 70%,transparent),#0E0F13;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 0 14px -2px color-mix(in srgb,var(--tc) 55%,transparent)}
+.tl img{width:76%;height:76%;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.tl.nologo img{display:none}.tl.nologo{background:var(--tc)}
+.tl.sm{width:20px;height:20px;margin-right:5px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 0 8px -2px color-mix(in srgb,var(--tc) 55%,transparent)}
+.x-team,.x-sbrow{align-items:center}.x-team>b,.x-sbrow>b{margin-right:auto}
+.x-team .tl{width:26px;height:26px}
+.x-bteams div{align-items:center!important}.x-bteams .tl{width:40px;height:40px}
+.h-match{display:inline-flex;align-items:center;gap:0}
+.x-game{min-width:0}.x-game .x-team b{font-size:16px}

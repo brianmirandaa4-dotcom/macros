@@ -31,8 +31,8 @@ window.viewHome2 = async function(){ const m = $('#main'); const ds = await week
   const gameCard = ({g, d}) => { const st = gameState(g.away.abbr, g.home.abbr); const mk = g.market || {}; const live = st && st.state === 'in', fin = st && st.state === 'post';
     const sp = isNum(mk.spread_home) ? mk.spread_home : null;
     return `<button class="x-game ${live ? 'is-live' : ''}" data-game="${esc(g.id)}" data-sl="${esc(d.id)}"><div class="x-gtop"><span class="wx-slot" data-wx="${esc(g.away.abbr)}@${esc(g.home.abbr)}|${esc(g.kick_utc)}"></span>${live ? `<span class="x-live">Live</span> ${esc(st.detail)}` : fin ? 'Final' : `${esc(dayET(g.kick_utc).split(',')[0])} ${kickET(g.kick_utc).replace(' ET', '')}`}</div>
-      <div class="x-team"><b>${esc(g.away.abbr)}</b><span>${st && st.state !== 'pre' ? st.as : isNum(sp) ? fmtSp(-sp) : ''}</span></div>
-      <div class="x-team"><b>${esc(g.home.abbr)}</b><span>${st && st.state !== 'pre' ? st.hs : isNum(sp) ? fmtSp(sp) : ''}</span></div>
+      <div class="x-team">${TL(g.away.abbr)}<b>${esc(g.away.abbr)}</b><span>${st && st.state !== 'pre' ? st.as : isNum(sp) ? fmtSp(-sp) : ''}</span></div>
+      <div class="x-team">${TL(g.home.abbr)}<b>${esc(g.home.abbr)}</b><span>${st && st.state !== 'pre' ? st.hs : isNum(sp) ? fmtSp(sp) : ''}</span></div>
       <div class="x-gfoot">${isNum(mk.total) ? `O/U ${ln(mk.total)}` : ''}${d.props.filter(p => p.tier === 'bet' && (p.team === g.away.abbr || p.team === g.home.abbr)).length ? ` · <em>${d.props.filter(p => p.tier === 'bet' && (p.team === g.away.abbr || p.team === g.home.abbr)).length} bets</em>` : ''}</div></button>`; };
   const betCard = ({p, d}) => { const ch = p.p ?? pSide(p); return `<button class="x-bet" data-prop="${esc(p.id)}" data-sl="${esc(d.id)}"><div class="xb-top"><span class="xb-tier">Model bet</span><span class="xb-mu">${esc(p.team)} vs ${esc(p.opp)}</span></div>
       <div class="xb-head"><div class="xb-sel">${esc(selText(p))}</div><div class="xb-price"><b>${odds(p.odds)}</b><i>${esc(p.book || '')}</i></div></div>
@@ -46,7 +46,7 @@ window.viewHome2 = async function(){ const m = $('#main'); const ds = await week
       const p = top.p, ch = p.p ?? pSide(p);
       return `<div class="h-hi"><span>${esc(day)}</span><b>${bets.length} plays the model loves</b></div>
       <button class="h-card" data-prop="${esc(p.id)}" data-sl="${esc(top.d.id)}"><i class="h-foil"></i>
-        <div class="h-row"><span class="h-badge">Top play</span><span class="h-match">${esc(p.team)} vs ${esc(p.opp)}</span></div>
+        <div class="h-row"><span class="h-badge">Top play</span><span class="h-match">${TL(p.team, 'sm')}${esc(p.team)} vs ${TL(p.opp, 'sm')}${esc(p.opp)}</span></div>
         <div class="h-player">${esc(p.player)}</div><div class="h-sel">${esc(selText(p))}</div>
         <div class="h-row h-nums"><div><small>Model chance</small><b>${pc(ch)}</b></div><div><small>Best price</small><b>${odds(p.odds)}</b><i>${esc(p.book || '')}</i></div><div><small>Edge</small><b>${isNum(p.edge_pts) ? '+' + p.edge_pts.toFixed(1) : '–'}</b></div></div>
         <span class="h-tail">Tail it</span></button>
@@ -88,7 +88,7 @@ window.openGame = async function(slId, gid){ const d = SLATE[slId] || await load
     const groups = {}; rows.forEach(r => (groups[r.e.market] = groups[r.e.market] || []).push(r));
     box.innerHTML = Object.keys(groups).length ? Object.entries(groups).map(([mkt, rs]) => `<div class="x-grp"><h3>${esc(mkt)}</h3>${rs.map(r => mktRow(bg, r.P, r.e)).join('')}</div>`).join('') : '<p class="sub">No props posted in this group.</p>';
     wirePlayers(box); $$('[data-gt]', el).forEach(b => b.setAttribute('aria-pressed', b.dataset.gt === tab)); };
-  const html = `<div class="body"><div class="x-gh"><div class="x-gteams"><div><b>${esc(g.away.abbr)}</b><span>${st && st.state !== 'pre' ? st.as : ''}</span></div><i>@</i><div><b>${esc(g.home.abbr)}</b><span>${st && st.state !== 'pre' ? st.hs : ''}</span></div></div>
+  const html = `<div class="body"><div class="x-gh"><div class="x-gteams"><div>${TL(g.away.abbr)}<b>${esc(g.away.abbr)}</b><span>${st && st.state !== 'pre' ? st.as : ''}</span></div><i>@</i><div>${TL(g.home.abbr)}<b>${esc(g.home.abbr)}</b><span>${st && st.state !== 'pre' ? st.hs : ''}</span></div></div>
     <p>${st && st.state === 'in' ? `<span class="x-live">Live</span> ${esc(st.detail)}` : st && st.state === 'post' ? 'Final' : `${esc(dayET(g.kick_utc))} · ${kickET(g.kick_utc)}`}</p>
     <div class="x-lines"><div><small>Spread</small><b>${isNum(mk.spread_home) ? `${esc(g.home.abbr)} ${mk.spread_home > 0 ? '+' : ''}${ln(mk.spread_home)}` : '—'}</b></div><div><small>Total</small><b>${isNum(mk.total) ? ln(mk.total) : '—'}</b></div><div><small>Moneyline</small><b>${mk.moneyline ? `${odds(mk.moneyline.away)} / ${odds(mk.moneyline.home)}` : '—'}</b></div></div></div>
     <div class="x-tabs" role="tablist">${TABS2.map(([l]) => `<button data-gt="${esc(l)}" aria-pressed="${l === tab}">${esc(l)}</button>`).join('')}</div><div id="x-gbody"></div></div>`;
@@ -156,7 +156,7 @@ function cardBody(P, bp, e, games, opp, pos, ds){ if(!e) return `<p class="sub">
 const findGame = (away, home) => { for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; const g = d.games.find(x => x.away.abbr === away && x.home.abbr === home); if(g) return {d, g}; } return null; };
 const scoreBox = (st, big) => { const live = st.state === 'in', fin = st.state === 'post'; const win = (a, b) => fin && a > b ? 'w' : '';
   return `<button class="x-sb ${big ? 'big' : ''} ${live ? 'live' : ''}" data-sbg="${esc(st.away)}|${esc(st.home)}"><div class="x-sbtop">${live ? `<span class="x-live">Live</span>${esc(st.detail)}` : fin ? 'Final' : esc(st.detail || '')}</div>
-    <div class="x-sbrow ${win(st.as, st.hs)}"><b>${esc(st.away)}</b><span>${st.state === 'pre' ? '' : st.as}</span></div><div class="x-sbrow ${win(st.hs, st.as)}"><b>${esc(st.home)}</b><span>${st.state === 'pre' ? '' : st.hs}</span></div>
+    <div class="x-sbrow ${win(st.as, st.hs)}">${TL(st.away)}<b>${esc(st.away)}</b><span>${st.state === 'pre' ? '' : st.as}</span></div><div class="x-sbrow ${win(st.hs, st.as)}">${TL(st.home)}<b>${esc(st.home)}</b><span>${st.state === 'pre' ? '' : st.hs}</span></div>
     ${big ? `<div class="x-sbfoot">Picks · Live · Props · Players</div>` : ''}</button>`; };
 const wireSB = root => $$('[data-sbg]', root).forEach(b => b.onclick = () => { const [a, h] = b.dataset.sbg.split('|'); const f = findGame(a, h); if(f) openGame(f.d.id, f.g.id); else toast(`${a} @ ${h} is not on a modeled slate`); });
 window.onLiveTick = () => { if(window._gameTick) window._gameTick(); if(S.tab === 'lobby'){ const h = $('#x-livehero-slot'); if(h){ h.innerHTML = liveHeroHTML(); wireSB(h); } } if(S.tab === 'live' && window.viewLiveNow2) viewLiveNow2(); };
@@ -187,7 +187,7 @@ window.openGame = async function(slId, gid){ const d = SLATE[slId] || await load
   const tms = [g.away.abbr, g.home.abbr]; const ps = d.props.filter(p => tms.includes(p.team)); let tab = 'Picks'; const mk = g.market || {};
   const head = () => { const st = Object.values(LV.games).find(x => x.away === g.away.abbr && x.home === g.home.abbr) || {state: 'pre', away: g.away.abbr, home: g.home.abbr, as: '', hs: '', detail: `${dayET(g.kick_utc)} · ${kickET(g.kick_utc)}`};
     return `<div class="x-board ${st.state === 'in' ? 'live' : ''}"><div class="x-bt"><span class="wx-slot" data-wx="${esc(g.away.abbr)}@${esc(g.home.abbr)}|${esc(g.kick_utc)}"></span>${st.state === 'in' ? `<span class="x-live">Live</span>${esc(st.detail)}` : st.state === 'post' ? 'Final' : esc(st.detail)}</div>
-      <div class="x-bteams"><div><b>${esc(g.away.abbr)}</b><span>${st.state === 'pre' ? '' : st.as}</span></div><i>@</i><div><span>${st.state === 'pre' ? '' : st.hs}</span><b>${esc(g.home.abbr)}</b></div></div>
+      <div class="x-bteams"><div>${TL(g.away.abbr)}<b>${esc(g.away.abbr)}</b><span>${st.state === 'pre' ? '' : st.as}</span></div><i>@</i><div><span>${st.state === 'pre' ? '' : st.hs}</span>${TL(g.home.abbr)}<b>${esc(g.home.abbr)}</b></div></div>
       <div class="x-lines"><div><small>Spread</small><b>${isNum(mk.spread_home) ? `${esc(g.home.abbr)} ${mk.spread_home > 0 ? '+' : ''}${ln(mk.spread_home)}` : '—'}</b></div><div><small>Total</small><b>${isNum(mk.total) ? ln(mk.total) : '—'}</b></div><div><small>Moneyline</small><b>${mk.moneyline ? `${od(mk.moneyline.away)} / ${od(mk.moneyline.home)}` : '—'}</b></div></div></div>`; };
   const body = el => { const box = $('#x-gb', el); $$('[data-gt2]', el).forEach(b => b.setAttribute('aria-pressed', b.dataset.gt2 === tab));
     if(tab === 'Picks'){ const bets = ps.filter(p => p.tier === 'bet').sort((a, b) => (b.edge_pts || 0) - (a.edge_pts || 0)); const sides = ps.filter(p => p.tier !== 'bet' && !p.no_prediction && p.side && isNum(pSide(p)) && isNum(p.line)).sort((a, b) => pSide(b) - pSide(a));

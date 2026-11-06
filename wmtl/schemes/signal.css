@@ -4,14 +4,14 @@
 :root{
   /* ink surfaces: low-chroma blue-black, each step a little lighter and a little bluer */
   --s0:#05070B; --s1:#0A0E15; --s2:#10151E; --s3:#171D28; --s4:#1E2531;
-  --glass:rgba(6,9,14,.86); --glass-hi:rgba(56,242,192,.05);
+  --glass:rgba(6,9,14,.86); --glass-hi:rgba(54,241,205,.05);
   --w:236,241,247; --t1:#ECF1F7; --t2:rgba(236,241,247,.70); --t3:rgba(236,241,247,.56);
   --hair:rgba(236,241,247,.08); --hair2:rgba(236,241,247,.14);
-  --rule:rgba(160,190,230,.10); --rule2:rgba(56,242,192,.32);
+  --rule:rgba(160,190,230,.10); --rule2:rgba(54,241,205,.32);
 
   /* the signal */
-  --sig:#38F2C0; --sig-hi:#9BFFE3; --sig-lo:#12B892; --sig-ink:#03150F;
-  --sig-wash:rgba(56,242,192,.12); --sig-glow:rgba(56,242,192,.38);
+  --sig:#36F1CD; --sig-hi:#A6FFEC; --sig-lo:#10B89A; --sig-ink:#021512;
+  --sig-wash:rgba(54,241,205,.10); --sig-glow:rgba(54,241,205,.42);
 
   /* every legacy accent token now points at the signal */
   --pk:var(--sig); --gold:var(--sig); --gold-d:var(--sig-lo); --brass:var(--sig); --brass-ink:var(--sig-ink); --brass-wash:var(--sig-wash);
@@ -19,17 +19,17 @@
   --foil:linear-gradient(90deg,var(--sig-lo) 0%,var(--sig) 55%,var(--sig-hi) 100%);
   --violet:#0E1420; --violet-d:#080B12;
   --banner:linear-gradient(160deg,#141B27 0%,#0A0E15 60%,#05070B 100%);
-  --edge:var(--sig); --edge-wash:rgba(56,242,192,.14);
+  --edge:var(--sig); --edge-wash:rgba(54,241,205,.14);
   --fair:#AFC0D6; --fair-wash:rgba(175,192,214,.10); --pass:#7E8999;
   --loss:#FF5D63; --loss-wash:rgba(255,93,99,.13);
   --nfl:var(--sig); --cfb:#AFC0D6;
 
   /* hero card + Tail button */
-  --hc-bg:radial-gradient(120% 80% at 100% 0%,rgba(56,242,192,.16) 0%,transparent 55%),linear-gradient(165deg,#151C28 0%,#0C1119 55%,#070A0F 100%);
+  --hc-bg:radial-gradient(120% 80% at 100% 0%,rgba(54,241,205,.16) 0%,transparent 55%),linear-gradient(165deg,#151C28 0%,#0C1119 55%,#070A0F 100%);
   --hc-ink:var(--t1);
-  --hc-foil:linear-gradient(rgba(160,190,230,.045) 1px,transparent 1px) 0 0/100% 28px,linear-gradient(90deg,rgba(160,190,230,.045) 1px,transparent 1px) 0 0/28px 100%;
+  --hc-foil:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 120' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='f' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2336F1CD' stop-opacity='.10'/%3E%3Cstop offset='1' stop-color='%2336F1CD' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 104 L30 98 L55 101 L80 86 L105 90 L130 72 L155 78 L180 58 L205 62 L230 40 L255 44 L280 22 L300 12 L300 120 L0 120Z' fill='url(%23f)'/%3E%3Cpath d='M0 104 L30 98 L55 101 L80 86 L105 90 L130 72 L155 78 L180 58 L205 62 L230 40 L255 44 L280 22 L300 12' fill='none' stroke='%2336F1CD' stroke-opacity='.30' stroke-width='1.4' vector-effect='non-scaling-stroke' stroke-linejoin='round'/%3E%3C/svg%3E") right 0 top 44px/56% 30% no-repeat,linear-gradient(rgba(160,190,230,.05) 1px,transparent 1px) 0 0/100% 28px,linear-gradient(90deg,rgba(160,190,230,.05) 1px,transparent 1px) 0 0/28px 100%;
   --hc-foil-o:1;
-  --hc-sh:inset 0 0 0 1px rgba(56,242,192,.28),0 0 0 1px rgba(0,0,0,.6),0 24px 60px -28px rgba(56,242,192,.45);
+  --hc-sh:inset 0 0 0 1px rgba(54,241,205,.30),inset 0 1px 0 rgba(166,255,236,.18),0 0 0 1px rgba(0,0,0,.6),0 0 46px -14px rgba(54,241,205,.40),0 30px 60px -30px rgba(0,0,0,.9);
   --hc-badge:var(--sig-wash); --hc-badge-ink:var(--sig);
   --tail-bg:var(--sig); --tail-ink:var(--sig-ink);
 
@@ -53,13 +53,14 @@ body::before{background:var(--s0)!important}
 .tabbar button[aria-current=page]::after{background:var(--sig)!important;box-shadow:0 0 10px var(--sig-glow)}
 
 /* hero */
-.h-card .h-badge{box-shadow:inset 0 0 0 1px rgba(56,242,192,.35)}
+.h-card .h-badge{box-shadow:inset 0 0 0 1px rgba(54,241,205,.35)}
 .h-card .h-nums div:first-child b{color:var(--sig)}
 .h-tail{box-shadow:0 10px 30px -10px var(--sig-glow),inset 0 1px 0 rgba(255,255,255,.35)}
 .h-stats div{background:var(--s1);box-shadow:inset 0 0 0 1px var(--rule)}
 
 /* links, numbers the model is proud of */
-.x-link,a{color:var(--sig)!important}
+.x-link,a,.link,.back{color:var(--t1)!important}
+.x-shead .x-link{color:var(--t2)!important}
 .x-pct,.x-chance,.bc-pct{color:var(--sig)!important}
 .x-gfoot em{color:var(--sig)!important}
 
@@ -73,7 +74,7 @@ body::before{background:var(--s0)!important}
 /* cards */
 .x-game{background:var(--s1)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
 .x-game.is-live{box-shadow:inset 0 0 0 1px rgba(255,93,99,.6)!important}
-.x-board,.x-sb.big{background:radial-gradient(110% 80% at 100% 0%,rgba(56,242,192,.08),transparent 55%),linear-gradient(165deg,#141B27 0%,#0A0E15 60%,#06080C 100%)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+.x-board,.x-sb.big{background:radial-gradient(110% 80% at 100% 0%,rgba(54,241,205,.08),transparent 55%),linear-gradient(165deg,#141B27 0%,#0A0E15 60%,#06080C 100%)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
 .x-lines div,.x-sel,.x-hit,.x-match,.x-books,.x-more{background:var(--s0)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
 
 /* prices */
@@ -88,10 +89,26 @@ body::before{background:var(--s0)!important}
 
 /* slate picker */
 .slatebtn.sb2{background:linear-gradient(180deg,rgba(160,190,230,.08),rgba(160,190,230,.02));box-shadow:inset 0 0 0 1px var(--hair2),0 6px 18px -10px rgba(0,0,0,.8)}
-.sb2-ic{background:var(--sig);color:var(--sig-ink);box-shadow:0 0 0 3px var(--sig-wash),0 0 18px -4px var(--sig-glow)}
+.sb2-ic{background:var(--s3);color:var(--t1);box-shadow:inset 0 0 0 1px var(--hair2),0 0 0 3px rgba(160,190,230,.05)}
 .sheet{background:var(--s3)}
 .sp2-row{background:rgba(160,190,230,.04);box-shadow:inset 0 0 0 1px var(--rule)}
 .sp2-row.cur{background:var(--sig-wash);box-shadow:inset 0 0 0 1.5px var(--sig)}
 .sp2-cur{background:var(--sig);color:var(--sig-ink)}
 .sp2-date{background:var(--s0)}
 :focus-visible{outline-color:var(--sig)}
+
+/* v2: the signal only where the model speaks */
+.betcard .bc-tier,.x-bet .xb-tier{color:var(--t2)!important}
+.h-card .h-match{opacity:.7}
+.tk-dot{color:var(--sig)!important;opacity:.6}
+.sp2-date small{color:var(--t3)!important}
+.sp2-row.cur .sp2-date small{color:var(--sig)!important}
+.sp2-row.live .sp2-date small{color:var(--loss)!important}
+.sp2-st{background:rgba(160,190,230,.07)}
+
+/* v3: the grid fades out toward the button; edge reads as money moving up */
+.h-foil{-webkit-mask:linear-gradient(180deg,#000 0%,#000 45%,transparent 92%);mask:linear-gradient(180deg,#000 0%,#000 45%,transparent 92%)}
+.h-card .h-nums div:last-child b{color:var(--sig)}
+.h-card .h-player{text-shadow:0 1px 0 rgba(0,0,0,.4)}
+/* live pills: dark ink on coral so small text clears AA (white on coral was 3.0:1) */
+.sp2-st.live,.x-live{color:#1A0507!important}.sp2-st.live i{background:#1A0507!important}

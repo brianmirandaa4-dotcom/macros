@@ -63,7 +63,7 @@ async function game(away, home, kick){ const V = await venues(); const s = site(
   const onset = win.find((h, i) => i > 0 && h.pop >= 50 && win[i - 1].pop < 50);
   return {site: s, kind: s.roof === 'retract' ? 'retract' : 'out', win, atK, maxWind, maxGust, maxPop, minTemp, snow, rain, onset, alerts: A}; }
 
-const chipHTML = w => { if(!w) return ''; if(w.kind === 'dome') return '<span class="wx-c">🏟️ Indoors</span>'; if(w.kind === 'abroad') return `<span class="wx-c">🌍 ${w.site.indoor ? 'Indoors' : esc(w.site.city || 'Abroad')}</span>`;
+const chipHTML = w => { if(!w) return ''; if(w.kind === 'dome') return '<span class="wx-c">🏟️ Indoors</span>'; if(w.kind === 'abroad') return `<span class="wx-c">${w.site.indoor ? '🏟️ Indoors' : '🌍 ' + esc(w.site.city || 'Abroad')}</span>`;
   if(w.kind === 'neutral') return `<span class="wx-c">${w.site.indoor ? '🏟️ Indoors' : '📍 Neutral site'}</span>`; if(w.kind === 'far' || w.kind === 'error') return '';
   const a = w.atK; return `<span class="wx-c${w.alerts.length ? ' al' : ''}">${w.alerts.length ? '⚠️' : ''}${emoji(a)}${windy(w.maxWind) ? '💨' : ''} ${a.temp}°${windy(w.maxWind) ? ` · ${w.maxWind} mph` : w.maxPop >= 30 ? ` · ${w.maxPop}%` : ''}${w.kind === 'retract' ? ' · roof' : ''}</span>`; };
 
@@ -121,7 +121,7 @@ async function renderWatch(host, list){ if(!host) return; const rows = (await Pr
     .filter(r => windy(r.w.maxWind) || r.w.maxPop >= 30 || r.w.minTemp <= 35 || r.w.alerts.length)
     .sort((a, b) => (b.w.alerts.length - a.w.alerts.length) || (b.w.maxWind - a.w.maxWind) || (b.w.maxPop - a.w.maxPop) || (a.w.minTemp - b.w.minTemp));
   if(!rows.length){ host.innerHTML = ''; return; }
-  host.innerHTML = `<div class="x-shelf"><div class="x-shead"><h2>Weather watch</h2></div><p class="wx-note">Outdoor games with wind, rain, snow or cold in the forecast. Strongest wind first.</p><div class="x-list">${rows.map(({g, d, w}) => `<button class="x-li wx-li" data-game="${esc(g.id)}" data-sl="${esc(d.id)}"><span class="wx-e">${w.alerts.length ? '⚠️' : ''}${emoji(w.atK)}${windy(w.maxWind) ? '💨' : ''}</span><div><b>${esc(g.away.abbr)} @ ${esc(g.home.abbr)}</b><span>${esc(sentence(w))}</span></div></button>`).join('')}</div></div>`;
+  host.innerHTML = `<div class="x-shelf"><div class="x-shead"><h2>Weather watch</h2></div><p class="wx-note">Outdoor games with wind, rain, snow or cold in the forecast. Strongest wind first.</p><div class="x-list">${rows.map(({g, d, w}) => `<button class="x-li wx-li" data-game="${esc(g.id)}" data-sl="${esc(d.id)}"><span class="wx-e">${w.alerts.length ? '⚠️' : ''}${emoji(w.atK)}${windy(w.maxWind) ? '💨' : ''}</span><div><b>${window.TL ? TL(g.away.abbr, 'sm') : ''}${esc(g.away.abbr)} @ ${window.TL ? TL(g.home.abbr, 'sm') : ''}${esc(g.home.abbr)}</b><span>${esc(sentence(w))}</span></div></button>`).join('')}</div></div>`;
   host.querySelectorAll('[data-game]').forEach(b => b.onclick = () => openGame(b.dataset.sl, b.dataset.game)); }
 
 /* ticker: active alerts + rain/snow onsets in the next 90 minutes for games today */

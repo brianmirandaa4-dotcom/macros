@@ -1,0 +1,143 @@
+/* tail. scheme: "After-hours lounge"
+   A members' room at night. Smoked ink-teal in five tones instead of black, warm ivory type,
+   and one warm metal (lounge copper) kept for the things worth reaching for: Tail it, the seal, a pick, a win.
+   Loaded after mono.css + weather.css. Overrides tokens first, then the few selectors that hard-code colour. */
+
+:root{
+  /* palette */
+  --lg-night:#0A1517;     /* Night pool: canvas */
+  --lg-ink:#0E1C1F;       /* Smoked ink */
+  --lg-deep:#132528;      /* Deep teal felt */
+  --lg-felt:#1A3134;      /* Felt */
+  --lg-baize:#203B3E;     /* Baize: floating sheets */
+  --lg-verd:#3E6E68;      /* Verdigris: hairlines, inner light */
+  --lg-patina:#7EBEB0;    /* Patina light: glows only, never text on light */
+  --lg-ivory:#F2E9DA;     /* Ivory: type */
+  --lg-copper:#E0A07C;    /* Lounge copper: the one highlight */
+  --lg-copper-hi:#F3C3A4; /* Copper highlight */
+  --lg-copper-lo:#B8704C; /* Copper shadow */
+  --lg-espresso:#2A1209;  /* Espresso: ink on copper */
+
+  /* surfaces */
+  --s0:var(--lg-night); --s1:var(--lg-ink); --s2:var(--lg-deep); --s3:var(--lg-felt); --s4:var(--lg-baize);
+  --glass:rgba(8,19,21,.86); --glass-hi:rgba(126,190,176,.07);
+
+  /* type */
+  --w:242,233,218; --t1:var(--lg-ivory); --t2:rgba(242,233,218,.72); --t3:rgba(242,233,218,.6);
+  --hair:rgba(242,233,218,.08); --hair2:rgba(242,233,218,.14);
+  --rule:rgba(126,190,176,.14); --rule2:rgba(126,190,176,.3);
+
+  /* the model's numbers stay ivory (tonal); copper is reserved */
+  --gold:var(--lg-ivory); --gold-d:#A9A08F; --pk:var(--lg-ivory);
+  --brass:var(--lg-copper); --brass-ink:var(--lg-espresso); --brass-wash:rgba(224,160,124,.13);
+  --act:var(--lg-ivory); --act-ink:var(--lg-ink); --act-wash:rgba(242,233,218,.08);
+  --foil:linear-gradient(135deg,#F6D0B6 0%,#C27A55 34%,#F0BE9E 55%,#A9653F 80%,#E8AE8A 100%);
+
+  /* semantics: a win is copper (the reward colour); fair/pass stay tonal */
+  --edge:#EDB18E; --edge-wash:rgba(224,160,124,.16);
+  --fair:#B9CFC9; --fair-wash:rgba(126,190,176,.12);
+  --pass:#8FA3A0; --pass-wash:rgba(143,163,160,.12);
+  --loss:#FF6B66; --loss-wash:rgba(255,107,102,.13);
+  --nfl:var(--lg-ivory); --cfb:#CDBFA8;
+
+  /* brand leftovers */
+  --violet:#16302F; --violet-d:#0C1C1D;
+  --banner:linear-gradient(160deg,#1B3A3B 0%,#122A2C 50%,#0B1B1D 100%);
+  --float:0 24px 60px -16px rgba(0,0,0,.7),0 2px 8px rgba(0,0,0,.35);
+
+  /* hero card: verdigris lit from the top-left, a copper lamp glow top-right */
+  --hc-bg:radial-gradient(130% 90% at 0% 0%,rgba(126,190,176,.20) 0%,transparent 55%),linear-gradient(160deg,#1C3B3C 0%,#132B2D 48%,#0A1A1C 100%);
+  --hc-ink:var(--lg-ivory);
+  --hc-foil:radial-gradient(70% 55% at 100% 0%,rgba(224,160,124,.16),transparent 70%);
+  --hc-foil-o:1;
+  --hc-sh:inset 0 1px 0 rgba(242,233,218,.12),inset 0 0 0 1px rgba(126,190,176,.2),0 30px 60px -28px rgba(0,0,0,.95);
+  --hc-badge:rgba(242,233,218,.12); --hc-badge-ink:var(--lg-ivory);
+  --tail-bg:linear-gradient(180deg,var(--lg-copper-hi) 0%,var(--lg-copper) 52%,#CB8762 100%); --tail-ink:var(--lg-espresso);
+
+  /* bet cards */
+  --bc-surface:linear-gradient(180deg,#17302F 0%,var(--s1) 50%,var(--s0) 100%);
+  --bc-frame:rgba(126,190,176,.16);
+  --bc-gold-dim:rgba(242,233,218,.34);
+  --bc-run:rgba(224,160,124,.1); --bc-run-solid:var(--lg-copper);
+  --bc-win-wash:rgba(224,160,124,.2);
+}
+
+/* canvas: a faint lamp over the room, not flat black */
+html,body{background:var(--s0)!important}
+body{background:radial-gradient(130% 55% at 50% 0%,rgba(62,110,104,.30),transparent 70%) no-repeat,var(--s0)!important;color:var(--t1)}
+body::before{background:#0A1719!important}
+.page{background:radial-gradient(130% 50% at 50% 0%,rgba(62,110,104,.26),transparent 70%) no-repeat,var(--s0)}
+
+/* frame: header, ticker, tab bar */
+.top{background:rgba(9,21,23,.86)!important;-webkit-backdrop-filter:saturate(1.4) blur(22px);backdrop-filter:saturate(1.4) blur(22px);box-shadow:inset 0 -1px 0 var(--rule)!important}
+.page .sbar{background:rgba(9,21,23,.86)}
+.ticker{background:#0A1719!important;box-shadow:inset 0 -1px 0 var(--rule)!important;color:var(--t2)}
+.tabbar{background:rgba(7,16,18,.92)!important;box-shadow:inset 0 1px 0 var(--rule)!important}
+.tabbar button{color:rgba(242,233,218,.5)}
+.tabbar button[aria-current=page],.tabbar button[aria-current=page] svg{color:var(--lg-ivory)!important}
+.tabbar button[aria-current=page]::after{background:var(--lg-copper)!important;box-shadow:0 0 10px rgba(224,160,124,.6)}
+
+/* seal + lockup: a copper coin with an ink t, ivory wordmark, copper full stop */
+.lockup>circle:first-child,svg[viewBox="0 0 100 100"]>circle[r="44"]{fill:var(--lg-copper)}
+.lockup>g:first-of-type,svg[viewBox="0 0 100 100"]>g{stroke:var(--lg-ink)}
+.lockup>g:nth-of-type(2){stroke:var(--lg-ivory)}
+.lockup>circle[cy="29"]{fill:var(--lg-ivory)}
+.lockup>circle[cy="78"]{fill:var(--lg-copper)}
+
+/* links + headline numbers */
+.x-link,a{color:var(--lg-ivory)!important}
+.x-pct,.x-chance,.x-gfoot em{color:var(--lg-ivory)!important}
+
+/* hero card */
+.h-badge{box-shadow:inset 0 0 0 1px rgba(242,233,218,.18)}
+.h-tail{box-shadow:inset 0 1px 0 rgba(255,240,228,.6),inset 0 -2px 0 rgba(120,60,30,.25),0 10px 22px -14px rgba(224,160,124,.5)}
+.h-stats div{background:linear-gradient(180deg,var(--s2),var(--s1));box-shadow:inset 0 1px 0 rgba(242,233,218,.06),inset 0 0 0 1px var(--rule)}
+
+/* game tickets + boards */
+.x-game{background:linear-gradient(180deg,#112426,#0B191B)!important;box-shadow:inset 0 1px 0 rgba(242,233,218,.06),inset 0 0 0 1px var(--rule)!important}
+.x-game.is-live{box-shadow:inset 0 0 0 1px rgba(255,107,102,.7)!important}
+.x-board,.x-sb.big{background:var(--hc-bg)!important;box-shadow:inset 0 1px 0 rgba(242,233,218,.1),inset 0 0 0 1px rgba(126,190,176,.2)!important}
+.x-board .x-lines div,.x-sb.big .x-lines div{background:rgba(7,16,18,.45)!important;box-shadow:inset 0 0 0 1px rgba(126,190,176,.16)!important}
+.x-gtop{color:var(--t3)!important}
+
+/* bet cards: copper foil edge is the one metal cue */
+.x-bet{background:var(--bc-surface)!important;box-shadow:inset 0 1px 0 rgba(242,233,218,.07),inset 0 0 0 1px var(--bc-frame)!important}
+.x-bet::before{background:var(--foil)!important}
+.betcard{box-shadow:inset 0 0 0 1px var(--bc-frame),0 18px 36px -24px rgba(0,0,0,.9)}
+
+/* chips + segmented tabs: pressed = ivory, not copper */
+.x-chip{background:rgba(242,233,218,.03)!important;box-shadow:inset 0 0 0 1px rgba(242,233,218,.16)!important;color:var(--t1)}
+.x-chip:active,.x-chip[aria-pressed=true]{background:var(--lg-ivory)!important;color:var(--lg-ink)!important;box-shadow:none!important}
+.x-tabs{background:transparent}
+.x-tabs button{box-shadow:inset 0 0 0 1px rgba(242,233,218,.14);color:var(--t2)}
+.x-tabs button[aria-pressed=true]{background:var(--lg-ivory)!important;color:var(--lg-ink)!important;box-shadow:none}
+.x-sub button[aria-pressed=true]{color:var(--lg-ivory)!important;background:rgba(126,190,176,.14)!important}
+.x-tag.gold{background:var(--lg-ivory)!important;color:var(--lg-ink)!important}
+
+/* prices: the model's pick wears copper */
+.x-odd{background:var(--s1)!important;box-shadow:inset 0 0 0 1px rgba(126,190,176,.2)!important}
+.x-odd.pick{background:linear-gradient(180deg,rgba(224,160,124,.22),rgba(224,160,124,.1))!important;box-shadow:inset 0 0 0 1.5px var(--lg-copper)!important}
+.x-odd.pick b{color:var(--lg-copper-hi)!important}.x-odd.pick small,.x-odd.pick i{color:rgba(243,195,164,.8)!important}
+.x-model{color:var(--t1)!important}.x-model.bet{color:var(--lg-copper-hi)!important}
+
+/* panels */
+.x-lines div,.x-sel,.x-hit,.x-match,.x-books,.x-more{background:var(--s1);box-shadow:inset 0 0 0 1px var(--rule)}
+
+/* slate pill + picker sheet */
+.slatebtn.sb2{background:linear-gradient(180deg,rgba(126,190,176,.12),rgba(126,190,176,.04));box-shadow:inset 0 0 0 1px rgba(126,190,176,.22),inset 0 1px 0 rgba(242,233,218,.1),0 6px 18px -10px rgba(0,0,0,.8)}
+.sb2-ic{background:var(--lg-ivory);color:var(--lg-ink);box-shadow:0 0 0 3px rgba(126,190,176,.12)}
+.sb2-ch{background:rgba(126,190,176,.12);color:var(--t2)}
+.modal{background:rgba(3,9,10,.62)}
+.sheet,.modal .card{background:linear-gradient(180deg,#1B3335 0%,#132729 40%,#0F2022 100%);box-shadow:inset 0 1px 0 rgba(242,233,218,.1),var(--float)}
+.sp2-row{background:rgba(7,16,18,.35);box-shadow:inset 0 0 0 1px rgba(126,190,176,.16)}
+.sp2-row.cur{background:rgba(126,190,176,.1);box-shadow:inset 0 0 0 1.5px var(--lg-copper)}
+.sp2-date{background:var(--s0);box-shadow:inset 0 0 0 1px rgba(126,190,176,.18)}
+.sp2-date small{color:var(--lg-copper)}
+.sp2-st{background:rgba(242,233,218,.07)}
+.sp2-st.live{color:#1A0605;background:var(--loss)}.sp2-st.live i{background:#1A0605}
+.sp2-cur{background:var(--lg-copper);color:var(--lg-espresso)}
+.sp2-imp{box-shadow:inset 0 0 0 1px rgba(126,190,176,.2)}
+.btn.primary{background:var(--tail-bg);color:var(--tail-ink)}
+:focus-visible{outline-color:var(--lg-copper)}
+.tabbar .badge{background:var(--lg-copper)!important;color:var(--lg-espresso)!important;box-shadow:0 0 0 2px var(--s0)}
+.page .x-tabs{background:linear-gradient(180deg,var(--s0) 70%,rgba(10,21,23,0))}
