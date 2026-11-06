@@ -171,18 +171,30 @@ function viewCard(d){ const m = d.meta, info = slateInfo(d.id) || {}; const st =
   const bw = bets.filter(inWin), lw = leans.filter(inWin);
   const R = d.results && d.results.summary;
   const verdict = bets.length ? `<div class="verdict"><span class="label">The card</span><div class="big"><span class="num" data-count="${bets.length}">${bets.length}</span> bet${bets.length > 1 ? 's' : ''} pass${bets.length > 1 ? '' : 'es'} the model</div><p>Each one cleared both keys: a strong 25D report card with the pattern check, and an edge of 5 or more points after the market check at the best price.</p></div>`
-    : `<div class="verdict"><span class="label">The card</span><div class="big none">No bets pass the model today.</div><p>${esc(noBetReason(m.funnel))}</p>${funnelHTML(m.funnel)}</div>`;
+    : topPicksHTML(d, m);
   return `<div class="view">
     <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(m.label || '')}</span><h1>${esc(m.date_label || 'The card')}</h1><p>${esc(st.word)} · prices ${esc(m.prices_et || 'Not available')}</p></div>
     ${verdict}
     ${bets.length && (m.windows || []).length > 1 ? windowSeg(d, S.win, 'card', w => bets.filter(p => w === 'all' || p.window === w).length) : ''}
     ${bets.length ? `<section class="sec cardlist stagger">${bw.length ? bw.map(p => ticket(p, d)).join('') : `<p class="sub">No bets in this window. Swipe or pick another window.</p>`}${bw.length ? `<div class="sub">Tap a ticket for its full report card and the Log bet button.</div>` : ''}</section>` : ''}
     ${R && R.graded ? `<section class="sec"><div class="hd"><h2>How it went</h2><span class="sub">${R.graded.toLocaleString()} of ${R.priced.toLocaleString()} priced props graded</span></div>${gradedStrip(d)}</section>` : ''}
-    ${leans.length ? `<section class="info" aria-label="Information only, not recommended"><div class="hd"><b>Information only · not bets</b><span class="sub">${leans.length} leans</span></div>
-      <p class="note" style="margin:0">Strong report card, but the price is already fair. These are not bets.</p>
-      ${lw.slice(0, S.leanAll ? 999 : 8).map(p => leanRow(p, d)).join('')}${lw.length > 8 && !S.leanAll ? `<button class="link" data-leanall>Show all ${lw.length}</button>` : ''}</section>` : ''}
+    ${sidesHTML(d, inWin)}
     <section class="sec"><div class="sub">Model ${esc(m.model_version || '')} · built ${esc(m.generated_et || 'Not available')} · injuries ${esc(m.injuries_et || 'Not available')} · ${(m.sims_per_game || 10000).toLocaleString()} replays per game</div></section>
   </div>`; }
+const pSide = p => isNum(p.p) ? p.p : isNum(p.p_raw) ? p.p_raw : null;
+const grade = x => x >= .60 ? 'A' : x >= .55 ? 'B' : 'C';
+function topPicksHTML(d, m){ const top = d.props.filter(p => !p.no_prediction && p.side && isNum(pSide(p)) && isNum(p.line) && pSide(p) >= .55).sort((a, b) => pSide(b) - pSide(a)).slice(0, 5);
+  if(!top.length) return `<div class="verdict"><span class="label">Top picks</span><div class="big none">Every prop is close to a coin flip on this slate.</div><p>No side reaches 55% in the model's calibrated simulations. ${esc(noBetReason(m.funnel))}</p>${funnelHTML(m.funnel)}</div>`;
+  return `<div class="verdict"><span class="label">Top picks · the model's ${top.length} strongest sides</span><div class="big"><span class="num">${top.length}</span> recommended</div>
+    <p>Ranked by the calibrated chance from 10,000 simulations. These clear 55%, but none has a confirmed edge at a real price yet, so keep stakes small (0.5u) until prices are checked.</p>
+    <div class="list" style="margin-top:8px">${top.map(p => sideRow(p, d)).join('')}</div></div>`; }
+function sidesHTML(d, inWin){ const all = d.props.filter(p => !p.no_prediction && p.side && isNum(pSide(p)) && p.tier !== 'bet' && isNum(p.line)).sort((a, b) => pSide(b) - pSide(a));
+  const L = all.filter(inWin); if(!L.length) return ''; const n = S.leanAll ? 999 : 12; const cnt = k => all.filter(p => grade(pSide(p)) === k).length;
+  return `<section class="info" aria-label="Model side on every prop"><div class="hd"><b>Model side · every prop</b><span class="sub">${all.length} props · A ${cnt('A')} · B ${cnt('B')} · C ${cnt('C')}</span></div>
+    <p class="note" style="margin:0">The trained model's side and chance on every prop with a line, best first. A is 60%+, B is 55–60%, C is under 55%. These are model predictions, not bets: a bet also needs an edge at a real price whose interval clears break-even.</p>
+    ${L.slice(0, n).map(p => sideRow(p, d)).join('')}${L.length > n ? `<button class="link" data-leanall>Show all ${L.length}</button>` : ''}</section>`; }
+function sideRow(p, d){ const r = resultOf(d, p); const x = pSide(p); const g = grade(x);
+  return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · proj ${ln(p.projection)} · ${esc(p.window || '')}</span></span><span class="r"><span class="grade g${g}">${g}</span> <b class="num">${pc(x)}</b><br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : isNum(p.odds) ? od(p.odds) + ' ' + esc(p.book || '') : 'no price'}</span></span></button>`; }
 function leanRow(p, d){ const r = resultOf(d, p); return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · ${esc(p.window || '')} · 25D ${sg(p.score25, 1)}</span></span><span class="r">${od(p.odds)}<br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : ''}</span></span></button>`; }
 function gradedStrip(d){ const s = d.results.summary, b = s.bets || {}, t = s.by_tier || {}, L = s.lines || {};
   const cell = (v, l) => `<div><b>${v}</b><span>${l}</span></div>`;

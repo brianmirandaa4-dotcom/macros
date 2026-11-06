@@ -318,3 +318,4 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .fld.search .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none}
 .fld.search input{padding-left:38px;font:400 var(--fs-17)/1 var(--f-ui);background:var(--s2);box-shadow:none;border-radius:var(--r10)}
 .fld.search input::placeholder{color:var(--t3)}
+.grade{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font:700 12px/1 var(--f-ui);vertical-align:1px}.gA{background:var(--edge);color:#000}.gB{background:var(--fair);color:#000}.gC{box-shadow:inset 0 0 0 1px var(--hair2);color:var(--t3)}
