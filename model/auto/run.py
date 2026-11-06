@@ -90,6 +90,9 @@ def summary(entry):
            f"- published: {len(entry['published'])} files" + (f" ({', '.join(entry['published'][:12])}{' ...' if len(entry['published']) > 12 else ''})" if entry['published'] else ' (nothing changed)'),
            f"- kept last good: {entry['kept'] or 'none'}", f"- errors: {entry['errors'] or 'none'}",
            f"- outputs: `{json.dumps({k: {kk: v[kk] for kk in ('added', 'removed', 'flipped', 'retiered', 'bets', 'leans')} for k, v in entry['outputs_changed'].items()})}`"]
+    an = entry['sources'].get('action_network') or {}
+    if an.get('props_books') or an.get('allprops_books'): txt.append(f"- books (rows): props `{json.dumps(an.get('props_books'))}` · all props `{json.dumps(an.get('allprops_books'))}`")
+    if entry.get('book_set'): txt.append(f"- book set: `{json.dumps(entry['book_set'])}`")
     if entry.get('refit'): txt.append(f"- refit: `{json.dumps(entry['refit'])[:1500]}`")
     print('\n'.join(txt))
     if s:
@@ -166,6 +169,9 @@ def run_slates(a, budget, now, entry, stage, W, sch):
         entry['kept'].append('slates: slate.py failed, every slate keeps its last good version'); entry['errors'].append(str(e)[:1500]); return
     run = read_json(f'{WORK}/slate_{SEASON}_{W:02d}.json')
     entry['sources']['invariants_log'] = (run.get('log') or [])[:30]
+    bs = run.get('book_set') or {}
+    entry['book_set'] = dict(best_set=bs.get('best_set'), best_from=bs.get('best_from'), books_seen=bs.get('books_seen'), compare=bs.get('compare'),
+                             priced=sum(p.get('best') is not None for p in run.get('props', [])), bets_model_run=sum(p.get('tier') == 'bet' for p in run.get('props', [])))
     parts = sorted({'thu' if g['weekday'] in ('Wed', 'Thu', 'Fri') else 'sun' for g in sch['games'] if not g['started']})
     for part in parts:
         sid = f'nfl-{SEASON}-wk{W:02d}-{part}'; rel = f'nfl/{SEASON}-wk{W:02d}-{part}.json'

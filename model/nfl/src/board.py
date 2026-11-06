@@ -2,12 +2,16 @@
 Copies prices from the Action Network pull; attaches the model's numbers only where the trained model produced them
 (slate file props with matching player + market). Computes nothing new.
 Run: python3 src/board.py <allprops.json> <slate-sun.json> <slate-thu.json> <out.json>"""
-import json, sys, re, unicodedata, datetime as dt
+import json, sys, re, math, unicodedata, datetime as dt
 from zoneinfo import ZoneInfo
+import os
 import pandas as pd
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import books as BK
 SRC, SUN, THU, OUT = sys.argv[1:5]
 d = json.load(open(SRC)); NY = ZoneInfo('America/New_York')
-BOOK = {68: 'DK', 69: 'FD', 75: 'MGM', 71: 'BR', 49: 'CZR', 30: 'Open'}
+BOOK = {**BK.CODE, BK.OPEN: 'Open'}        # short codes (DK FD MGM BR CZR unchanged; Caesars 123, fallback 49 -> CZR); consensus 15 is not a book
+def price(v): return None if BK.no_price(v) else int(v)
 ALIAS = {'JAC': 'JAX', 'LAR': 'LA'}
 def norm(s): return re.sub(r'[^a-z ]', '', unicodedata.normalize('NFKD', str(s)).encode('ascii', 'ignore').decode().lower()).replace(' jr', '').replace(' iii', '').replace(' ii', '').strip()
 NAMES = {'passing_yards': 'Passing yards', 'pass_completions': 'Completions', 'passing_attempts': 'Pass attempts', 'passing_tds': 'Passing TDs', 'interceptions': 'Interceptions',
@@ -37,7 +41,6 @@ TEAMID = {}
 for g in GM.values(): TEAMID[g[3]] = ALIAS.get(g[1], g[1]); TEAMID[g[4]] = ALIAS.get(g[2], g[2])
 # model props from slate files
 MP = {}
-import os
 for f in (SUN, THU):
     if not os.path.exists(f): continue   # [auto] a week may have no Thursday slate
     for p in json.load(open(f))['props']:
@@ -49,18 +52,24 @@ for (gid, pid), g in R.groupby(['an_gid', 'player_id']):
     G = games.setdefault(gid, dict(gid=int(gid), kick_utc=st, away=ALIAS.get(aw, aw), home=ALIAS.get(hm, hm), players={}))
     P = G['players'].setdefault(pid, dict(name=nm, pos=pos, team=team, pkey='nfl:' + norm(nm), props={}))
     for t, h in g.groupby('type'):
+        h = h[h.book_id.isin(BK.drop_fallback(h.book_id.astype(int).unique()))]   # Caesars: 123, else 49, never both
         lab, rung, key = label(t)
         if rung is not None:   # ladder: one row per rung, yes price per book
             L = P['props'].setdefault(lab, dict(market=lab, cat=cat(key), kind='ladder', rungs={}))
-            L['rungs'][str(rung)] = {BOOK[b]: int(x.odds.iloc[0]) for b, x in h.groupby('book_id') if b in BOOK}
+            L['rungs'][str(rung)] = {BOOK[b]: price(x.odds.iloc[0]) for b, x in h.groupby('book_id') if b in BOOK and price(x.odds.iloc[0]) is not None}
             continue
         e = dict(market=lab, cat=cat(key), books={})
         for b, x in h.groupby('book_id'):
             if b not in BOOK: continue
             ov = x[x.side == 'over']; un = x[x.side == 'under']; ys = x[x.side.isin(['noside', 'yes'])]
-            if len(ys): e['kind'] = 'yes'; e['books'][BOOK[b]] = dict(yes=int(ys.odds.iloc[0]))
+            pk = b != BK.OPEN and BK.is_pickem(b, *x.odds.tolist())          # pick'em (PrizePicks, Underdog, Sleeper, or odds 0/null): line only
+            if len(ys):
+                if pk: continue                                               # a yes/no market without a price says nothing
+                e['kind'] = 'yes'; e['books'][BOOK[b]] = dict(yes=price(ys.odds.iloc[0]))
             elif len(ov) or len(un):
-                e['kind'] = 'ou'; e['books'][BOOK[b]] = dict(line=float((ov if len(ov) else un).value.iloc[0]), over=int(ov.odds.iloc[0]) if len(ov) else None, under=int(un.odds.iloc[0]) if len(un) else None)
+                e['kind'] = 'ou'; e['books'][BOOK[b]] = dict(line=float((ov if len(ov) else un).value.iloc[0]), over=None if pk or not len(ov) else price(ov.odds.iloc[0]),
+                                                             under=None if pk or not len(un) else price(un.odds.iloc[0]))
+                if pk: e['books'][BOOK[b]]['pickem'] = True
         if not e['books']: continue
         mk = MODEL_MK.get(lab); mp = MP.get((norm(nm), team, mk)) if mk else None
         if mp and not mp.get('no_prediction') and mp.get('projection') is not None:
@@ -78,6 +87,17 @@ for G in sorted(games.values(), key=lambda g: g['kick_utc']):
         P['n'] = len(P['props']); pl.append(P)
     G['players'] = sorted(pl, key=lambda P: (P['team'] != G['away'], -P['n'], P['name']))
     out.append(G)
-json.dump(dict(schema='wmtl.board.v1', week=d['week'], pulled=d['pulled'], source='Action Network (DraftKings, FanDuel, BetMGM, BetRivers, Caesars, opener)', games=out), open(OUT, 'w'), separators=(',', ':'))
+seen = sorted({c for g in out for P in g['players'] for e in P['props'] for c in (e.get('books') or {})} | {c for g in out for P in g['players'] for e in P['props'] for r in (e.get('rungs') or {}).values() for c in r})
+NAMES_ = {BK.INFO[n]['code']: n for n in BK.ORDER}
+def _clean(o):   # strict JSON: NaN / inf -> null
+    if isinstance(o, dict): return {k: _clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)): return [_clean(v) for v in o]
+    if hasattr(o, 'item') and not isinstance(o, (str, bytes)): o = o.item()
+    if isinstance(o, float) and not math.isfinite(o): return None
+    return o
+json.dump(_clean(dict(schema='wmtl.board.v1', week=d['week'], pulled=d['pulled'], source='Action Network (every book it carries, plus the opener)', games=out,
+               books={c: dict(name=NAMES_[c], **{k: v for k, v in BK.INFO[NAMES_[c]].items() if k != 'code'}) for c in [BK.INFO[n]['code'] for n in BK.ORDER] if c in seen},
+               book_order=[BK.INFO[n]['code'] for n in BK.ORDER if BK.INFO[n]['code'] in seen] + (['Open'] if 'Open' in seen else []))),
+          open(OUT, 'w'), separators=(',', ':'), allow_nan=False)
 print('games', len(out), 'players', sum(len(g['players']) for g in out), 'props', sum(P['n'] for g in out for P in g['players']),
       'with model', sum(1 for g in out for P in g['players'] for e in P['props'] if 'model' in e))

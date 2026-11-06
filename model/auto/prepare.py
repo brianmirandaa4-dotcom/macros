@@ -113,6 +113,7 @@ def parse_props(d):
     tm = d.get('teams') or {}
     X['team'] = X.team_id.map(lambda t: None if pd.isna(t) else AN_TO_NFLVERSE.get(tm.get(str(int(t))), tm.get(str(int(t)))))
     X['market'] = X.type.map(MARKET)
+    X['odds'] = pd.to_numeric(X.odds, errors='coerce').fillna(0)              # pick'em books (PrizePicks) post a line with odds 0/null
     for c in ('team_id', 'tix', 'money', 'value'): X[c] = X[c].astype(float)
     for c in ('week', 'an_gid', 'book_id', 'player_id', 'odds', 'alt'): X[c] = X[c].astype('int64')
     for c in ('type', 'start', 'player', 'pos', 'side', 'team', 'market'): X[c] = X[c].astype('string')

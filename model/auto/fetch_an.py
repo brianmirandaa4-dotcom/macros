@@ -7,17 +7,20 @@ Writes, each only when its pull passed the schema check (so a block or a schema 
                                   (identical layout to the stored an_nfl_props_wk01-09 pull; parse_props() turns it into the parquet)
   an_nfl_wk09_allprops_<ts>.json  every player market for the board (src/board.py input layout)
   an_nfl_wk09_odds_<ts>.json      game lines + public betting % (informational: line movement and public % for the run log)
-  an_status.json                  {"props": "ok ..."|"blocked ..."|"error ...", "allprops": ..., "odds": ...}
+  an_status.json                  {"props": "ok ..."|"blocked ..."|"error ...", "allprops": ..., "odds": ..., "props_books": {code: rows}, "allprops_books": ...}
+Books: every id in src/books.py (consensus 15, opener 30, sportsbooks, exchanges, pick'em apps). Pick'em rows may carry odds 0/null.
 Live (in-game) prices are dropped: the model only prices pregame.
 """
 import argparse, os, sys, json, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from concurrent.futures import ThreadPoolExecutor
 import urllib.error
-from common import SchemaError, need, http_json, write_json, now_utc, log, BROWSER_UA, AN_TO_NFLVERSE
+from common import SchemaError, need, http_json, write_json, now_utc, log, BROWSER_UA, AN_TO_NFLVERSE, MODEL
+sys.path.insert(0, os.path.join(MODEL, 'nfl', 'src'))
+import books as BK                                  # model/nfl/src/books.py: the book registry (ids, names, codes, kinds)
 
 API = 'https://api.actionnetwork.com/web/v2/scoreboard/nfl'
-BOOKS = '15,30,49,68,69,71,75'                    # consensus, open, Caesars, DK, FD, BetRivers, BetMGM
+BOOKS = BK.REQUEST_IDS                            # consensus, opener + every book Action Network carries (src/books.py; Caesars 123 and fallback 49)
 HDR = {'User-Agent': BROWSER_UA, 'Origin': 'https://www.actionnetwork.com', 'Referer': 'https://www.actionnetwork.com/nfl/props'}
 CORE = ['core_bet_type_9_passing_yards', 'core_bet_type_12_rushing_yards', 'core_bet_type_15_receptions', 'core_bet_type_16_receiving_yards']
 MARKET = {'core_bet_type_9_passing_yards': 'pass_yds', 'core_bet_type_12_rushing_yards': 'rush_yds', 'core_bet_type_15_receptions': 'receptions',
@@ -67,11 +70,24 @@ def markets(week, t):
             for typ, arr in obj.items():
                 if typ != t or not isinstance(arr, list): continue
                 for o in arr:
-                    for k in ('player_id', 'side', 'odds', 'event_id'):
+                    for k in ('player_id', 'side', 'event_id'):
                         if k not in o: raise SchemaError(f'an outcome missing {k}')
+                    if 'odds' not in o and KIND_OF(bid) != 'pickem': raise SchemaError('an outcome missing odds')
                     if o.get('is_live'): continue
                     out.append((typ, o, int(bid)))
     return out, P, G
+
+
+def KIND_OF(bid):
+    try: return BK.KIND.get(int(bid))
+    except (TypeError, ValueError): return None
+
+
+def book_counts(rows, col):
+    """Rows per book (short code) in one pull, for the status file and the run log."""
+    c = {}
+    for r in rows: k = {BK.CONSENSUS: 'consensus', BK.OPEN: 'Open', BK.CZR_FALLBACK: 'CZR49'}.get(r[col]) or BK.CODE.get(r[col], str(r[col])); c[k] = c.get(k, 0) + 1
+    return dict(sorted(c.items(), key=lambda x: -x[1]))
 
 
 def _pct(o, k):
@@ -95,9 +111,9 @@ def pull_props(week, types, slim=False):
         for typ, o, bid in rr:
             if not o.get('player_id'): continue
             p = P.get(o['player_id']) or {}; g = G.get(o['event_id']) or {}
-            if slim: rows.append([typ, o['event_id'], bid, o['player_id'], o['side'], o.get('value'), o['odds'], 1 if o.get('is_alt_market') else 0, o.get('deeplink_id') or None])
+            if slim: rows.append([typ, o['event_id'], bid, o['player_id'], o['side'], o.get('value'), o.get('odds'), 1 if o.get('is_alt_market') else 0, o.get('deeplink_id') or None])
             else: rows.append([week, typ, o['event_id'], g.get('start_time'), bid, o['player_id'], p.get('full_name'), p.get('position'), p.get('team_id'),
-                               o['side'], o.get('value'), o['odds'], 1 if o.get('is_alt_market') else 0, _pct(o, 'tickets'), _pct(o, 'money')])
+                               o['side'], o.get('value'), o.get('odds'), 1 if o.get('is_alt_market') else 0, _pct(o, 'tickets'), _pct(o, 'money')])
             n += 1
         log_.append(f'{t[14:]}:{n}')
     return rows, players, games, log_, errs
@@ -148,7 +164,7 @@ def main():
         write_json(f'{a.out}/an_nfl_wk{a.week:02d}_props_{ts}.json', dict(pulled=pulled, source='api.actionnetwork.com/web/v2/scoreboard/nfl/markets (server side)',
                    cols=['week', 'type', 'an_gid', 'start', 'book_id', 'player_id', 'player', 'pos', 'team_id', 'side', 'value', 'odds', 'alt', 'tix', 'money'],
                    rows=rows, teams=teams, log=lg), compact=True)
-        st['props'] = f'ok {len(rows)} rows' + (f' ({len(errs)} type errors)' if errs else '')
+        st['props'] = f'ok {len(rows)} rows' + (f' ({len(errs)} type errors)' if errs else ''); st['props_books'] = book_counts(rows, 4)
     except Blocked as e: st['props'] = f'blocked {e}'
     except Exception as e: st['props'] = f'error {e}'                          # noqa: BLE001
     if not a.no_board and st['props'].startswith('ok'):
@@ -160,7 +176,7 @@ def main():
             players = {str(pid): [p.get('full_name'), p.get('position'), p.get('team_id')] for pid, p in P.items()}
             write_json(f'{a.out}/an_nfl_wk{a.week:02d}_allprops_{ts}.json', dict(pulled=pulled, week=a.week, cols=['type', 'an_gid', 'book_id', 'player_id', 'side', 'value', 'odds', 'alt', 'deeplink_id'],
                        rows=rows, players=players, games=games, teams=T, log=lg), compact=True)
-            st['allprops'] = f'ok {len(rows)} rows' + (f' ({len(errs)} type errors)' if errs else '')
+            st['allprops'] = f'ok {len(rows)} rows' + (f' ({len(errs)} type errors)' if errs else ''); st['allprops_books'] = book_counts(rows, 2)
         except Blocked as e: st['allprops'] = f'blocked {e}'
         except Exception as e: st['allprops'] = f'error {e}'                   # noqa: BLE001
     try:

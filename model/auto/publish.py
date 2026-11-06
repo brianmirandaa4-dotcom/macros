@@ -40,7 +40,7 @@ def funnel(props, validated):
     """The export_overlay.py funnel, recounted over the merged props (same six definitions)."""
     return [dict(step='Props with a DraftKings line', n=len(props)), dict(step='Model can predict (not out-of-distribution, passes invariants)', n=sum(not p['no_prediction'] for p in props)),
             dict(step='Market where the model beat the line out of sample (receptions, receiving yards)', n=sum(not p['no_prediction'] and p['market'] in validated for p in props)),
-            dict(step='Priced at a sportsbook (Action Network: DraftKings, FanDuel, BetMGM, BetRivers, Caesars)', n=sum(isinstance(p['odds'], (int, float)) for p in props)),
+            dict(step='Priced at a sportsbook (Action Network, every book it carries)', n=sum(isinstance(p['odds'], (int, float)) for p in props)),
             dict(step='Edge of 3+ points over break-even at the best price', n=sum((p.get('edge_pts') or -99) >= 3 for p in props)),
             dict(step='Interval (bootstrap by game) clears break-even, validated market, no flags = Bet', n=sum(p['tier'] == 'bet' for p in props))]
 

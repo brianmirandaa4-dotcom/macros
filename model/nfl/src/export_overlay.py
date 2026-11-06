@@ -3,6 +3,8 @@ Run: python3 src/export_overlay.py 2026 9 <out.json> [--skip-thu]"""
 import json, sys, os, re, unicodedata, datetime as dt
 from zoneinfo import ZoneInfo
 import numpy as np
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import books as BK
 H = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); W = f'{H}/work'
 SEASON, WEEK, OUT = int(sys.argv[1]), int(sys.argv[2]), sys.argv[3]; SKIP_THU = '--skip-thu' in sys.argv
 # [auto] --part sun (= --skip-thu: Sat-Tue games) or --part thu (Wed-Fri games); --frozen-bets/--frozen-units = bets already placed in
@@ -14,6 +16,8 @@ SRCS = json.load(open(f'{W}/sources.json')) if os.path.exists(f'{W}/sources.json
 S = json.load(open(f'{W}/slate_{SEASON}_{WEEK:02d}.json')); CAL = json.load(open(f'{W}/calibrated_2026.json')); LK = json.load(open(f'{W}/leakage_check.json'))
 GS = json.load(open(f'{W}/backtest_games_summary.json')); BP = json.load(open(f'{W}/backtest_priced.json'))
 NY = ZoneInfo('America/New_York'); now = dt.datetime.now(NY)
+BSET = S.get('book_set') or dict(best_set='core5', best_from=list(BK.CORE5))     # model runs before the all-books change: the 5 original books
+BEST = set(BSET['best_from'])
 LABEL = {'rec_yds': 'Receiving yards', 'receptions': 'Receptions', 'rush_yds': 'Rushing yards', 'pass_yds': 'Passing yards'}
 PLAIN = {'f_tg_sh': 'Target share (recent, weighted)', 'f_ca_sh': 'Carry share (recent, weighted)', 'f_air_sh': 'Air-yard share', 'f_rz_sh': 'Red-zone share', 'f_db_sh': 'Dropback share',
  'f_offense_pct': 'Snap share (recent)', 'f_snap_last': 'Snap share last game', 'f_ypt_shr': 'Yards per target (shrunk)', 'f_ypc_shr': 'Yards per carry (shrunk)', 'f_cr_shr': 'Catch rate (shrunk)',
@@ -30,6 +34,11 @@ def norm(s): return re.sub(r'[^a-z0-9 ]', '', unicodedata.normalize('NFKD', str(
 def kick(g):
     t = dt.datetime.strptime(g['kick'], '%Y-%m-%d %H:%M').replace(tzinfo=NY); return t, t.astimezone(dt.timezone.utc)
 def win(t): wd = t.strftime('%a'); return {'Thu': 'TNF', 'Mon': 'MNF'}.get(wd) or ('SNF' if t.hour >= 19 else '1 PM' if t.hour < 15 else '4 PM')
+def _offer(o):   # every book's line and price; model numbers copied from the run (pick'em: line only, pickem true)
+    d = dict(book=o['book'], code=o.get('code') or BK.INFO.get(o['book'], {}).get('code'), line=o['line'], over=o['over'], under=o['under'],
+             p_over=o.get('p_over'), novig_over=o.get('novig_over'), edge_over=o.get('edge_over'), edge_under=o.get('edge_under'))
+    if o.get('pickem'): d['pickem'] = True
+    return d
 games, props = [], []
 for gid, g in S['games'].items():
     t, tu = kick(g)
@@ -47,8 +56,9 @@ for p in S['props']:
     flags = list(p['ood']) + (['team passing check failed: receivers and QB projections more than 10% apart'] if p.get('team_check_failed') else []) + (['rejected by an invariant check'] if p['rejected'] else [])
     bst = p.get('best') if not st else None; offs = p.get('offers') or []
     if bst:   # stale-price guard: drop books whose no-vig over price sits > 8 points from the median of the other books, then re-pick the best edge
-        live_ = [o for o in offs if o['book'] != 'Open']; med = float(np.median([o['novig_over'] for o in live_])) if live_ else None
-        keep = [o for o in live_ if med is None or abs(o['novig_over'] - med) <= .08]
+        # median over every priced book (pick'em lines carry no price); the re-pick stays inside the book set `best` may use (meta.book_set)
+        live_ = [o for o in offs if o['book'] != 'Open' and not o.get('pickem')]; med = float(np.median([o['novig_over'] for o in live_])) if live_ else None
+        keep = [o for o in live_ if (med is None or abs(o['novig_over'] - med) <= .08) and o['book'] in BEST]
         if keep:
             cand = [(o['edge_over'], 'over', o) for o in keep] + [(o['edge_under'], 'under', o) for o in keep]
             e_, sd_, o_ = max(cand, key=lambda x: x[0]); pr = o_[sd_]; ps_ = o_['p_over'] if sd_ == 'over' else 1 - o_['p_over']
@@ -60,7 +70,8 @@ for p in S['props']:
         side_, line_, odds_, book_ = bst['side'], bst['line'], bst['odds'], bst['book']
         units_ = round(min(3.0, max(0.0, (p['kelly'] or {}).get('stake', 0) * 100)), 2) if p.get('kelly') else None
     props.append(dict(id=f"{p['game_id']}-{p['pid']}-{p['market']}", gid=p['game_id'], player=p['name'], team=p['team'], opp=p['opp'], market=p['market'], market_label=LABEL[p['market']],
-        side=None if st else p['side'], line=p['line'], odds=None, book='DraftKings', best=dict(book='DraftKings', line=p['line'], over=None, under=None), offers=[dict(book='DraftKings', line=p['line'], over=None, under=None)],
+        side=None if st else p['side'], line=p['line'], odds=None, book='DraftKings', best=dict(book='DraftKings', line=p['line'], over=None, under=None),
+        offers=[_offer(o) for o in offs if o['book'] != 'Open'] or [dict(book='DraftKings', line=p['line'], over=None, under=None)],   # no best: books shown for their lines only
         opener=dict(line=p['line_open']) if p.get('line_open') is not None else None, classification=p['tier'], tier=p['tier'], model_status=st.upper() if st else ('INFO · NO PRICE' if p['tier'] == 'lean' else 'PASS'),
         projection=None if st else round(p['median'], 1), range80=None if st else [round(p['p10'], 1), round(p['p90'], 1)],
         p=None, p_raw=None if st or p['p_side'] is None else round(p['p_side'], 3), p_uncal=None if st or p['pov_raw'] is None else round(p['pov_raw'] if p['side'] == 'over' else 1 - p['pov_raw'], 3), break_even=None, edge_pts=None, ev_per_unit=None, units=None,
@@ -75,7 +86,7 @@ for p in S['props']:
         q.update(side=side_, line=line_, odds=odds_, book=book_, p=bst['p'], p_raw=bst['p'], break_even=bst['break_even'], edge_pts=round(bst['edge'] * 100, 1), novig=bst['novig'],
                  ev_per_unit=round(bst['p'] * (1 + (100 / -odds_ if odds_ < 0 else odds_ / 100)) - 1, 3), units=units_ if q['tier'] == 'bet' else None, interval=p.get('interval'), kelly=p.get('kelly'),
                  best=dict(book=book_, line=line_, over=next((o['over'] for o in offs if o['book'] == book_), None), under=next((o['under'] for o in offs if o['book'] == book_), None)),
-                 offers=[dict(book=o['book'], line=o['line'], over=o['over'], under=o['under']) for o in offs if o['book'] != 'Open'],
+                 offers=[_offer(o) for o in offs if o['book'] != 'Open'],
                  opener=dict(line=op['line'], over=op['over'], under=op['under']) if op else q['opener'], ceiling=p.get('ceiling'),
                  model_status='BET' if q['tier'] == 'bet' else ('LEAN' if q['tier'] == 'lean' else 'PASS'),
                  lights=dict(q['lights'], edge=bool(bst['edge'] >= .03)))
@@ -93,14 +104,16 @@ leans = [p for p in props if p['tier'] == 'lean']
 cal = {mk: dict(model=S['chosen'][mk], logloss=CAL[mk][S['chosen'][mk]]['logloss'], market_5050=CAL[mk]['market_5050']['logloss'], picks55=CAL[mk][S['chosen'][mk]]['picks55'], hit55=CAL[mk][S['chosen'][mk]]['hit55'], n=CAL[mk]['n'], k=S['K'][mk]) for mk in S['chosen']}
 funnel = [dict(step='Props with a DraftKings line', n=len(props)), dict(step='Model can predict (not out-of-distribution, passes invariants)', n=sum(not p['no_prediction'] for p in props)),
           dict(step='Market where the model beat the line out of sample (receptions, receiving yards)', n=sum(not p['no_prediction'] and p['market'] in S['validated'] for p in props)),
-          dict(step='Priced at a sportsbook (Action Network: DraftKings, FanDuel, BetMGM, BetRivers, Caesars)', n=sum(isinstance(p['odds'], (int, float)) for p in props)), dict(step='Edge of 3+ points over break-even at the best price', n=sum((p.get('edge_pts') or -99) >= 3 for p in props)), dict(step='Interval (bootstrap by game) clears break-even, validated market, no flags = Bet', n=sum(p['tier'] == 'bet' for p in props))]
+          dict(step='Priced at a sportsbook (Action Network, every book it carries)', n=sum(isinstance(p['odds'], (int, float)) for p in props)), dict(step='Edge of 3+ points over break-even at the best price', n=sum((p.get('edge_pts') or -99) >= 3 for p in props)), dict(step='Interval (bootstrap by game) clears break-even, validated market, no flags = Bet', n=sum(p['tier'] == 'bet' for p in props))]
 if not games: sys.exit(f'no {PART or ""} games to export')
 _KS = sorted(dt.datetime.fromisoformat(g['kick_utc'].replace('Z', '+00:00')).astimezone(NY) for g in games)
 _DL = (_KS[0].strftime('%a %b %-d') + ' · ' + games[0]['away']['abbr'] + ' @ ' + games[0]['home']['abbr']) if len(games) == 1 else (_KS[0].strftime('%a %b %-d') if _KS[0].date() == _KS[-1].date() else _KS[0].strftime('%a %b %-d') + ' – ' + _KS[-1].strftime('%a %b %-d'))
 _LB = f'Week {WEEK} · ' + ('Thursday' if PART == 'thu' and all(k.strftime('%a') == 'Thu' for k in _KS) else (_KS[0].strftime('%a') if _KS[0].strftime('%a') == _KS[-1].strftime('%a') else _KS[0].strftime('%a') + '–' + _KS[-1].strftime('%a')))
 meta = dict(brand='Overlay', sport='NFL', league='NFL', date=min(g['kick_utc'] for g in games)[:10], date_label=_DL, week=WEEK, label=_LB, model_version='v4.1 · trained model + Action Network prices',
     generated_et=now.strftime('%a %b %-d, %-I:%M %p ET'), prices_et=SRCS['prices_et'] if SRCS.get('prices_et') else (lambda f: 'Action Network · ' + (dt.datetime.strptime(re.search(r'(\d{4}-\d{2}-\d{2}T\d{4})Z', f).group(1), '%Y-%m-%dT%H%M').replace(tzinfo=dt.timezone.utc).astimezone(NY).strftime('%a %b %-d, %-I:%M %p ET') if f and re.search(r'\d{4}-\d{2}-\d{2}T\d{4}Z', f) else 'time not recorded'))(S.get('prices_file')), prices_utc=None,
-    injuries_et=SRCS.get('injuries_et') or 'Official NFL injury report via nflverse (Sunday teams report Friday; this run is preliminary)', books=['DraftKings', 'FanDuel', 'BetMGM', 'BetRivers', 'Caesars'], opener_book='Action Network opener', sims_per_game=10000, factors_per_prop=f"{len(set(sum(([k] for k in PLAIN), [])))} defined, 32–38 per market",
+    injuries_et=SRCS.get('injuries_et') or 'Official NFL injury report via nflverse (Sunday teams report Friday; this run is preliminary)', books=[n for n in BK.ORDER if any(o['book'] == n for p in props for o in p['offers'])] or list(BK.CORE5), best_books=[n for n in BK.ORDER if n in BEST],
+    book_set=dict(BSET, note=('`best`, edge and the bet tier use only best_from; every other book is shown for its price. ' + BSET.get('note', ''))),
+    book_info={n: BK.INFO[n] for n in BK.ORDER}, opener_book='Action Network opener', sims_per_game=10000, factors_per_prop=f"{len(set(sum(([k] for k in PLAIN), [])))} defined, 32–38 per market",
     n_games=len(games), n_props=len(props), calibration=dict(by_market=cal, note='Temperature on the log-odds, fit walk-forward on earlier 2026 weeks only.'),
     backtest=dict(props_2026=cal, props_priced_2026=BP, hubacek_wk9=S.get('hubacek'), game_lines_2022_2026={k: dict(n=GS[k]['n'], model=GS[k]['model'], market_close=GS[k]['market_close'], roi_at_close_edge3=GS[k]['bets_edge3']) for k in ('moneyline', 'spread', 'total')},
                   leakage=LK['verdict'], game_line_verdict='Trained game model lost to the closing line every season 2022–2026, so game numbers shown are the market, with outcome spread learned from data.'),
@@ -113,5 +126,11 @@ meta = dict(brand='Overlay', sport='NFL', league='NFL', date=min(g['kick_utc'] f
 slate = dict(schema='wmtl.slate.v2', id=f'nfl-{SEASON}-wk{WEEK:02d}-' + (PART or 'sun'), sport='NFL', meta=meta, games=games, props=props,
              parlays=dict(status='info', items=[dict(legs=x['legs'], p_joint=x['p_joint_raw'], p_independent=x['p_if_independent_raw'], gid=x['game_id']) for x in S['parlays'] if x['game_id'] in GW][:8],
                           note='Joint chances from the correlated simulation, before calibration. Information only, no prices.'), results=dict(status='pending', props={}, games={}))
-json.dump(slate, open(OUT, 'w'), separators=(',', ':'), default=lambda o: o.item() if hasattr(o, 'item') else None)
+def _clean(o):   # strict JSON: NaN / inf -> null, numpy scalars -> Python
+    if isinstance(o, dict): return {k: _clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)): return [_clean(v) for v in o]
+    if hasattr(o, 'item') and not isinstance(o, (str, bytes)): o = o.item()
+    if isinstance(o, float) and not np.isfinite(o): return None
+    return o
+json.dump(_clean(slate), open(OUT, 'w'), separators=(',', ':'), allow_nan=False, default=lambda o: None)
 print('games', len(games), 'props', len(props), 'leans', len(leans), 'no-pred', sum(p['no_prediction'] for p in props))
