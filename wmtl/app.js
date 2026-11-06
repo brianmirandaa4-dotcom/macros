@@ -668,8 +668,10 @@ async function boot(){ store.load(); drawTabs();
   try{ await loadIndex(); }catch(e){ $('#main').innerHTML = `<div class="view"><div class="lt"><h1>Not available</h1><p>The slate list could not be loaded. Check your connection and pull down to retry.</p></div></div>`; pullToRefresh(); return; }
   const hs = (location.hash || '').slice(1); const want = TABS.find(t => t[0] === hs) ? hs : (store.d.ui.tab || 'lobby');
   const newest = INDEX.slates.slice().sort((x, y) => x.start_utc < y.start_utc ? 1 : -1)[0];
-  const sl = store.d.ui.slate && slateInfo(store.d.ui.slate) ? store.d.ui.slate : newest ? newest.id : null; if(sl){ S.slate = sl; drawSlateBtn(); }
-  go(want); pullToRefresh();
+  const seen = store.d.ui.seen || (store.d.ui.slate ? [store.d.ui.slate] : []); const fresh = newest && !seen.includes(newest.id);
+  const sl = fresh ? newest.id : store.d.ui.slate && slateInfo(store.d.ui.slate) ? store.d.ui.slate : newest ? newest.id : null; if(sl){ S.slate = sl; store.d.ui.slate = sl; drawSlateBtn(); }
+  store.d.ui.seen = INDEX.slates.map(x => x.id); store.save();
+  go(fresh && want === 'lobby' ? 'card' : want); if(fresh) setTimeout(() => toast('New slate: ' + (newest.label || newest.id)), 600); pullToRefresh();
   addEventListener('hashchange', () => { const h = location.hash.slice(1); if(h !== S.tab && TABS.find(t => t[0] === h)) go(h); });
   addEventListener('keydown', e => { if(e.key === 'Escape'){ if($('#modal').classList.contains('on')){ $('#modal').classList.remove('on'); } else if(STACK.length) popSheet(); } });
   if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js', {scope: './'}).catch(() => {}); }
