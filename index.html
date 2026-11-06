@@ -2521,7 +2521,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.58';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.59';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4452,19 +4452,19 @@ const TOUR=[
   ['today','#profBtn','You','Streak, rank, wearables, privacy and settings.'],
   ['today','#findBtn','Find anything','Type “water”, “report” or “rest sound” and jump straight there.'],
   ['today','#helpBtn','You’re set','Replay this anytime from the ?. Now log your first meal.']];
-let tourI=-1;
-function startTour(){closeSheet&&closeSheet();if(typeof pgStack!=='undefined'&&pgStack.length)closePages();if(S.view!=='today')setView('today');tourI=0;setTimeout(tourStep,180)}
+let tourI=-1,tourDir=1;
+function startTour(){closeSheet&&closeSheet();if(typeof pgStack!=='undefined'&&pgStack.length)closePages();if(S.view!=='today')setView('today');tourI=0;tourDir=1;setTimeout(tourStep,180)}
 function tourEnd(){tourI=-1;const o=$('tourO');if(o)o.remove();try{localStorage.setItem('syncope.tour2','1')}catch(e){}if(S.view!=='today')setView('today')}
 function tourStep(){let o=$('tourO');if(tourI<0||tourI>=TOUR.length)return tourEnd();
   const [vw,sel,h,b]=TOUR[tourI];if(S.view!==vw){setView(vw);return setTimeout(tourStep,260)}let el=document.querySelector(sel);
-  if(!el||!el.getBoundingClientRect().height){tourI++;return tourStep()}
+  if(!el||!el.getBoundingClientRect().height){tourI+=tourDir;if(tourI<0){tourI=0;tourDir=1}return tourStep()}
   if(!o){o=document.createElement('div');o.id='tourO';o.className='sytour';o.innerHTML='<div class="tour-hole"></div><div class="tour-card" role="dialog" aria-live="polite"></div>';document.body.appendChild(o);
-    o.addEventListener('click',e=>{if(e.target.closest('[data-tn]')){tourI++;tourStep()}else if(e.target.closest('[data-tx]'))tourEnd()})}
+    o.addEventListener('click',e=>{if(e.target.closest('[data-tn]')){tourDir=1;tourI++;tourStep()}else if(e.target.closest('[data-tb]')){if(tourI>0){tourDir=-1;tourI--;tourStep()}}else if(e.target.closest('[data-tx]'))tourEnd()})}
   const fixed=getComputedStyle(el).position==='fixed'||el.closest('header');
   if(!fixed){const r=el.getBoundingClientRect(),want=Math.max(70,(innerHeight-r.height)/2-60);window.scrollTo({top:Math.max(0,scrollY+r.top-want),behavior:'instant'})}
   requestAnimationFrame(()=>{const r=el.getBoundingClientRect(),pad=8,hole=o.querySelector('.tour-hole'),card=o.querySelector('.tour-card');
     Object.assign(hole.style,{left:r.left-pad+'px',top:r.top-pad+'px',width:r.width+pad*2+'px',height:Math.min(r.height+pad*2,innerHeight*.62)+'px'});
-    card.innerHTML=`<div class="tour-n">${tourI+1} of ${TOUR.length}</div><h3>${h}</h3><p>${b}</p><div class="row" style="justify-content:space-between"><button class="ghost" data-tx>${tourI===TOUR.length-1?'Close':'Skip'}</button><button class="primary" data-tn>${tourI===TOUR.length-1?'Let’s go':'Next'}</button></div>`;
+    card.innerHTML=`<div class="tour-n">${tourI+1} of ${TOUR.length}</div><h3>${h}</h3><p>${b}</p><div class="row" style="justify-content:space-between;gap:8px"><button class="ghost" data-tx>${tourI===TOUR.length-1?'Close':'Skip'}</button><span style="display:flex;gap:8px">${tourI>0?'<button class="ghost" data-tb aria-label="Previous step">Back</button>':''}<button class="primary" data-tn>${tourI===TOUR.length-1?'Let’s go':'Next'}</button></span></div>`;
     const below=r.top+Math.min(r.height,innerHeight*.62)+pad+16,cardH=card.offsetHeight||180;
     card.style.top=(below+cardH<innerHeight-10?below:Math.max(12,r.top-pad-16-cardH))+'px'})}
 $('helpBtn').onclick=startTour;
