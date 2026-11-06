@@ -1363,9 +1363,9 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 </div>
   <div class="pg" id="pg-scan">    <div class="card" style="display:flex;flex-direction:column;gap:14px">
       <div><div class="eyebrow">Photo scanning</div><h2>Scan meals with Claude</h2></div>
-      <p class="note">Photo scanning sends the picture to Claude using your own Anthropic API key, so it needs an internet connection. Everything else in Syncope works offline. Get a key at console.anthropic.com → API Keys, and set a monthly spend limit there. A scan typically costs under a cent. Your key is stored only in this browser and is never included in backups.</p>
+      <p class="note">Scanning is included: snap a meal, a nutrition label or a bottle and Claude fills in the numbers. It needs internet; everything else works offline. Each person gets up to 60 scans a day.</p><p class="note" style="margin:0">Optional: paste your own Anthropic API key to scan with your own account instead (no daily limit).</p>
       <div class="grid2">
-        <div class="field"><label for="aKey">API key</label><input id="aKey" type="password" autocomplete="off" placeholder="sk-ant-..."></div>
+        <div class="field"><label for="aKey">Your own API key (optional)</label><input id="aKey" type="password" autocomplete="off" placeholder="sk-ant-..."></div>
         <div class="field"><label for="aModel">Model</label><select id="aModel"><option value="claude-sonnet-5-5" selected>Claude Sonnet 5.5 (best balance)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (fastest, cheapest)</option><option value="claude-opus-5-5">Claude Opus 5.5 (most careful)</option></select></div>
       </div>
       <div class="row"><button class="primary" id="aSave">Save</button><button class="ghost" id="aClear">Remove key</button><span class="status" id="aStatus"></span></div>
@@ -2371,7 +2371,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.35';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.36';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2428,7 +2428,7 @@ function openOnline(q,o={}){let res=[],busy=false,loc=[];
     const run=async()=>{q=$('olQ').value.trim();if(q.length<2)return;loc=localSearch(q);busy=true;res=[];draw();res=await foodSearch(q).catch(()=>[]);busy=false;if($('olL'))draw()};
     $('olGo').onclick=run;$('olQ').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();run()}};
     if($('olAi'))$('olAi').onclick=async()=>{if(o.aiBusy)return;q=$('olQ').value.trim()||q;o.aiBusy=true;o.aiErr='';draw();
-      try{const x=await aiFood(q);o.ai=true;res=[x,...res.filter(y=>y.src!=='Claude')];if(!AI.key)throw 0}catch(e){o.aiErr=e&&e.msg||'Claude lookup failed.'}o.aiBusy=false;if($('olL'))draw()};
+      try{const x=await aiFood(q);o.ai=true;res=[x,...res.filter(y=>y.src!=='Claude')]}catch(e){o.aiErr=e&&e.msg||'Claude lookup failed.'}o.aiBusy=false;if($('olL'))draw()};
     if($('olG'))$('olG').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;o.g=b.dataset.g;$('olG').querySelectorAll('[data-g]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};
     $('olX').onclick=()=>{closeSheet();o.onClose&&o.onClose()};
     $('olMan').onclick=()=>{closeSheet();openManual(q,true)};
@@ -2771,7 +2771,6 @@ function openManual(prefill,offerSave,editId,scanUrl){
   $('mCancel').onclick=closeSheet;
   let fromLabel=false;
   const runScan=async u=>{const st=$('mScanSt');if(!st)return;
-    if(!AI.key){st.className='status err';st.textContent='Label scanning uses your Anthropic key. Add it on the Plan page under Photo scanning, then try again.';return}
     st.className='status';st.textContent='Claude is reading the label…';$('mScan').disabled=true;
     try{const o=await scanLabel(u);if(!$('mN'))return;const num=v=>v==null||!isFinite(+v)?'':String(r1(+v));
       const nm=[o.brand,o.product].filter(Boolean).join(' ').replace(/\s+/g,' ').trim();if(!$('mN').value.trim()&&nm)$('mN').value=cap(nm.toLowerCase()).slice(0,60);
@@ -3333,7 +3332,7 @@ const AIK='macros.ai.v1';
 function aiLoad(){try{return JSON.parse(localStorage.getItem(AIK)||'{}')}catch(e){return {}}}
 function aiSave(v){try{localStorage.setItem(AIK,JSON.stringify(v))}catch(e){}}
 let AI=aiLoad();
-function renderAiSettings(){if(document.activeElement.id!=='aKey')$('aKey').value=AI.key||'';$('aModel').value=AI.model||'claude-sonnet-5-5';$('aStatus').textContent=AI.key?'Key saved on this device.':'No key yet.'}
+function renderAiSettings(){if(document.activeElement.id!=='aKey')$('aKey').value=AI.key||'';$('aModel').value=AI.model||'claude-sonnet-5-5';$('aStatus').textContent=AI.key?'Using your own key on this device.':'Not needed. Scanning is included.'}
 $('aSave').onclick=()=>{const k=$('aKey').value.trim();if(k&&!/^sk-ant-/.test(k)){$('aStatus').className='status err';$('aStatus').textContent='That doesn\'t look like an Anthropic key. Keys start with sk-ant-.';return}AI={key:k,model:$('aModel').value};aiSave(AI);$('aStatus').className='status';renderAiSettings();toast(k?'Photo scanning is ready':'Settings saved')};
 $('aClear').onclick=()=>{AI={model:$('aModel').value};aiSave(AI);renderAiSettings();toast('Key removed')};
 
@@ -3357,22 +3356,27 @@ async function shrinkImage(file){
   throw new Error('decode');
 }
 // Text-only Claude lookup: any food or drink that isn't in the library (house cocktails, regional dishes, restaurant items)
-async function aiFood(q){if(!AI.key)throw {msg:'Add your Anthropic key on the Plan page under Photo scanning to ask Claude.'};let r;
-  try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:AI.model||'claude-sonnet-5-5',max_tokens:500,messages:[{role:'user',content:`Give typical nutrition for one standard serving of: "${String(q).replace(/"/g,"'").slice(0,120)}". It may be a food, a drink, a cocktail (use a typical bar recipe and pour, e.g. an Orange Crush is 2 oz orange vodka, 1 oz triple sec, 3 oz fresh orange juice, splash of lemon-lime soda), a regional or restaurant item, or a brand. For alcoholic drinks, kcal must include alcohol (7 kcal per gram of alcohol).
-Reply with only JSON: {"name": "Orange Crush", "serving": "1 drink", "serving_grams": 237, "kcal": 290, "protein": 0.5, "carbs": 27, "fat": 0, "alcohol_g": 22, "note": "2 oz vodka, 1 oz triple sec, 3 oz OJ, splash of Sprite"}. If it isn't a real food or drink, reply {}.`}]})})}
+/* Claude calls: with your own key (Plan → Photo scanning) they go straight to Anthropic; otherwise they go through the
+   Syncope server, which holds the app's key, so friends can scan without ever seeing or needing a key. */
+async function claudeReq(body){
+  if(AI.key)return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+  const c=await ensureSync();return fetch(c.url+'/api/ai',{method:'POST',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})}
+async function claudeErr(r,what){let m='';try{const j=await r.json();m=(j.error&&(j.error.message||j.error))||''}catch(e){}
+  if(!AI.key)return {msg:r.status===429||r.status===503?String(m):r.status===401?'Couldn’t sign in to scanning. Check your connection and try again.':`${what} failed (${r.status}). Try again in a moment.`};
+  return {msg:r.status===401?'Your API key was rejected. Check it on the Plan page under Photo scanning, or remove it to use the built-in scanning.':r.status===429?'Too many scans or your spend limit was reached. Try again in a minute.':r.status===400&&/credit/i.test(m)?'Your Anthropic account is out of credits. Remove your key on the Plan page to use the built-in scanning.':`${what} failed (${r.status}). ${m}`}}
+async function aiFood(q){let r;
+  try{r=await claudeReq(({model:AI.model||'claude-sonnet-5-5',max_tokens:500,messages:[{role:'user',content:`Give typical nutrition for one standard serving of: "${String(q).replace(/"/g,"'").slice(0,120)}". It may be a food, a drink, a cocktail (use a typical bar recipe and pour, e.g. an Orange Crush is 2 oz orange vodka, 1 oz triple sec, 3 oz fresh orange juice, splash of lemon-lime soda), a regional or restaurant item, or a brand. For alcoholic drinks, kcal must include alcohol (7 kcal per gram of alcohol).
+Reply with only JSON: {"name": "Orange Crush", "serving": "1 drink", "serving_grams": 237, "kcal": 290, "protein": 0.5, "carbs": 27, "fat": 0, "alcohol_g": 22, "note": "2 oz vodka, 1 oz triple sec, 3 oz OJ, splash of Sprite"}. If it isn't a real food or drink, reply {}.`}]}))}
   catch(e){throw {msg:'No connection. Asking Claude needs internet; the built-in library works offline.'}}
-  if(!r.ok)throw {msg:r.status===401?'Your API key was rejected. Check it on the Plan page.':`Claude lookup failed (${r.status}).`};
+  if(!r.ok)throw await claudeErr(r,'Claude lookup');
   const j=await r.json(),t=(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''),a=t.indexOf('{'),b=t.lastIndexOf('}');const o=a>=0?JSON.parse(t.slice(a,b+1)):{};
   const g=+o.serving_grams;if(!(o.kcal>=0)||!(g>0))throw {msg:'Claude didn’t recognize that. Try different words.'};
   return {src:'Claude',brand:'',name:cap(String(o.name||q).slice(0,60)),k:o.kcal/g*100,p:(+o.protein||0)/g*100,c:(+o.carbs||0)/g*100,f:(+o.fat||0)/g*100,sg:g,sn:String(o.serving||'serving').toLowerCase().replace(/^1\s+/,'').slice(0,24),note:o.note?String(o.note).slice(0,140):''}}
 async function aiAsk(dataUrl,prompt,maxTok=1500){
   let r;
-  try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:AI.model||'claude-sonnet-5-5',max_tokens:maxTok,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:(dataUrl.match(/^data:([^;]+);/)||[])[1]||'image/jpeg',data:dataUrl.split(',')[1]}},{type:'text',text:prompt}]}]})})}
+  try{r=await claudeReq(({model:AI.model||'claude-sonnet-5-5',max_tokens:maxTok,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:(dataUrl.match(/^data:([^;]+);/)||[])[1]||'image/jpeg',data:dataUrl.split(',')[1]}},{type:'text',text:prompt}]}]}))}
   catch(e){throw {msg:'No connection. Scanning needs internet; typing foods still works offline.'}}
-  if(!r.ok){let m='';try{const j=await r.json();m=j.error&&j.error.message||''}catch(e){}
-    throw {msg:r.status===401?'Your API key was rejected. Check it on the Plan page under Photo scanning.':r.status===429?'Too many scans or your spend limit was reached. Try again in a minute.':r.status===400&&/credit/i.test(m)?'Your Anthropic account is out of credits.':`Scan failed (${r.status}). ${m}`}}
+  if(!r.ok)throw await claudeErr(r,'Scan');
   const j=await r.json();return (j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
 }
 /* Nutrition label -> a saved food */
@@ -3406,7 +3410,7 @@ function savedItem(c,sv){sv=Math.max(.05,Math.min(40,sv));const g=c.sg?c.sg*sv:0
   return {n:c.name,g:g||sv,k:c.k*sv,p:c.p*sv,c:c.c*sv,f:c.f*sv,conf:'high',on:true,mine:c.id,sv,unitless:!c.sg}
 }
 function openPhoto(file){
-  if(!AI.key){
+  if(false){
     sheet(`<div><div class="eyebrow">Photo scanning</div><h3>Add your API key once</h3><p class="note">Scanning sends your photo to Claude with your own Anthropic API key, so it needs internet. Create a key at console.anthropic.com → API Keys and set a spend limit there. Each scan usually costs under a cent.</p></div>
       <div class="field"><label for="kIn">API key</label><input id="kIn" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste key: sk-ant-api03-..."></div>
       <div class="status" id="kErr"></div>
@@ -3602,7 +3606,7 @@ function renderMe(){
     <div class="glabel">Connections</div><div class="glist">
       ${grow({pg:'conn',ic:'watch',c:'--good',t:'Wearables',s:'WHOOP, Oura Ring, Garmin, Apple Watch',v:conn.length?conn.join(' + '):'Connect',vc:conn.length?'on':''})}
       ${grow({ga:'apple',ic:'heart',c:'--over',t:'Apple Health',s:'Through an iPhone Shortcut'})}
-      ${grow({pg:'scan',ic:'camera',c:'--kcal',t:'Photo scanning',s:'Snap a meal, get the macros',v:AI.key?'On':'Off',vc:AI.key?'on':''})}</div>
+      ${grow({pg:'scan',ic:'camera',c:'--kcal',t:'Photo scanning',s:'Snap a meal, get the macros',v:AI.key?'Own key':'On',vc:'on'})}</div>
     <div class="glabel">App</div><div class="glist">
       ${grow({pg:'prefs',ic:'sliders',c:'--carb',t:'Settings',s:'Training fuel, rest timer, accent color, sync'})}
       ${grow({ga:'foods',ic:'list',c:'--carb',t:'My foods & meals',s:'Saved meals and the food library',v:String((S.meals||[]).length+(S.custom||[]).length)})}
@@ -3711,7 +3715,7 @@ function hydPlan(k=S.day){const H=hydS(),d=H.day[k]||{},ty=hydTypes(k),hot=!!d.h
 function hydDay(k=S.day){const l=hydS().log[k]||[];return {list:l,oz:l.reduce((a,x)=>a+(+x.oz||0),0),na:l.reduce((a,x)=>a+(+x.na||0),0)}}
 function hydAdd(oz,kind='water',na=0,k=S.day,label){oz=Math.round(+oz*10)/10;if(!(oz>0)&&!(na>0))return;const H=hydS();(H.log[k]=H.log[k]||[]).push({id:uid(),t:Date.now(),oz,kind,...(na?{na:Math.round(na)}:{}),...(label?{l:label}:{})});save();
   const p=hydPlan(k),d=hydDay(k);toast(`+${r1(oz)} oz · ${fmt(d.oz)} of ${fmt(p.oz.total)} oz today`,()=>{const L=H.log[k];L.pop();save();renderHyd();renderTodayRows()});renderHyd();renderTodayRows()}
-async function scanBottle(file){if(!AI.key){toast('Add your Anthropic key on the Plan page under Photo scanning to scan bottles');return}
+async function scanBottle(file){
   const st=$('hyScanSt');if(st){st.className='status';st.textContent='Claude is sizing up your bottle…'}
   try{const u=await shrinkImage(file),t=await aiAsk(u,`This photo shows a drink container (water bottle, tumbler, jug, glass or cup). Work out how many US fluid ounces it holds when full. Read any printed capacity or recognize the brand and model (for example Stanley Quencher 40 oz, Owala FreeSip 24 oz, Hydro Flask 32 oz, gallon jug 128 oz, Nalgene 32 oz, standard 16.9 oz water bottle). If nothing is printed or recognizable, estimate from its proportions and nearby objects. Also estimate roughly what fraction is filled right now.
 
