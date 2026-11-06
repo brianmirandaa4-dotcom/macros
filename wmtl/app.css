@@ -318,10 +318,3 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .fld.search .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none}
 .fld.search input{padding-left:38px;font:400 var(--fs-17)/1 var(--f-ui);background:var(--s2);box-shadow:none;border-radius:var(--r10)}
 .fld.search input::placeholder{color:var(--t3)}
-.pros{display:grid;gap:var(--sp3)}
-.pro{display:grid;gap:4px;padding-bottom:var(--sp3);box-shadow:inset 0 -.5px 0 var(--hair2)}
-.pro[data-prop]{cursor:pointer}
-.pro-top,.pro-play{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp3);min-width:0}
-.pro-play span:first-child{font:600 var(--fs-15)/1.3 var(--f-ui);color:var(--t1);overflow-wrap:anywhere}
-.pro .pos{color:var(--edge)}.pro .neg{color:var(--loss)}
-.pro-play .num{white-space:nowrap;flex:none}
