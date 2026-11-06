@@ -338,3 +338,5 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .brow.lad{grid-template-columns:1fr}.blad{display:flex;flex-wrap:wrap;gap:6px}.rung{font-size:12px;padding:3px 8px;border-radius:8px;box-shadow:inset 0 0 0 .5px var(--hair2);color:var(--t2)}
 .mdl{font-size:12px;color:var(--fair);cursor:pointer}.mdl.bet{color:var(--edge);font-weight:600}.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.pgrid b{display:block;font-size:14px;overflow-wrap:anywhere}
 .tabbar button{min-width:0}
+.lvlist{display:grid}.lv{padding:12px 14px;box-shadow:inset 0 -.5px 0 var(--hair2);display:grid;gap:8px;cursor:pointer}.lvt{font-size:15px}
+.lvg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.lvg>div{display:grid;gap:2px}.lvg b{font-size:17px}.lvg .na{font-size:12px;color:var(--t3)}.lvb{font:500 11px/1.3 var(--f-mono,monospace)}.lvb i{font-style:normal;color:var(--t3)}
