@@ -928,10 +928,24 @@ header.top .wrap{gap:8px}
 .mt em.on{color:var(--good)}.mt em.warn{color:var(--carb)}
 .me2-foot{display:flex;justify-content:center;gap:22px;padding-top:4px}
 .me2-foot .link{color:var(--muted);font-size:13px}
+.composer .inrow{gap:8px}
+@media (max-width:520px){.composer .cam{width:46px}.composer .go{padding:0 14px}.composer .go svg{display:none}}
+.ed-name{width:100%;background:transparent;border:0;border-bottom:1.5px dashed rgba(255,255,255,.18);color:var(--fg);font:800 22px/1.2 var(--f-display);padding:4px 0 6px;margin-top:4px;outline:none}
+.ed-name:focus{border-bottom-color:var(--kcal)}
+.ed-fix{display:flex;flex-wrap:wrap;gap:8px}
+.big-act{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;font-size:16px}
+.scan-list .mc[data-open]{cursor:pointer;border-radius:8px;padding:2px 4px;margin:-2px -4px;background:rgba(255,255,255,.03)}
+.scan-list li.sc-ed{display:block;background:color-mix(in srgb,var(--kcal) 8%,var(--surface-2));margin-top:-4px}
+.scan-list li.sc-ed .grid4{gap:8px}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
 .wear-g{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;margin-right:6px}
+.srcb{position:relative;color:#fff!important;background:linear-gradient(115deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),#14161D!important;border:1px solid transparent!important;background-clip:padding-box!important;isolation:isolate}
+.srcb::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,#7CF5FF,#B79CFF,#FF8AD8,#FFE27A,#7CFFB2,#7CF5FF);background-size:300% 100%;animation:holo 6s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;z-index:-1}
+.srcb svg{color:var(--b,#fff);filter:drop-shadow(0 0 3px color-mix(in srgb,var(--b,#fff) 60%,transparent))}
+@keyframes holo{to{background-position:300% 0}}
+@media (prefers-reduced-motion:reduce){.srcb::before{animation:none}}
 .srcrow{display:inline-flex;flex-wrap:wrap;gap:6px}
 .wn-src .srcb{margin-left:4px}
 .dz-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;flex-wrap:wrap}.dz-h b{white-space:nowrap}.dz-h span{color:var(--muted);font-size:12px}
@@ -1190,7 +1204,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
           <input id="foodIn" type="text" enterkeyhint="done" placeholder="e.g. 2 eggs, a banana, an orange crush" aria-label="What you ate or drank" aria-autocomplete="list" aria-controls="sugg">
           <ul class="sugg" id="sugg" role="listbox" hidden></ul>
         </div>
-        <button class="cam" type="button" id="photoBtn" aria-label="Scan a photo of your food" title="Scan a photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button><input type="file" id="photoIn" accept="image/*" hidden>
+        <button class="cam" type="button" id="barBtn" aria-label="Scan a barcode" title="Scan a barcode"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V5h3M17 5h3v2M20 17v2h-3M7 19H4v-2M7 9v6M10 9v6M13 9v6M16 9v6"/></svg></button><button class="cam" type="button" id="photoBtn" aria-label="Scan a photo of your food" title="Scan a photo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button><input type="file" id="photoIn" accept="image/*" hidden>
         <button class="go" type="button" id="addBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add</button>
       </div>
       <div class="status" id="status"></div>
@@ -2449,7 +2463,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.46';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.47';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2798,31 +2812,54 @@ function wireChips(id,set){$(id).onclick=ev=>{const b=ev.target.closest('[data-m
 
 function openEdit(id){
   const k=S.day,e=(S.days[k]||[]).find(x=>x.id===id);if(!e)return;
-  const base={...e},hasG=base.g>0;let factor=1,meal=e.meal||'snack';
-  sheet(`<div><div class="eyebrow">${esc(mealName(meal))} · ${esc(niceDate(k,{month:'short',day:'numeric'}))}</div><h3>${esc(e.n)}</h3><p class="note">Logged as ${esc(e.a)}${e.src==='guess'?' · closest library match, check the amount':''}</p></div>
+  let base={...e},hasG=base.g>0,factor=1,meal=e.meal||'snack',touched=false;
+  sheet(`<div><div class="eyebrow">${esc(mealName(meal))} · ${esc(niceDate(k,{month:'short',day:'numeric'}))}${e.src==='photo'?' · photo scan':''}</div>
+      <input class="ed-name" id="eN" value="${esc(e.n)}" aria-label="Food name"><p class="note" style="margin:2px 0 0">Logged as ${esc(e.a)}${e.src==='guess'?' · closest match, check it':''}. Tap anything to change it.</p></div>
     <div class="field"><label for="eAmt">${hasG?'Amount (grams)':'Servings'}</label><div class="stepper"><button type="button" id="eMinus" aria-label="Less">−</button><input id="eAmt" type="number" inputmode="decimal" value="${hasG?r0(base.g):1}" style="flex:1"><button type="button" id="ePlus" aria-label="More">+</button></div></div>
-    <div id="eLive">${liveHTML(e.k,e.p,e.c,e.f)}</div>
+    <div class="grid4 ed-mac">
+      <div class="field mfield" style="--c:var(--kcal)"><label for="eK">Calories</label><input id="eK" type="number" inputmode="decimal"></div>
+      <div class="field mfield" style="--c:var(--pro)"><label for="eP">Protein g</label><input id="eP" type="number" inputmode="decimal"></div>
+      <div class="field mfield" style="--c:var(--carb)"><label for="eC">Carbs g</label><input id="eC" type="number" inputmode="decimal"></div>
+      <div class="field mfield" style="--c:var(--fat)"><label for="eF">Fat g</label><input id="eF" type="number" inputmode="decimal"></div>
+    </div>
+    <div class="ed-fix"><button type="button" class="chip" id="eLbl">📷 Scan the label</button><button type="button" class="chip" id="eBar">▥ Scan barcode</button></div>
+    <div class="status" id="eSt"></div>
+    <label class="check"><input type="checkbox" id="eMine"> Save to My foods so it’s right next time</label>
     <div class="field"><label>Meal</label>${mealChips('eMeal',meal)}</div>
     <div class="row" style="justify-content:space-between"><button class="danger" id="eDel">Delete</button><div class="row"><button class="ghost" id="eCancel">Cancel</button><button class="primary" id="eSave">Save</button></div></div>`);
-  const amt=$('eAmt');
-  const upd=()=>{const v=Math.max(+amt.value||0,0);factor=hasG?v/base.g:v;$('eLive').innerHTML=liveHTML(base.k*factor,base.p*factor,base.c*factor,base.f*factor)};
+  const amt=$('eAmt'),F={k:$('eK'),p:$('eP'),c:$('eC'),f:$('eF')};
+  const fill=()=>{F.k.value=r0(base.k*factor);F.p.value=r1(base.p*factor);F.c.value=r1(base.c*factor);F.f.value=r1(base.f*factor)};fill();
+  const upd=()=>{const v=Math.max(+amt.value||0,0);factor=hasG?(base.g?v/base.g:1):v;fill()};
   amt.oninput=upd;
-  const step=hasG?Math.max(5,Math.round(base.g/10/5)*5):0.5;
-  $('eMinus').onclick=()=>{amt.value=Math.max(0,r1((+amt.value||0)-step));upd()};
-  $('ePlus').onclick=()=>{amt.value=r1((+amt.value||0)+step);upd()};
+  // typing a macro rewrites the food itself (per current amount), so the stepper keeps scaling from your numbers
+  Object.entries(F).forEach(([key,inp])=>inp.addEventListener('input',()=>{touched=true;const val=+inp.value||0;base[key]=factor?val/factor:val;
+    if(key!=='k'&&!F.k.dataset.own){base.k=base.p*4+base.c*4+base.f*9;F.k.value=r0(base.k*factor)}if(key==='k')F.k.dataset.own='1'}));
+  const step=()=>hasG?Math.max(5,Math.round((base.g||100)/10/5)*5):0.5;
+  $('eMinus').onclick=()=>{amt.value=Math.max(0,r1((+amt.value||0)-step()));upd()};
+  $('ePlus').onclick=()=>{amt.value=r1((+amt.value||0)+step());upd()};
   wireChips('eMeal',m=>meal=m);
+  const st=(t,err)=>{const x=$('eSt');if(x){x.className='status'+(err?' err':'');x.textContent=t}};
+  const apply=(o,why)=>{if(!$('eN'))return;if(o.n)$('eN').value=o.n;const sg=+o.sg||0;
+    base={...base,k:+o.k||(+o.p||0)*4+(+o.c||0)*4+(+o.f||0)*9,p:+o.p||0,c:+o.c||0,f:+o.f||0,g:sg,a:`1 ${o.sn||'serving'}`};hasG=false;factor=1;amt.value=1;
+    amt.closest('.field').querySelector('label').textContent=`Servings (1 = ${o.sn||'serving'}${sg?`, ${r0(sg)} g`:''})`;fill();touched=true;$('eMine').checked=true;st(`${why}. Set how many servings you had, then save.`)};
+  $('eLbl').onclick=()=>pickPhoto(async u=>{st('Claude is reading the label…');try{const o=await scanLabel(u);apply({n:[o.brand,o.product].filter(Boolean).join(' ').trim()?cap([o.brand,o.product].filter(Boolean).join(' ').toLowerCase()).slice(0,60):'',sn:o.serving,sg:o.serving_grams,k:o.kcal,p:o.protein,c:o.carbs,f:o.fat},'Updated from the label')}catch(er){st(er.msg||'Couldn’t read that label.',1)}});
+  $('eBar').onclick=()=>barcodeFlow(o=>apply(o,'Updated from the barcode'),st);
   $('eCancel').onclick=closeSheet;
   $('eDel').onclick=()=>{const before=[...(S.days[k]||[])];S.days[k]=before.filter(x=>x.id!==id);if(!S.days[k].length)delete S.days[k];save();closeSheet();renderAll();toast(`Deleted ${esc(e.n)}`,()=>{S.days[k]=before;save();renderAll()})};
   $('eSave').onclick=()=>{
     const list=S.days[k]||[],i=list.findIndex(x=>x.id===id);if(i<0){closeSheet();return}
-    const ne={...base,meal,k:r0(base.k*factor),p:r1(base.p*factor),c:r1(base.c*factor),f:r1(base.f*factor)};
-    if(factor!==1||e.src==='guess')ne.src=e.src==='guess'?'db':e.src;
+    const nm=($('eN').value||'').trim()||e.n;
+    const ne={...e,n:nm,meal,k:r0(+F.k.value||0),p:r1(+F.p.value||0),c:r1(+F.c.value||0),f:r1(+F.f.value||0)};
+    if(touched||factor!==1||e.src==='guess')ne.src=e.src==='guess'?'db':(touched?'mine':e.src);
     if(hasG&&factor!==1){ne.g=r1(base.g*factor);ne.a=`${r0(ne.g)} g`}
-    else if(!hasG&&factor!==1){ne.a=`${r1(factor)} × ${base.a}`}
-    S.days[k]=list.map((x,j)=>j===i?ne:x);save();closeSheet();renderAll();
+    else if(!hasG){const amtV=+amt.value||1;ne.a=base.a&&touched?`${r1(amtV)} × ${base.a.replace(/^1\s+/,'')}`:(factor!==1?`${r1(factor)} × ${e.a}`:e.a);ne.g=base.g?r1(base.g*amtV):e.g}
+    if($('eMine').checked){const per=hasG?100/(ne.g||100):1/(+amt.value||1);const sg=hasG?100:(base.g||0);
+      const rec={id:'c'+uid(),name:cap(nm),sn:hasG?'100 g':(base.a||'1 serving').replace(/^1\s+/,'')||'serving',sg,k:r0(ne.k*per),p:r1(ne.p*per),c:r1(ne.c*per),f:r1(ne.f*per),from:'edit'};
+      S.custom=[rec,...S.custom.filter(c=>c.name.toLowerCase()!==rec.name.toLowerCase())];buildFoods()}
+    S.days[k]=list.map((x,j)=>j===i?ne:x);save();closeSheet();renderAll();toast(`Saved ${esc(nm)}`);
   };
 }
-function openManual(prefill,offerSave,editId,scanUrl){
+function openManual(prefill,offerSave,editId,scanUrl,pre){
   const ex=editId?S.custom.find(c=>c.id===editId):null;
   let meal=S.mealSel;
   const name=ex?ex.name:cap((prefill||'').replace(/^\s*[\d.\/½¼¾]+\s*(x\s*)?/,'').trim());
@@ -2842,6 +2879,7 @@ function openManual(prefill,offerSave,editId,scanUrl){
     ${ex?'':`<label class="check"><input type="checkbox" id="mSave" ${offerSave?'checked':''}> Save to My foods so typing it works next time</label>
     <div class="field"><label>Log 1 serving to</label>${mealChips('mMeal',meal)}</div>`}
     <div class="row" style="justify-content:space-between">${ex?'<button class="danger" id="mDel">Delete food</button>':'<button class="ghost" id="mOnly">Just save it</button>'}<div class="row"><button class="ghost" id="mCancel">Cancel</button><button class="primary" id="mOk">${ex?'Save changes':'Save and log'}</button></div></div>`);
+  if(pre){const set=(id,v)=>{if($(id)&&v!=null&&v!=='')$(id).value=v};set('mN',pre.n);set('mS',pre.sn);set('mG',pre.sg);set('mP',pre.p);set('mC',pre.c);set('mF',pre.f);set('mK',pre.k);if($('mSave'))$('mSave').checked=true}
   const v=id=>+$(id).value||0, kIn=$('mK');
   const auto=()=>{kIn.placeholder=String(r0(v('mP')*4+v('mC')*4+v('mF')*9))};
   ['mP','mC','mF'].forEach(id=>$(id).addEventListener('input',auto));
@@ -3545,11 +3583,14 @@ function openPhoto(file){
   const drawItems=()=>{
     const on=items.filter(i=>i.on),t=on.reduce((a,i)=>({k:a.k+i.k*i.sc,p:a.p+i.p*i.sc,c:a.c+i.c*i.sc,f:a.f+i.f*i.sc}),{k:0,p:0,c:0,f:0});
     $('phBody').innerHTML=items.length?`<ul class="scan-list">${items.map((it,i)=>`<li class="${it.on?'':'off'}"><label class="check"><input type="checkbox" data-on="${i}" ${it.on?'checked':''}></label>
-      <div class="si"><input class="sn-in" data-name="${i}" value="${esc(it.n)}" aria-label="Food name"><div class="mc num"><span>${fmt(it.k*it.sc)} kcal</span><span style="color:var(--pro)">${r0(it.p*it.sc)}P</span><span style="color:var(--carb)">${r0(it.c*it.sc)}C</span><span style="color:var(--fat)">${r0(it.f*it.sc)}F</span>${it.mine?'<span class="tag" style="color:var(--good);border-color:currentColor">your label</span>':it.conf==='low'?'<span class="tag">unsure</span>':''}</div></div>
-      <div class="sg"><input type="number" inputmode="decimal" data-g="${i}" value="${it.unitless?r1(it.g*it.sc):r0(it.g*it.sc)}" aria-label="${it.unitless?'Servings':'Grams'}"><span>${it.unitless?'srv':'g'}</span></div></li>`).join('')}</ul>${liveHTML(t.k,t.p,t.c,t.f)}`:'<p class="note">No food found in this photo.</p>';
+      <div class="si"><input class="sn-in" data-name="${i}" value="${esc(it.n)}" aria-label="Food name"><div class="mc num" data-open="${i}" role="button" title="Tap to fix the macros"><span>${fmt(it.k*it.sc)} kcal</span><span style="color:var(--pro)">${r0(it.p*it.sc)}P</span><span style="color:var(--carb)">${r0(it.c*it.sc)}C</span><span style="color:var(--fat)">${r0(it.f*it.sc)}F</span>${it.mine?'<span class="tag" style="color:var(--good);border-color:currentColor">your label</span>':it.conf==='low'?'<span class="tag">unsure</span>':''}</div></div>
+      <div class="sg"><input type="number" inputmode="decimal" data-g="${i}" value="${it.unitless?r1(it.g*it.sc):r0(it.g*it.sc)}" aria-label="${it.unitless?'Servings':'Grams'}"><span>${it.unitless?'srv':'g'}</span></div></li>`).join('')}</ul><p class="note" style="margin:0">Tap a food’s numbers to fix them.</p>${liveHTML(t.k,t.p,t.c,t.f)}`:'<p class="note">No food found in this photo.</p>';
+    items.forEach((it,i)=>{if(!it.open)return;const li=$('phBody').querySelectorAll('.scan-list>li')[i];if(!li)return;li.insertAdjacentHTML('afterend',`<li class="sc-ed"><div class="grid4">${[['k','Calories','--kcal'],['p','Protein g','--pro'],['c','Carbs g','--carb'],['f','Fat g','--fat']].map(([key,l,c])=>`<div class="field mfield" style="--c:var(${c})"><label>${l}</label><input type="number" inputmode="decimal" data-mx="${i}|${key}" value="${key==='k'?r0(it[key]*it.sc):r1(it[key]*it.sc)}"></div>`).join('')}</div></li>`)});
     $('phGo').textContent=on.length?`Add ${on.length} item${on.length>1?'s':''}`:'Add';$('phGo').disabled=!on.length;
   };
-  $('phBody').addEventListener('change',e=>{const t=e.target;if(t.dataset.on!=null){items[+t.dataset.on].on=t.checked;drawItems()}if(t.dataset.name!=null)items[+t.dataset.name].n=t.value});
+  $('phBody').addEventListener('change',e=>{const t=e.target;if(t.dataset.on!=null){items[+t.dataset.on].on=t.checked;drawItems()}if(t.dataset.name!=null)items[+t.dataset.name].n=t.value;
+    if(t.dataset.mx){const [i,key]=t.dataset.mx.split('|'),it=items[+i];it[key]=(+t.value||0)/(it.sc||1);if(key!=='k')it.k=it.p*4+it.c*4+it.f*9;drawItems()}});
+  $('phBody').addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(!o)return;const it=items[+o.dataset.open];it.open=!it.open;drawItems()});
   $('phBody').addEventListener('input',e=>{const t=e.target;if(t.dataset.g!=null){const it=items[+t.dataset.g];it.sc=it.g?Math.max(0,+t.value||0)/it.g:1;const live=t.closest('li').querySelector('.mc');live.innerHTML=`<span>${fmt(it.k*it.sc)} kcal</span><span style="color:var(--pro)">${r0(it.p*it.sc)}P</span><span style="color:var(--carb)">${r0(it.c*it.sc)}C</span><span style="color:var(--fat)">${r0(it.f*it.sc)}F</span>`;
     const on=items.filter(i=>i.on),tt=on.reduce((a,i)=>({k:a.k+i.k*i.sc,p:a.p+i.p*i.sc,c:a.c+i.c*i.sc,f:a.f+i.f*i.sc}),{k:0,p:0,c:0,f:0});$('phBody').querySelector('.live').outerHTML=liveHTML(tt.k,tt.p,tt.c,tt.f)}});
   let scanned=false;
@@ -3562,6 +3603,38 @@ function openPhoto(file){
     catch(e){$('phStatus').className='status err';$('phStatus').textContent=e.msg||niceErr(e,'Claude');$('phGo').disabled=false;const sk=$('phBody').querySelector('.skel-list');if(sk)sk.remove()}
   };
 }
+/* ================= BARCODES: photo of the barcode → Open Food Facts (free, no key) ================= */
+let zxP=null;
+function loadZX(){return zxP||(zxP=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';sc.onload=()=>ok(window.ZXing);sc.onerror=()=>{zxP=null;no(new Error('zx'))};document.head.appendChild(sc)}))}
+async function readBarcode(dataUrl){
+  try{if('BarcodeDetector' in window){const bd=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128']});const img=new Image();img.src=dataUrl;await img.decode();const r=await bd.detect(img);if(r&&r[0])return r[0].rawValue}}catch(e){}
+  try{const ZX=await loadZX();const hints=new Map();hints.set(ZX.DecodeHintType.TRY_HARDER,true);const rd=new ZX.BrowserMultiFormatReader(hints);const r=await rd.decodeFromImageUrl(dataUrl);if(r&&r.getText())return r.getText()}catch(e){}
+  try{const t=await aiAsk(dataUrl,'Read the barcode number printed under the barcode in this photo (UPC or EAN digits). Reply with only the digits, nothing else. If there is no readable barcode reply NONE.',40);const d=String(t).replace(/\D/g,'');if(d.length>=8)return d}catch(e){}
+  return null}
+async function lookupBarcode(code){
+  const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,brands,nutriments,serving_size,serving_quantity`);
+  const j=await r.json();if(!j||j.status!==1||!j.product)return null;const P=j.product,N=P.nutriments||{};
+  const sq=+P.serving_quantity||0,hasSv=N['energy-kcal_serving']!=null||N.proteins_serving!=null;
+  const g=(k)=>{const sv=N[k+'_serving'],h=N[k+'_100g'];return hasSv&&sv!=null?+sv:h!=null?(sq?h*sq/100:+h):null};
+  let k=g('energy-kcal');if(k==null&&g('energy')!=null)k=g('energy')/4.184;
+  const brand=String(P.brands||'').split(',')[0].trim(),name=[brand,P.product_name].filter(Boolean).join(' ').trim()||'Scanned food';
+  return {n:cap(name.toLowerCase()).slice(0,60),sn:hasSv||sq?String(P.serving_size||'1 serving').toLowerCase().slice(0,30):'100 g',sg:hasSv||sq?(sq||''):100,k:k!=null?r0(k):'',p:g('proteins')!=null?r1(g('proteins')):'',c:g('carbohydrates')!=null?r1(g('carbohydrates')):'',f:g('fat')!=null?r1(g('fat')):'',code}}
+function pickPhoto(cb){const i=document.createElement('input');i.type='file';i.accept='image/*';i.setAttribute('capture','environment');i.onchange=async()=>{const f=i.files[0];if(!f)return;try{cb(await shrinkImage(f))}catch(e){toast('Couldn’t open that photo. Try a screenshot of it.')}};i.click()}
+async function barcodeFlow(onFound,st){
+  pickPhoto(async u=>{st('Reading the barcode…');const code=await readBarcode(u);if(!code){st('Couldn’t read a barcode. Get it flat, close and in focus, or type the numbers.',1);return}
+    st(`Looking up ${code}…`);try{const o=await lookupBarcode(code);if(!o){st(`${code} isn’t in the food database yet. Snap the nutrition label instead.`,1);return}st('');onFound(o)}catch(e){st('No connection. Barcode lookup needs internet.',1)}})}
+function openBarcode(){
+  sheet(`<div><div class="eyebrow">Barcode</div><h3>Scan a package</h3><p class="note">Take a photo of the barcode. Syncope looks it up in Open Food Facts (3M+ products) and fills in the macros. You can change anything before you log it.</p></div>
+    <button class="primary big-act" id="bcShot" type="button">${'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V5h3M17 5h3v2M20 17v2h-3M7 19H4v-2M7 9v6M10 9v6M13 9v6M16 9v6"/></svg>'} Photo of the barcode</button>
+    <div class="field"><label for="bcIn">Or type the numbers</label><div class="inrow"><input id="bcIn" type="text" inputmode="numeric" placeholder="e.g. 096619756803"><button class="ghost" id="bcGo" type="button">Look up</button></div></div>
+    <div class="status" id="bcSt"></div>
+    <button class="link" type="button" id="bcLabel" style="align-self:flex-start">No barcode? Snap the nutrition label instead</button>`);
+  const st=(t,err)=>{const e=$('bcSt');if(e){e.className='status'+(err?' err':'');e.textContent=t}};
+  const found=o=>{closeSheet();setTimeout(()=>openManual(o.n,true,null,null,o),120);toast('Found it. Check the numbers, then save.')};
+  $('bcShot').onclick=()=>barcodeFlow(found,st);
+  $('bcGo').onclick=async()=>{const c=$('bcIn').value.replace(/\D/g,'');if(c.length<8){st('Barcodes are 8 to 13 digits.',1);return}st('Looking up…');try{const o=await lookupBarcode(c);o?found(o):st('Not in the database yet. Snap the label instead.',1)}catch(e){st('No connection. Barcode lookup needs internet.',1)}};
+  $('bcLabel').onclick=()=>{closeSheet();setTimeout(()=>openManual('',true),120)}}
+$('barBtn').onclick=openBarcode;
 $('photoBtn').onclick=()=>$('photoIn').click();
 $('photoIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)openPhoto(f)};
 const comp=document.querySelector('.composer');
@@ -5583,7 +5656,7 @@ function renderTrain(){
   const dfmt=k=>niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   $('hist').innerHTML=feed.length?feed.slice(0,15).map(x=>{
     if(x.log){const w=x.log,d=x.dev,v=w.ex.reduce((b,y)=>b+y.sets.reduce((c,s2)=>c+setVol(s2),0),0);
-      return `<li><button data-wk="${x.i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}${d?`<span class="wb">${esc(d.src)}</span>`:''}</b><span class="r">${v||!w.ex.some(y=>y.cardio)?fmt(v)+' lb':fmt(w.ex.reduce((b,y)=>b+(y.cardio?+y.cardio.kcal||0:0),0))+' kcal'}<br><span class="dim">${d&&d.strain!=null?`strain ${d.strain}`:fmtDur(w.end-w.start)}</span></span><span class="s">${dfmt(w.date)} · ${w.ex.length} exercises · ${w.ex.some(y=>y.cardio)?`${w.ex.reduce((a2,y)=>a2+(y.cardio?+y.cardio.min||0:0),0)} min cardio${w.ex.some(y=>y.sets.length)?' · ':''}`:''}${(n=>n?n+' sets':'')(w.ex.reduce((a2,y)=>a2+y.sets.length,0))}${d&&d.kcal?` · ${fmt(d.kcal)} kcal`:''}</span></button></li>`}
+      return `<li><button data-wk="${x.i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}${d?srcBadge(d.src):''}</b><span class="r">${v||!w.ex.some(y=>y.cardio)?fmt(v)+' lb':fmt(w.ex.reduce((b,y)=>b+(y.cardio?+y.cardio.kcal||0:0),0))+' kcal'}<br><span class="dim">${d&&d.strain!=null?`strain ${d.strain}`:fmtDur(w.end-w.start)}</span></span><span class="s">${dfmt(w.date)} · ${w.ex.length} exercises · ${w.ex.some(y=>y.cardio)?`${w.ex.reduce((a2,y)=>a2+(y.cardio?+y.cardio.min||0:0),0)} min cardio${w.ex.some(y=>y.sets.length)?' · ':''}`:''}${(n=>n?n+' sets':'')(w.ex.reduce((a2,y)=>a2+y.sets.length,0))}${d&&d.kcal?` · ${fmt(d.kcal)} kcal`:''}</span></button></li>`}
     const d=x.dev;return `<li><button data-devwk="${esc(d.id)}"><b>${esc(d.name)}${srcBadge(d.src)}</b><span class="r">${d.kcal!=null?fmt(d.kcal)+' kcal':''}${d.strain!=null?`<br><span class="dim">strain ${d.strain}</span>`:''}</span><span class="s">${dfmt(d.date)}${d.min?` · ${d.min} min`:''}${d.avgHr?` · ${d.avgHr} bpm avg`:''}</span></button></li>`}).join('')
     :`<li>${emptyState('dumbbell','--pro','No workouts yet','Start one from a template above. WHOOP and Garmin sessions show up here on their own.','Start a workout','startNow')}</li>`;
   const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
