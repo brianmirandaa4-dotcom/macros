@@ -1215,6 +1215,26 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .hist .wb{font:700 10.5px/1 var(--f-body);letter-spacing:.06em;color:var(--good);border:1px solid color-mix(in srgb,var(--good) 45%,transparent);border-radius:999px;padding:3px 6px;margin-left:6px;vertical-align:2px}
 .ver{text-align:center;color:var(--subtle);font-size:12px;margin-top:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* private-banking finish: hairline jewel-tone monogram icons, compact two-up tiles with the mark on the right */
+:root{--champ:#d8c08c;--j-sapphire:#5fa8ff;--j-emerald:#3ed6a0;--j-gold:#e3c27a;--j-amethyst:#b49cff;--j-rose:#ff8fa8;--j-copper:#f0a46b;--j-teal:#45d3d0;--j-sage:#a9cf8a}
+.gi{--j:var(--c,var(--champ));background:radial-gradient(circle at 50% 28%,color-mix(in srgb,var(--j) 22%,transparent),color-mix(in srgb,var(--j) 6%,transparent) 75%)!important;border:1px solid color-mix(in srgb,var(--j) 48%,transparent);border-radius:50%!important;color:var(--j)!important;box-shadow:0 0 14px color-mix(in srgb,var(--j) 14%,transparent)}
+.gi svg{stroke-width:1.6}
+.gi[data-j=sapphire]{--j:var(--j-sapphire)}.gi[data-j=emerald]{--j:var(--j-emerald)}.gi[data-j=gold]{--j:var(--j-gold)}.gi[data-j=amethyst]{--j:var(--j-amethyst)}.gi[data-j=rose]{--j:var(--j-rose)}.gi[data-j=copper]{--j:var(--j-copper)}.gi[data-j=teal]{--j:var(--j-teal)}.gi[data-j=sage]{--j:var(--j-sage)}
+.glist.tgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.glist.tgrid .gr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t i" "v i";align-items:center;column-gap:10px;row-gap:3px;padding:11px 12px 11px 14px;min-height:58px;border-radius:16px;position:relative;overflow:hidden}
+.glist.tgrid .gr::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 50%,color-mix(in srgb,var(--tj,transparent) 9%,transparent),transparent 60%);pointer-events:none}
+.glist.tgrid .gt{grid-area:t;align-self:end}.glist.tgrid .gv{grid-area:v;align-self:start}
+.glist.tgrid .gr:has(.gv:empty) .gt{grid-row:1/3;align-self:center}
+.glist.tgrid .gi{grid-area:i;width:32px;height:32px;border-radius:50%}.glist.tgrid .gi svg{width:16px;height:16px}
+.glist.tgrid .gt b{font:650 14px/1.22 var(--f-display);letter-spacing:-.005em;overflow-wrap:anywhere}
+.glist.tgrid .gv{font-size:12px;font-weight:600}
+:where(div):has(>.mt){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.mt{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t i" "v i";align-items:center;column-gap:8px;row-gap:2px;padding:11px 10px 11px 13px!important;min-height:56px;border-radius:16px!important}
+.mt>b{grid-area:t;align-self:end;font-size:14px!important}.mt>em{grid-area:v;align-self:start;margin-top:0!important}
+.mt:not(:has(em))>b{grid-row:1/3;align-self:center}
+.mt>.mt-i{grid-area:i;width:30px!important;height:30px!important;border-radius:50%!important}.mt>.mt-i svg{width:15px!important;height:15px!important}
+.status:empty{display:none}
+.empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
 </head>
 <body>
@@ -2521,7 +2541,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.59';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.60';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3855,12 +3875,16 @@ const GI={bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 
   copy:sv('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),plus:sv('<path d="M12 5v14M5 12h14"/>'),fire:sv('<path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 2-7 2 1 3 3 3 5 1-2 1-5 1-9z"/>'),
   palette:sv('<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.5-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/>'),
   cal:sv('<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>'),timer:sv('<circle cx="12" cy="13" r="7"/><path d="M12 9v4l2 2M9 3h6"/>'),info:sv('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
-  watch:sv('<rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2l1.5 1.5"/>')};
+  watch:sv('<rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2l1.5 1.5"/>'),
+  leaf:sv('<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l8-8"/>'),moon:sv('<path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5z"/>'),
+  laurel:sv('<path d="M12 20V9"/><path d="M8 19c-3-2-4-6-3-10M16 19c3-2 4-6 3-10"/><path d="M5.5 12.5c1.5 0 2.5 1 2.5 2.5M5 9c1.5 0 2.5 1 2.5 2.5M18.5 12.5c-1.5 0-2.5 1-2.5 2.5M19 9c-1.5 0-2.5 1-2.5 2.5"/><circle cx="12" cy="6" r="2"/>'),
+  quill:sv('<path d="M20 4C11 5 7 10 5 20"/><path d="M20 4c-1 6-5 9-10 10M9 9h5"/>'),cloche:sv('<path d="M4 17h16M3 20h18M5 17a7 7 0 0 1 14 0M12 8V6M10.5 6h3"/>')};
+const JEWEL={drop:'sapphire',timer:'sapphire',cal:'sapphire',watch:'teal',moon:'amethyst',leaf:'emerald',bars:'emerald',chart:'teal',plan:'teal',refresh:'teal',laurel:'gold',user:'gold',target:'gold',dumbbell:'gold',cloche:'copper',fire:'copper',download:'copper',list:'copper',quill:'rose',heart:'rose',bell:'rose',palette:'amethyst',camera:'amethyst',book:'amethyst',scale:'sage',body:'sage',sliders:'sage',shield:'emerald',link:'teal',info:'sapphire',copy:'sage',plus:'gold'};
 const CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>';
 function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.act?`data-ga="${o.act}"`:'';
-  const inner=`<span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv ${o.vc||''}">${o.v??''}</span>${o.ctl?'':CHEV}`;
+  const inner=`<span class="gi" data-j="${JEWEL[o.ic]||''}" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv ${o.vc||''}">${o.v??''}</span>${o.ctl?'':CHEV}`;
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
-  if(o.ctl)return `<div class="gr static"><span class="gi" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
+  if(o.ctl)return `<div class="gr static"><span class="gi" data-j="${JEWEL[o.ic]||''}" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
 const PG_T={report:'Monthly report',hyd:'Hydration',cook:'Meal ideas & recipes',fuel:'Fuel & timing',progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'Wearables',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
 const PG_R={report:renderReport,hyd:renderHyd,cook:renderCook,fuel:renderFuel,progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
@@ -3887,7 +3911,7 @@ function bodyLine(){const c=S.calc||{},lw=latestWeight(),w=(lw&&lw.w)||c.wt;if(!
 function planLabel(){if(!S.plan)return 'No plan';return S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}
 /* Profile: a dashboard, not a settings list. Who you are and how you're doing up top, then big tap targets. */
 function mtile(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:'';
-  const inner=`<span class="mt-i" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><b>${o.t}</b>${o.v!=null&&o.v!==''?`<em class="${o.vc||''}">${o.v}</em>`:''}`;
+  const inner=`<span class="gi mt-i" data-j="${JEWEL[o.ic]||''}" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><b>${o.t}</b>${o.v!=null&&o.v!==''?`<em class="${o.vc||''}">${o.v}</em>`:''}`;
   return o.href?`<a class="mt" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`:`<button class="mt" type="button" ${attr}>${inner}</button>`}
 function renderMe(){
   const c=syncCfg(),st=c.st||{},lw=latestWeight(),g=goalsFor(todayKey()),nWk=trainFeed().length,nd=Object.keys(S.days).filter(k=>(S.days[k]||[]).length).length,sk=streak();
@@ -3911,12 +3935,12 @@ function renderMe(){
       ${mtile({ga:'plan',ic:'plan',c:'--good',t:'Plan',v:pl?`${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · wk ${Math.min(pl.i+1,S.plan.N)}`:'Set up',vc:pl?'':'warn'})}
       ${mtile({pg:'targets',ic:'target',c:'--pro',t:'Targets',v:`${fmt(goalKcal(g))} kcal`})}
       ${mtile({pg:'body',ic:'body',c:'--fat',t:'Body',v:bodyLine()?bodyLine().split(' · ')[0]:'Add',vc:bodyLine()?'':'warn'})}
-      ${mtile({pg:'ideas',ic:'fire',c:'--good',t:'Meal ideas'})}
+      ${mtile({pg:'ideas',ic:'cloche',c:'--good',t:'Meal ideas'})}
       ${mtile({pg:'prep',ic:'list',c:'--carb',t:'Meal prep'})}
-      ${mtile({pg:'fuel',ic:'heart',c:'--carb',t:'Fueling'})}
+      ${mtile({pg:'fuel',ic:'fire',c:'--carb',t:'Fueling'})}
       ${mtile({pg:'report',ic:'chart',c:'--kcal',t:'Report'})}
       ${mtile({pg:'hyd',ic:'drop',c:'--fat',t:'Water'})}
-      ${mtile({pg:'health',ic:'heart',c:'--good',t:'Recovery'})}
+      ${mtile({pg:'health',ic:'moon',c:'--good',t:'Recovery'})}
     </div>
     <div class="glabel">Connect & share</div>
     <div class="mgrid">
@@ -4384,7 +4408,7 @@ function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayK
   else tr={v:k===tk?'Start':'Rest',s:k===tk?'Tap to log a workout':'No training logged',fr:0,go:k===tk?'start':'train'};
   const rec=h.recovery,sl=h.sleep;
   const tiles=[
-    {id:'water',c:'var(--fat)',ic:GI.drop||'',lab:'Water',v:`${fmt(wo)}<small>/${fmt(wt)} oz</small>`,s:wo>=wt?'Goal hit 🎉':`${fmt(Math.max(0,wt-wo))} oz to go`,fr:wt?wo/wt:0,act:`<button class="q-add" data-qwater aria-label="Add 12 oz of water">+12</button>`},
+    {id:'water',c:'var(--j-sapphire)',ic:GI.drop||'',lab:'Water',v:`${fmt(wo)}<small>/${fmt(wt)} oz</small>`,s:wo>=wt?'Goal hit 🎉':`${fmt(Math.max(0,wt-wo))} oz to go`,fr:wt?wo/wt:0,act:`<button class="q-add" data-qwater aria-label="Add 12 oz of water">+12</button>`},
     {id:'train',c:'var(--pro)',lab:'Training',v:tr.v,s:tr.s,fr:tr.fr,hot:tr.hot},
     {id:'rec',c:'var(--good)',lab:h.recovery!=null&&h.ouraReady?'Readiness':h.garminBB?'Body Battery':'Recovery',v:rec!=null?`${rec}<small>%</small>`:'—',s:sl!=null?`${sl}h sleep${h.hrv!=null?` · HRV ${h.hrv}`:''}`:'Connect a wearable',fr:rec!=null?rec/100:0},
     {id:'steps',c:'var(--carb)',lab:'Steps',v:h.steps!=null?fmt(h.steps):'—',s:h.steps!=null?(h.steps>=stepGoal?'Goal hit 🎉':`${fmt(stepGoal-h.steps)} to ${fmt(stepGoal/1000)}k`):'Syncs from your watch',fr:h.steps!=null?h.steps/stepGoal:0}];
@@ -4923,7 +4947,7 @@ function renderPrep(){
   const have=((S.prefs.groc||{})[wk])||[];
   const uL=(u,q)=>({lb:'lb',oz:'oz',cup:q===1?'cup':'cups',tbsp:'tbsp',each:'',scoop:q===1?'scoop':'scoops'}[u]??u);
   $('pg-prep').innerHTML=`<div class="card prep-hero" style='--bnr:${bnr("dinner","prep")}'><div class="eyebrow">Week of ${niceDate(wk,{month:'short',day:'numeric'})}</div><h2>3 high-protein meals to prep this Sunday</h2><p>About ${r0(rs.reduce((a,r)=>a+r.min,0)/60*10)/10} hours of cooking for ${rs.reduce((a,r)=>a+r.sv,0)} meals. New recipes every Sunday.</p></div>
-    <div class="glist">${grow({pg:'cook',ic:'book',c:'--good',t:'More meal ideas & recipes',s:'Built from your favourite foods · bump servings to prep'})}</div>
+    <div class="glist">${grow({pg:'cook',ic:'cloche',c:'--good',t:'More meal ideas & recipes',s:'Built from your favourite foods · bump servings to prep'})}</div>
     ${rs.map((r,i)=>{const s=prepServing(r);return `<div class="card" style="display:flex;flex-direction:column;gap:12px">
       <div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(['lunch','dinner','breakfast'][i%3])}'></div><div class="idea-t"><div class="eyebrow">${r.sv} servings · ${r.min} min</div><h2>${esc(r.name)}</h2></div></div>
       <div class="idea-mac"><span class="mp" style="--c:var(--kcal)"><b>${fmt(s.k)}</b> kcal</span><span class="mp" style="--c:var(--pro)"><b>${r0(s.p)}</b>g P</span><span class="mp" style="--c:var(--carb)"><b>${r0(s.c)}</b>g C</span><span class="mp" style="--c:var(--fat)"><b>${r0(s.f)}</b>g F</span><span class="idea-fit">per serving</span></div>
@@ -5184,9 +5208,9 @@ function renderFriendPage(){
 $('pg-friend')&&$('pg-friend').addEventListener('click',e=>{const rm=e.target.closest('[data-rm]');if(rm){closePages();setView('friends');setTimeout(()=>{const b=document.querySelector(`#frBody [data-rm="${CSS.escape(rm.dataset.rm)}"]`);if(b)b.click()},150)}});
 async function refreshFriend(){renderFriendPage();if(fpUid!=='me'){await socBoard();if(pgStack[pgStack.length-1]==='friend')renderFriendPage()}}
 async function openFriends(){renderFriends();const c=socCfg();if(c.on&&(!c.boardAt||Date.now()-c.boardAt>20000)){await socPush(true);await socBoard();if(S.view==='friends')renderFriends()}}
-function friendsRow(){const c=socCfg();if(!c.on)return grow({ga:'friends',ic:'user',c:'--good',t:'Compete with friends',s:'Weekly leaderboard, streaks and cheers'});
+function friendsRow(){const c=socCfg();if(!c.on)return grow({ga:'friends',ic:'laurel',c:'--good',t:'Compete with friends',s:'Weekly leaderboard, streaks and cheers'});
   const b=c.board,ws=weekStart(todayKey()),me=myWeek().stats.score,frs=((b&&b.friends)||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0),rank=1+frs.filter(x=>x>me).length,top=Math.max(0,...frs);
-  return grow({ga:'friends',ic:'user',c:'--good',t:frs.length?`You're #${rank} of ${frs.length+1} this week`:'Friends',s:frs.length?(rank===1?`Leading by ${fmt(me-Math.max(0,...frs.filter(x=>x<=me)))} pts`:`${fmt(top-me)} pts behind first`):'Invite friends to start competing',v:`${fmt(me)} pts`,vc:'on'})}
+  return grow({ga:'friends',ic:'laurel',c:'--good',t:frs.length?`You're #${rank} of ${frs.length+1} this week`:'Friends',s:frs.length?(rank===1?`Leading by ${fmt(me-Math.max(0,...frs.filter(x=>x<=me)))} pts`:`${fmt(top-me)} pts behind first`):'Invite friends to start competing',v:`${fmt(me)} pts`,vc:'on'})}
 GACT.backupNow=()=>{backup();renderTodayRows()};
 GACT.friends=()=>{closePages();setView('friends')};
 
@@ -5464,7 +5488,7 @@ function microOf(list){const names=(list||[]).map(e=>String(e.n||'').toLowerCase
 function microChips(list){const has=microOf(list);return has.length?`<div class="micro">${MICRO.filter(m=>has.includes(m[0])).map(([,l,c])=>`<span style="--c:var(${c})">${l}</span>`).join('')}</div>`:''}
 function microRow(){const k=S.day,list=S.days[k]||[];if(list.length<2)return '';const has=microOf(list),miss=MICRO.filter(m=>!has.includes(m[0])&&m[0]!=='omega');
   const tip={iron:'lean beef, spinach, beans (pair plants with vitamin C)',calcium:'Greek yogurt, milk, cheese',vitd:'salmon, eggs, fortified milk',vitc:'berries, peppers, oranges, broccoli'};
-  return grow({pg:'fuel',ic:'heart',c:'--good',t:'Micronutrients',s:miss.length?`Add ${miss.map(m=>m[1].toLowerCase()).join(', ')}: try ${tip[miss[0][0]]}`:'Iron, calcium, vitamin D and vitamin C all have a food source today',v:`${4-miss.length}/4`,vc:miss.length?'':'on'})}
+  return grow({pg:'fuel',ic:'leaf',c:'--good',t:'Micronutrients',s:miss.length?`Add ${miss.map(m=>m[1].toLowerCase()).join(', ')}: try ${tip[miss[0][0]]}`:'Iron, calcium, vitamin D and vitamin C all have a food source today',v:`${4-miss.length}/4`,vc:miss.length?'':'on'})}
 /* ---- Meal grades: how balanced each meal is against your own targets ---- */
 const MEAL_SHARE={breakfast:.25,lunch:.3,dinner:.3,snack:.15};
 const PRODUCE=/apple|banana|berr|orange|grape|mango|pineapple|kiwi|peach|pear|melon|cherr|fruit|salad|lettuce|spinach|kale|broccoli|carrot|pepper|tomato|cucumber|onion|zucchini|asparagus|green bean|veg|cauliflower|brussels|mushroom|avocado|sweet potato|corn\b|\bpeas?\b|beans?\b|lentil|salsa|greens|cabbage|celery|plantain|squash|raisin|date|fig|apricot|edamame|chickpea/;
@@ -5606,11 +5630,11 @@ function renderTodayRows(){
   const el=$('todayRows');if(!el)return;const k=S.day,h=hv(k),c=S.checkins[k],cfg=syncCfg();
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
-  el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'heart',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.oura||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP, Oura or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
+  el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'moon',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.oura||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP, Oura or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
     +(()=>{const tk=todayKey(),pm=prevYM();if(k!==tk||+tk.slice(8)>7||!monthHasData(pm))return '';const [y,m]=pm.split('-').map(Number);return grow({ga:'report',ic:'chart',c:'--good',t:`Your ${MON[m-1]} report is ready`,s:'How the month went: nutrition, vitamins, water, training, sleep',v:'New',vc:'on'})})()
     +(()=>{const hp=hydPlan(k),hd=hydDay(k);return grow({pg:'hyd',ic:'drop',c:'--fat',t:'Hydration',s:`${fmt(hd.oz)} of ${fmt(hp.oz.total)} oz${hp.types.length?' · '+hp.label.toLowerCase():''}${hd.na?` · ${fmt(hd.na)} mg sodium`:''}`,v:hd.oz>=hp.oz.total?'✓':`${Math.round(hd.oz/Math.max(1,hp.oz.total)*100)}%`,vc:hd.oz>=hp.oz.total?'on':''})})()
-    +grow({pg:'cook',ic:'book',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
-    +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'book',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
+    +grow({pg:'cook',ic:'cloche',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
+    +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'quill',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
 const TIPS={today:['Welcome to Syncope','Type what you ate or drank in plain words, like “2 eggs and toast” or “2 orange crushes”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
   train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
