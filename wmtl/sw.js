@@ -1,6 +1,6 @@
 /* Overlay (whomadethisline) service worker. It reads and writes only its own "wmtl-" caches, and only for files inside its own
    folder, so it never touches SYNCOPE or SPAN on the same site. Shell: cache first. Slate data: network first. */
-const VERSION = 'wmtl-v18-2026-11-05';
+const VERSION = 'wmtl-v19-2026-11-05';
 const DATA = 'wmtl-data';
 const SCOPE = new URL('./', self.location).pathname;
 const SHELL = ['./', './index.html', './tokens.css', './components.css', './app.css', './icons.js', './charts.js', './app.js', './room.js', './vendor/three.min.js', './manifest.webmanifest',
@@ -16,6 +16,6 @@ self.addEventListener('fetch', e => {
     return; }
   e.respondWith(caches.open(VERSION).then(c => {
     if(e.request.mode === 'navigate') return fetch(e.request).then(r => { if(r.ok) c.put('./index.html', r.clone()); return r; }).catch(() => c.match('./index.html'));
-    return c.match(e.request, {ignoreSearch: true}).then(hit => hit || fetch(e.request).then(r => { if(r.ok) c.put(e.request, r.clone()); return r; }));
+    return c.match(e.request).then(hit => hit || fetch(e.request).then(r => { if(r.ok) c.put(e.request, r.clone()); return r; }).catch(() => c.match(e.request, {ignoreSearch: true})));
   }));
 });
