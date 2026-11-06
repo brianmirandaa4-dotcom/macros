@@ -584,7 +584,8 @@ button:active{transform:translateY(0) scale(.98)}
   .chip{padding:8px 13px}
   .meals-pick{gap:6px}
   .composer>.row{flex-direction:column;align-items:stretch;gap:10px}
-  .composer>.row .meals-pick{display:grid;grid-template-columns:repeat(4,1fr)}
+  .composer>.row .meals-pick{display:flex;flex-wrap:nowrap;justify-content:space-between;gap:4px;width:100%}
+  .composer>.row .meals-pick .chip{flex:1 1 auto;padding-left:6px;padding-right:6px;font-size:12.5px;min-width:0;letter-spacing:-.01em}
   .composer>.row .chip{padding:8px 4px;text-align:center}
   .seg2{max-width:none}
   .pill-btn{padding:8px 14px}
@@ -1561,7 +1562,10 @@ const IC = {
 const VIEWS=[['today','Today'],['train','Train'],['week','Week'],['month','Month'],['friends','Friends'],['foods','Foods'],['plan','Plan']];
 const TABS=[['today','Today'],['train','Train'],['progress','Progress'],['foods','Foods'],['plan','Plan'],['add','Log']];
 const TABS_M=[['today','Today'],['train','Train'],['add','Log'],['progress','Progress'],['plan','Plan']];
-const MEALS=[['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snacks']];
+const MEALS=[['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snacks'],['drinks','Drinks']];
+// alcoholic drinks go to the Drinks section on their own (food that just sounds similar, like sour cream or hard-boiled eggs, does not)
+const DRINK_RX=/(^|[^a-z])(beer|lager|ipa|stout|porter|pilsner|seltzer|twisted tea|cider|wine|champagne|prosecco|sangria|sake|soju|vodka|tequila|mezcal|rum\b|whisk|bourbon|scotch|cognac|brandy|liqueur|schnapps|fireball|jager|baileys|kahlua|amaretto|margarita|mojito|martini|daiquiri|mai tai|bloody mary|mimosa|bellini|spritz|negroni|old fashioned|manhattan|colada|long island|paloma|russian|toddy|shot\b|michelada|white claw|truly|high noon|corona|modelo|heineken|bud light|budweiser|michelob|coors|miller|stella|guinness|yuengling|pacifico|loko)/i,NOT_DRINK_RX=/cream|egg|candy|cake|dough|bread|chicken|pork|beef|sauce|glaze|marinade|braised|battered|cheese/i;
+const isBooze=n=>DRINK_RX.test(String(n||''))&&!NOT_DRINK_RX.test(String(n||''));
 
 /* ---------- built-in foods: #category, then aliases;kcal;P;C;F per 100 g;units (first = default) ---------- */
 const FOOD_SRC = `
@@ -2495,7 +2499,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.53';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.54';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2763,6 +2767,7 @@ $('meals').addEventListener('click',e=>{const gb=e.target.closest('[data-grade]'
 
 function addEntries(entries,k=S.day,meal=S.mealSel){
   if(!entries.length)return;const _before=dayTotals(k);setTimeout(()=>checkRewards(k,_before),0);
+  if(meal!=='drinks'&&entries.every(e=>isBooze(e.n))){meal='drinks';setTimeout(()=>toast('Added to Drinks 🍺'),400)}
   entries.forEach(e=>e.meal=meal);
   const ids=entries.map(e=>e.id),kc=entries.reduce((a,e)=>a+e.k,0);
   S.just={k,ids};
@@ -4242,6 +4247,7 @@ const ART={};
     lunch:(r,cx,cy,s)=>bowl(cx,cy,110*s,rice(r,cx,cy,90*s)+greens(r,cx-40*s,cy-30*s,30*s,9)+salmon(cx+30*s,cy-30*s,-25)+salmon(cx+45*s,cy-5*s,-20)+salmon(cx+35*s,cy+22*s,-15)+avo(cx-30*s,cy+35*s,30)+dots(r,cx+5*s,cy+55*s,18*s,12,'#7CB342',5)+dots(r,cx,cy,70*s,40,'#F5EBD0',1.4)+tomato(cx-55*s,cy+5*s,.9)),
     breakfast:(r,cx,cy,s)=>bowl(cx,cy,110*s,toast(cx-30*s,cy+10*s,-12)+avo(cx-30*s,cy+8*s,10)+egg(cx+38*s,cy-28*s,15)+egg(cx+42*s,cy+22*s,-20,.9)+blue(cx-55*s,cy-48*s)+blue(cx-40*s,cy-58*s)+straw(cx-70*s,cy-25*s,20,.9)+greens(r,cx+5*s,cy+60*s,12*s,4),true),
     dinner:(r,cx,cy,s)=>bowl(cx,cy,110*s,steak(cx+10*s,cy-25*s,-20)+broc(cx-45*s,cy+20*s)+broc(cx-25*s,cy+50*s,.8)+potato(cx+35*s,cy+35*s,15)+potato(cx+55*s,cy+15*s,-20)+potato(cx+20*s,cy+58*s,35)+greens(r,cx-55*s,cy-35*s,14*s,5)+lemon(cx+65*s,cy-50*s,40,.7),true),
+    drinks:(r,cx,cy,s)=>`<circle cx="${cx}" cy="${cy}" r="${108*s}" fill="#1B2A33"/><path d="M${cx-48*s} ${cy-62*s}h${96*s}l-${10*s} ${132*s}a${8*s} ${8*s} 0 0 1-${8*s} ${7*s}h-${60*s}a${8*s} ${8*s} 0 0 1-${8*s}-${7*s}z" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.55)" stroke-width="${3*s}"/><path d="M${cx-44*s} ${cy-30*s}h${88*s}l-${7*s} ${96*s}a${6*s} ${6*s} 0 0 1-${6*s} ${5*s}h-${62*s}a${6*s} ${6*s} 0 0 1-${6*s}-${5*s}z" fill="#E9A63B"/><path d="M${cx-46*s} ${cy-44*s}q${12*s}-${12*s} ${24*s} 0t${24*s} 0t${24*s} 0t${22*s} 0v${16*s}h-${94*s}z" fill="#FFF6E3"/>${[[-20,10,5],[8,30,4],[22,-4,6],[-6,48,3.5],[14,58,3]].map(([dx,dy,rr])=>`<circle cx="${cx+dx*s}" cy="${cy+dy*s}" r="${rr*s}" fill="rgba(255,255,255,.55)"/>`).join('')}<circle cx="${cx+40*s}" cy="${cy-58*s}" r="${16*s}" fill="#F4D35E"/><path d="M${cx+30*s} ${cy-70*s}l${20*s} ${24*s}" stroke="#E0B532" stroke-width="${3*s}"/>`,
     snack:(r,cx,cy,s)=>bowl(cx,cy,110*s,`<circle cx="${cx}" cy="${cy}" r="${92*s}" fill="#F8F5EF"/><path d="M${cx-50*s} ${cy}q25 -30 50 0t50 0" stroke="#EDE6DA" stroke-width="6" fill="none"/>`+straw(cx-30*s,cy-35*s,-15)+straw(cx+5*s,cy-50*s,25)+blue(cx+35*s,cy-20*s)+blue(cx+45*s,cy-5*s)+blue(cx+28*s,cy+2*s)+blue(cx+50*s,cy+15*s)+almond(cx-35*s,cy+30*s,30)+almond(cx-20*s,cy+45*s,-20)+almond(cx-45*s,cy+48*s,70)+dots(r,cx+10*s,cy+40*s,20*s,20,'#C9A26B',2.2)+leaf(cx+25*s,cy+50*s,.5,-30,'#5BA24B'))};
   const plate=(cx,cy,r)=>`<circle cx="${cx+r*.05}" cy="${cy+r*.08}" r="${r*1.03}" fill="url(#sh)"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#plt)"/><circle cx="${cx}" cy="${cy}" r="${r*.22}" fill="#0E1015"/><circle cx="${cx}" cy="${cy}" r="${r*.14}" fill="#2B303B"/>${[0,1,2,3,4,5,6,7].map(i=>{const a=i*Math.PI/4;return `<circle cx="${cx+Math.cos(a)*r*.86}" cy="${cy+Math.sin(a)*r*.86}" r="${r*.025}" fill="#3A404D"/>`}).join('')}<text x="${cx}" y="${cy-r*.36}" text-anchor="middle" font-family="Avenir Next,system-ui" font-weight="800" font-size="${r*.16}" fill="#C9F26B" fill-opacity=".9">45</text>`;
   const bg=(w,h,c1,c2)=>`<rect width="${w}" height="${h}" fill="#0E1015"/><rect width="${w}" height="${h}" fill="url(#tb)"/><defs><radialGradient id="tb" cx="70%" cy="40%" r="80%"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></radialGradient></defs>`;
@@ -5379,10 +5385,10 @@ const GRADE_SCALE=[[85,'A','Balanced','--good'],[70,'B','Good','--kcal'],[55,'C'
 const MEAL_FOODS={p:{breakfast:'eggs, Greek yogurt or a protein shake',lunch:'chicken, tuna, turkey or tofu',dinner:'chicken, fish, lean beef or tofu',snack:'cottage cheese, jerky, skyr or a shake'},
   c:{breakfast:'oats, fruit, toast or a bagel',lunch:'rice, a wrap, potatoes or beans',dinner:'rice, potatoes, pasta or quinoa',snack:'fruit, rice cakes or pretzels'},
   v:{breakfast:'berries or a banana',lunch:'a side salad or peppers',dinner:'roasted veg or greens',snack:'an apple or baby carrots'}};
-function mealTargets(m,g){const sh=MEAL_SHARE[m]||.2,snack=m==='snack';
+function mealTargets(m,g){const sh=MEAL_SHARE[m]||.2,snack=m==='snack'||m==='drinks';
   return {p:snack?Math.max(10,r0(g.p*.12)):Math.max(proteinPerMealTarget(),r0(g.p*sh)),c:Math.max(snack?5:15,r0(g.c*sh)),f:Math.max(snack?3:8,r0(g.f*sh))}}
 function gradeMeal(m,es,g){
-  if(!es.length)return null;const t=sumEntries(es),T=mealTargets(m,g),snack=m==='snack';
+  if(!es.length||m==='drinks')return null;const t=sumEntries(es),T=mealTargets(m,g),snack=m==='snack';
   const rP=t.p/T.p,rC=t.c/T.c,rF=t.f/T.f;
   const cLo=snack?.3:.6,cHi=snack?2.5:1.6,fLo=.25,fHi=snack?2:1.6;
   const sp=35*Math.min(1,Math.pow(rP,1.2));
@@ -5405,8 +5411,8 @@ function gradeMeal(m,es,g){
   if(!tips.length)tips.push(t.p>=50?`Big protein meal, carbs and fat in range. Nothing to change.`:`Protein, carbs and fat all sit in a healthy range for ${lab.toLowerCase()}. Nothing to change.`);
   return {score,letter:G[1],label:G[2],col:G[3],head,tips,st,need,t,T,veg,parts:{p:Math.round(sp),c:Math.round(sc),f:Math.round(sf),v:sv}}}
 /* what an empty meal should aim for: today's remaining macros spread over the meals still to come */
-function mealAim(m,k,g){if(k!==todayKey()||m==='snack')return null;const list=S.days[k]||[],t=dayTotals(k);
-  const left=MEALS.filter(([x])=>x!=='snack'&&!list.some(e=>(e.meal||'snack')===x));if(!left.some(([x])=>x===m))return null;
+function mealAim(m,k,g){if(k!==todayKey()||m==='snack'||m==='drinks')return null;const list=S.days[k]||[],t=dayTotals(k);
+  const left=MEALS.filter(([x])=>x!=='snack'&&x!=='drinks'&&!list.some(e=>(e.meal||'snack')===x));if(!left.some(([x])=>x===m))return null;
   const w=left.length+(list.some(e=>(e.meal||'snack')==='snack')?0:.5),R={p:g.p-t.p,c:g.c-t.c,f:g.f-t.f};if(R.p<=5&&R.c<=5)return null;
   const a={p:Math.max(0,Math.round(R.p/w/5)*5),c:Math.max(0,Math.round(R.c/w/5)*5),f:Math.max(0,Math.round(R.f/w/5)*5)};
   const behind=[['protein',R.p/g.p],['carbs',R.c/g.c],['fat',R.f/g.f]].sort((x,y)=>y[1]-x[1])[0];
@@ -5429,7 +5435,7 @@ function openGrade(m){const k=S.day,g=goalsFor(k),es=(S.days[k]||[]).filter(e=>(
   $('grOk').onclick=closeSheet}
 function proteinPerMealTarget(){return Math.round(Math.max(25,.3*kgNow()))}
 function renderFuel(){const kg=kgNow(),g=goalsFor(todayKey()),fs=fuelState(),pm=proteinPerMealTarget(),lb=r0(kg/.4536);
-  const day=MEALS.filter(([m])=>m!=='snack').map(([m,l])=>{const es=(S.days[todayKey()]||[]).filter(e=>(e.meal||'snack')===m),t=sumEntries(es);return [l,t.p,es.length]});
+  const day=MEALS.filter(([m])=>m!=='snack'&&m!=='drinks').map(([m,l])=>{const es=(S.days[todayKey()]||[]).filter(e=>(e.meal||'snack')===m),t=sumEntries(es);return [l,t.p,es.length]});
   $('pg-fuel').innerHTML=`<div class="card fuel-hero"><div class="eyebrow" style="color:var(--good)">Your numbers at ${lb} lb</div><h2>When to eat what</h2>
     <div class="fuel-grid"><div style="--c:var(--pro)"><b>${pm}+ g</b><span>protein each meal, more is fine</span></div><div style="--c:var(--carb)"><b>${r0(.8*kg)}–${r0(1*kg)} g</b><span>carbs before or after lifting</span></div><div style="--c:var(--fat)"><b>${r0(g.f*9/Math.max(1,goalKcal(g))*100)}%</b><span>of calories from fat (aim 20–35%)</span></div><div style="--c:var(--fat)"><b>${r1(kg*7.5/1000*33.8)} oz</b><span>water 2–4 h before training</span></div></div></div>
     ${proteinHTML()}
