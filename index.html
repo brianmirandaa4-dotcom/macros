@@ -2423,7 +2423,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.41';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.42';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -6092,7 +6092,7 @@ function mergeDevice(d,days=14){
   if(d.whoop)put('w',d.whoop.days);if(d.oura)put('o',d.oura.days);if(d.garmin)put('g',d.garmin.days);
   const ws=[...(d.whoop?d.whoop.workouts:[]),...(d.oura?d.oura.workouts:[]),...(d.garmin?d.garmin.workouts:[])];
   // drop sessions you deleted in WHOOP / Oura / Garmin: anything from a source that answered, inside the window it sent, that's no longer there
-  const from=addDays(todayKey(),-(days-2)),fresh=new Set(ws.map(w=>w.id)),answered=['whoop','oura','garmin'].filter(x=>d[x]&&Array.isArray(d[x].workouts));
+  const from=addDays(todayKey(),-(days-2)),fresh=new Set(ws.map(w=>w.id)),answered=['whoop','oura','garmin'].filter(x=>d[x]&&Array.isArray(d[x].workouts)&&!(d[x].errors||[]).length&&!(d.errors||[]).some(e=>String(e).toLowerCase().startsWith(x)));
   const gone=S.dev.workouts.filter(w=>answered.some(x=>String(w.id).startsWith(x+'-'))&&w.date>=from&&!fresh.has(w.id));
   if(gone.length){const g=new Set(gone.map(w=>w.id));S.dev.workouts=S.dev.workouts.filter(w=>!g.has(w.id));S.dev.skip=(S.dev.skip||[]).filter(id=>!g.has(id));S.workouts.forEach(w=>{if(w.devId&&g.has(w.devId))delete w.devId})}
   const map=new Map(S.dev.workouts.map(w=>[w.id,w]));ws.forEach(w=>map.set(w.id,w));
