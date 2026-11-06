@@ -1,0 +1,44 @@
+/* tail. polish layer — structural fixes, tokens only (works with every scheme) */
+
+/* game header scoreboard: team | score | team, nothing can collide */
+.sbd{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;margin:6px 0 4px}
+.sbd-t{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.sbd-t b{font:800 22px/1 var(--f-disp);letter-spacing:.01em}
+.sbd-t .tl{margin:0}
+.tl.lg{width:52px;height:52px}
+.sbd-s{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.sbd-s b{font:800 40px/1 var(--f-num);letter-spacing:-.02em;color:var(--t2);min-width:1.2ch;text-align:center}
+.sbd-s b.w{color:var(--t1)}
+.sbd-s i{font:600 18px/1 var(--f-ui);font-style:normal;color:var(--t3)}
+.x-board .x-bt{display:flex;align-items:center;gap:8px;min-height:24px}
+.x-board .x-bt .wx-slot{margin-left:auto;float:none}
+.x-lines{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.x-lines div{min-width:0;padding:10px 12px!important}
+.x-lines b{font:700 16px/1.2 var(--f-num)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-lines b.ml2{display:grid;gap:3px;font-size:14px!important}
+.x-lines b.ml2 span{white-space:nowrap}
+
+/* model-side rows: real cards with padding, radius, aligned columns */
+.info:has(.sr3){display:grid;gap:10px;background:none!important;box-shadow:none!important;padding:0!important}
+.sr3{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;width:100%;text-align:left;border:0;border-radius:18px;padding:14px 16px;color:var(--t1);
+  background:var(--s2);box-shadow:inset 0 0 0 1px var(--hair2);overflow:hidden}
+.sr3-who{display:grid;gap:4px;min-width:0}
+.sr3-who b{font:700 17px/1.2 var(--f-disp);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr3-who>span{font:600 14.5px/1.2 var(--f-ui);color:var(--t2)}
+.sr3-p{display:flex;align-items:center;gap:8px;align-self:start}
+.sr3-p b{font:800 22px/1 var(--f-num);letter-spacing:-.02em}
+.sr3-g{font:800 11px/1 var(--f-ui);font-style:normal;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:var(--s3);color:var(--t2)}
+.sr3-meta{grid-column:1/-1;font:500 12.5px/1.35 var(--f-ui);color:var(--t3)}
+.sr3-foot{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;padding-top:10px;box-shadow:inset 0 1px 0 var(--hair)}
+.sr3-price{font:700 14px/1 var(--f-num);color:var(--t1);white-space:nowrap}.sr3-price i{font:600 12px/1 var(--f-ui);font-style:normal;color:var(--t3)}
+.sr3 .bkrow{display:flex;gap:6px;margin:0!important}
+.sr3 .bkrow>*{min-height:32px;padding:0 12px!important;font-size:13px!important;border-radius:10px!important}
+/* live progress on rows: rounded, inset fill, inline status chip (never overlapping text) */
+.sr3.pg{padding:14px 16px!important;border-radius:18px;background:linear-gradient(90deg,color-mix(in srgb,var(--edge) 12%,transparent) 0 var(--pg),transparent var(--pg)),var(--s2)!important;box-shadow:inset 0 0 0 1px var(--hair2)!important}
+.sr3.pg::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:var(--pg);background:var(--edge);border-radius:0 2px 2px 0}
+.sr3.pg.pg-under::after{background:var(--live)}
+.sr3.pg.pg-win{background:linear-gradient(180deg,color-mix(in srgb,var(--edge) 16%,transparent),transparent 80%),var(--s2)!important;box-shadow:inset 0 0 0 1.5px var(--edge)!important}
+.sr3.pg.pg-win::after{width:100%}
+.sr3.pg.pg-loss{opacity:.72;background:var(--s2)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--loss) 45%,transparent)!important}
+.sr3.pg.pg-loss::after{background:var(--loss)}
+.sr3 .pgtag{position:static!important;grid-column:1/-1;justify-self:start;margin-top:2px;order:9}
