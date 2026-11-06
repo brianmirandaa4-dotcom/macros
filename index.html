@@ -1346,6 +1346,13 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .ac-band{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;text-align:left;color:var(--fg);cursor:pointer;background:var(--surface);border:1px solid rgba(255,255,255,.07);font:inherit}
 .ac-band.warn{border-color:color-mix(in srgb,var(--carb) 45%,transparent);background:color-mix(in srgb,var(--carb) 7%,var(--surface))}
 .ac-band .mb-crest{color:var(--good)}.ac-band.warn .mb-crest{color:var(--carb)}
+
+.hk-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.hk-steps li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:12px;border-radius:14px;background:var(--surface-2)}
+.hk-n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--kcal) 18%,transparent);color:var(--kcal);font-weight:800;font-size:13px}
+.hk-steps b{display:block;font-size:15px}.hk-steps span{display:block;font-size:13px;color:var(--muted);margin:2px 0 8px;line-height:1.4}
+.hk-steps a,.hk-steps button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:9px 14px;border-radius:11px;font-size:14px}
+.hk-diy summary{cursor:pointer;color:var(--muted);font-size:13.5px;padding:4px 0}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -2641,7 +2648,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.68';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.69';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3551,7 +3558,7 @@ function renderPlan(){renderTip('plan');
     const set=(id,v)=>{if(v!=null&&v!=='')$(id).value=v};
     set('pSex',c.sex);set('pAge',c.age);if(c.ht){set('pFt',Math.floor(c.ht/12));set('pIn',r1(c.ht%12))}set('pWt',c.wt);set('pBf',c.bf);set('pAct',c.act);
     set('pLbs',c.lbs);set('pDur',c.dur);set('pUnit',c.unit);set('pStyle',c.style);set('pPro',c.pro==='0.7'||c.pro==='0.9'?'auto':c.pro);set('pBrk',c.breaks);
-    $('pStart').value=todayKey();$('wDate').value=todayKey();
+    $('pStart').value=(c.planStart&&!S.plan)?c.planStart:todayKey();$('wDate').value=todayKey();
     const lw=latestWeight();if(!c.wt&&lw)$('pWt').value=lw.w;
   }
   renderTypeSeg();
@@ -3756,7 +3763,7 @@ $('wIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$
 function saveProfileFields(){const p=profIn();S.calc={sex:p.sex,age:p.age,ht:p.ht,wt:p.wt,bf:p.bf,act:p.act,lbs:+$('pLbs').value,dur:+$('pDur').value,unit:p.unit,style:p.style,pro:p.pro,breaks:p.breaks,type:S.pType};save()}
 ['pSex','pAge','pFt','pIn','pWt','pBf','pAct','pLbs','pDur','pUnit','pStyle','pPro','pBrk','pStart'].forEach(id=>{$(id).addEventListener('input',()=>renderPlan());$(id).addEventListener('change',saveProfileFields)});
 $('pType').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;S.pType=b.dataset.t;S.calc={...S.calc,type:S.pType};save();renderPlan()};
-$('pStartBtn').onclick=()=>{if(!draft){openPage('body');toast('Add your age, height and weight, then come back to start your plan');return}saveProfileFields();S.plan=draft;if(!S.weights[draft.start]&&draft.start<=todayKey())S.weights[draft.start]=draft.startW;save();renderAll();window.scrollTo({top:0,behavior:'smooth'});toast(`Plan started: ${fmt(draft.weeks[0].k)} kcal a day this week`)};
+$('pStartBtn').onclick=()=>{if(!draft){openPage('body');toast('Add your age, height and weight, then come back to start your plan');return}saveProfileFields();S.plan=draft;setTimeout(()=>{cloudBackup(true);try{socPush(true)}catch(e){}},300);if(!S.weights[draft.start]&&draft.start<=todayKey())S.weights[draft.start]=draft.startW;save();renderAll();window.scrollTo({top:0,behavior:'smooth'});toast(`Plan started: ${fmt(draft.weeks[0].k)} kcal a day this week`)};
 let stopArmed=null;
 $('pStop').onclick=()=>{const b=$('pStop');if(!stopArmed){b.textContent='Tap again to end the plan';b.classList.add('danger');stopArmed=setTimeout(()=>{b.textContent='End current plan';b.classList.remove('danger');stopArmed=null},4000);return}clearTimeout(stopArmed);stopArmed=null;S.plan=null;b.textContent='End current plan';b.classList.remove('danger');save();renderAll();toast('Plan ended. Manual targets are back in use.')};
 
@@ -4120,7 +4127,10 @@ function restoreFromSoc(soc){if(!soc)return 0;const D=soc.detail||{},n0=Object.k
   const wid=new Set((S.workouts||[]).map(w=>w.name+'|'+w.date));(D.wks||[]).forEach(w=>{if(!w.d||w.src==='live'||(w.src&&w.src!=='')||!(w.ex||[]).length||wid.has(w.name+'|'+w.d))return;const st=new Date(w.d+'T12:00:00').getTime();
     S.workouts=S.workouts||[];S.workouts.push({id:'w'+uid(),name:w.name,date:w.d,start:st,end:st+(w.min||45)*60000,restored:true,prs:[],ex:w.ex.map(e=>{const m=String(e.top||'').match(/([\d.]+)\D+(\d+)/);return {n:e.n,sets:Array.from({length:Math.max(1,e.sets||1)},()=>({w:m?+m[1]:0,r:m?+m[2]:0,done:true}))}})});n++});
   {const ws=Object.keys(S.weights).sort();if(ws.length&&!(S.calc&&S.calc.wt))S.calc={...(S.calc||{}),wt:S.weights[ws[ws.length-1]]};
-   const pt=/bulk/i.test(D.plan||'')?'bulk':/cut/i.test(D.plan||'')?'cut':/maint/i.test(D.plan||'')?'maintain':null;if(pt&&!S.plan){S.pType=pt;S.calc={...(S.calc||{}),type:pt}};renderPlan.filled=false}
+   const pt=/bulk/i.test(D.plan||'')?'bulk':/cut/i.test(D.plan||'')?'cut':/maint/i.test(D.plan||'')?'maintain':null;if(pt&&!S.plan){S.pType=pt;S.calc={...(S.calc||{}),type:pt}};
+   const pp=String(D.plan||'').split('|');if(pt&&!S.plan&&pp.length>=4){const m=String(pp[2]).match(/^([\d.]+)([wm])/);S.calc={...S.calc,lbs:+pp[1]||0,dur:m?+m[1]:S.calc.dur,unit:m?(m[2]==='m'?'months':'weeks'):S.calc.unit,planStart:/^\d{4}-\d\d-\d\d$/.test(pp[3])?pp[3]:null,...(pp[4]?{style:pp[4]}:{}),...(pp[5]?{pro:pp[5]}:{})};
+     if(S.calc.age&&S.calc.ht&&S.calc.wt){try{const pr={sex:S.calc.sex||'m',age:S.calc.age,ht:S.calc.ht,wt:S.calc.wt,bf:S.calc.bf,act:S.calc.act||'1.55',type:pt,lbs:S.calc.lbs,dur:S.calc.dur,unit:S.calc.unit,style:S.calc.style||'gradual',pro:S.calc.pro||'auto',breaks:S.calc.breaks||'none',start:S.calc.planStart||todayKey()};S.plan=buildPlan(pr)}catch(e){}}}
+   renderPlan.filled=false}
   if(soc.name&&!S.profile.name)S.profile.name=soc.name;if(soc.av&&!S.profile.avatar&&!S.profile.photo)S.profile.avatar=soc.av;S.profile.onboarded=true;
   const sc=socCfg();socSave({...sc,on:true,code:soc.code,name:soc.name,color:soc.color,share:soc.share,username:soc.username,phoneLast4:soc.phLast4||null});
   save();return n}
@@ -4130,7 +4140,7 @@ async function acctFinish(j,mode){syncSave({url:j.url,uid:j.uid,token:j.token});
       const local=localStorage.getItem(LS);if(local&&local.length>20)localStorage.setItem(LS+'.before-restore',local);localStorage.setItem(LS,raw);restored=true;
       if(j.soc){const sc=socCfg(),soc=j.soc;socSave({...sc,on:true,code:soc.code,name:soc.name,color:soc.color,share:soc.share,username:soc.username,phoneLast4:soc.phLast4||null})}
       acctSave({un:j.username||'me',at:Date.now()});closeSheet();toast('Welcome back. Your data is restored.');setTimeout(()=>location.reload(),900);return}}catch(e){}}
-  const n=restoreFromSoc(j.soc);closeSheet();renderAll();
+  const n=restoreFromSoc(j.soc);closeSheet();if(!$('onb').hidden){$('onb').hidden=true;document.documentElement.style.overflow='';ob=null}renderAll();
   toast(n?`Welcome back, @${esc(j.username)}. Restored your templates, workouts and recent days.`:`Signed in as @${esc(j.username)}. Your data will back up automatically.`);
   setTimeout(()=>cloudBackup(true),1500)}
 function openAccount(mode='signin',pre={}){
@@ -5446,7 +5456,8 @@ function myDetail(){
       ex:w?w.ex.map(y=>{const b=y.sets.reduce((a,z)=>e1rm(z.w,z.r)>e1rm(a.w,a.r)?z:a,y.sets[0]);return {n:y.n,sets:y.sets.length,top:b?`${b.w}×${b.r}`:''}}):[]}});
   const pl=S.plan?`${S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}`:'';
   const tpls=S.templates.map(t=>({name:t.name,ex:t.ex.map(n=>{const l=lastFor(n);return {n,m:musOf(n),eq:eqOf(n),s:l&&l.length?`${l.length}×${l[0].r}`:''}})}));
-  return {daily,foods,wks:[...live,...wks].slice(0,10),tpls,plan:pl}}
+  const P=S.plan,pc=P&&S.calc?[pl,r1(Math.abs(S.calc.lbs||0)),(S.calc.dur||'')+String(S.calc.unit||'w')[0],P.start,String(S.calc.style||'').slice(0,8),String(S.calc.pro||'auto').slice(0,4)].join('|').slice(0,40):pl;
+  return {daily,foods,wks:[...live,...wks].slice(0,10),tpls,plan:pc}}
 let fpUid=null;
 function openFriend(uid){fpUid=uid;openPage('friend')}
 function ringMini(v,goal,col,size=128,stroke=12){const R=(size-stroke)/2,C=2*Math.PI*R,f=goal?Math.min(1,v/goal):0;
@@ -5464,7 +5475,7 @@ function renderFriendPage(){
   const macro=(l,v,g,col)=>{const pct=g?Math.min(100,v/g*100):0;return `<div class="fp-m" style="--c:var(${col})"><div class="row" style="justify-content:space-between"><span>${l}</span><b class="num">${r0(v)}<small> / ${r0(g)} g</small></b></div><i><u style="width:${pct}%"></u></i></div>`};
   const left=hasN?today.gk-today.k:0;
   const fn=isMe?'You':esc(F.name.split(' ')[0]),onN=sh.nutrition||isMe,onR=sh.recovery||isMe,onS=sh.steps||isMe,onW=sh.workouts||isMe,priv=[];
-  let html=`<div class="fp-top">${AV(F.name,F.color,58,F.me?myAv():F.av)}<div class="fp-id"><h2>${esc(F.name)}</h2><p>${F.username?'@'+esc(F.username):''}${D.plan?` · ${esc(D.plan)}`:''}</p></div></div>
+  let html=`<div class="fp-top">${AV(F.name,F.color,58,F.me?myAv():F.av)}<div class="fp-id"><h2>${esc(F.name)}</h2><p>${F.username?'@'+esc(F.username):''}${D.plan?` · ${esc(String(D.plan).split('|')[0])}`:''}</p></div></div>
     <div class="fp-chips"><div><b>${fmt(st.score||0)}</b><span>pts</span></div><div><b>#${rank||'—'}</b><span>rank</span></div><div><b>${st.streak??'—'}</b><span>streak</span></div><div><b>${st.workouts??'—'}</b><span>workouts</span></div></div>`;
   if(onN){const t={k:today.k||0,p:today.p||0,c:today.c||0,f:today.f||0},gk=today.gk||0,lf=gk-t.k,ov=lf<0,pc=gk?Math.round(t.k/gk*100):0;
     const mac=(lab,v,goal,col,key)=>{const rem=(goal||0)-(v||0),p2=goal?Math.min(v/goal,1):0;return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b>${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':key==='p'?'extra':'over'}</span></div><div class="bar"><i style="width:${p2*100}%"></i></div><div class="hm-g num">${r0(v)} / ${r0(goal)}</div></div>`};
@@ -6697,6 +6708,7 @@ function renderHealth(){
     :(conn?'Nothing synced for this day yet. Tap Sync now, or wear your device overnight.':'Bring in recovery, sleep, HRV and workouts from WHOOP, Oura or Garmin automatically. Tap Set up.');
 }
 async function syncHealth(){
+  if(syncCfg().hk){await pullHK(true);return}
   let text='';
   try{if(navigator.clipboard&&navigator.clipboard.readText)text=await navigator.clipboard.readText()}catch(e){}
   const h=parseHealth(text);
@@ -6721,16 +6733,22 @@ function openHealthEdit(){
   $('heClr').onclick=()=>{delete S.health[S.day];save();closeSheet();renderAll()};
   $('heOk').onclick=()=>{const n={};H_FIELDS.forEach(([k])=>{const v=$('he_'+k).value;if(v!=='')n[k]=+v});const wo=$('he_wo').value.trim();if(wo)n.workouts=wo;S.health[S.day]={...n,t:Date.now()};if(!Object.keys(n).length)delete S.health[S.day];save();closeSheet();renderAll();toast('Saved')};
 }
+const SHORTCUT_URL='';// iCloud link to the shared "Trainer Sync" shortcut
+async function hkLink(){const c=await ensureSync();let code=c.hk;if(!code){const j=await api('/api/hk-code',{method:'POST'});code=j.code;syncSave({...syncCfg(),hk:code})}return `${c.url}/api/hk/in?k=${code}`}
 function openHealthGuide(){
-  sheet(`<div><div class="eyebrow">One-time setup · about 5 minutes</div><h3>Connect WHOOP or Garmin</h3><p class="note">Web apps can't read Apple Health directly, but the free Shortcuts app on your iPhone can. Your WHOOP or Garmin app already sends its data to Apple Health; the Shortcut collects it and Trainer pastes it in.</p></div>
-    <ol class="steps-guide">
-      <li><b>Turn on the Health connection.</b> In the WHOOP app, look in settings under Integrations for Apple Health. In Garmin Connect, look under Settings → Connected Apps → Apple Health. Allow all categories.</li>
-      <li><b>Open Shortcuts → + → name it “Trainer Sync”.</b></li>
-      <li><b>Add “Find Health Samples”</b> for each item below, filtered to <i>Start Date is today</i> (sleep: <i>in the last 1 day</i>). For totals add <b>Calculate Statistics → Sum</b>; for single readings sort by Start Date, Latest First, Limit 1.
-        <br>Steps (Sum) · Active Energy (Sum) · Resting Heart Rate (latest) · Heart Rate Variability (latest) · Sleep Analysis, value Asleep (Sum of durations, in hours) · Weight (latest)</li>
-      <li><b>Add a “Text” action</b> and insert each result after its label:</li>
+  sheet(`<div><div class="eyebrow">Apple Health</div><h3>Connect Apple Watch</h3><p class="note" style="margin:4px 0 0">Also brings in WHOOP, Garmin and Oura data that those apps share with Apple Health. Set it up once and Trainer updates every time you open it.</p></div>
+    <ol class="hk-steps">
+      <li><span class="hk-n">1</span><div><b>Copy your private sync link</b><span>It only lets your shortcut send health data to your account.</span><button class="ghost" type="button" id="hkCopy">Copy link</button></div></li>
+      <li><span class="hk-n">2</span><div><b>Add the Trainer Sync shortcut</b><span>Tap Add Shortcut, then paste your link when it asks.</span>${SHORTCUT_URL?`<a class="primary" id="hkAdd" href="${SHORTCUT_URL}" target="_blank" rel="noopener">Add shortcut</a>`:`<button class="ghost" type="button" disabled>Shortcut link coming soon</button>`}</div></li>
+      <li><span class="hk-n">3</span><div><b>Run it once and tap Allow</b><span>Your iPhone asks which Health data to share. Allow steps, sleep, heart rate, HRV, active energy and weight.</span><a class="ghost" href="shortcuts://run-shortcut?name=Trainer%20Sync">Run it now</a></div></li>
+      <li><span class="hk-n">4</span><div><b>Make it automatic</b><span>In Shortcuts → Automation → + → Time of Day (for example 8 AM) → Run Immediately → Trainer Sync.</span></div></li>
     </ol>
-    <div class="codebox">SYNCOPE-HEALTH
+    <details class="hk-diy"><summary>Build the shortcut yourself instead</summary>
+      <ol class="steps-guide">
+        <li>Open Shortcuts → + → name it <b>Trainer Sync</b>.</li>
+        <li>Add <b>Find Health Samples</b> for each: Steps (Sum), Active Energy (Sum), Resting Heart Rate (latest), Heart Rate Variability (latest), Sleep Analysis asleep (sum of durations, hours), Weight (latest). Filter to today (sleep: last 1 day).</li>
+        <li>Add a <b>Text</b> action:</li></ol>
+      <div class="codebox">TRAINER-HEALTH
 date=[Current Date, format yyyy-MM-dd]
 steps=[Steps]
 active=[Active Energy]
@@ -6738,16 +6756,18 @@ rhr=[Resting Heart Rate]
 hrv=[HRV]
 sleep=[Sleep hours]
 weight=[Weight]</div>
-    <ol class="steps-guide" start="5">
-      <li><b>Add “Copy to Clipboard”.</b> Run it once and allow Health access.</li>
-      <li><b>Each morning:</b> run the shortcut (or set Automation → Time of Day to run it), open Trainer, tap <b>Sync</b>.</li>
-    </ol>
-    <p class="note">What comes through: WHOOP sends sleep, resting heart rate, active energy and workouts, but not HRV or Recovery. Garmin sends sleep, steps, active energy, workouts and weight, but not HRV or resting HR. Apple Watch sends all of it. Type anything missing, like WHOOP Recovery, with Edit.</p>
-    <div class="row" style="justify-content:flex-end"><button class="primary" id="hgOk">Got it</button></div>`);
-  $('hgOk').onclick=closeSheet;
+      <ol class="steps-guide" start="4"><li>Add <b>Get Contents of URL</b>: paste your sync link, Method POST, Request Body File → the Text.</li></ol>
+    </details>
+    <button class="primary" type="button" id="hkDone" style="width:100%">Done</button>`,{nofocus:true});
+  $('hkDone').onclick=()=>{closeSheet();pullHK(true)};
+  $('hkCopy').onclick=async()=>{const b=$('hkCopy');b.disabled=true;b.textContent='One moment…';try{const l=await hkLink();try{await navigator.clipboard.writeText(l)}catch(e){prompt('Copy your sync link',l)}b.textContent='Copied ✓';toast('Sync link copied')}catch(e){b.disabled=false;b.textContent='Copy link';toast(esc(niceErr(e,'Trainer')))}};
 }
-
-$('profBtn').onclick=()=>openPage('me');$('hSync').onclick=()=>{const c=syncCfg();if(c.url&&c.uid)syncDevices(true);else syncHealth()};$('hEdit').onclick=openHealthEdit;$('hHow').onclick=openSetupChooser;
+let hkBusy=false;
+async function pullHK(loud){const c=syncCfg();if(!c.hk||hkBusy)return;hkBusy=true;try{const j=await api('/api/hk');const since=(S.prefs&&S.prefs.hkAt)||0;let n=0,last=null;
+    (j.list||[]).filter(x=>x.t>since).forEach(x=>{const h=parseHealth(x.text);if(h){last=applyHealth(h);n++}});
+    const top=(j.list||[]).reduce((a,x)=>Math.max(a,x.t),since);if(top>since){S.prefs={...(S.prefs||{}),hkAt:top};save()}
+    if(n)toast(`Apple Health synced${last?` for ${niceDate(last,{month:'short',day:'numeric'})}`:''}`);else if(loud)toast('No new Apple Health data yet. Run Trainer Sync in Shortcuts.')}catch(e){if(loud)toast(esc(niceErr(e,'Apple Health')))}finally{hkBusy=false}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pullHK(false)});setTimeout(()=>pullHK(false),2500);
 function renderJust(){
   const el=$('justAdded');if(!el)return;const j=S.just;
   const list=j&&j.k===S.day?(S.days[S.day]||[]).filter(e=>j.ids.includes(e.id)):[];
