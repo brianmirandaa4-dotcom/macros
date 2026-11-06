@@ -43,8 +43,8 @@ const INDOOR = '<span class="wx-c">🏟️ Indoors</span>';
 const rows = () => ((INDEX && INDEX.slates) || []).filter(s => s.sport === 'NBA').sort((a, b) => a.start_utc < b.start_utc ? 1 : -1);
 function currentRows(){ const R = rows(); if(!R.length) return []; const now = Date.now();
   const cur = R.filter(s => new Date(s.end_utc || s.start_utc).getTime() + 6 * 3.6e6 > now && new Date(s.start_utc).getTime() < now + 36 * 3.6e6); return cur.length ? cur : [R[0]]; }
-async function slates(){ const out = []; for(const s of currentRows()){ try{ out.push(await loadSlate(s.id)); }catch(e){} } return out.sort((a, b) => ((a.games[0] || {}).kick_utc || '') < ((b.games[0] || {}).kick_utc || '') ? -1 : 1); }
-const loaded = () => { const ids = new Set(currentRows().map(s => s.id)); return Object.values(SLATE).filter(d => d && d.sport === 'NBA' && (ids.has(d.id) || d.id === S.slate)); };
+async function slates(){ const out = []; for(const s of currentRows()){ try{ out.push(tagCal(await loadSlate(s.id))); }catch(e){} } return out.sort((a, b) => ((a.games[0] || {}).kick_utc || '') < ((b.games[0] || {}).kick_utc || '') ? -1 : 1); }
+const loaded = () => { const ids = new Set(currentRows().map(s => s.id)); return Object.values(SLATE).filter(d => d && d.sport === 'NBA' && (ids.has(d.id) || d.id === S.slate)).map(tagCal); };
 let PIX = null, TEAMS;
 const crow = r => Array.isArray(r) ? {pid: String(r[0]), name: r[1], team: nab(r[2]), pos: r[3] || '', jersey: r[4], status: r[5] || '', contract: r[6] || ''}
   : {pid: String(r.pid ?? r.id ?? ''), name: r.name, team: nab(r.team), pos: r.pos || '', jersey: r.jersey, status: r.status || '', contract: r.contract_type || r.contract || '', gleague: r.gleague || null};
@@ -95,7 +95,7 @@ document.addEventListener('visibilitychange', () => { if(document.visibilityStat
 function pickNow(p){ const g = gameFor(p.team); if(!g || g.state === 'pre') return null; const k = mkey(p.market); if(!(k in MK) || !isNum(p.line) || !p.side) return null;
   const st = statsOf(p); if(!st) return null; const now = sv(st, k); if(!isNum(now)) return null; const over = p.side !== 'under', hit = now > p.line, done = g.state === 'post';
   return {g, now, over, done, win: over ? hit : (done && !hit), loss: over ? (done && !hit) : hit}; }
-function applyNBA(root, d){ if(!root || !d) return;
+function applyNBA(root, d){ if(!root || !d) return; tagCal(d);
   for(const el of root.querySelectorAll('[data-prop]')){ const p = d.props.find(x => x.id === el.dataset.prop); if(!p || p.no_prediction) continue; const s = pickNow(p); if(!s) continue;
     const state = s.win ? 'win' : s.loss ? 'loss' : 'run'; const frac = Math.max(0, Math.min(1, p.line > 0 ? s.now / p.line : (s.now > 0 ? 1 : 0)));
     const ck = p.id + (el.classList.contains('betcard') ? '|c' : el.classList.contains('x-bet') ? '|h' : '|o');
@@ -189,7 +189,7 @@ function betNowNFL(){ const out = []; if(!LV.at || !Object.values(LV.games).some
 function itemsNBA(){ const out = [], G = Object.values(NLV.games); const ord = s => s === 'in' ? 0 : s === 'post' ? 1 : 2;
   for(const b of betNowNBA()){ const p = b.p; out.push({k: `b:${p.id}:${b.cp}`, kind: 'bet', html: `<span class="tk tk-bet" data-tkp="${esc(p.id)}"><i>BET NOW</i>${TLN(p.team, 'xs')}${esc(p.player)} ${p.side === 'under' ? 'U' : 'O'} <b>${ln(b.line)}</b> ${MK[mkey(p.market)]} · ${ln(b.v)} at ${b.cp === 'ht' ? 'half' : 'end Q1'}</span>`}); }
   const nb = out.length; let w = 0, l = 0; const seen = new Set(), wins = [];
-  for(const d of loaded()) for(const p of d.props){ if(p.no_prediction || !(p.tier === 'bet' || (pSide(p) || 0) >= .55)) continue; const s = pickNow(p); if(!s) continue; const k = p.player + p.market; if(seen.has(k)) continue; seen.add(k);
+  for(const d of loaded()) for(const p of d.props){ if(p.no_prediction || p._uncal || !(p.tier === 'bet' || (pSide(p) || 0) >= .55)) continue; const s = pickNow(p); if(!s) continue; const k = p.player + p.market; if(seen.has(k)) continue; seen.add(k);
     if(s.win){ w++; wins.push({k: 'p:' + p.id, kind: 'win', html: `<span class="tk tk-win" data-tkp="${esc(p.id)}">✓ ${TLN(p.team, 'xs')}${esc(p.player)} ${esc(selText(p))} · <b>${ln(s.now)}</b>${p.tier === 'bet' ? ' · BET' : ''}</span>`}); } else if(s.loss) l++; }
   for(const g of G.filter(g => g.state !== 'pre').sort((a, b) => ord(a.state) - ord(b.state)))
     out.push({k: `g:${g.away}@${g.home}`, kind: g.state === 'in' ? 'live' : 'final', sig: `${g.as}-${g.hs}`, html: `<span class="tk ${g.state === 'in' ? 'tk-live' : ''}" data-nbg="${esc(g.away)}|${esc(g.home)}"><i>${g.state === 'in' ? 'LIVE' : 'FINAL'}</i>${TLN(g.away, 'xs')}${esc(g.away)} <b>${g.as}</b> · ${TLN(g.home, 'xs')}${esc(g.home)} <b>${g.hs}</b>${g.state === 'in' ? ' · ' + esc(g.detail) : ''}</span>`});
@@ -207,10 +207,17 @@ function best(p, side){ const offs = (p.offers || []).filter(o => isNum(o[side])
   for(const o of (at.length ? at : offs)){ if(!b || decOdds(o[side]) > decOdds(b.v)) b = {k: (window.BOOK && BOOK.find(o.book)) ? o.book : bk(o.book), v: o[side], line: o.line}; }
   if(!b && p.best && isNum(p.best[side])) b = {k: (window.BOOK && BOOK.find(p.best.book)) ? p.best.book : bk(p.best.book), v: p.best[side], line: p.best.line}; return b; }
 const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${window.BOOK && BOOK.find(b.k) ? `<img class="bk-mini" src="${BOOK.find(b.k).logo}" alt="">` : ''}${esc(window.BOOK && BOOK.find(b.k) ? BOOK.find(b.k).short : b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
-const mpick = p => !p.no_prediction && p.side && (isNum(p.p) || isNum(pSide(p)));
+/* markets whose chances failed the slate's own calibration gate (meta.validated_prob, e.g. PTS and PRA) are projection only: no side, no chance */
+function tagCal(d){ if(!d || d._nbcal) return d; d._nbcal = 1; const v = d.meta && Array.isArray(d.meta.validated_prob) ? new Set(d.meta.validated_prob.map(mkey)) : null;
+  if(v) for(const p of d.props || []) p._uncal = !v.has(mkey(p.market)); return d; }
+const mpick = p => !p.no_prediction && !p._uncal && p.side && (isNum(p.p) || isNum(pSide(p)));
+const projOnly = p => !p.no_prediction && isNum(p.projection);
+/* the slate's own reasons (ood / flags), deduped; "outside training range: <feature ids>" reads as plain words */
+const whyList = ps => { const out = []; for(const p of ps) for(const f of (p.ood && p.ood.length ? p.ood : p.flags) || []){ const t = /^outside training range/i.test(f) ? 'some inputs outside the training range' : String(f); if(!out.includes(t)) out.push(t); } return out; };
+const whyNo = p => esc(whyList([p]).join(' · ') || 'outside what the model was trained on');
 const pidOf = p => p.pid ? String(p.pid) : String(p.pkey || '').startsWith('nba:') && !/^nba:x:/.test(p.pkey) ? String(p.pkey).split(':').pop() : '';
 function mrow(p, d){ const k = mkey(p.market), g = p._g || {}; const md = mpick(p);
-  return `<div class="x-mrow" data-nbpl="${esc(pidOf(p))}|${esc(p.player)}|${esc(nab(p.team))}|${esc(k)}"><div class="x-mwho"><b>${esc(p.player)}</b><span>${esc(nab(p.team))} · ${g.away ? `${esc(nab(g.away.abbr))} @ ${esc(nab(g.home.abbr))}` : 'vs ' + esc(nab(p.opp))}</span>${md ? `<span class="x-model ${p.tier === 'bet' ? 'bet' : ''}">${p.tier === 'bet' ? 'Bet · ' : 'Model · '}${p.side === 'under' ? 'Under' : 'Over'} ${pc(pSide(p))}${isNum(p.projection) ? ' · proj ' + ln(p.projection) : ''}</span>` : ''}</div>
+  return `<div class="x-mrow" data-nbpl="${esc(pidOf(p))}|${esc(p.player)}|${esc(nab(p.team))}|${esc(k)}"><div class="x-mwho"><b>${esc(p.player)}</b><span>${esc(nab(p.team))} · ${g.away ? `${esc(nab(g.away.abbr))} @ ${esc(nab(g.home.abbr))}` : 'vs ' + esc(nab(p.opp))}</span>${md ? `<span class="x-model ${p.tier === 'bet' ? 'bet' : ''}">${p.tier === 'bet' ? 'Bet · ' : 'Model · '}${p.side === 'under' ? 'Under' : 'Over'} ${pc(pSide(p))}${isNum(p.projection) ? ' · proj ' + ln(p.projection) : ''}</span>` : projOnly(p) ? `<span class="x-model nb-po">Projection only · proj ${ln(p.projection)}</span>` : ''}</div>
     <div class="x-mline">${priceBtn('O ' + ln(p.line), best(p, 'over'), md && p.side === 'over' ? 'pick' : '')}${priceBtn('U ' + ln(p.line), best(p, 'under'), md && p.side === 'under' ? 'pick' : '')}</div></div>`; }
 const wireRows = el => $$('[data-nbpl]', el).forEach(b => b.onclick = () => { const [pid, n, t, k] = b.dataset.nbpl.split('|'); NBA.openCard(pid || n, t, k); });
 function openByTeams(a, h){ a = nab(a); h = nab(h); for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NBA') continue; const g = d.games.find(x => nab(x.away.abbr) === a && nab(x.home.abbr) === h); if(g){ openGame(d.id, g.id); return; } }
@@ -291,7 +298,7 @@ async function openMarket(k){ const ds = await slates(); const rs = ds.flatMap(d
   pushSheet(`NBA ${MK[k]}`, `<div class="body"><div class="lt"><span class="sp" style="--c:var(--act)">NBA · ${esc(MK[k])}</span><h1>${esc(MK[k])}</h1><p>${rs.length} player${rs.length === 1 ? '' : 's'} on the current slate. Best price among the books the slate lists; model side where it has one.</p></div><div class="x-mkt">${rs.map(r => mrow(r.p, r.d)).join('') || '<p class="sub">No props posted for this stat.</p>'}</div></div>`, el => wireRows(el)); }
 
 /* ------------------------------------------------------------ game screen: Picks / Live / Props / Players (no Weather: NBA is indoors) */
-async function nbaGame(d, gid){ const g = d.games.find(x => x.id === gid); if(!g) return; const A = nab(g.away.abbr), H = nab(g.home.abbr); const mk = g.market || {};
+async function nbaGame(d, gid){ tagCal(d); const g = d.games.find(x => x.id === gid); if(!g) return; const A = nab(g.away.abbr), H = nab(g.home.abbr); const mk = g.market || {};
   const ps = d.props.filter(p => [A, H].includes(nab(p.team))); let tab = 'Picks'; const TABS = ['Picks', 'Live', 'Props', 'Players'];
   const head = () => { const st = liveOf(A, H) || {state: 'pre', as: '', hs: ''}; const live = st.state === 'in';
     return `<div class="x-board ${live ? 'live' : ''}"><div class="x-bt"><span class="wx-slot">${INDOOR}</span>${live ? `<span class="x-live">Live</span>${esc(st.detail)}` : st.state === 'post' ? 'Final' : `${esc(dayET(g.kick_utc))} · ${kickET(g.kick_utc)}`}</div>
@@ -312,8 +319,8 @@ async function nbaGame(d, gid){ const g = d.games.find(x => x.id === gid); if(!g
     else if(tab === 'Props'){ const by = {}; ps.filter(p => isNum(p.line)).forEach(p => (by[mkey(p.market)] = by[mkey(p.market)] || []).push(p));
       const ks = Object.keys(by).sort((a, b) => (MKORD.indexOf(a) + 99) % 99 - (MKORD.indexOf(b) + 99) % 99);
       box.innerHTML = ks.length ? ks.map(k => `<div class="x-grp"><h3>${esc(MK[k] || k)}</h3>${by[k].sort((a, b) => (b.tier === 'bet') - (a.tier === 'bet') || b.line - a.line).map(p => mrow(p, d)).join('')}</div>`).join('') : '<p class="sub">No props posted for this game yet.</p>'; wireRows(box); }
-    else { const by = {}; for(const p of ps){ const t = nab(p.team); by[t] = by[t] || new Map(); const k = nkey(p.player); const e = by[t].get(k) || {p, n: 0}; e.n++; by[t].set(k, e); }
-      box.innerHTML = [A, H].filter(t => by[t]).map(t => `<h3 class="x-h3">${TLN(t, 'sm')}${esc(t)}</h3><div class="x-list">${[...by[t].values()].map(({p, n}) => `<button class="x-li" data-nbpl="${esc(pidOf(p))}|${esc(p.player)}|${esc(t)}|"><div><b>${esc(p.player)}</b><span>${n} prop${n > 1 ? 's' : ''}</span></div><div>${ICON.chev}</div></button>`).join('')}</div>`).join('') || '<p class="sub">No player props posted for this game yet.</p>';
+    else { const by = {}; for(const p of ps){ const t = nab(p.team); by[t] = by[t] || new Map(); const k = nkey(p.player); const e = by[t].get(k) || {p, n: 0, pj: 0}; if(isNum(p.line)) e.n++; else if(projOnly(p)) e.pj++; by[t].set(k, e); }
+      box.innerHTML = [A, H].filter(t => by[t]).map(t => `<h3 class="x-h3">${TLN(t, 'sm')}${esc(t)}</h3><div class="x-list">${[...by[t].values()].sort((x, y) => (y.n > 0) - (x.n > 0) || x.p.player.localeCompare(y.p.player)).map(({p, n, pj}) => `<button class="x-li" data-nbpl="${esc(pidOf(p))}|${esc(p.player)}|${esc(t)}|"><div><b>${esc(p.player)}</b><span>${n ? `${n} priced prop${n > 1 ? 's' : ''}` : pj ? 'No sportsbook prices yet · projection only' : 'No prediction'}</span></div><div>${ICON.chev}</div></button>`).join('')}</div>`).join('') || '<p class="sub">No player props posted for this game yet.</p>';
       wireRows(box); } };
   const html = `<div class="body nb-game"><div id="x-ghead">${head()}</div><div class="x-tabs" role="tablist">${TABS.map(l => `<button data-gt2="${l}" aria-pressed="${l === tab}">${l}</button>`).join('')}</div><div id="x-gb"></div></div>`;
   pushSheet(`${A} @ ${H}`, html, el => { $$('[data-gt2]', el).forEach(b => b.onclick = () => { tab = b.dataset.gt2; body(el); }); body(el); if(!NLV.at) poll();
@@ -327,11 +334,18 @@ function logTable(rs){ if(!rs.length) return '<p class="sub">No games.</p>'; con
   return `<div class="tbl"><table><thead><tr><th>Date</th><th>Opp</th><th>Result</th>${cols.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rs.map(r => `<tr><td>${esc(String(r.d || r.date || '').slice(5))}</td><td>${esc(r.ha === '@' ? '@' : 'vs')} ${esc(nab(r.opp))}</td><td>${esc(r.dnp ? 'DNP' : r.res || '')}</td>${cols.map(([k]) => { const v = sv(r, k); return `<td class="num">${isNum(v) ? (Number.isInteger(v) ? v : v.toFixed(1)) : ''}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`; }
 function careerTable(rs){ if(!rs.length) return ''; const cols = [['g', 'G'], ...LOGC.slice(1)].filter(([k]) => rs.some(r => isNum(k === 'g' ? r.g : sv(r, k))));
   return `<div class="tbl"><table><thead><tr><th>Yr</th><th>Tm</th>${cols.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rs.map(r => `<tr><td>${esc(r.season || '')}</td><td>${esc(nab(r.team || r.tm || ''))}</td>${cols.map(([k]) => { const v = k === 'g' ? r.g : sv(r, k); return `<td class="num">${isNum(v) ? (Number.isInteger(v) ? v : v.toFixed(1)) : ''}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`; }
-function cardBody(P, x, log){ if(!x) return `<p class="sub">No props posted for this player on the current NBA slate.</p>`;
+/* empty states, only from what the slate says: no row / no-prediction rows, projection with no price, or a price with no model side */
+function emptyCard(ctx){ const why = ctx.np.length ? esc(whyList(ctx.np).join(' · ') || 'outside what the model was trained on') : ctx.playing ? 'The model has no projection for him on the current NBA slate.' : 'He is not on the current NBA slate.';
+  return `<div class="x-take off nb-empty"><b>No prediction</b><small>${why}</small></div>`; }
+function projCard(x){ const {p} = x, k = mkey(p.market), r = Array.isArray(p.range80) && p.range80.every(isNum) ? p.range80 : null, mn = p.minutes && isNum(p.minutes.median) ? p.minutes.median : null;
+  return `<div class="x-sel nb-psel"><div class="nb-noprice"><b>No sportsbook prices posted yet</b><span>Model projection shown. With no line there is no side or chance.</span></div>
+    <div class="nb-proj"><div><small>${esc(MK[k] || p.market_label)} projection</small><b class="num">${ln(p.projection)}</b></div>${r ? `<div><small>80% range</small><b class="num">${ln(r[0])}–${ln(r[1])}</b></div>` : ''}${isNum(mn) ? `<div><small>Minutes</small><b class="num">${ln(mn)}</b></div>` : ''}</div></div>`; }
+function cardBody(P, x, log, ctx){ if(!x) return emptyCard(ctx); if(!isNum(x.p.line)) return projCard(x);
   const {p, d} = x, k = mkey(p.market), L = p.line, md = mpick(p); const bo = best(p, 'over'), bu = best(p, 'under');
   let out = `<div class="x-sel"><div class="x-selh"><div><small>${esc(MK[k] || p.market_label)}</small><b class="num">${ln(L)}</b></div><div class="x-mline big">${priceBtn('Over', bo, md && p.side === 'over' ? 'pick' : '')}${priceBtn('Under', bu, md && p.side === 'under' ? 'pick' : '')}</div></div>
     ${md ? `<div class="x-take ${p.tier === 'bet' ? 'bet' : ''}" data-prop="${esc(p.id)}" data-sl="${esc(d.id)}"><div><small>${p.tier === 'bet' ? 'Model bet' : 'Model side'}</small><b>${p.side === 'under' ? 'Under' : 'Over'} ${ln(L)}</b></div><div><small>Chance</small><b>${pc(pSide(p))}</b></div><div><small>Projection</small><b>${ln(p.projection)}</b></div><div class="x-go">Report</div></div>`
-      : `<div class="x-take off"><b>No model prediction</b><small>${p.no_prediction ? esc((p.flags || []).join(' · ') || 'outside what the model was trained on') : 'The model has no side on this prop.'}</small></div>`}
+      : p._uncal && projOnly(p) ? `<div class="x-take off nb-po"><b>Projection only · ${ln(p.projection)} ${esc(MK[k] || '')}</b><small>${esc(MK[k] || p.market_label)} chances did not pass the model's calibration check, so it takes no side on this line.</small></div>`
+      : `<div class="x-take off"><b>No prediction</b><small>${p.no_prediction ? whyNo(p) : 'The model has no side on this prop.'}</small></div>`}
     ${window.BOOK ? BOOK.slip({label: `${p.player} ${(md ? p.side : 'over') === 'under' ? 'Under' : 'Over'} ${ln(L)} ${MK[k] || p.market_label}`, side: md ? p.side : 'over', line: L, rows: p.offers || []}) : ''}</div>`;
   const games = log.filter(r => !r.dnp && isNum(sv(r, k))).slice(0, 10);
   if(games.length && isNum(L)){ const vals = games.map(r => sv(r, k)); const rate = n => { const v = vals.slice(0, n); return v.length ? v.filter(z => z > L).length / v.length : null; };
@@ -347,32 +361,92 @@ async function openCard(id, team, market){ await loadIndex(); const ds = await s
   const row = PIX.find(r => r.pid === String(id)) || PIX.find(r => nkey(r.name) === nkey(id) && (!t0 || r.team === t0)) || PIX.find(r => nkey(r.name) === nkey(id)) || null;
   let P = null; if(row){ try{ P = await getJSON(`data/nbap/p/${encodeURIComponent(row.pid)}.json`); }catch(e){} }
   const name = (P && P.name) || (row && row.name) || String(id), tm = nab((P && P.team) || (row && row.team) || t0), pid = row ? row.pid : (P && P.pid ? String(P.pid) : '');
-  const props = ds.flatMap(d => d.props.filter(p => isNum(p.line) && samePlayer(p, pid, name, tm)).map(p => ({p, d}))).sort((a, b) => (MKORD.indexOf(mkey(a.p.market)) + 99) % 99 - (MKORD.indexOf(mkey(b.p.market)) + 99) % 99);
-  let sel = props.find(x => mkey(x.p.market) === market) || props[0] || null;
+  const mine = ds.flatMap(d => d.props.filter(p => samePlayer(p, pid, name, tm)).map(p => ({p, d})));
+  /* tabs: every market with a line or a model projection; priced first within the usual market order */
+  const props = mine.filter(x => isNum(x.p.line) || projOnly(x.p)).sort((a, b) => (MKORD.indexOf(mkey(a.p.market)) + 99) % 99 - (MKORD.indexOf(mkey(b.p.market)) + 99) % 99);
+  const priced = props.some(x => isNum(x.p.line)); const playing = ds.some(d => d.games.some(g => [nab(g.away.abbr), nab(g.home.abbr)].includes(tm)));
+  const ctx = {np: mine.filter(x => x.p.no_prediction).map(x => x.p), playing};
+  let sel = props.find(x => mkey(x.p.market) === market && isNum(x.p.line)) || props.find(x => mkey(x.p.market) === market) || props.find(x => isNum(x.p.line)) || props[0] || null;
   const gm = sel ? sel.p._g : ds.flatMap(d => d.games).find(g => [nab(g.away.abbr), nab(g.home.abbr)].includes(tm)); const opp = gm ? (nab(gm.away.abbr) === tm ? nab(gm.home.abbr) : nab(gm.away.abbr)) : null;
   const log = (P ? (P.log || P.games || []) : []).slice().sort((a, b) => String(b.d || b.date || '') < String(a.d || a.date || '') ? -1 : 1);
   const ct = contractOf(P || row); const inj = P && P.injury && (P.injury.status || P.injury.detail); const pos = (P && P.pos) || (row && row.pos) || '', jer = (P && P.jersey) ?? (row && row.jersey);
-  const draw = el => { const box = $('#x-cbody', el); box.innerHTML = cardBody(P, sel, log); $$('[data-cm]', el).forEach(b => b.setAttribute('aria-pressed', sel && b.dataset.cm === sel.p.id));
+  const draw = el => { const box = $('#x-cbody', el); box.innerHTML = cardBody(P, sel, log, ctx); $$('[data-cm]', el).forEach(b => b.setAttribute('aria-pressed', sel && b.dataset.cm === sel.p.id));
     { const on = $('[data-cm][aria-pressed="true"]', el), rail = on && on.parentElement; if(rail) rail.scrollLeft = Math.max(0, on.offsetLeft - (rail.clientWidth - on.offsetWidth) / 2); }
     $$('[data-prop]', box).forEach(b => b.onclick = () => { const d = SLATE[b.dataset.sl]; if(d) openProp(d, b.dataset.prop); });
     $$('[data-copy]', box).forEach(b => b.onclick = async () => { const t = b.dataset.copy; try{ await navigator.clipboard.writeText(t); }catch(e){} toast('Copied: ' + t); setTimeout(() => { location.href = b.dataset.url; }, 450); }); };
   const bio = P ? [['Age', P.age], ['Height', P.height_ft], ['Weight', P.weight ? P.weight + ' lb' : null], ['College', P.college || P.country], ['Experience', isNum(P.exp) ? (P.exp ? P.exp + ' yr' : 'Rookie') : null], ['Draft', P.draft ? [P.draft.year, P.draft.round ? 'R' + P.draft.round : null, P.draft.pick ? '#' + P.draft.pick : null].filter(Boolean).join(' ') : null], ['Contract', ct || (P.contract && typeof P.contract === 'object' ? P.contract.label : P.contract) || null], ['G League', P.gleague && typeof P.gleague === 'object' ? P.gleague.team || P.gleague.name : P.gleague]].filter(x => x[1] != null && x[1] !== '') : [];
   const html = `<div class="body"><div class="x-ch"><div><span class="sp" style="--c:var(--act)">NBA · ${esc(tm || 'FA')}</span><h1>${esc(name)}</h1><p>${esc(tm)} · ${esc(pos)}${jer != null && jer !== '' ? ' · #' + esc(jer) : ''}${opp ? ` · vs ${esc(opp)}` : ''}${gm ? ` · ${esc(kickET(gm.kick_utc))}` : ''}</p>
       <div class="nb-tags">${inj ? `<span class="x-tag red">${esc(P.injury.status || 'Injury')}${P.injury.reason || P.injury.detail ? ' · ' + esc(P.injury.reason || P.injury.detail) : ''}</span>` : ''}${ct ? `<span class="x-tag nb-ct">${esc(ct)}</span>` : ''}</div></div></div>
-    ${props.length ? `<div class="x-tabs scroll">${props.map(x => `<button data-cm="${esc(x.p.id)}" aria-pressed="${x === sel}">${esc(MK[mkey(x.p.market)] || x.p.market_label)}</button>`).join('')}</div>` : ''}<div id="x-cbody"></div>
-    ${!props.length && log.length ? `<h3 class="x-h3">Last 10 games</h3>${logTable(log.slice(0, 10))}` : ''}
-    ${P ? `<details class="x-more"${props.length ? '' : ' open'}><summary>Bio, season and career</summary>${bio.length ? `<div class="group pad pgrid">${bio.map(([a, b]) => `<div><span class="label">${a}</span><b>${esc(b)}</b></div>`).join('')}</div>` : ''}
+    ${props.length ? `<div class="x-tabs scroll">${props.map(x => `<button data-cm="${esc(x.p.id)}" aria-pressed="${x === sel}"${isNum(x.p.line) ? '' : ' class="nb-tproj" title="Projection only"'}>${esc(MK[mkey(x.p.market)] || x.p.market_label)}</button>`).join('')}</div>` : ''}<div id="x-cbody"></div>
+    ${!priced && log.length ? `<h3 class="x-h3">Last 10 games</h3>${logTable(log.slice(0, 10))}` : ''}
+    ${P ? `<details class="x-more"${priced ? '' : ' open'}><summary>Bio, season and career</summary>${bio.length ? `<div class="group pad pgrid">${bio.map(([a, b]) => `<div><span class="label">${a}</span><b>${esc(b)}</b></div>`).join('')}</div>` : ''}
       <h3 class="x-h3">Game log</h3>${logTable(log)}${(P.career || []).length ? `<h3 class="x-h3">Career</h3>${careerTable(P.career)}` : ''}</details>` : row ? '' : '<p class="sub">This player is not in the NBA player library yet.</p>'}
     <p class="note">${esc((P && P.source) || 'Stats and bio: the NBA player library.')} Prices: the books listed on the slate. Live: ESPN box score.</p></div>`;
   pushSheet(name, html, el => { $$('[data-cm]', el).forEach(b => b.onclick = () => { sel = props.find(x => x.p.id === b.dataset.cm) || sel; draw(el); }); draw(el); }); }
-async function searchIndex(){ await loadIndex(); return PIX; }
+async function searchIndex(){ await Promise.all([loadIndex(), loadTeams()]); return PIX; }
 /* relevance shared with app.js openSearch so both sports merge into one list */
 const score = (name, teamHit, q) => { const n = nkey(name); return (teamHit ? 4 : 0) + (q && n.startsWith(q) ? 2 : 0) + (q && n.split(' ').some(w => w.startsWith(q)) ? 1 : 0); };
+const tlN = (a, cls) => window.TL ? TL(nab(a), cls, 'NBA') : TLN(a, cls);
+/* tonight: team -> its game on the loaded current slate(s), from the slate file only */
+function tonightMap(){ const M = {}; for(const d of loaded()) for(const g of d.games || []){ const A = nab(g.away.abbr), H = nab(g.home.abbr); M[A] = {opp: H, at: true, g, d}; M[H] = {opp: A, at: false, g, d}; } return M; }
+const tnText = x => x ? `Tonight ${x.at ? '@' : 'vs'} ${esc(x.opp)}${x.g.kick_utc ? ' · ' + esc(kickET(x.g.kick_utc).replace(' ET', '')) : ''}` : '';
+const teamName = t => (TEAMS && TEAMS[t] && TEAMS[t].name) || t;
+/* team codes and names ("NYK", "knicks", "new york") that a query points at */
+function teamHits(q, up){ if(!TEAMS) return []; const T = up.length >= 2 ? nab(up) : '';
+  return Object.keys(TEAMS).filter(t => t === T || (q.length >= 3 && [TEAMS[t].name, TEAMS[t].short, TEAMS[t].location].some(n => n && nkey(n).split(' ').some(w => w.startsWith(q)) || (n && nkey(n).startsWith(q))))); }
 function searchRows(q, up){ if(!PIX || !PIX.length) return []; const T = up.length >= 2 ? nab(up) : '';
-  const hitT = T && PIX.some(p => p.team === T); const r = PIX.filter(p => (q.length >= 2 && nkey(p.name).includes(q)) || (hitT && p.team === T));
-  return r.map(p => ({p, s: score(p.name, hitT && p.team === T, q)})).sort((a, b) => b.s - a.s || a.p.name.localeCompare(b.p.name)).slice(0, 40).map(({p, s}) => { const ct = contractOf(p);
-    return {s, h: `<button class="row" data-nbpid="${esc(p.pid)}"><div><div class="nm">${esc(p.name)}<span class="sbg nba">${GLY.NBA}NBA</span>${ct ? `<span class="sbg ct">${esc(ct)}</span>` : ''}</div><div class="mt">${TLN(p.team, 'xs')}${esc(p.team || 'FA')}${p.pos ? ' · ' + esc(p.pos) : ''}${p.jersey != null && p.jersey !== '' ? ' · #' + esc(p.jersey) : ''}${p.status && !/^(act|active)$/i.test(p.status) && !ct ? ' · ' + esc(p.status) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`}; }); }
-const wireSearch = out => $$('[data-nbpid]', out).forEach(b => b.onclick = () => openCard(b.dataset.nbpid));
+  const hitT = T && PIX.some(p => p.team === T); const r = PIX.filter(p => (q.length >= 2 && nkey(p.name).includes(q)) || (hitT && p.team === T)); const TN = tonightMap();
+  const teams = teamHits(q, up).map(t => { const n = PIX.filter(p => p.team === t).length;
+    return {s: 9, h: `<button class="row nb-trow" data-nbteamgo="${esc(t)}"><div><div class="nm">${tlN(t, 'xs')}${esc(teamName(t))}<span class="sbg nba">${GLY.NBA}NBA</span></div><div class="mt">Team · ${n} player${n === 1 ? '' : 's'}${TN[t] ? ' · ' + tnText(TN[t]) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`}; });
+  return teams.concat(r.map(p => ({p, s: score(p.name, hitT && p.team === T, q)})).sort((a, b) => b.s - a.s || a.p.name.localeCompare(b.p.name)).slice(0, 40).map(({p, s}) => { const ct = contractOf(p);
+    return {s, h: `<button class="row" data-nbpid="${esc(p.pid)}"><div><div class="nm">${esc(p.name)}<span class="sbg nba">${GLY.NBA}NBA</span>${ct ? `<span class="sbg ct">${esc(ct)}</span>` : ''}</div><div class="mt">${tlN(p.team, 'xs')}${esc(p.team || 'FA')}${p.pos ? ' · ' + esc(p.pos) : ''}${p.jersey != null && p.jersey !== '' ? ' · #' + esc(p.jersey) : ''}${p.status && !/^(act|active)$/i.test(p.status) && !ct ? ' · ' + esc(p.status) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`}; })); }
+const wireSearch = out => { $$('[data-nbpid]', out).forEach(b => b.onclick = () => openCard(b.dataset.nbpid));
+  $$('[data-nbteamgo]', out).forEach(b => b.onclick = () => { PL.team = b.dataset.nbteamgo; PL.q = ''; setPS('NBA'); while(STACK.length) popSheet(); go('players'); }); };
+/* universal search intro: say both leagues and their roster types (app.js writes the sheet; this only rewrites its intro line) */
+const _os = window.openSearch;
+if(_os) window.openSearch = function(){ const r = _os.apply(this, arguments); try{ const el = STACK[STACK.length - 1]; const p = el && $('.lt p', el), i = el && $('#uq', el);
+  if(p) p.textContent = 'Every player on a 2026 NFL roster (depth chart and practice squad) and on a 2026-27 NBA roster (two-way and 10-day deals included). Search a name or a team, like PHI, NYK or Knicks.';
+  if(i) i.placeholder = 'Player, or team like PHI or NYK'; }catch(e){} return r; };
+
+/* ------------------------------------------------------------ Players tab: NFL | NBA switch; NBA lists the library by team and opens NBA.openCard */
+const PSK = 'tail.playersSport';
+const getPS = () => { try{ const v = localStorage.getItem(PSK); return v === 'NBA' ? 'NBA' : 'NFL'; }catch(e){ return 'NFL'; } };
+const setPS = v => { try{ localStorage.setItem(PSK, v); }catch(e){} };
+const PL = {team: null, q: ''};
+const plSeg = sp => `<div class="seg lvseg plseg" role="group" aria-label="Sport">${['NFL', 'NBA'].map(k => `<button type="button" data-plsp="${k}" aria-pressed="${sp === k}">${GLY[k]}<span>${k}</span></button>`).join('')}</div>`;
+function wirePlSeg(root){ $$('[data-plsp]', root).forEach(b => b.onclick = () => { const k = b.dataset.plsp; if(k === getPS()) return; setPS(k); PL.team = null; PL.q = ''; window.viewPlayers2(); window.scrollTo(0, 0); }); }
+function plRow(p){ const ct = contractOf(p);
+  return `<button class="x-li nb-pli" data-nbpid="${esc(p.pid)}"><div><b>${esc(p.name)}</b><span>${esc(p.pos || '')}${p.jersey != null && p.jersey !== '' ? ' · #' + esc(p.jersey) : ''}${ct ? ` · <em class="nb-ct2">${esc(ct)}</em>` : ''}</span></div><div>${ICON.chev}</div></button>`; }
+/* grouped by team, team header carries the NBA logo, full name and roster count */
+function plGroups(list, TN){ const by = {}; for(const p of list) (by[p.team || 'FA'] = by[p.team || 'FA'] || []).push(p);
+  return Object.keys(by).sort((a, b) => (!!TN[b] - !!TN[a]) || a.localeCompare(b)).map(t => `<h3 class="x-h3 nb-th">${t === 'FA' ? '' : tlN(t, 'sm')}<span>${esc(t === 'FA' ? 'Free agents' : teamName(t))}</span><i>${by[t].length}</i></h3>${TN[t] ? `<p class="nb-tsub">${tnText(TN[t])}</p>` : ''}
+    <div class="x-list">${by[t].sort((a, b) => (!!contractOf(a) - !!contractOf(b)) || a.name.localeCompare(b.name)).map(plRow).join('')}</div>`).join(''); }
+async function playersNBA(){ const m = $('#main'); await Promise.all([loadIndex(), loadTeams()]); try{ await slates(); }catch(e){} if(S.tab !== 'players' || getPS() !== 'NBA') return;
+  const TN = tonightMap(); const teams = (TEAMS ? Object.keys(TEAMS) : [...new Set(PIX.map(p => p.team).filter(Boolean))]).sort();
+  const games = []; for(const d of loaded()) for(const g of d.games || []) games.push(g); games.sort((a, b) => (a.kick_utc || '') < (b.kick_utc || '') ? -1 : 1);
+  m.innerHTML = `<div class="view nb-players"><div class="x-hero"><h1>Players</h1><p>${PIX.length ? `${PIX.length.toLocaleString()} players on 2026-27 NBA rosters, two-way and 10-day deals included. Tap a team or search.` : 'The NBA player library is not available right now.'}</p></div>
+    ${plSeg('NBA')}
+    <div class="fld search"><label for="pq2" class="sr">Search NBA players</label>${Icon.svg('search', {size: 18})}<input id="pq2" type="search" autocomplete="off" placeholder="Search any NBA player or team" value="${esc(PL.q)}"></div><div id="pres" class="nb-pres"></div>
+    ${games.length ? `<div class="x-shelf"><div class="x-shead"><h2>Playing tonight</h2></div><div class="nb-games">${games.map(g => { const A = nab(g.away.abbr), H = nab(g.home.abbr); return `<button class="nb-gchip" data-nbgm="${esc(A)}|${esc(H)}"><span>${tlN(A, 'xs')}${esc(A)}</span><i>@</i><span>${tlN(H, 'xs')}${esc(H)}</span><small>${esc(kickET(g.kick_utc).replace(' ET', ''))}</small></button>`; }).join('')}</div></div>` : ''}
+    <div class="x-shelf"><div class="x-shead"><h2>Teams</h2></div><div class="x-teams nb-teams">${teams.map(t => `<button class="x-chip" data-nbteam="${esc(t)}" aria-pressed="${PL.team === t}">${tlN(t, 'xs')}<span>${esc(t)}</span></button>`).join('')}</div></div>
+    <div class="x-shelf"><button class="x-link" data-more>Settings, how the model works, results</button></div></div>`;
+  const out = $('#pres', m), inp = $('#pq2', m);
+  const mark = () => $$('[data-nbteam]', m).forEach(b => b.setAttribute('aria-pressed', b.dataset.nbteam === PL.team));
+  const show = (html, scroll) => { out.innerHTML = html; $$('[data-nbpid]', out).forEach(b => b.onclick = () => openCard(b.dataset.nbpid)); mark(); if(scroll && html) out.scrollIntoView({behavior: 'smooth', block: 'start'}); };
+  const byTeams = (ts, scroll) => show(plGroups(PIX.filter(p => ts.includes(p.team)), TN) || '<p class="sub">No players listed for this team.</p>', scroll);
+  const draw = () => { const v = inp.value, q = nkey(v), up = v.trim().toUpperCase(); PL.q = v;
+    if(q.length < 2 && up.length < 2){ if(PL.team) byTeams([PL.team]); else show(''); return; } PL.team = null;
+    const ts = teamHits(q, up); const hits = PIX.filter(p => q.length >= 2 && nkey(p.name).includes(q) && !ts.includes(p.team));
+    const html = (ts.length ? plGroups(PIX.filter(p => ts.includes(p.team)), TN) : '') + (hits.length ? plGroups(hits.slice(0, 60), TN) : '');
+    show(html || `<p class="sub nb-none">No NBA player or team matches “${esc(v)}”.</p>`); };
+  inp.oninput = draw;
+  $$('[data-nbteam]', m).forEach(b => b.onclick = () => { const t = b.dataset.nbteam; inp.value = ''; PL.q = ''; PL.team = PL.team === t ? null : t; if(PL.team) byTeams([t], true); else show(''); });
+  $$('[data-nbgm]', m).forEach(b => b.onclick = () => { inp.value = ''; PL.q = ''; PL.team = null; byTeams(b.dataset.nbgm.split('|'), true); });
+  wirePlSeg(m); $('[data-more]', m).onclick = () => go('more'); draw(); }
+const _vp = window.viewPlayers2;
+if(_vp) window.viewPlayers2 = async function(){ if(getPS() === 'NBA') return playersNBA(); await _vp.apply(this, arguments);
+  const v = $('#main .view'); if(!v || S.tab !== 'players' || getPS() !== 'NFL' || $('.plseg', v)) return; const w = document.createElement('div'); w.innerHTML = plSeg('NFL'); const sg = w.firstElementChild;
+  const h = $('.x-hero', v); h ? h.after(sg) : v.prepend(sg); wirePlSeg(v); };
 
 window.NBA = {poll: () => poll(), applyProgress: applyNBA, openCard, openGame: nbaGame, openByTeams, openMarket, searchIndex, searchRows, score, wireSearch, slates, nab, MK, live: NLV, _gameTick: null};
 
