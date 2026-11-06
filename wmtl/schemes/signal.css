@@ -1,0 +1,97 @@
+/* tail. — scheme "Signal": a trading terminal at night.
+   Blue-black ink with depth, crisp cool off-white type, and ONE vivid signal (mint) that means
+   "the model likes this / tail it / it cashed". Everything else is neutral ink. Loaded last. */
+:root{
+  /* ink surfaces: low-chroma blue-black, each step a little lighter and a little bluer */
+  --s0:#05070B; --s1:#0A0E15; --s2:#10151E; --s3:#171D28; --s4:#1E2531;
+  --glass:rgba(6,9,14,.86); --glass-hi:rgba(56,242,192,.05);
+  --w:236,241,247; --t1:#ECF1F7; --t2:rgba(236,241,247,.70); --t3:rgba(236,241,247,.56);
+  --hair:rgba(236,241,247,.08); --hair2:rgba(236,241,247,.14);
+  --rule:rgba(160,190,230,.10); --rule2:rgba(56,242,192,.32);
+
+  /* the signal */
+  --sig:#38F2C0; --sig-hi:#9BFFE3; --sig-lo:#12B892; --sig-ink:#03150F;
+  --sig-wash:rgba(56,242,192,.12); --sig-glow:rgba(56,242,192,.38);
+
+  /* every legacy accent token now points at the signal */
+  --pk:var(--sig); --gold:var(--sig); --gold-d:var(--sig-lo); --brass:var(--sig); --brass-ink:var(--sig-ink); --brass-wash:var(--sig-wash);
+  --act:var(--t1); --act-ink:var(--s0); --act-wash:rgba(236,241,247,.08);
+  --foil:linear-gradient(90deg,var(--sig-lo) 0%,var(--sig) 55%,var(--sig-hi) 100%);
+  --violet:#0E1420; --violet-d:#080B12;
+  --banner:linear-gradient(160deg,#141B27 0%,#0A0E15 60%,#05070B 100%);
+  --edge:var(--sig); --edge-wash:rgba(56,242,192,.14);
+  --fair:#AFC0D6; --fair-wash:rgba(175,192,214,.10); --pass:#7E8999;
+  --loss:#FF5D63; --loss-wash:rgba(255,93,99,.13);
+  --nfl:var(--sig); --cfb:#AFC0D6;
+
+  /* hero card + Tail button */
+  --hc-bg:radial-gradient(120% 80% at 100% 0%,rgba(56,242,192,.16) 0%,transparent 55%),linear-gradient(165deg,#151C28 0%,#0C1119 55%,#070A0F 100%);
+  --hc-ink:var(--t1);
+  --hc-foil:linear-gradient(rgba(160,190,230,.045) 1px,transparent 1px) 0 0/100% 28px,linear-gradient(90deg,rgba(160,190,230,.045) 1px,transparent 1px) 0 0/28px 100%;
+  --hc-foil-o:1;
+  --hc-sh:inset 0 0 0 1px rgba(56,242,192,.28),0 0 0 1px rgba(0,0,0,.6),0 24px 60px -28px rgba(56,242,192,.45);
+  --hc-badge:var(--sig-wash); --hc-badge-ink:var(--sig);
+  --tail-bg:var(--sig); --tail-ink:var(--sig-ink);
+
+  --bc-surface:linear-gradient(180deg,#111723 0%,var(--s1) 50%,var(--s0) 100%);
+  --bc-gold-dim:rgba(236,241,247,.26);
+}
+html,body{background:var(--s0)!important}
+body::before{background:var(--s0)!important}
+
+/* seal + wordmark */
+.lockup circle:first-child{fill:var(--sig)}
+.lockup>g:first-of-type{stroke:var(--sig-ink)}
+
+/* frame: header, tape, tab bar */
+.top{background:rgba(5,7,11,.88)!important;box-shadow:inset 0 -1px 0 var(--rule)!important}
+.sbar{background:var(--glass)!important;box-shadow:inset 0 -1px 0 var(--rule)}
+.ticker{background:var(--s1)!important;box-shadow:inset 0 -1px 0 var(--rule)!important;color:var(--t2)}
+.tk-win{color:var(--sig)!important}.tk-sum i{background:var(--sig)!important;color:var(--sig-ink)!important}
+.tabbar{background:rgba(5,7,11,.92)!important;box-shadow:inset 0 1px 0 var(--rule)!important}
+.tabbar button[aria-current=page],.tabbar button[aria-current=page] svg{color:var(--sig)!important}
+.tabbar button[aria-current=page]::after{background:var(--sig)!important;box-shadow:0 0 10px var(--sig-glow)}
+
+/* hero */
+.h-card .h-badge{box-shadow:inset 0 0 0 1px rgba(56,242,192,.35)}
+.h-card .h-nums div:first-child b{color:var(--sig)}
+.h-tail{box-shadow:0 10px 30px -10px var(--sig-glow),inset 0 1px 0 rgba(255,255,255,.35)}
+.h-stats div{background:var(--s1);box-shadow:inset 0 0 0 1px var(--rule)}
+
+/* links, numbers the model is proud of */
+.x-link,a{color:var(--sig)!important}
+.x-pct,.x-chance,.bc-pct{color:var(--sig)!important}
+.x-gfoot em{color:var(--sig)!important}
+
+/* chips, tabs, segmented */
+.x-chip{box-shadow:inset 0 0 0 1px var(--hair2)!important;background:transparent}
+.x-chip[aria-pressed=true],.x-chip:active,.x-tabs button[aria-pressed=true],.x-tag.gold{background:var(--sig)!important;color:var(--sig-ink)!important;box-shadow:none!important}
+.x-tabs{background:transparent!important}
+.x-tabs button{box-shadow:inset 0 0 0 1px var(--hair2)!important}
+.x-sub button[aria-pressed=true]{color:var(--sig)!important;background:var(--sig-wash)!important}
+
+/* cards */
+.x-game{background:var(--s1)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+.x-game.is-live{box-shadow:inset 0 0 0 1px rgba(255,93,99,.6)!important}
+.x-board,.x-sb.big{background:radial-gradient(110% 80% at 100% 0%,rgba(56,242,192,.08),transparent 55%),linear-gradient(165deg,#141B27 0%,#0A0E15 60%,#06080C 100%)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+.x-lines div,.x-sel,.x-hit,.x-match,.x-books,.x-more{background:var(--s0)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+
+/* prices */
+.x-odd{background:var(--s1)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+.x-odd.pick{background:var(--sig-wash)!important;box-shadow:inset 0 0 0 1.5px var(--sig)!important}
+.x-odd.pick b,.x-odd.pick small,.x-odd.pick i{color:var(--sig)!important}
+.x-model{color:var(--t1)!important}.x-model.bet{color:var(--sig)!important}
+
+/* bet cards: signal top edge, signal price */
+.betcard{box-shadow:inset 0 0 0 1px var(--rule),0 18px 36px -24px rgba(0,0,0,.9)}
+.bc-over{background:var(--foil)!important}
+
+/* slate picker */
+.slatebtn.sb2{background:linear-gradient(180deg,rgba(160,190,230,.08),rgba(160,190,230,.02));box-shadow:inset 0 0 0 1px var(--hair2),0 6px 18px -10px rgba(0,0,0,.8)}
+.sb2-ic{background:var(--sig);color:var(--sig-ink);box-shadow:0 0 0 3px var(--sig-wash),0 0 18px -4px var(--sig-glow)}
+.sheet{background:var(--s3)}
+.sp2-row{background:rgba(160,190,230,.04);box-shadow:inset 0 0 0 1px var(--rule)}
+.sp2-row.cur{background:var(--sig-wash);box-shadow:inset 0 0 0 1.5px var(--sig)}
+.sp2-cur{background:var(--sig);color:var(--sig-ink)}
+.sp2-date{background:var(--s0)}
+:focus-visible{outline-color:var(--sig)}

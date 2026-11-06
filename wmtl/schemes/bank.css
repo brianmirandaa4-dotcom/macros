@@ -1,0 +1,126 @@
+/* tail. scheme · "Private bank"
+   Warm graphite surfaces, bone type, one cool signature accent (Steel).
+   Green and red are reserved for cashed and lost. Loaded after mono.css. */
+
+:root{
+  /* ---- palette */
+  --pb-ink:#0E0C0A;        /* Ink: canvas */
+  --pb-g1:#16130F;         /* Graphite 1: grouped section */
+  --pb-g2:#1E1A16;         /* Graphite 2: card */
+  --pb-g3:#28231E;         /* Graphite 3: raised */
+  --pb-g4:#332D27;         /* Graphite 4: floating sheet */
+  --pb-bone:#F1EBDF;       /* Bone: primary type */
+  --pb-steel:#A4B8CC;      /* Steel: the signature accent */
+  --pb-steel-hi:#C3D2E0;   /* Steel light: sheen, pressed */
+  --pb-steel-ink:#0E141B;  /* ink on steel */
+  --pb-steel-deep:#1C242D; /* Steel deep: washes, hero glow */
+  --pb-win:#5FCB93;        /* Cashed */
+  --pb-loss:#E2685E;       /* Lost */
+
+  /* ---- surfaces */
+  --s0:var(--pb-ink); --s1:var(--pb-g1); --s2:var(--pb-g2); --s3:var(--pb-g3); --s4:var(--pb-g4);
+  --glass:rgba(14,12,10,.86);
+  --glass-hi:rgba(164,184,204,.06);
+
+  /* ---- type: bone at three strengths (all AA on g0-g4) */
+  --w:241,235,223;
+  --t1:var(--pb-bone);
+  --t2:rgba(241,235,223,.70);
+  --t3:rgba(241,235,223,.56);
+  --hair:rgba(241,235,223,.08); --hair2:rgba(241,235,223,.14);
+  --rule:rgba(241,235,223,.09); --rule2:rgba(241,235,223,.18);
+
+  /* ---- the one accent everywhere the old gold/white accent lived */
+  --gold:var(--pb-steel); --gold-d:#6F8399; --brass:var(--pb-steel); --brass-ink:var(--pb-steel-ink);
+  --brass-wash:rgba(164,184,204,.12); --pk:var(--pb-steel);
+  --act:var(--pb-steel); --act-ink:var(--pb-steel-ink); --act-wash:rgba(164,184,204,.12);
+  --foil:linear-gradient(135deg,#D9E3EC 0%,#7F93A8 34%,#C3D2E0 55%,#5E6F80 80%,#B4C5D6 100%);
+  --violet:#1C1B19; --violet-d:#12110F;
+  --banner:linear-gradient(150deg,#26292C 0%,#171615 60%,#0D0C0B 100%);
+
+  /* ---- semantic */
+  --edge:var(--pb-win); --edge-wash:rgba(95,203,147,.14);
+  --loss:var(--pb-loss); --loss-wash:rgba(226,104,94,.14);
+  --fair:#C9C3B8; --fair-wash:rgba(241,235,223,.07);
+  --pass:#8E8A83; --pass-wash:rgba(241,235,223,.06);
+  --nfl:var(--pb-steel); --cfb:#C9C3B8;
+
+  /* ---- hero card: a brushed graphite card with a steel light leak */
+  --hc-bg:linear-gradient(158deg,#2B2D2F 0%,#211D19 42%,#14110E 100%);
+  --hc-ink:var(--pb-bone);
+  --hc-foil:radial-gradient(80% 60% at 100% 0%,rgba(164,184,204,.26),transparent 64%),repeating-linear-gradient(118deg,rgba(241,235,223,.022) 0 1px,transparent 1px 7px),linear-gradient(112deg,transparent 38%,rgba(195,210,224,.06) 50%,transparent 62%);
+  --hc-foil-o:1;
+  --hc-sh:inset 0 0 0 1px rgba(164,184,204,.26),inset 0 1px 0 rgba(241,235,223,.08),0 28px 56px -26px rgba(0,0,0,.95);
+  --hc-badge:rgba(164,184,204,.16); --hc-badge-ink:var(--pb-steel-hi);
+  --tail-bg:linear-gradient(180deg,#CBD8E4 0%,#A4B8CC 52%,#8EA4BB 100%); --tail-ink:var(--pb-steel-ink);
+
+  /* ---- bet cards */
+  --bc-surface:linear-gradient(180deg,#221E19 0%,var(--s1) 46%,var(--s0) 100%);
+  --bc-frame:var(--rule);
+}
+html,body{background:var(--s0)!important}
+body::before{background:var(--s0)!important}
+
+/* ---- frame: header, ticker, tab bar */
+.top{background:linear-gradient(180deg,rgba(26,23,19,.96),rgba(14,12,10,.92))!important;box-shadow:inset 0 -1px 0 var(--rule)!important}
+.ticker{background:var(--s0)!important;box-shadow:inset 0 -1px 0 var(--rule)!important;color:var(--t3)}
+.tabbar{background:rgba(14,12,10,.93)!important;box-shadow:inset 0 1px 0 var(--rule)!important}
+.tabbar button{color:rgba(241,235,223,.5)!important}
+.tabbar button[aria-current=page],.tabbar button[aria-current=page] svg{color:var(--pb-bone)!important}
+.tabbar button[aria-current=page]::after{background:var(--pb-steel)!important}
+
+/* ---- seal + wordmark */
+.lockup>circle:first-child{fill:var(--pb-steel)}
+.lockup>g:first-of-type{stroke:var(--pb-steel-ink)}
+.lockup>g:nth-of-type(2){stroke:var(--pb-bone)}
+.lockup>circle:not(:first-child){fill:var(--pb-bone)}
+
+/* ---- links, numbers that matter */
+.x-link,a{color:var(--pb-steel)!important}
+.x-pct,.x-chance,.x-gfoot em{color:var(--pb-steel-hi)!important}
+
+/* ---- hero card */
+.h-card .h-badge{box-shadow:inset 0 0 0 1px rgba(164,184,204,.28)}
+.h-card .h-nums b{color:var(--pb-bone)}
+.h-card .h-nums div:nth-child(2) b,.h-card .h-nums div:last-child b{color:var(--pb-steel-hi)}
+.h-card .h-player{color:#FFF9EE}
+.h-tail{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(14,20,27,.25),0 12px 26px -14px rgba(164,184,204,.6);letter-spacing:-.01em}
+.h-stats div{background:var(--s2);box-shadow:inset 0 0 0 1px var(--rule)}
+
+/* ---- game tickets, boards */
+.x-game{background:var(--s1)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+.x-board,.x-sb.big{background:linear-gradient(155deg,#26292C 0%,#181715 60%,#0F0E0D 100%)!important;box-shadow:inset 0 0 0 1px rgba(164,184,204,.18)!important}
+.x-board.live,.x-sb.big.live{box-shadow:inset 0 0 0 1.5px rgba(226,104,94,.7)!important}
+.x-lines div,.x-sel,.x-hit,.x-match,.x-books,.x-more{background:var(--s1)!important;box-shadow:inset 0 0 0 1px var(--rule)!important}
+
+/* ---- chips + tabs */
+.x-chip{background:transparent!important;box-shadow:inset 0 0 0 1px rgba(241,235,223,.14)!important;color:var(--t1)}
+.x-tabs{background:var(--s0)!important}
+.x-tabs button{box-shadow:inset 0 0 0 1px rgba(241,235,223,.14)!important;color:var(--t2)!important}
+.x-tag.gold,.x-tabs button[aria-pressed=true],.x-chip[aria-pressed=true],.x-chip:active{background:var(--pb-steel)!important;color:var(--pb-steel-ink)!important;box-shadow:none!important}
+.x-sub button[aria-pressed=true]{color:var(--pb-steel-hi)!important;background:rgba(164,184,204,.12)!important}
+
+/* ---- prices */
+.x-odd{background:var(--s1)!important;box-shadow:inset 0 0 0 1px rgba(241,235,223,.12)!important}
+.x-odd.pick{background:var(--pb-steel)!important;box-shadow:none!important}
+.x-odd.pick b,.x-odd.pick small,.x-odd.pick i{color:var(--pb-steel-ink)!important}
+.x-model{color:var(--t1)!important}.x-model.bet{color:var(--pb-steel-hi)!important}
+
+/* ---- bet cards: steel hairline instead of white foil */
+.x-bet::before,.betcard::before{background:var(--foil)!important}
+.betcard .bc-price b,.x-bet .xb-price b{color:var(--pb-steel-hi)}
+.betcard .bc-tier,.x-bet .xb-tier{color:var(--t2)}
+
+/* ---- slate pill + picker */
+.slatebtn.sb2{background:linear-gradient(180deg,rgba(241,235,223,.06),rgba(241,235,223,.02));box-shadow:inset 0 0 0 1px rgba(241,235,223,.12),inset 0 1px 0 rgba(241,235,223,.08),0 6px 18px -10px rgba(0,0,0,.8)}
+.sb2-ic{background:var(--pb-steel);color:var(--pb-steel-ink);box-shadow:0 0 0 3px rgba(164,184,204,.12)}
+.sb2-ch{background:rgba(241,235,223,.06)}
+.modal .card,.sheet{background:var(--s4)}
+.sp2-row{background:rgba(241,235,223,.035);box-shadow:inset 0 0 0 1px rgba(241,235,223,.07)}
+.sp2-row.cur{background:rgba(164,184,204,.08);box-shadow:inset 0 0 0 1.5px var(--pb-steel)}
+.sp2-cur{background:var(--pb-steel);color:var(--pb-steel-ink)}
+.sp2-date{background:var(--s0);box-shadow:inset 0 0 0 1px rgba(241,235,223,.1)}
+.sp2-date small{color:var(--pb-steel)}
+.sp2-st{background:rgba(241,235,223,.06)}
+.sp2-imp{box-shadow:inset 0 0 0 1px rgba(241,235,223,.1)}
+:focus-visible{outline-color:var(--pb-steel)}
