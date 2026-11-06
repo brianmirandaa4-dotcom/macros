@@ -88,3 +88,25 @@
 @media (max-width:360px){.tkl-sw span{display:none}.tkl-sw{padding:0 5px}}
 .tkl-auto{position:static;align-self:center;height:auto;padding:3px 4px;margin-left:1px;border-radius:4px;font-size:7.5px;background:color-mix(in srgb,var(--act) 18%,transparent);color:var(--act)}
 #tktrack[data-mode=auto] .tkl-auto{display:inline-block}
+/* continuous scroll, right to left */
+.tkl-n{display:none!important}
+.tkl-vp{perspective:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent)}
+.tkm{display:flex;width:max-content;height:26px;align-items:center;animation:tkm linear infinite;will-change:transform}
+.tkm-r{display:flex;align-items:center;flex:none}
+@keyframes tkm{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.tkl-vp:active .tkm{animation-play-state:paused}
+.tkm-i{display:inline-flex;align-items:center;flex:none;height:26px;padding:0 4px;border-radius:6px}
+.tkm-sep{flex:none;width:4px;height:4px;margin:0 12px;border-radius:50%;background:var(--t3);opacity:.5}
+.tkm .tk{display:inline;white-space:nowrap;font:600 12.5px/26px var(--f-ui);color:var(--t2);font-variant-numeric:tabular-nums;cursor:pointer}
+.tkm .tk b{color:var(--t1);font-weight:700}
+.tkm .tk i{display:inline-block;font:800 9.5px/1 var(--f-ui);font-style:normal;letter-spacing:.06em;padding:3px 5px;border-radius:4px;margin-right:6px;background:var(--s3);color:var(--t2);vertical-align:1px}
+.tkm .tk-live i{background:var(--loss);color:var(--s0)}
+.tkm .tk-pre i{background:var(--s3);color:var(--t1)}
+.tkm .tk-win,.tkm .tk-win b{color:var(--edge)}
+.tkm .tk-sum i{background:var(--edge);color:var(--s0)}
+.tkm .tk-wx{color:var(--t1)}
+.tkm .tk-bet,.tkm .tk-bet b{color:var(--loss)}
+.tkm .tk-bet i{background:var(--loss);color:var(--s0);animation:tkbet 1.1s ease-in-out infinite}
+.tkm-i.k-bet{background:color-mix(in srgb,var(--loss) 16%,transparent)}
+.tkm .tl.xs{width:16px;height:16px;margin:0 4px 0 1px;vertical-align:-4px}
+@media (prefers-reduced-motion:reduce){.tkm{animation:none}.tkl-vp{overflow-x:auto;-webkit-mask-image:none;mask-image:none}}

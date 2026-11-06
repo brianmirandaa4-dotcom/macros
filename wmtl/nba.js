@@ -1,7 +1,7 @@
 /* tail. NBA — the basketball side, built to the NFL side's standard and fed only by data the app is given:
    slates in data/nba/<date>.json (wmtl.slate.v2), the player library in data/nbap, teams in data/nba/teams.json,
    and ESPN's public NBA scoreboard + box scores for live scores. Nothing here estimates a number; anything missing reads "Not available"
-   or is left out. Also owns the one-banner header ticker (NFL | NBA switch, Auto by default) that app.js drawTicker hands its items to.
+   or is left out. Also owns the one-banner header ticker (NFL | NBA switch, Auto by default; scrolls right to left) that app.js drawTicker hands its items to.
    Loaded after every other script; it wraps, never replaces, the NFL screens (Home, Live Now, game screen, search). */
 (function(){
 'use strict';
@@ -126,7 +126,7 @@ function mountLanes(){ const tk = $('#ticker'), tr = $('#tktrack'); if(!tk || !t
       if(want === SHOW.on && SHOW.mode !== 'auto'){ SHOW.mode = 'auto'; save(); show(autoPick()); toast('Banner: Auto. Shows the sport that is live or up next'); }
       else { SHOW.mode = want; save(); show(want); toast(`Banner: ${want}. Tap ${want} again for Auto`); } });
     $('.tkl-n', L.el).onclick = e => { e.stopPropagation(); roll(L, true); };
-    L.vp.onclick = e => { const t = e.target.closest('[data-tkp],[data-tkg],[data-nbg]'); if(t && openTarget(t)) return; roll(L, true); }; }
+    L.vp.onclick = e => { const t = e.target.closest('[data-tkp],[data-tkg],[data-nbg]'); if(t) openTarget(t); }; }
   show(SHOW.mode === 'auto' ? autoPick() : SHOW.mode); return true; }
 /* one banner: the user picks NFL or NBA with one tap; until then (and after tapping the active sport again) Auto shows what matters now */
 const SHOW = {mode: (() => { try{ const v = localStorage.getItem('tail.banner'); return v === 'NFL' || v === 'NBA' ? v : 'auto'; }catch(e){ return 'auto'; } })(), on: null};
@@ -138,20 +138,20 @@ function autoPick(){ const has = (sp, k) => LANE[sp].items.some(x => x.kind === 
   const a = nextNFL(), b = nextNBA(); if(a === Infinity && b === Infinity) return SHOW.on || 'NFL'; return b < a ? 'NBA' : 'NFL'; }
 function show(sp){ const tr = $('#tktrack'); if(!tr || !sp) return; const ch = SHOW.on !== sp; SHOW.on = sp; tr.dataset.show = sp; tr.dataset.mode = SHOW.mode;
   tr.querySelectorAll('.tkl-sw').forEach(b => { const on = b.dataset.sw === sp; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-  for(const x of ['NFL', 'NBA']){ const L = LANE[x]; if(x === sp){ if(ch && L.items.length){ L.i = Math.min(L.i, L.items.length - 1); paint(L, L.items[L.i], false); } schedule(L); } else clearTimeout(L.t); } }
+  for(const x of ['NFL', 'NBA']){ const L = LANE[x]; if(x === sp){ if(ch) marquee(L, true); } else clearTimeout(L.t); } }
 function openTarget(t){
   if(t.dataset.tkp){ const d = Object.values(SLATE).find(x => x && x.props.some(p => p.id === t.dataset.tkp)); if(d){ openProp(d, t.dataset.tkp); return true; } return false; }
   if(t.dataset.tkg){ const [a, h] = t.dataset.tkg.split('|'); for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; const g = d.games.find(x => x.away.abbr === a && x.home.abbr === h); if(g){ openGame(d.id, g.id); return true; } } toast(`${a} @ ${h} is not on a modeled slate`); return true; }
   if(t.dataset.nbg){ const [a, h] = t.dataset.nbg.split('|'); openByTeams(a, h); return true; } return false; }
-function schedule(L){ clearTimeout(L.t); if(!L.el || L.paused || (SHOW.on && SHOW.on !== L.sp) || L.items.length < 2 || document.visibilityState !== 'visible') return; const it = L.items[L.i];
+function schedule(L){ clearTimeout(L.t); return; if(!L.el || L.paused || (SHOW.on && SHOW.on !== L.sp) || L.items.length < 2 || document.visibilityState !== 'visible') return; const it = L.items[L.i];
   L.t = setTimeout(() => roll(L), (it && it.kind === 'bet' ? HOLD_BET : HOLD) ); }
 function count(L){ if(!L.cnt) return; const n = L.items.length; L.cnt.textContent = n > 1 ? `${L.i + 1}/${n}` : ''; L.el.classList.toggle('single', n < 2); }
-function paint(L, it, anim){ const vp = L.vp, old = vp.querySelector('.tkl-it.cur'); const n = document.createElement('div'); n.className = 'tkl-it k-' + it.kind; n.dataset.k = it.k; n.innerHTML = it.html;
+function paint(L, it, anim){ marquee(L); return; const vp = L.vp, old = vp.querySelector('.tkl-it.cur'); const n = document.createElement('div'); n.className = 'tkl-it k-' + it.kind; n.dataset.k = it.k; n.innerHTML = it.html;
   if(it.flash){ n.classList.add('flash'); it.flash = false; } if(it.pulse){ n.classList.add('pulse'); it.pulse = false; }
   if(!old || !anim){ vp.querySelectorAll('.tkl-it').forEach(x => x.remove()); n.classList.add('cur'); vp.appendChild(n); }
   else { vp.querySelectorAll('.tkl-it.leave').forEach(x => x.remove()); n.classList.add('enter'); vp.appendChild(n); void n.offsetWidth; n.classList.remove('enter'); n.classList.add('cur'); old.classList.remove('cur'); old.classList.add('leave'); setTimeout(() => old.remove(), 650); }
   count(L); }
-function roll(L, now){ clearTimeout(L.t); if(!L.items.length || !L.el) return; let j = -1; if(L.next){ j = L.items.findIndex(x => x.k === L.next); L.next = null; }
+function roll(L, now){ clearTimeout(L.t); L.next = null; return; if(!L.items.length || !L.el) return; let j = -1; if(L.next){ j = L.items.findIndex(x => x.k === L.next); L.next = null; }
   if(j < 0) j = (L.i + 1) % L.items.length; if(j === L.i && L.vp.querySelector('.tkl-it.cur') && !now){ schedule(L); return; }
   L.i = j; paint(L, L.items[j], true); schedule(L); }
 /* team chips render as <span> in the lanes: app.css styles every `.tk i` as a LIVE/FINAL badge */
@@ -167,6 +167,16 @@ function setItems(L, list){ if(!mountLanes()) return; const cur = L.items[L.i]; 
     if(el && el.innerHTML !== it.html){ el.innerHTML = it.html; if(it.pulse){ el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); it.pulse = false; } }
     count(L); if(!L.t) schedule(L); return; }
   L.i = Math.max(0, Math.min(L.i, list.length - 1)); if(list.length) paint(L, list[L.i], true); schedule(L); }
+
+/* continuous right-to-left scroll of every item in the visible sport (replaces the one-at-a-time flip) */
+const SPEED = 38; // px per second: slow enough to read
+function marquee(L, force){ if(!L.vp) return; const items = L.items || []; const sig = items.map(x => x.k + '\u0001' + x.html).join('\u0002');
+  if(!force && sig === L.msig && L.vp.querySelector('.tkm')) return; L.msig = sig; L.el.classList.add('single');
+  const run = items.map(x => `<span class="tkm-i k-${x.kind}">${x.html}</span><span class="tkm-sep" aria-hidden="true"></span>`).join('');
+  L.vp.innerHTML = `<div class="tkm"><div class="tkm-r">${run}</div><div class="tkm-r" aria-hidden="true">${run}</div></div>`;
+  const m = L.vp.firstElementChild, r = m.firstElementChild; const w = r.getBoundingClientRect().width; if(!w) return;
+  const dur = Math.max(8, w / SPEED); if(!L.mstart) L.mstart = performance.now();
+  m.style.animationDuration = dur + 's'; m.style.animationDelay = -(((performance.now() - L.mstart) / 1000) % dur) + 's'; }
 const parse = h => { const t = document.createElement('template'); t.innerHTML = h.trim(); const e = t.content.firstElementChild; if(!e) return null; const c = e.classList, tx = e.textContent.replace(/\s+/g, ' ').trim();
   if(e.dataset.tkg) return {k: 'g:' + e.dataset.tkg, html: h, kind: c.contains('tk-live') ? 'live' : 'final', sig: e.dataset.sc || null};
   if(e.dataset.tkp) return {k: 'p:' + e.dataset.tkp, html: h, kind: c.contains('tk-bet') ? 'bet' : 'win'};
@@ -189,8 +199,8 @@ function itemsNBA(){ const out = [], G = Object.values(NLV.games); const ord = s
   if(!out.length) out.push({k: 'i:none', kind: 'info', html: `<span class="tk">${NLV.at ? 'No NBA game on today' : NLV.err ? 'NBA scores not available right now' : 'Checking NBA scores…'}</span>`});
   return out; }
 const TKL = window.TKL = {
-  nfl(items){ if(!mountLanes()) return; const list = (items || []).map(parse).filter(Boolean); setItems(LANE.NFL, [...betNowNFL(), ...list]); if(SHOW.mode === 'auto') show(autoPick()); },
-  nba(){ if(!mountLanes()) return; setItems(LANE.NBA, itemsNBA()); if(SHOW.mode === 'auto') show(autoPick()); }, lanes: LANE, show: s => { SHOW.mode = s === 'auto' ? 'auto' : s; save(); show(s === 'auto' ? autoPick() : s); }};
+  nfl(items){ if(!mountLanes()) return; const list = (items || []).map(parse).filter(Boolean); setItems(LANE.NFL, [...betNowNFL(), ...list]); marquee(LANE.NFL); if(SHOW.mode === 'auto') show(autoPick()); },
+  nba(){ if(!mountLanes()) return; setItems(LANE.NBA, itemsNBA()); marquee(LANE.NBA); if(SHOW.mode === 'auto') show(autoPick()); }, lanes: LANE, show: s => { SHOW.mode = s === 'auto' ? 'auto' : s; save(); show(s === 'auto' ? autoPick() : s); }};
 
 /* ------------------------------------------------------------ shared pieces (same markup and classes as the NFL screens) */
 function best(p, side){ const offs = (p.offers || []).filter(o => isNum(o[side])); const at = offs.filter(o => o.line === p.line); let b = null;
