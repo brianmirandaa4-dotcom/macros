@@ -2520,7 +2520,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.56';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.57';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -6254,11 +6254,12 @@ async function restWav(sec){const sr=22050,b0=Math.round(sec*sr),tail=await rsTa
   for(let i=0;i<tail.length;i++)dv.setInt16(44+(b0+i)*2,Math.max(-32767,Math.min(32767,Math.round(32767*tail[i]))),true);
   return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}))}
 function restLockStop(){if(restAudio){try{restAudio.pause()}catch(e){}URL.revokeObjectURL(restAudio._u);restAudio=null;sessType('ambient')}try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}}catch(e){}}
-async function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;const end0=S.rest.end;sessType('playback');const u=await restWav(Math.max(0,(end0-Date.now())/1000));if(!S.rest||S.rest.end!==end0||!restLockOn()){URL.revokeObjectURL(u);return}
+let restLockBusy=false;
+async function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;const end0=S.rest.end;sessType('playback');restLockBusy=true;let u;try{u=await restWav(Math.max(0,(end0-Date.now())/1000))}finally{restLockBusy=false}if(!S.rest||S.rest.end!==end0||!restLockOn()){URL.revokeObjectURL(u);return}
   const left=(S.rest.end-Date.now())/1000;if(left<1){URL.revokeObjectURL(u);return}
   const au=new Audio(u);au._u=u;au.setAttribute('playsinline','');restAudio=au;
   au.onended=()=>{if(restAudio===au){restBeeped=S.rest?S.rest.end:Date.now();restLockStop()}};
-  au.play().catch(()=>{});
+  au._t0=Date.now();au.play().catch(()=>{});
   try{if('mediaSession' in navigator){const at=new Date(S.rest.end).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
     navigator.mediaSession.metadata=new MediaMetadata({title:`Rest · next set at ${at}`,artist:(S.active&&S.active.name)||'Syncope',album:'Syncope rest timer',artwork:[{src:'./icon-512.png',sizes:'512x512',type:'image/png'}]});
     navigator.mediaSession.playbackState='playing';
@@ -6266,7 +6267,13 @@ async function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;c
     try{navigator.mediaSession.setPositionState({duration:left+rsDur()+0.1,position:0,playbackRate:1})}catch(e){}}}catch(e){}}
 async function restWakeOn(){try{if(!restWake&&navigator.wakeLock&&document.visibilityState==='visible'){restWake=await navigator.wakeLock.request('screen');restWake.addEventListener('release',()=>{restWake=null})}}catch(e){}}
 function restWakeOff(){try{restWake&&restWake.release()}catch(e){}restWake=null}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){sessType(restAudio?'playback':'ambient');if(S.rest){restWakeOn();if(S.rest.end-Date.now()>300)restArm();renderRest()}}});
+/* keep the lock-screen timer alive: opening the app, locking again, or iOS pausing the audio must never drop it */
+function restLockEnsure(gesture){if(restLockBusy||!restLockOn()||!S.rest||!S.active||S.rest.end-Date.now()<1500)return;const a=restAudio;if(a&&!a.paused&&!a.ended)return;
+  if(a&&a._t0){try{a.currentTime=Math.max(0,(Date.now()-a._t0)/1000);a.play().catch(()=>{if(gesture)restLockStart()});return}catch(e){}}
+  restLockStart()}
+document.addEventListener('pointerdown',()=>restLockEnsure(true),true);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){sessType(restAudio?'playback':'ambient');if(S.rest){restWakeOn();if(S.rest.end-Date.now()>300)restArm();renderRest()}}restLockEnsure(false)});
+addEventListener('pagehide',()=>restLockEnsure(false));
 function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else{rsUnlock();playRestSound(null,S.rest.end)}}
 function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();if(restSoundId()==='custom')rsLoadCustom();restArm();restLockStart();restWakeOn();renderRest()}
 function renderRest(){
@@ -6279,6 +6286,7 @@ function renderRest(){
         renderRest();return}
       if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save();restArm();restLockStart()}else{S.rest=null;rsCancel()}renderRest()}}
   const left=S.rest.end-Date.now();
+  if(left>2000&&restLockOn()&&(!restAudio||restAudio.paused))restLockEnsure(false);
   if(left<=0){const end=S.rest.end,late=Date.now()-end;S.rest=null;el.remove();restWakeOff();
     const au=restAudio,playing=au&&!au.paused&&!au.ended;restBuzz();
     if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&Math.abs(restBeeped-end)>1500)restBeep();restLockStop()}
