@@ -904,6 +904,13 @@ header.top .wrap{gap:8px}
 .tour-card h3{margin:4px 0 6px;font:800 19px/1.2 var(--f-display)}
 .tour-card p{margin:0 0 14px;color:var(--muted);font-size:14.5px;line-height:1.45}
 .tour-n{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--kcal)}
+.fp-top{display:flex;align-items:center;gap:14px;padding:2px 2px 0}.fp-id{min-width:0}.fp-id h2{margin:0;font:800 24px/1.1 var(--f-display)}.fp-id p{margin:3px 0 0;color:var(--muted);font-size:13.5px}
+.fp-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.fp-chips div{background:var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:9px 6px;text-align:center}
+.fp-chips b{display:block;font:700 18px/1.1 var(--f-num)}.fp-chips span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.fp-q .qt{cursor:default}.fp-empty{display:flex;flex-direction:column;gap:4px}.fp-empty span{color:var(--muted);font-size:13.5px}
+.fp-priv{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;padding:4px 6px}.fp-priv svg{width:16px;height:16px;flex:none}
+.fp-priv .link{font-size:13px;padding:0 0 0 2px}
+.fr-privb{display:inline-flex;align-items:center;gap:6px}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
@@ -1284,7 +1291,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
   <!-- FRIENDS -->
   <section class="view" id="v-friends" aria-label="Friends" hidden>
     <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button><button type="button" data-goto="friends" aria-pressed="true">Friends</button></div>
-    <div class="pnav"><div class="title"><div class="sub">Weekly leaderboard</div><h1>Friends</h1></div></div>
+    <div class="pnav"><div class="title"><div class="sub">Weekly leaderboard</div><h1>Friends</h1></div><button class="pill-btn fr-privb" type="button" data-privacy><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg>Privacy</button></div>
     <div class="tip" id="tip-friends" hidden></div>
     <div id="frBody" style="display:flex;flex-direction:column;gap:16px"></div>
   </section>
@@ -2423,7 +2430,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.42';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.43';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3127,7 +3134,7 @@ function safeFloor(k){const c=S.calc||{};if(!c.age||!c.ht)return null;
   const male=c.sex==='m',kgW=wt*.4536,cm=c.ht*2.54,lbm=c.bf>0&&c.bf<70?kgW*(1-c.bf/100):null;
   const bmr=bmrAt({...c},wt,lbm),tdee=bmr*(+c.act||1.375);
   const ffm=lbm||(male?.407*kgW+.267*cm-19.2:.252*kgW+.473*cm-48.3); // Boer fat-free mass when no body fat %
-  const ex=((S.dev&&S.dev.workouts)||[]).filter(w=>w.date===k&&w.kcal>0).reduce((a,w)=>a+Math.max(0,w.kcal-kgW*(w.min||0)/60),0);
+  const ex=devList().filter(w=>w.date===k&&w.kcal>0).reduce((a,w)=>a+Math.max(0,w.kcal-kgW*(w.min||0)/60),0);
   const parts=[['basic',male?1500:1200],['rest',bmr],['deficit',tdee*.75],['energy',30*ffm+ex]];
   if(c.age<18)parts.push(['teen',tdee]);
   const [why,kc]=parts.reduce((a,b)=>b[1]>a[1]?b:a);
@@ -3148,7 +3155,7 @@ function goalsBaseRaw(k){
 const ACT_BASE={'1.2':0,'1.375':150,'1.55':250,'1.725':350,'1.9':450};
 function trainFuel(k){
   const P=S.prefs||{};if(P.fuel===false)return null;
-  const ws=((S.dev&&S.dev.workouts)||[]).filter(w=>w.date===k&&w.kcal>0);if(!ws.length)return null;
+  const ws=devList().filter(w=>w.date===k&&w.kcal>0);if(!ws.length)return null;
   const lw=latestWeight(),kgw=((lw&&lw.w)||(S.calc&&S.calc.wt)||170)*.4536;
   const net=ws.reduce((a,w)=>a+Math.max(0,w.kcal-kgw*(w.min||0)/60),0);
   const base=ACT_BASE[String((S.calc&&S.calc.act)||'1.55')]??250;
@@ -3771,7 +3778,7 @@ const ML_OZ=29.5735,ozR=v=>Math.round(v);
 function hydTrainMin(k){let lift=0,cardio=0,run=0;(S.workouts||[]).filter(w=>w.date===k).forEach(w=>{const cm=(w.ex||[]).reduce((t,x)=>t+(x.cardio?+x.cardio.min||0:0),0),tot=Math.max(0,Math.round(((w.end||0)-(w.start||0))/60000));
     (w.ex||[]).forEach(x=>{if(x.cardio&&/run|jog|sprint/i.test(x.n))run+=+x.cardio.min||0});cardio+=cm-0;lift+=Math.max(0,tot-cm)*((w.ex||[]).some(x=>x.sets&&x.sets.length)?1:0)});
   cardio-=run;
-  ((S.dev&&S.dev.workouts)||[]).filter(d=>d.date===k&&d.min&&!(S.workouts||[]).some(w=>w.devId===d.id)).forEach(d=>{const t=String(d.type||d.name||'').toLowerCase();if(/run|jog/.test(t))run+=d.min;else if(/strength|weight|lift|functional/.test(t))lift+=d.min;else cardio+=d.min});
+  devList().filter(d=>d.date===k&&d.min&&!(S.workouts||[]).some(w=>w.devId===d.id)).forEach(d=>{const t=String(d.type||d.name||'').toLowerCase();if(/run|jog/.test(t))run+=d.min;else if(/strength|weight|lift|functional/.test(t))lift+=d.min;else cardio+=d.min});
   return {lift:Math.min(lift,240),cardio,run,all:lift+cardio+run}}
 const HYD_ACT={lift:'lift',cardio:'cardio',hard:'run'};
 function hydAutoTypes(k){const m=hydTrainMin(k),o=[];if(m.lift)o.push('lift');if(m.cardio)o.push('cardio');if(m.run)o.push('hard');
@@ -3924,7 +3931,7 @@ function buildReport(ym){const keys=monthKeys(ym),MT=microTargets(),out={ym,keys
   const hy=keys.map(k=>({k,d:hydDay(k),p:hydPlan(k)})).filter(x=>x.d.list.length);out.hyDays=hy.length;
   if(hy.length){out.hyAvg=avg(hy.map(x=>x.d.oz));out.hyGoal=avg(hy.map(x=>x.p.oz.total));out.hyHit=hy.filter(x=>x.d.oz>=x.p.oz.total*.9).length;const ln=hy.filter(x=>x.p.naGoal);out.naNeed=ln.length;out.naMet=ln.filter(x=>x.d.na>=x.p.naGoal*.6).length}
   // training
-  const wk=(S.workouts||[]).filter(w=>keys.includes(w.date)),dv=((S.dev&&S.dev.workouts)||[]).filter(d=>keys.includes(d.date)&&!wk.some(w=>w.devId===d.id));
+  const wk=(S.workouts||[]).filter(w=>keys.includes(w.date)),dv=devList().filter(d=>keys.includes(d.date)&&!wk.some(w=>w.devId===d.id));
   out.lifts=wk.filter(w=>(w.ex||[]).some(x=>x.sets&&x.sets.length)).length;out.cardioMin=wk.reduce((t,w)=>t+(w.ex||[]).reduce((a,x)=>a+(x.cardio?+x.cardio.min||0:0),0),0)+dv.filter(d=>!/strength|weight|lift/i.test(String(d.type||d.name))).reduce((t,d)=>t+(d.min||0),0);
   out.sessions=wk.length+dv.length;out.prs=wk.reduce((t,w)=>t+(w.prs||[]).length,0);out.weeks=Math.max(1,keys.length/7);out.perWeek=out.sessions/out.weeks;
   const half=Math.ceil(keys.length/2),vol=ks=>wk.filter(w=>ks.includes(w.date)).reduce((t,w)=>t+(w.ex||[]).reduce((a,x)=>a+(x.sets||[]).reduce((b,s2)=>b+setVol(s2),0),0),0);out.vol1=vol(keys.slice(0,half));out.vol2=vol(keys.slice(half));
@@ -4078,7 +4085,7 @@ function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayK
   const done=(S.workouts||[]).filter(w=>w.date===k),dv=devList().filter(d=>d.date===k&&!done.some(w=>w.devId===d.id)),nx=k===tk?tplNext():null;
   let tr;
   if(S.active&&k===tk)tr={v:'Live',s:esc(S.active.name),fr:.5,go:'train',hot:1};
-  else if(done.length||dv.length){const n=done.length+dv.length,m=done.reduce((a,w)=>a+Math.round(((w.end||0)-(w.start||0))/60000),0)+dv.reduce((a,d)=>a+(d.min||0),0);tr={v:'Done',s:`${n>1?n+' sessions':esc((done[0]||dv[0]).name)}${m>0?` · ${m} min`:''}`,fr:1,go:'train'}}
+  else if(done.length||dv.length){const n=done.length+dv.length,m=done.reduce((a,w)=>a+Math.round(((w.end||0)-(w.start||0))/60000),0)+dv.reduce((a,d)=>a+(d.min||0),0);tr={v:'Done',s:`${n>1?n+' sessions':esc((done[0]||dv[0]).name)}${m>0?` · ${m} min`:''}${!done.length?' · '+esc(dv[0].src):''}`,fr:1,go:!done.length&&dv.length===1?'dev:'+dv[0].id:'train'}}
   else if(nx&&S.templates[nx.i])tr={v:'Start',s:esc(S.templates[nx.i].name),fr:0,go:'start'};
   else tr={v:k===tk?'Start':'Rest',s:k===tk?'Tap to log a workout':'No training logged',fr:0,go:k===tk?'start':'train'};
   const rec=h.recovery,sl=h.sleep;
@@ -4092,7 +4099,7 @@ function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayK
 $('quick').addEventListener('click',e=>{
   if(e.target.closest('[data-qwater]')){e.stopPropagation();hydAdd(12,'water',0,S.day);const b=e.target.closest('[data-qwater]');renderQuick();toast('+12 oz water',()=>{const L=hydS().log[S.day]||[];L.pop();save();renderQuick();renderTodayRows()});return}
   const t=e.target.closest('[data-q]');if(!t)return;const q=t.dataset.q;
-  if(q==='water')openPage('hyd');else if(q==='train'){if($('quick').dataset.go==='start'&&!S.active){setView('train');openStart()}else setView('train')}
+  if(q==='water')openPage('hyd');else if(q==='train'){const g=$('quick').dataset.go||'';if(g.startsWith('dev:'))openDevWorkout(g.slice(4));else if(g==='start'&&!S.active){setView('train');openStart()}else setView('train')}
   else if(q==='rec')openPage('health');else if(q==='steps')openPage('health')});
 $('quick').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-q]')){e.preventDefault();e.target.click()}});
 
@@ -4140,9 +4147,10 @@ $('findBtn').onclick=openFind;
 /* ================= TOUR: six quick stops, replay from the ? anytime ================= */
 const TOUR=[
   ['#hero','Your day, front and center','Calories left and the ring fill up as you log. Protein, carbs and fat sit right under it.'],
-  ['#quick','Everything else, one tap away','Water (tap +12 to add a glass), training, recovery and steps. Tap any tile to open it.'],
+  ['#quick','Everything else, one tap away','Tap +12 to add a glass of water. Tap Training to start today’s workout, or to fix a session your watch logged by mistake. Recovery and steps come from your watch.'],
   ['.composer','Log anything in plain words','Type “2 eggs and a coffee”, or tap the camera to scan your plate or a label.'],
-  ['#tabsBottom','Move around','Train for workouts, Progress for trends and friends, Plan for your goals. The big + logs food, water, weight or a workout from anywhere.'],
+  ['#tabsBottom','Move around','Train: workouts and templates. Progress: your trends, plus Friends, where you tap anyone to see their day. Plan: your goal and targets. The big + logs food, water, weight or a workout from anywhere.'],
+  ['#profBtn','You and your settings','Your profile, devices, rest sounds and privacy all live here.'],
   ['#findBtn','Can’t find something?','Search jumps straight to any screen. Try “water”, “report” or “rest sound”.'],
   ['#helpBtn','That’s it','Replay this tour anytime from the ? up here. Now go log your first meal.']];
 let tourI=-1;
@@ -4726,7 +4734,6 @@ function renderFriends(){
     <div class="glabel">Today's points</div><div class="card fr-today">${(()=>{const d=dayPoints(todayKey());return `<ul class="todo">${POINTS.map(([k,v,l])=>`<li><button type="button" class="${d[k]?'done':''}" tabindex="-1"><span class="ck">${d[k]?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span><b>${l}</b></span><span class="gv">+${v}</span></button></li>`).join('')}</ul>`})()}</div>
     <div class="glabel">Activity</div><div class="feed">${feed.length?feed.map(e=>{const n=(e.cheers||[]).length,mineEv=e.who.me,did=cheered.has(e.who.uid+'|'+e.id);return `<div class="fe" data-fp="${e.who.me?'me':esc(e.who.uid)}">${AV(e.who.name,e.who.color,38,e.who.me?myAv():e.who.av)}<div class="fe-t"><p><b>${esc(mineEv?'You':e.who.name.split(' ')[0])}</b> ${evText(e)}</p><span>${ago(e.t,e.date)}${n?` · ${mineEv?'cheered by ':''}${mineEv?esc(e.cheers.slice(0,3).join(', ')):n+' cheer'+(n>1?'s':'')}`:''}</span></div>${mineEv?'':`<button type="button" class="cheer ${did?'on':''}" data-ch="${esc(e.who.uid)}|${esc(e.id)}" ${did?'disabled':''}>🔥${did?'':' Cheer'}</button>`}</div>`}).join(''):'<p class="note" style="padding:6px">Workouts, protein days and streaks from you and your friends show up here.</p>'}</div>
     <details class="steps card" style="padding:14px 18px"><summary>How points work</summary><ul class="ing" style="margin-top:8px">${POINTS.map(([,v,l])=>`<li><span>${l}</span><b>+${v}/day</b></li>`).join('')}</ul><p class="note">Up to ${POINTS.reduce((a,x)=>a+x[1],0)} points a day. Everyone's points are counted the same way from their own plan.</p></details>
-    <div class="glabel">Privacy</div><div class="glist" id="frShare2">${shareRows(c.share||{})}</div>
     <button class="link" id="frLeave" style="color:var(--muted);align-self:center;padding:10px">Leave Syncope Friends</button>`;
 }
 function shareRows(sh){sh={...sh,templates:sh.templates!==false};return [['templates','Workout templates','--pro','dumbbell'],['nutrition','Calories & macros','--kcal','target'],['foods','Food log (what you ate)','--carb','list'],['recovery','Recovery & sleep','--good','heart'],['streak','Logging streak','--carb','fire'],['workouts','Workouts & PRs','--pro','dumbbell'],['protein','Protein days','--pro','target'],['steps','Steps','--fat','watch'],['meals','Days on target','--good','list'],['weight','Weekly weight change','--kcal','scale']]
@@ -4751,6 +4758,15 @@ $('frBody').addEventListener('click',async e=>{
   if(e.target.closest('#frLeave')){const b=$('frLeave');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to leave and delete your Friends profile';return}
     try{await socApi('leave',{})}catch(err){}socSave({});renderFriends();toast('You left Syncope Friends')}
 });
+function openPrivacy(){const c=socCfg();if(!c.on){toast('Join Syncope Friends first, then choose what to share');setView('friends');return}
+  const n=Object.values({...c.share,templates:(c.share||{}).templates!==false}).filter(Boolean).length;
+  sheet(`<div><div class="eyebrow">Privacy</div><h3>What friends see when they tap you</h3><p class="note" style="margin:6px 0 0">Your weekly points always show so the leaderboard works. Everything else is your call, and you can change it anytime.</p></div>
+    <div class="glist" id="frShare2">${shareRows(c.share||{})}</div>
+    <div class="row" style="justify-content:space-between"><button class="ghost" id="pvPrev">Preview my profile</button><button class="primary" id="pvOk">Done</button></div>`);
+  $('pvOk').onclick=closeSheet;$('pvPrev').onclick=()=>{closeSheet();openFriend('me')};
+  $('frShare2').addEventListener('change',async e=>{const t=e.target.closest('[data-sh]');if(!t)return;const c=socCfg();c.share={...(c.share||{}),[t.dataset.sh]:t.checked};socSave(c);
+    try{await socApi('profile',{name:c.name,color:c.color,share:c.share});toast('Privacy updated')}catch(err){toast(esc(err.message))}})}
+document.addEventListener('click',e=>{if(e.target.closest('[data-privacy]')){e.preventDefault();if(pgStack.length&&e.target.closest('#pg-friend'))closePages();openPrivacy()}});
 $('frBody').addEventListener('change',async e=>{const t=e.target.closest('[data-sh]');if(!t||!$('frShare2')||!$('frShare2').contains(t))return;const c=socCfg();c.share={...(c.share||{}),[t.dataset.sh]:t.checked};socSave(c);
   try{await socApi('profile',{name:c.name,color:c.color,share:c.share});toast('Privacy updated')}catch(err){toast(esc(err.message))}});
 
@@ -4797,23 +4813,34 @@ function renderFriendPage(){
   const D=F.detail||{daily:[],shares:{}},sh=D.shares||{},tk=todayKey(),ws=weekStart(tk),st=F.stats&&F.stats.week===ws?F.stats:{score:0};
   const days=D.daily||[],today=days.find(x=>x.d===tk)||{},hasN=today.k!=null;
   const all=[...(b.friends||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0),myWeek().stats.score].sort((a,x)=>x-a),rank=all.indexOf(st.score)+1;
-  const locked=(what,key)=>`<div class="card fp-lock"><span class="gi" style="--c:var(--muted)">${GI.shield}</span><div><b>${what} isn't shared</b><span>${isMe?'Turn it on under Privacy on the Friends page.':`${esc(F.name.split(' ')[0])} can turn on “${key}” in Friends → Privacy.`}</span></div></div>`;
+  const locked=(what,key)=>`<div class="card fp-lock"><span class="gi" style="--c:var(--muted)">${GI.shield}</span><div><b>${what} isn't shared</b><span>${isMe?'Turn it on under Friends → Privacy.':`${esc(F.name.split(' ')[0])} can turn on “${key}” in Friends → Privacy.`}</span></div></div>`;
   const macro=(l,v,g,col)=>{const pct=g?Math.min(100,v/g*100):0;return `<div class="fp-m" style="--c:var(${col})"><div class="row" style="justify-content:space-between"><span>${l}</span><b class="num">${r0(v)}<small> / ${r0(g)} g</small></b></div><i><u style="width:${pct}%"></u></i></div>`};
   const left=hasN?today.gk-today.k:0;
-  let html=`<div class="fp-hero" style='--bnr:${bnr("all","fp"+(F.uid||"me"))}'>${AV(F.name,F.color,84,F.me?myAv():F.av)}<h2>${esc(F.name)}</h2><p>${F.username?'@'+esc(F.username):''}${D.plan?` · ${esc(D.plan)}`:''}</p>
-      <div class="fp-stats"><div><b>${fmt(st.score||0)}</b><span>pts this week</span></div><div><b>#${rank||'—'}</b><span>rank</span></div><div><b>${st.streak??'—'}</b><span>day streak</span></div><div><b>${st.workouts??'—'}</b><span>workouts</span></div></div></div>`;
-  if(sh.nutrition||isMe){
-    html+=`<div class="glabel">Today</div><div class="card fp-today">${hasN?`<div class="fp-ring">${ringMini(today.k,today.gk,today.k>today.gk*1.1?'var(--over)':'var(--kcal)')}<div class="fp-rc"><b>${fmt(today.k)}</b><span>of ${fmt(today.gk)} kcal</span></div></div>
-      <div class="fp-ms">${macro('Protein',today.p,today.gp,'--pro')}${macro('Carbs',today.c,today.gc,'--carb')}${macro('Fat',today.f,today.gf,'--fat')}<p class="note" style="margin:0">${today.n?`${today.n} item${today.n>1?'s':''} logged · `:''}${left>=0?`${fmt(left)} kcal left`:`${fmt(-left)} kcal over`}</p></div>`:'<p class="note" style="margin:0">Nothing logged yet today.</p>'}</div>`;
-  }else html+=locked('Calories & macros','Calories & macros');
+  const fn=isMe?'You':esc(F.name.split(' ')[0]),onN=sh.nutrition||isMe,onR=sh.recovery||isMe,onS=sh.steps||isMe,onW=sh.workouts||isMe,priv=[];
+  let html=`<div class="fp-top">${AV(F.name,F.color,58,F.me?myAv():F.av)}<div class="fp-id"><h2>${esc(F.name)}</h2><p>${F.username?'@'+esc(F.username):''}${D.plan?` · ${esc(D.plan)}`:''}</p></div></div>
+    <div class="fp-chips"><div><b>${fmt(st.score||0)}</b><span>pts</span></div><div><b>#${rank||'—'}</b><span>rank</span></div><div><b>${st.streak??'—'}</b><span>streak</span></div><div><b>${st.workouts??'—'}</b><span>workouts</span></div></div>`;
+  if(onN){const t={k:today.k||0,p:today.p||0,c:today.c||0,f:today.f||0},gk=today.gk||0,lf=gk-t.k,ov=lf<0,pc=gk?Math.round(t.k/gk*100):0;
+    const mac=(lab,v,goal,col,key)=>{const rem=(goal||0)-(v||0),p2=goal?Math.min(v/goal,1):0;return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b>${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':key==='p'?'extra':'over'}</span></div><div class="bar"><i style="width:${p2*100}%"></i></div><div class="hm-g num">${r0(v)} / ${r0(goal)}</div></div>`};
+    html+=hasN?`<div class="card hero v2 fp-heroC"><div class="hv-top"><div class="hv-l"><div class="eyebrow">${ov?'Over today':'Left today'}</div><div class="hv-big ${ov?'over':''}"><b class="num">${fmt(Math.abs(lf))}</b><small>kcal</small></div><div class="hv-sub num">${fmt(t.k)} eaten of ${fmt(gk)}${today.n?` · ${today.n} item${today.n>1?'s':''}`:''}</div></div>
+      <div class="gauge ${ov?'over':''}">${gaugeSVG(t,gk)}<div class="c"><b class="num">${pc}</b><span>%</span></div></div></div>
+      <div class="hv-mac">${mac('Protein',t.p,today.gp,'--pro','p')}${mac('Carbs',t.c,today.gc,'--carb','c')}${mac('Fat',t.f,today.gf,'--fat','f')}</div></div>`
+      :`<div class="card fp-empty"><b>${fn==='You'?'You haven’t':fn+' hasn’t'} logged anything yet today</b><span>Their numbers show up here as soon as they do.</span></div>`}
+  else priv.push('calories & macros');
+  {const tiles=[],hx=today.ht!=null?today:null;
+    tiles.push(hx?{id:'water',c:'var(--fat)',lab:'Water',v:`${fmt(hx.ho||0)}<small>/${fmt(hx.ht)} oz</small>`,s:(hx.ho||0)>=hx.ht?'Goal hit 🎉':`${fmt(hx.ht-(hx.ho||0))} oz to go`,fr:(hx.ho||0)/hx.ht}:{id:'water',c:'var(--fat)',lab:'Water',v:'—',s:'Not logged yet',fr:0});
+    const tw=(D.wks||[]).filter(w=>w.d===tk);
+    tiles.push(!onW?{id:'train',c:'var(--pro)',lab:'Training',v:'🔒',s:'Private',fr:0}:tw.length?{id:'train',c:'var(--pro)',lab:'Training',v:'Done',s:`${esc(tw[0].name)}${tw[0].min?` · ${tw[0].min} min`:''}`,fr:1}:{id:'train',c:'var(--pro)',lab:'Training',v:'Not yet',s:'No workout today',fr:0});
+    const r=days.slice().reverse().find(x=>x.rec!=null||x.sleep!=null)||{};
+    tiles.push(!onR?{id:'rec',c:'var(--good)',lab:'Recovery',v:'🔒',s:'Private',fr:0}:{id:'rec',c:'var(--good)',lab:'Recovery',v:r.rec!=null?`${r.rec}<small>%</small>`:'—',s:r.sleep!=null?`${r.sleep}h sleep${r.hrv!=null?` · HRV ${r.hrv}`:''}`:'No wearable data',fr:r.rec!=null?r.rec/100:0});
+    tiles.push(!onS?{id:'steps',c:'var(--carb)',lab:'Steps',v:'🔒',s:'Private',fr:0}:{id:'steps',c:'var(--carb)',lab:'Steps',v:today.steps!=null?fmt(today.steps):'—',s:today.steps!=null?(today.steps>=10000?'Goal hit 🎉':`${fmt(10000-today.steps)} to 10k`):'No steps yet',fr:today.steps!=null?today.steps/10000:0});
+    if(!onR)priv.push('recovery & sleep');if(!onS)priv.push('steps');if(!onW)priv.push('workouts');
+    html+=`<div class="qgrid fp-q">${tiles.map(t=>`<div class="qt" style="--c:${t.c}">${qRing(t.fr,t.c)}<div class="qt-t"><span>${t.lab}</span><b class="num">${t.v}</b><em>${t.s}</em></div></div>`).join('')}</div>`}
+  if(!isMe&&!sh.foods)priv.push('food log');
   if(D.foods&&D.foods.length){const by={};D.foods.forEach(x=>(by[x.m]=by[x.m]||[]).push(x));
     html+=`<div class="glabel">What ${isMe?'you':esc(F.name.split(' ')[0])} ate today</div><div class="card fp-foods">${MEALS.filter(([m])=>by[m]).map(([m,l])=>`<div class="fp-meal"><div class="row" style="justify-content:space-between"><b>${l}</b><span class="num">${fmt(by[m].reduce((a,x)=>a+x.k,0))} kcal</span></div>${by[m].map(x=>`<div class="fp-f"><span>${esc(x.n)} <i>${esc(x.a)}</i></span><span class="num">${fmt(x.k)} · <em style="color:var(--pro)">${x.p}P</em> <em style="color:var(--carb)">${x.c}C</em> <em style="color:var(--fat)">${x.f}F</em></span></div>`).join('')}</div>`).join('')}</div>`}
   else if(!isMe&&!sh.foods&&sh.nutrition)html+='';
-  if((sh.recovery||isMe)&&days.some(x=>x.rec!=null||x.sleep!=null)){const r=days.slice().reverse().find(x=>x.rec!=null||x.sleep!=null)||{};
-    html+=`<div class="glabel">Recovery & sleep</div><div class="fp-tiles">${[['Recovery',r.rec!=null?r.rec+'%':'—','--good'],['Sleep',r.sleep!=null?r.sleep+'h':'—','--kcal'],['HRV',r.hrv??'—','--fat'],['Resting HR',r.rhr??'—','--pro'],['Strain',r.strain??'—','--carb'],['Steps',today.steps!=null?fmt(today.steps):'—','--good']].map(([l,v,c2])=>`<div class="tile" style="--c:var(${c2})"><div class="eyebrow">${l}</div><div class="v" style="color:var(${c2})">${v}</div></div>`).join('')}</div>`}
-  else if(!isMe&&!sh.recovery)html+=locked('Recovery & sleep','Recovery & sleep');
   if(days.some(x=>x.ht!=null)){const hx=today.ht!=null?today:days.slice().reverse().find(x=>x.ht!=null),ho=hx.ho||0,ht=hx.ht||1,pc=Math.min(100,ho/ht*100),isT=hx.d===tk,who=isMe?'You':esc(F.name.split(' ')[0]);
-    html+=`<div class="glabel">Hydration</div><div class="card fp-hyd"><div class="fp-m" style="--c:var(--fat)"><div class="row" style="justify-content:space-between"><span>${GI.drop} ${isT?'Today':niceDate(hx.d,{weekday:'short',day:'numeric'})}</span><b class="num">${fmt(ho)}<small> / ${fmt(ht)} fl oz</small></b></div><i><u style="width:${pc}%"></u></i></div>
+    html+=`<div class="glabel">Water this week</div><div class="card fp-hyd"><div class="fp-m" style="--c:var(--fat)"><div class="row" style="justify-content:space-between"><span>${GI.drop} ${isT?'Today':niceDate(hx.d,{weekday:'short',day:'numeric'})}</span><b class="num">${fmt(ho)}<small> / ${fmt(ht)} fl oz</small></b></div><i><u style="width:${pc}%"></u></i></div>
       <p class="note" style="margin:0">${ho>=ht?`${who} hit the water goal${hx.na?` · ${fmt(hx.na)} mg sodium from electrolytes`:''}`:ho?`${fmt(ht-ho)} fl oz to go${hx.na?` · ${fmt(hx.na)} mg sodium from electrolytes`:''}`:`No water logged ${isT?'yet today':'that day'}.`}</p>
       <div class="fp-hb">${days.map(x=>{const v=x.ht?Math.min(1,(x.ho||0)/x.ht):0;return `<div title="${x.d}: ${fmt(x.ho||0)} / ${fmt(x.ht||0)} fl oz"><i><u style="height:${v*100}%;background:${v>=1?'var(--good)':'var(--fat)'}"></u></i><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`}).join('')}</div>
       <p class="note" style="margin:0">${days.filter(x=>x.ht&&(x.ho||0)>=x.ht).length} of ${days.filter(x=>x.ht!=null).length} days on target this week</p></div>`}
@@ -4821,8 +4848,9 @@ function renderFriendPage(){
     html+=`<div class="glabel">Last 7 days</div><div class="card"><div class="fp-bars">${days.map(x=>`<div class="fb" title="${x.d}"><div class="fb-c"><i class="g" style="bottom:${(x.gk||0)/mx*100}%"></i><u style="height:${(x.k||0)/mx*100}%;background:${x.k>x.gk*1.1?'var(--over)':x.k>=x.gk*.9?'var(--good)':'var(--kcal)'}"></u></div><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`).join('')}</div>
       <table class="dtable fp-t"><thead><tr><th>Day</th>${sh.nutrition||isMe?'<th>kcal</th><th style="color:var(--pro)">P</th>':''}${sh.steps||isMe?'<th>Steps</th>':''}${sh.recovery||isMe?'<th style="color:var(--good)">Rec</th><th>Sleep</th>':''}</tr></thead><tbody>${days.slice().reverse().map(x=>`<tr><td>${niceDate(x.d,{weekday:'short',day:'numeric'})}</td>${sh.nutrition||isMe?`<td>${x.k!=null&&x.n?fmt(x.k):'—'}</td><td>${x.p!=null&&x.n?x.p:'—'}</td>`:''}${sh.steps||isMe?`<td>${x.steps!=null?fmt(x.steps):'—'}</td>`:''}${sh.recovery||isMe?`<td>${x.rec!=null?x.rec+'%':'—'}</td><td>${x.sleep!=null?x.sleep+'h':'—'}</td>`:''}</tr>`).join('')}</tbody></table></div>`}
   if(D.wks&&D.wks.length)html+=`<div class="glabel">Workouts this week</div><div class="fp-wks">${D.wks.map(w=>`<details class="card fp-w"><summary><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(w.name)}${w.prs?` <span class="pr">${w.prs} PR</span>`:''}</b><span>${niceDate(w.d,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.strain!=null?` · strain ${w.strain}`:''}</span></span><span class="gv">${w.vol?fmt(w.vol)+' lb':w.kcal?fmt(w.kcal)+' kcal':''}</span></summary>${w.ex&&w.ex.length?`<ul class="ing">${w.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.sets} sets · top ${esc(e.top)}</b></li>`).join('')}</ul>`:'<p class="note">Watch session, no lifts logged.</p>'}</details>`).join('')}</div>`;
-  else if(!isMe&&!sh.workouts)html+=locked('Workouts','Workouts & PRs');
+
   if(!isMe&&D.tpls&&D.tpls.length)html+=`<div class="glabel">${esc(F.name.split(' ')[0])}'s workout templates</div>${D.tpls.map((t,i)=>tplCard(t,F.uid,i)).join('')}`;
+  if(priv.length)html+=`<div class="fp-priv">${GI.shield}<span>${isMe?'Hidden from friends':fn+' keeps private'}: ${priv.join(', ')}${isMe?' · <button class="link" data-privacy>Change</button>':''}</span></div>`;
   if(!isMe)html+=`<button class="link" data-rm="${esc(F.uid)}" style="color:var(--muted);align-self:center;padding:12px">Remove ${esc(F.name.split(' ')[0])}</button>`;
   else html+=`<p class="note" style="text-align:center">This is exactly what your friends see when they tap you.</p>`;
   el.innerHTML=html;
@@ -5709,7 +5737,7 @@ function finishWorkout(){
 }
 function openWorkout(i){
   const w=S.workouts[i];if(!w)return;
-  const dv=w.devId&&((S.dev&&S.dev.workouts)||[]).find(x=>x.id===w.devId);
+  const dv=w.devId&&devList().find(x=>x.id===w.devId);
   sheet(`<div><div class="eyebrow">${niceDate(w.date,{weekday:'long',month:'short',day:'numeric'})} · ${fmtDur(w.end-w.start)}</div><h3>${esc(w.name)}</h3></div>
     ${dv?`<div class="live"><div style="--c:var(--good)"><b>${dv.strain??'—'}</b><span>${esc(dv.src)} strain</span></div><div style="--c:var(--over)"><b>${dv.kcal!=null?fmt(dv.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--pro)"><b>${dv.avgHr||'—'}</b><span>avg bpm</span></div><div style="--c:var(--fat)"><b>${dv.maxHr||'—'}</b><span>max bpm</span></div></div>`:''}
     ${w.copied?'<p class="note">Sets were copied from your last session. Tap Edit sets if anything changed.</p>':''}
@@ -6169,7 +6197,8 @@ const SRC_META={whoop:{n:'WHOOP',c:'#E9E9EF',i:'<rect x="7" y="2" width="10" hei
 function srcKey(src){const s=String(src||'').toLowerCase();return s.includes('whoop')?'whoop':s.includes('garmin')?'garmin':s.includes('oura')?'oura':/apple|health|watch/.test(s)?'apple':null}
 function srcBadge(src,big){const k=srcKey(src),m=k&&SRC_META[k];if(!m)return `<span class="srcb">${esc(src||'')}</span>`;
   return `<span class="srcb${big?' big':''}" style="--b:${m.c}"><svg viewBox="0 0 24 24" aria-hidden="true">${m.i}</svg>${m.n}</span>`}
-function devList(){return (S.dev&&S.dev.workouts)||[]}
+function devList(){const h=new Set((S.dev&&S.dev.hide)||[]);return ((S.dev&&S.dev.workouts)||[]).filter(w=>!h.has(w.id))}
+function hideDev(id){S.dev.hide=[...((S.dev&&S.dev.hide)||[]),id].slice(-300);S.workouts.forEach(w=>{if(w.devId===id)delete w.devId});save();renderAll();toast('Removed. It won’t count toward your day.',()=>{S.dev.hide=(S.dev.hide||[]).filter(x=>x!==id);save();renderAll()})}
 /* Watch sessions that are lifting get the "log your sets" prompts; everything else (golf, basketball, a run, tennis…)
    is shown as its own result: time, strain, calories, heart rate, zones and distance. */
 function isLiftDev(d){const t=String((d.type||'')+' '+(d.name||'')).toLowerCase();return /strength|weight|lift|functional|power|crossfit|hiit|bodybuild|gym|^\s*(workout|activity|other)\s*$/.test(t)||!t.trim()}
@@ -6213,17 +6242,18 @@ function renderWatchNow(){
     <h2>${esc(d.name)}</h2>${devResults(d)}
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
     <p class="note" style="margin:0">Counted in ${d.date===todayKey()?"today's":'that day’s'} calories burned and water target. It stays in your training history below.</p>
-    <div class="wn-acts"><button class="chip main" data-wskip>Got it</button><button class="chip" data-wpick>I lifted too</button></div>`;return}
+    <div class="wn-acts"><button class="chip main" data-wskip>Got it</button><button class="chip" data-wpick>I lifted too</button><button class="chip" data-wnotme>Not me</button></div>`;return}
   el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${srcBadge(d.src,1)}</span><span>${esc(whenStr(d))}</span></div>
     <h2>${esc(d.name)}</h2>
     <div class="live"><div style="--c:var(--pro)"><b>${d.min??'—'}</b><span>minutes</span></div><div style="--c:var(--good)"><b>${d.strain??'—'}</b><span>strain</span></div><div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div></div>
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
     <p class="note" style="margin:0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Syncope what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p>
-    <div class="wn-acts">${rec.map((w,j)=>`<button class="chip ${j?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button></div>`;
+    <div class="wn-acts">${rec.map((w,j)=>`<button class="chip ${j?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button><button class="chip" data-wnotme>Not me</button></div>`;
 }
 $('wNow').addEventListener('click',e=>{const id=$('wNow').dataset.id,d=devList().find(x=>x.id===id);if(!d)return;
   const c=e.target.closest('[data-wcopy]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.wcopy);if(src)quickCopy(src,d);return}
   if(e.target.closest('[data-wpick]'))return pickLiftFor(d);
+  if(e.target.closest('[data-wnotme]'))return hideDev(d.id);
   if(e.target.closest('[data-wskip]')){S.dev.skip=[...(S.dev.skip||[]),d.id].slice(-100);save();renderTrain();toast(isLiftDev(d)?'Kept as a watch session':`${esc(d.name)} saved to your training history`)}});
 function pickLiftFor(d){
   const rec=recentLogged(6);
@@ -6239,9 +6269,9 @@ function openDevWorkout(id){const w=devList().find(x=>x.id===id);if(!w)return;
   sheet(`<div><div class="row" style="justify-content:space-between;align-items:center">${srcBadge(w.src,1)}<span class="eyebrow" style="margin:0">${esc(whenStr(w))}</span></div><h3 style="margin-top:8px">${esc(w.name)}</h3></div>
     ${devResults(w)}
     ${isLiftDev(w)?`<p class="note">Your watch recorded time, heart rate and calories. Add the lifts to track sets, weights and strength progress for this session.</p>
-    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Add the lifts</button></div>`:`<p class="note">Recorded by ${esc(w.src)}. Its calories count toward that day’s burn and its time toward that day’s water target.</p>
-    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwLog">I lifted too</button><button class="primary" id="dwClose">Done</button></div>`}`);
-  $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();pickLiftFor(w)};
+    <div class="row" style="justify-content:space-between"><button class="link" id="dwNot" style="color:var(--over)">Not me, remove</button><span class="row" style="gap:8px"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Add the lifts</button></span></div>`:`<p class="note">Recorded by ${esc(w.src)}. Its calories count toward that day’s burn and its time toward that day’s water target.</p>
+    <div class="row" style="justify-content:space-between"><button class="link" id="dwNot" style="color:var(--over)">Not me, remove</button><span class="row" style="gap:8px"><button class="ghost" id="dwLog">I lifted too</button><button class="primary" id="dwClose">Done</button></span></div>`}`);
+  $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();pickLiftFor(w)};$('dwNot').onclick=()=>{closeSheet();hideDev(w.id)};
 }
 function recoveryTable(keys){
   const rows=keys.map(k=>[k,hv(k)]).filter(([,h])=>['sleep','recovery','hrv','rhr','steps'].some(x=>h[x]!=null));
