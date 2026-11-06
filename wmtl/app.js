@@ -180,8 +180,18 @@ function viewCard(d){ const m = d.meta, info = slateInfo(d.id) || {}; const st =
     ${leans.length ? `<section class="info" aria-label="Information only, not recommended"><div class="hd"><b>Information only · not bets</b><span class="sub">${leans.length} leans</span></div>
       <p class="note" style="margin:0">Strong report card, but the price is already fair. These are not bets.</p>
       ${lw.slice(0, S.leanAll ? 999 : 8).map(p => leanRow(p, d)).join('')}${lw.length > 8 && !S.leanAll ? `<button class="link" data-leanall>Show all ${lw.length}</button>` : ''}</section>` : ''}
+    ${prosHTML(d)}
     <section class="sec"><div class="sub">Model ${esc(m.model_version || '')} · built ${esc(m.generated_et || 'Not available')} · injuries ${esc(m.injuries_et || 'Not available')} · ${(m.sims_per_game || 10000).toLocaleString()} replays per game</div></section>
   </div>`; }
+function prosHTML(d, only){ const C = d.cappers; if(!C || !(C.picks || []).length) return ''; const R = Object.fromEntries((C.records || []).map(r => [r.name, r]));
+  const ps = only ? C.picks.filter(k => k.model && k.model.prop === only) : C.picks; if(!ps.length) return '';
+  const t = s => new Date(s).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit'}) + ' ET';
+  const mline = k => k.model ? `<span class="${k.model.agree ? 'pos' : 'neg'}">Model ${k.model.agree ? 'agrees' : 'disagrees'}</span> · model chance on this side ${pc(k.model.p_capper_side)}, before the market check · proj ${ln(k.model.projection)}` : '<span class="na">No prediction from the model for this market</span>';
+  const rows = ps.map(k => { const r = R[k.capper] || {}; return `<div class="pro"${k.model && !only ? ` data-prop="${esc(k.model.prop)}"` : ''}><div class="pro-top"><b>${esc(k.capper)}</b><span class="sub">${r.bets ? `${r.bets.toLocaleString()} bets · ROI ${sg(r.roi, 1)}%` : ''}</span></div>
+    <div class="pro-play"><span>${esc(k.play)}</span><span class="num">${od(k.odds)} · ${k.units}u</span></div>
+    <div class="sub">${mline(k)}</div><div class="sub">Posted ${esc(t(k.created_at))}${k.verified ? ' · verified' : ''}</div></div>`; }).join('');
+  const recs = only ? '' : `<div class="tbl"><table><thead><tr><th>Capper</th><th>NFL record</th><th>Units</th><th>ROI</th></tr></thead><tbody>${(C.records || []).map(r => `<tr><td>${esc(r.name)}</td><td>${r.w}–${r.l}–${r.p}</td><td class="${r.units < 0 ? 'neg' : 'pos'}">${sg(r.units, 1)}</td><td>${sg(r.roi, 1)}%</td></tr>`).join('')}</tbody></table></div>`;
+  return `<section class="sec"><div class="hd"><h2>${only ? 'Pros on this prop' : 'Pros on this game'}</h2><span class="sub">${ps.length} pick${ps.length === 1 ? '' : 's'} · ${esc(C.source)}</span></div><div class="group pad pros">${rows}${recs}<p class="note" style="margin:0">${esc(C.note)}</p></div></section>`; }
 function leanRow(p, d){ const r = resultOf(d, p); return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · ${esc(p.window || '')} · 25D ${sg(p.score25, 1)}</span></span><span class="r">${od(p.odds)}<br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : ''}</span></span></button>`; }
 function gradedStrip(d){ const s = d.results.summary, b = s.bets || {}, t = s.by_tier || {}, L = s.lines || {};
   const cell = (v, l) => `<div><b>${v}</b><span>${l}</span></div>`;
@@ -377,6 +387,7 @@ async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p)
       ${isNum(pm) ? `<div class="lossline">${lossLine(pm)}${isNum(p.pctile) ? ` · report card beats ${Math.round(p.pctile * 100)}% of history` : ''}</div>` : ''}
     </div>
     ${modelOnly && !yes ? `<section class="sec"><div class="hd"><h2>Check a price</h2><span class="sub">DraftKings price not on ESPN</span></div><div class="calc"><div class="fgrid"><div class="fld"><label for="pc-odds">Price you see on the ${p.side === 'under' ? 'under' : 'over'} ${ln(p.line)}</label><input id="pc-odds" inputmode="numeric" type="text" placeholder="−115"></div><div class="fld"><label>Model chance</label><input value="${pc(pm, 1)}" disabled></div></div><div id="pc-out" class="b15 t2">Enter a price to see what it needs.</div><p class="note" style="margin:0">This compares the price with the model's own replays only. The model's market check needs both sides' prices, so a prop priced here can't become a bet on the card.</p></div></section>` : ''}
+    ${prosHTML(d, p.id)}
     ${Q.length ? `<section class="sec"><div class="hd"><h2>The ${Q.length} answers</h2><span class="sub">tap a spoke</span></div>
       <div class="fp"><div class="fp-wrap">${Charts.fingerprint({q25: Q, score: isNum(p.score25) ? p.score25 : 0, size: 320})}</div>
         <div class="fp-tip" id="fp-tip">Longer green spokes push him past his normal game. Red spokes pull him short.</div>
