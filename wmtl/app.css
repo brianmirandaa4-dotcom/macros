@@ -319,3 +319,11 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .fld.search input{padding-left:38px;font:400 var(--fs-17)/1 var(--f-ui);background:var(--s2);box-shadow:none;border-radius:var(--r10)}
 .fld.search input::placeholder{color:var(--t3)}
 .grade{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font:700 12px/1 var(--f-ui);vertical-align:1px}.gA{background:var(--edge);color:#000}.gB{background:var(--fair);color:#000}.gC{box-shadow:inset 0 0 0 1px var(--hair2);color:var(--t3)}
+.pros{display:grid;gap:var(--sp3)}
+.pro{display:grid;gap:4px;padding-bottom:var(--sp3);box-shadow:inset 0 -.5px 0 var(--hair2)}
+.pro[data-prop]{cursor:pointer}
+.pro-top,.pro-play{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp3);min-width:0}
+.pro-play span:first-child{font:600 var(--fs-15)/1.3 var(--f-ui);color:var(--t1);overflow-wrap:anywhere}
+.pro .pos{color:var(--edge)}.pro .neg{color:var(--loss)}
+.pro-play .num{white-space:nowrap;flex:none}
+.proag{color:var(--edge);font-weight:600}
