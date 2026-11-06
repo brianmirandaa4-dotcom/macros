@@ -25,7 +25,23 @@ async function refresh(){
     ST = Notification.permission === 'granted' && sub && L && L.on && L.endpoint === sub.endpoint ? 'on' : 'off';
     /* the push service can rotate the endpoint; re-save quietly so alerts keep reaching this phone */
     if(Notification.permission === 'granted' && sub && L && L.on && L.endpoint !== sub.endpoint){ save(sub, true).then(() => { ST = 'on'; paint(); }).catch(() => {}); } }
-  paint(); }
+  paint(); autoOn(); }
+
+/* automatic alerts for every member: no "Turn on" tap needed.
+   - permission already granted (or granted once) and not switched off -> subscribe quietly on open
+   - permission not asked yet -> iOS only allows the Allow/Don't Allow prompt from a tap, so the first tap anywhere in the app asks once
+   - an explicit "Turn off" (tail.push.off) is always respected */
+let AUTO = false;
+const autoOK = () => { const L = ls.get(); return !(L && L.off); };
+function autoOn(){ if(AUTO || ST !== 'off' || !autoOK() || !CAN || (IOS && !STANDALONE)) return;
+  if(Notification.permission === 'granted'){ AUTO = true; turnOn().finally(() => { AUTO = false; }); return; }
+  if(Notification.permission === 'default') armTap(); }
+let ARMED = false;
+function armTap(){ if(ARMED) return; ARMED = true;
+  const h = ev => { const t = ev.target; if(t && t.closest && (t.closest('input,textarea,select,[data-push],.wl,#welcome'))) return;
+    document.removeEventListener('click', h, true); ARMED = false;
+    if(Notification.permission === 'default' && autoOK() && ST === 'off') turnOn(); };
+  document.addEventListener('click', h, true); }
 
 async function save(sub, on){ if(!window.CLUB || !CLUB.auth) throw new Error('Club sign-in is not ready');
   const s = await CLUB.auth(); const j = sub.toJSON ? sub.toJSON() : sub; const k = j.keys || {};
@@ -47,7 +63,7 @@ async function turnOn(){
   }catch(e){ ST = 'off'; MSG = "Couldn't turn alerts on. Check your connection and try again."; }
   paint(); }
 async function turnOff(){ ST = 'busy'; paint();
-  try{ const sub = await getSub(); if(sub) await save(sub, false); else ls.set({on: false}); ST = 'off'; MSG = 'Alerts are off for this phone.'; }
+  try{ const sub = await getSub(); if(sub) await save(sub, false); ls.set(Object.assign({}, ls.get() || {}, {on: false, off: true})); ST = 'off'; MSG = 'Alerts are off for this phone.'; }
   catch(e){ ST = 'on'; MSG = "Couldn't turn alerts off. Try again."; }
   paint(); }
 
