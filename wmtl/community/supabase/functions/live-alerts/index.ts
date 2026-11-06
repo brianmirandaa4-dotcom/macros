@@ -22,16 +22,21 @@ const SK: Record<string, string> = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', r
 const SHORT: Record<string, string> = {receptions: 'rec', rec_yds: 'rec yds'};
 async function getJSON(u: string) { const r = await fetch(u, {headers: {'User-Agent': 'tail-live-alerts/1', Accept: 'application/json'}}); if (!r.ok) throw new Error(`${u.split('?')[0]}: ${r.status}`); return r.json(); }
 
-// ---------------------------------------------------------------- in-game model: exact port of app.js liveQ / qOver / BKT / LMK
+// ---------------------------------------------------------------- in-game model: exact port of app.js liveQ / qOver / BKT / LMK (live_params v1 and v2)
 // deno-lint-ignore no-explicit-any
 let LP: any = null;
 const LMK = (m: string) => m === 'qb_rush' ? 'rush_yds' : m;
-const BKT = (d: number) => d <= -14 ? 'down14' : d <= -7 ? 'down7' : d < 7 ? 'close' : d < 14 ? 'up7' : 'up14';
+// score buckets come from live_params.json (v2: 11 states in 7s to +/-35); v1 files fall back to the 5-bucket rule
+const BKT1: [number, number, string][] = [[-999, -14, 'down14'], [-13, -7, 'down7'], [-6, 6, 'close'], [7, 13, 'up7'], [14, 999, 'up14']];
+const BKT = (d: number) => { const e = ((LP && LP.buckets) || BKT1).find(([lo, hi]: [number, number]) => d >= lo && d <= hi); return e ? e[2] : 'close'; };
 // deno-lint-ignore no-explicit-any
 function liveQ(p: any, soFar: number, f: number, diff: number) { const M = LP && LP.markets[LMK(p.market)]; if (!M || !M.validated || !isNum(p.projection)) return null;
   const pre = p.projection, r = 1 - f, pace = soFar / Math.max(f, .1), b = BKT(diff), B = M.beta; const ind = (k: string) => b === k ? 1 : 0;
-  const x = [pre * r, pace * r, r, r * ind('down14'), r * ind('down7'), r * ind('up7'), r * ind('up14'), pre * r * ind('down14'), pre * r * ind('down7'), pre * r * ind('up7'), pre * r * ind('up14')];
-  const rem = Math.max(.05, x.reduce((a, v, i) => a + v * B[i], 0)); const T = (1 - f) * 3600;
+  // x order = LP.feature_order: [pre*r, pace*r, r] then each bucket term x each non-close bucket (v2 adds r2 = r*r and pre*r2)
+  const tv: Record<string, number> = {r, 'pre*r': pre * r, r2: r * r, 'pre*r2': pre * r * r}, bn = (LP.buckets || BKT1).map((e: [number, number, string]) => e[2]).filter((k: string) => k !== 'close');
+  const x = [pre * r, pace * r, r]; for (const t of (LP.version >= 2 ? LP.bucket_terms : ['r', 'pre*r'])) for (const k of bn) x.push(tv[t] * ind(k));
+  if (x.length !== B.length) return null;
+  const rem = Math.max(.05, x.reduce((a: number, v: number, i: number) => a + v * B[i], 0)); const T = (1 - f) * 3600;
   const g = String(LP.snapshots_seconds_remaining.reduce((a: number, s: number) => Math.abs(s - T) < Math.abs(a - T) ? s : a)); const zq = M.zq[g];
   return {q: zq.map((z: number) => soFar + Math.max(0, rem + z * Math.sqrt(Math.max(rem, .25)))), k: M.k}; }
 function qOver(Q: {q: number[], k: number}, line: number) { const L = LP.quantile_levels; const q = Q.q.slice(); for (let i = 1; i < q.length; i++) q[i] = Math.max(q[i], q[i - 1]);
@@ -53,7 +58,7 @@ let VKEY: CryptoKey | null = null;
 async function vapidKey() { if (VKEY) return VKEY; const pub = unb64u(Deno.env.get('VAPID_PUBLIC_KEY')!);
   VKEY = await crypto.subtle.importKey('jwk', {kty: 'EC', crv: 'P-256', d: Deno.env.get('VAPID_PRIVATE_KEY')!, x: b64u(pub.slice(1, 33)), y: b64u(pub.slice(33, 65)), ext: true}, {name: 'ECDSA', namedCurve: 'P-256'}, false, ['sign']); return VKEY; }
 async function vapidJWT(aud: string) { const h = b64u(te.encode(JSON.stringify({typ: 'JWT', alg: 'ES256'})));
-  const c = b64u(te.encode(JSON.stringify({aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: Deno.env.get('VAPID_SUBJECT') || 'mailto:alerts@tail.invalid'})));
+  const c = b64u(te.encode(JSON.stringify({aud, exp: Math.floor(Date.now() / 1000) + 3600, sub: Deno.env.get('VAPID_SUBJECT') || APP})));
   const sig = new Uint8Array(await crypto.subtle.sign({name: 'ECDSA', hash: 'SHA-256'}, await vapidKey(), te.encode(h + '.' + c))); return `${h}.${c}.${b64u(sig)}`; }
 async function encrypt(payload: Uint8Array, p256dh: string, auth: string) {
   const ua = unb64u(p256dh), sec = unb64u(auth);
@@ -105,7 +110,7 @@ async function evaluate(slates: any[]) {
   const live = games.filter(g => g.state === 'in').map(g => ({g, d: slates.find(d => d.games.some((x: any) => x.away.abbr === g.away && x.home.abbr === g.home) || d.games.some((x: any) => [x.away.abbr, x.home.abbr].some(t => t === g.away || t === g.home)))})).filter(x => x.d);
   out.games = live.map(({g}) => `${g.away} ${g.as} @ ${g.home} ${g.hs} · ${g.detail}`);
   if (!live.length) return out;
-  if (!LP) LP = await getJSON(APP + 'data/nfl/live_params.json');
+  LP = await getJSON(APP + 'data/nfl/live_params.json'); // re-read every live run so a new version (v1 -> v2) takes effect at once
   // box score stats
   const stats: Record<string, Record<string, number>> = {};
   for (const {g} of live) { const sm = await getJSON('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + g.id); const bs = (sm.boxscore || {}).players; if (!Array.isArray(bs)) continue;
@@ -118,7 +123,7 @@ async function evaluate(slates: any[]) {
   // deno-lint-ignore no-explicit-any
   const lines: Record<string, any> = {};
   for (const wk of [...new Set(live.map(x => x.d.meta.week))]) for (const [t, mk] of Object.entries(AN_TYPES)) {
-    const r = await getJSON(`https://api.actionnetwork.com/web/v2/scoreboard/nfl/markets?bookIds=15,68,69&customPickTypes=${t}&seasonType=reg&week=${wk}`);
+    const r = await getJSON(`https://api.actionnetwork.com/web/v2/scoreboard/nfl/markets?bookIds=68,69&customPickTypes=${t}&seasonType=reg&week=${wk}`);
     if (!r || typeof r.markets !== 'object') throw new Error('Action Network schema changed');
     // deno-lint-ignore no-explicit-any
     const P = Object.fromEntries((r.players || []).map((p: any) => [p.id, p])); const TM: Record<string, string> = {}; for (const g of r.games || []) for (const x of [g.home_team, g.away_team]) if (x) TM[x.id] = ab(x.abbr);
