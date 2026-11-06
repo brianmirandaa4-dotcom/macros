@@ -54,3 +54,7 @@
 .betnow b{animation:betnowtx 1.1s ease-in-out infinite}
 .lv.lvbet{box-shadow:inset 3px 0 0 #FF2D2D}
 @media (prefers-reduced-motion:reduce){.betnow,.betnow b{animation:none}}
+
+/* no phantom gaps from empty slots */
+#wx-watch:empty,#x-livehero-slot:empty,[id$="-slot"]:empty{display:none}
+.x-home{gap:24px!important}
