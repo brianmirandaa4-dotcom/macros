@@ -864,6 +864,7 @@ details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:c
 .fp-foods{display:flex;flex-direction:column;gap:14px}.fp-meal b{font-family:var(--f-display)}
 .fp-f{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--line)}.fp-f:last-child{border-bottom:0}
 .fp-f i{color:var(--muted);font-style:normal;font-size:12px}.fp-f em{font-style:normal;font-size:12px}
+.live.l3{grid-template-columns:repeat(3,minmax(0,1fr))}.dz{display:flex;flex-direction:column;gap:8px}.dz-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px}.dz-bar i{display:block;min-width:3px}.dz-k{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--muted)}.dz-k span{display:inline-flex;align-items:center;gap:5px}.dz-k u{width:8px;height:8px;border-radius:50%;display:inline-block}
 .fp-hyd{display:flex;flex-direction:column;gap:10px}.fp-hyd .fp-m span svg{width:15px;height:15px;vertical-align:-2px;color:var(--fat)}.fp-hb{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.fp-hb div{display:flex;flex-direction:column;align-items:center;gap:4px}.fp-hb i{display:block;width:100%;max-width:26px;height:46px;border-radius:7px;background:var(--surface-2);position:relative;overflow:hidden}.fp-hb u{position:absolute;left:0;right:0;bottom:0;border-radius:7px}.fp-hb span{font-size:11px;color:var(--muted)}
 .fp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fp-tiles .tile{padding:12px}.fp-tiles .v{font-size:20px}
 .fp-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:120px;margin-bottom:14px}
@@ -2371,7 +2372,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.36';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.37';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3085,7 +3086,7 @@ function openFuel(){
   const g=goalsFor(S.day),f=g.fuel;if(!f)return;
   sheet(`<div><div class="eyebrow">Fuel for training</div><h3>+${f.c} g carbs today</h3></div>
     <ul class="ml-items">${f.ws.map(w=>`<li><span>${esc(w.name)} <span class="dim">· ${esc(w.src)}${w.min?` · ${w.min} min`:''}</span></span><span class="num">${fmt(w.kcal)} kcal</span></li>`).join('')}</ul>
-    <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Syncope adds back ${f.pct}% of the rest as carbs, which refill the glycogen lifting uses. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
+    <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Syncope adds back ${f.pct}% of the rest as carbs, which refill the glycogen your training used. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="fuSet">Change in Settings</button><button class="primary" id="fuOk">Got it</button></div>`);
   $('fuOk').onclick=closeSheet;$('fuSet').onclick=()=>{closeSheet();openPage('prefs')};
 }
@@ -5980,6 +5981,15 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 setInterval(()=>{if(document.visibilityState==='visible')syncDevices(false)},15*60000);
 /* ---- watch workouts in Train ---- */
 function devList(){return (S.dev&&S.dev.workouts)||[]}
+/* Watch sessions that are lifting get the "log your sets" prompts; everything else (golf, basketball, a run, tennis…)
+   is shown as its own result: time, strain, calories, heart rate, zones and distance. */
+function isLiftDev(d){const t=String((d.type||'')+' '+(d.name||'')).toLowerCase();return /strength|weight|lift|functional|power|crossfit|hiit|bodybuild|gym|^\s*(workout|activity|other)\s*$/.test(t)||!t.trim()}
+const ZC=['var(--muted)','#6FA8FF','#4FD1C5','#F6C453','#FF9F43','#FF5C6C'];
+function devResults(d){const hm=m=>m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
+  const z=Array.isArray(d.zones)?d.zones:null,zt=z?z.reduce((a,b)=>a+(+b||0),0):0;
+  const n=3+(d.strain!=null)+(!!d.maxHr)+(!!d.mi);
+  return `<div class="live${n>4?' l3':''}"><div style="--c:var(--pro)"><b style="white-space:nowrap">${d.min!=null?hm(d.min):'—'}</b><span>time</span></div>${d.strain!=null?`<div style="--c:var(--good)"><b>${d.strain}</b><span>strain</span></div>`:''}<div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div>${d.maxHr?`<div style="--c:var(--kcal)"><b>${d.maxHr}</b><span>max bpm</span></div>`:''}${d.mi?`<div style="--c:var(--carb)"><b>${d.mi}</b><span>miles</span></div>`:''}</div>
+  ${zt?`<div class="dz"><div class="dz-bar">${z.map((m,i)=>m?`<i style="flex:${m};background:${ZC[i]}"></i>`:'').join('')}</div><div class="dz-k">${z.map((m,i)=>m?`<span><u style="background:${ZC[i]}"></u>${i?'Zone '+i:'Rest'} ${m}m</span>`:'').join('')}</div></div>`:''}`}
 function autoLink(){
   let ch=false;const used=new Set(S.workouts.map(w=>w.devId).filter(Boolean));
   S.workouts.forEach(w=>{if(w.devId)return;const d=devList().find(x=>!used.has(x.id)&&x.date===w.date&&x.start&&Math.abs(Date.parse(x.start)-w.start)<90*60000);if(d){w.devId=d.id;used.add(d.id);ch=true}});
@@ -6005,6 +6015,11 @@ function renderWatchNow(){
   if(!d){el.hidden=true;el.innerHTML='';return}
   const rec=recentLogged(2),f=trainFuel(d.date);
   el.hidden=false;el.dataset.id=d.id;
+  if(!isLiftDev(d)){el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${esc(d.src)}</span><span>${esc(whenStr(d))}</span></div>
+    <h2>${esc(d.name)}</h2>${devResults(d)}
+    ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
+    <p class="note" style="margin:0">Counted in ${d.date===todayKey()?"today's":'that day’s'} calories burned and water target. It stays in your training history below.</p>
+    <div class="wn-acts"><button class="chip main" data-wskip>Got it</button><button class="chip" data-wpick>I lifted too</button></div>`;return}
   el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${esc(d.src)}</span><span>${esc(whenStr(d))}</span></div>
     <h2>${esc(d.name)}</h2>
     <div class="live"><div style="--c:var(--pro)"><b>${d.min??'—'}</b><span>minutes</span></div><div style="--c:var(--good)"><b>${d.strain??'—'}</b><span>strain</span></div><div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div></div>
@@ -6015,7 +6030,7 @@ function renderWatchNow(){
 $('wNow').addEventListener('click',e=>{const id=$('wNow').dataset.id,d=devList().find(x=>x.id===id);if(!d)return;
   const c=e.target.closest('[data-wcopy]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.wcopy);if(src)quickCopy(src,d);return}
   if(e.target.closest('[data-wpick]'))return pickLiftFor(d);
-  if(e.target.closest('[data-wskip]')){S.dev.skip=[...(S.dev.skip||[]),d.id].slice(-100);save();renderTrain();toast('Kept as a watch session')}});
+  if(e.target.closest('[data-wskip]')){S.dev.skip=[...(S.dev.skip||[]),d.id].slice(-100);save();renderTrain();toast(isLiftDev(d)?'Kept as a watch session':`${esc(d.name)} saved to your training history`)}});
 function pickLiftFor(d){
   const rec=recentLogged(6);
   sheet(`<div><div class="eyebrow">${esc(d.src)} · ${esc(whenStr(d))}</div><h3>What did you train?</h3><p class="note">“Same as last” copies every set and weight in one tap. A template opens the workout so you can enter today's numbers.</p></div>
@@ -6028,9 +6043,10 @@ function pickLiftFor(d){
 }
 function openDevWorkout(id){const w=devList().find(x=>x.id===id);if(!w)return;
   sheet(`<div><div class="eyebrow">${esc(w.src)} · ${esc(whenStr(w))}</div><h3>${esc(w.name)}</h3></div>
-    <div class="live"><div style="--c:var(--pro)"><b>${w.min??'—'}</b><span>minutes</span></div><div style="--c:var(--over)"><b>${w.kcal!=null?fmt(w.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--good)"><b>${w.strain??(w.avgHr||'—')}</b><span>${w.strain!=null?'strain':'avg bpm'}</span></div><div style="--c:var(--fat)"><b>${w.maxHr||'—'}</b><span>max bpm</span></div></div>
-    <p class="note">Your watch recorded time, heart rate and calories. Add the lifts to track sets, weights and strength progress for this session.</p>
-    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Add the lifts</button></div>`);
+    ${devResults(w)}
+    ${isLiftDev(w)?`<p class="note">Your watch recorded time, heart rate and calories. Add the lifts to track sets, weights and strength progress for this session.</p>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Add the lifts</button></div>`:`<p class="note">Recorded by ${esc(w.src)}. Its calories count toward that day’s burn and its time toward that day’s water target.</p>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwLog">I lifted too</button><button class="primary" id="dwClose">Done</button></div>`}`);
   $('dwClose').onclick=closeSheet;$('dwLog').onclick=()=>{closeSheet();pickLiftFor(w)};
 }
 function recoveryTable(keys){
