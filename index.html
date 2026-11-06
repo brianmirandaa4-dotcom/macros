@@ -728,6 +728,9 @@ button:active{transform:translateY(0) scale(.98)}
 .coach-x{border:0;background:none;color:var(--muted);font-size:12.5px;align-self:flex-start;padding:2px 0}
 .tip{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--kcal) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--kcal) 35%,var(--line));border-radius:16px;padding:13px 14px;margin-bottom:16px;font-size:14px;line-height:1.45}
 .tip[hidden]{display:none}
+.tip{padding:9px 10px 9px 12px!important;gap:10px!important;align-items:center!important;font-size:13px!important;line-height:1.4;margin-bottom:12px}
+.tip .tic{width:22px!important;height:22px!important;font-size:12px!important}
+.tip .tipx{flex:none;width:32px;height:32px;border-radius:50%;padding:0!important;font-size:20px!important;line-height:1;color:var(--muted)!important;display:grid;place-items:center}
 .tip .tic{flex:none;width:28px;height:28px;border-radius:50%;background:var(--kcal);color:#0B0C10;display:grid;place-items:center;font:800 15px var(--f-display)}
 .tip .tt{display:block;font-family:var(--f-display);font-size:15px;margin-bottom:2px}.tip .tx span b{color:var(--fg)}
 .tip .tx{flex:1;min-width:0;color:var(--fg)}.tip .tx span{color:var(--muted)}
@@ -1183,12 +1186,12 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
       <div class="pnav" style="margin-bottom:18px"><div class="title"><div class="sub" id="trSub">Lifts and workouts</div><h1>Train</h1></div><button class="pill-btn" id="trSync" hidden>Sync</button></div>
       <div style="display:flex;flex-direction:column;gap:18px">
         <div class="tip" id="tip-train" hidden></div>
+        <div class="tiles" id="trTiles"></div>
         <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
           <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="tplOrder" type="button">Order &amp; days</button><button class="pill-btn" data-pg="progs" type="button">Programs</button></div></div>
           <div class="tpl-grid" id="tplGrid"></div>
         </div>
-        <div class="tiles" id="trTiles"></div>
         <div class="card">
           <div class="card-h"><div><div class="eyebrow">History · your lifts and watch sessions</div><h2>Recent workouts</h2></div></div>
           <ul class="hist" id="hist"></ul>
@@ -2420,7 +2423,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.39';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.40';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4066,7 +4069,7 @@ function mealOfNow(){const h=new Date().getHours();return h<11?'breakfast':h<16?
 function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySelector('.pnav');if(!pn)return;
   const kind=S.view==='today'?mealOfNow():S.view==='week'||S.view==='month'?'all':S.view==='friends'?'all':S.view;
   pn.classList.add('banner');pn.classList.toggle('flush',pn===sec.firstElementChild||(pn.previousElementSibling&&pn.previousElementSibling.classList.contains('tip')&&pn.previousElementSibling===sec.firstElementChild));
-  pn.style.setProperty('--bnr',bnr(kind,S.view));pn.classList.toggle('compact',S.view==='today')}
+  pn.style.setProperty('--bnr',bnr(kind,S.view));pn.classList.add('compact')}
 /* ================= QUICK TILES: the things you check all day, one tap away on Today ================= */
 function qRing(fr,col){const R=17,C=2*Math.PI*R,f=Math.max(0,Math.min(1,fr||0));return `<svg class="qr" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="22" cy="22" r="${R}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" transform="rotate(-90 22 22)" style="transition:stroke-dasharray .6s var(--ease-out)"/></svg>`}
 function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayKey();
@@ -5262,7 +5265,7 @@ const TIPS={today:['Welcome to Syncope','Type what you ate or drank in plain wor
   foods:['Foods','Search the food library or save meals you eat often, then log them in one tap.'],
   plan:['Your plan','Your plan sets your daily calories and macros and adjusts them week by week. Just weigh in a few times a week.']};
 function renderTip(v){const el=$('tip-'+v);if(!el)return;const P=S.prefs||{};if((P.tipsSeen||{})[v]||!TIPS[v]){el.hidden=true;return}
-  el.hidden=false;el.innerHTML=`<span class="tic">i</span><div class="tx"><b class="tt">${TIPS[v][0]}</b><span>${TIPS[v][1]}</span><br><button type="button" data-tipx="${v}">Got it</button></div>`}
+  el.hidden=false;el.innerHTML=`<span class="tic">i</span><div class="tx"><span>${TIPS[v][1]}</span></div><button type="button" class="tipx" data-tipx="${v}" aria-label="Dismiss tip">×</button>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tipx]');if(!b)return;S.prefs.tipsSeen={...(S.prefs.tipsSeen||{}),[b.dataset.tipx]:true};save();renderTip(b.dataset.tipx)});
 const FAQ=[['How much protein can my body use in one meal?','More than people think. In a 2023 study, 100 g after lifting built more muscle than 25 g, and for over 12 hours, with almost none wasted. Get your daily total, eat at least ~25 g each time, and make the post-workout meal a big one. Details in Profile → Fuel & timing.'],['When should I eat carbs, protein and fat?','Carbs before and after training, protein (~0.3 g per kg, about 20–30 g) after training and every 3–5 hours, and most of your fat in meals away from training. Meal ideas switch to pre- or post-workout picks automatically when you have just trained. Details in Profile → Fuel & timing.'],['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
   ['Where do my calorie and macro targets come from?','From your body stats and goal. Syncope estimates what you burn, then sets a gradual weekly plan. Protein stays high to protect muscle. You can see every week in Plan.'],
