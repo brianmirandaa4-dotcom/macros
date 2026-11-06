@@ -40,6 +40,7 @@ const P = {
   down:    '<path d="M6 9.5l6 6 6-6"/>',
   share:   '<path d="M12 14.5V3.5M8 7.5l4-4 4 4"/><path d="M5 11.5v7A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-7"/>',
   search:  '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',
+  board:   '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
   refresh: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4v4h-4"/>',
   import:  '<path d="M12 4v11M8 11l4 4 4-4"/><path d="M5 19.5h14"/>',
   gear:    '<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.3M12 18.2v2.3M3.5 12h2.3M18.2 12h2.3M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6"/>',

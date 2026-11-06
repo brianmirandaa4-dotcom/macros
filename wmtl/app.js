@@ -93,7 +93,7 @@ function resultTag(r){ if(!r || !r.result) return ''; const c = r.result === 'wo
 
 /* ================================================================ state + routing */
 const S = {tab: 'lobby', slate: null, win: 'all', props: {mk: null, mode: 'strong', q: '', n: 50}, liveWin: 'all', resSport: 'NFL'};
-const TABS = [['lobby', 'Lobby'], ['card', 'Card'], ['props', 'Props'], ['live', 'Live'], ['more', 'More']];
+const TABS = [['lobby', 'Lobby'], ['card', 'Card'], ['board', 'Board'], ['props', 'Props'], ['live', 'Live'], ['more', 'More']];
 function drawTabs(){ const n = S.slate && slateInfo(S.slate) ? slateInfo(S.slate).bets : 0;
   $('#tabs').innerHTML = TABS.map(([k, l]) => `<button data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${ICON[k]}${k === 'card' && n ? `<span class="badge">${n}</span>` : ''}<span>${l}</span></button>`).join('');
   $$('#tabs button').forEach(b => b.onclick = () => { if(b.dataset.tab === S.tab){ window.scrollTo({top: 0, behavior: RM ? 'auto' : 'smooth'}); return; } go(b.dataset.tab); }); }
@@ -109,6 +109,7 @@ async function render(){ const m = $('#main'); const v = S.tab;
   if(v === 'more'){ m.innerHTML = viewMore(); wireMore(); return; }
   let d; try{ d = await loadSlate(S.slate); }catch(e){ m.innerHTML = `<div class="view"><div class="lt"><h1>Not available</h1><p>This slate could not be loaded. Pull down to try again.</p></div></div>`; return; }
   if(S.tab !== v) return;
+  if(v === 'board'){ const B = await loadBoard(d); if(S.tab !== v) return; m.innerHTML = viewBoard(d, B); wireBoard(d, B); return; }
   m.innerHTML = v === 'card' ? viewCard(d) : v === 'props' ? viewProps(d) : viewLive(d); ({card: wireCard, props: wireProps, live: wireLive})[v](d); countUp(m); }
 
 /* ================================================================ lobby */
@@ -216,6 +217,70 @@ function prosHTML(d, only){ const C = d.cappers; if(!C || !(C.picks || []).lengt
     <div class="sub">${mline(k)}</div><div class="sub">Posted ${esc(t(k.created_at))}${k.verified ? ' · verified' : ''}</div></div>`; }).join('');
   const recs = only ? '' : `<div class="tbl"><table><thead><tr><th>Capper</th><th>NFL record</th><th>Units</th><th>ROI</th></tr></thead><tbody>${(C.records || []).map(r => `<tr><td>${esc(r.name)}</td><td>${r.w}–${r.l}–${r.p}</td><td class="${r.units < 0 ? 'neg' : 'pos'}">${sg(r.units, 1)}</td><td>${sg(r.roi, 1)}%</td></tr>`).join('')}</tbody></table></div>`;
   return `<section class="sec"><div class="hd"><h2>${only ? 'Pros on this prop' : 'Pros on this game'}</h2><span class="sub">${ps.length} pick${ps.length === 1 ? '' : 's'} · ${esc(C.source)}</span></div><div class="group pad pros">${rows}${recs}<p class="note" style="margin:0">${esc(C.note)}</p></div></section>`; }
+
+/* ---------------- Board: every prop for every player on this slate (Action Network prices; model numbers where the model has one) */
+const BOARDS = {}; const BKS = ['DK', 'FD', 'MGM', 'BR', 'CZR'];
+const nkey = s => String(s).normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z ]/g, '').replace(/ (jr|iii|ii|iv)$/, '').trim();
+async function loadBoard(d){ if(d.sport !== 'NFL') return null; const yr = (d.meta.date || '2026').slice(0, 4), wk = String(d.meta.week || '').padStart(2, '0'); const path = `data/nfl/board-${yr}-wk${wk}.json`;
+  if(!(path in BOARDS)){ try{ BOARDS[path] = await getJSON(path); }catch(e){ BOARDS[path] = null; } } const B = BOARDS[path]; if(!B) return null;
+  const teams = new Set(d.games.flatMap(g => [g.away.abbr, g.home.abbr])); return {...B, games: B.games.filter(g => teams.has(g.away) || teams.has(g.home))}; }
+function bestOf(e, side){ let b = null; for(const k of BKS){ const o = (e.books || {})[k]; if(!o) continue; const v = side === 'yes' ? o.yes : o[side]; if(!isNum(v)) continue; if(!b || decOdds(v) > decOdds(b.v)) b = {k, v, line: o.line}; } return b; }
+function propLine(e){ if(e.kind === 'ladder') return ''; const o = BKS.map(k => (e.books || {})[k]).find(Boolean) || Object.values(e.books || {})[0]; return o && isNum(o.line) ? ln(o.line) : ''; }
+function boardRow(e, P){ const md = e.model;
+  if(e.kind === 'ladder') return `<div class="brow lad"><div class="bm">${esc(e.market)}</div><div class="blad">${Object.entries(e.rungs).sort((a, b) => +a[0] - +b[0]).map(([r, bk]) => { const b = BKS.map(k => [k, bk[k]]).filter(x => isNum(x[1])).sort((a, b) => decOdds(b[1]) - decOdds(a[1]))[0]; return b ? `<span class="rung"><b>${r}+</b> ${od(b[1])} <i>${b[0]}</i></span>` : ''; }).join('')}</div></div>`;
+  const bo = e.kind === 'yes' ? bestOf(e, 'yes') : bestOf(e, 'over'), bu = e.kind === 'yes' ? null : bestOf(e, 'under');
+  const mtxt = md ? (md.no_prediction ? '<span class="na">no prediction</span>' : `<span class="mdl ${md.tier === 'bet' ? 'bet' : ''}" data-prop="${esc(md.prop)}">Proj <b>${ln(md.projection)}</b>${md.side && isNum(md.p) ? ` · ${md.side === 'under' ? 'U' : 'O'} ${pc(md.p)}` : ''}${md.tier === 'bet' ? ' · BET' : ''}</span>`) : '';
+  return `<div class="brow"><div class="bm">${esc(e.market)} <b class="num">${propLine(e)}</b>${mtxt ? `<div>${mtxt}</div>` : ''}</div>
+    <div class="bb">${e.kind === 'yes' ? (bo ? `<span>Yes <b class="num">${od(bo.v)}</b> <i>${bo.k}</i></span>` : '—') : `${bo ? `<span>O <b class="num">${od(bo.v)}</b> <i>${bo.k}${isNum(bo.line) && bo.line !== +propLine(e) ? ' ' + ln(bo.line) : ''}</i></span>` : ''}${bu ? `<span>U <b class="num">${od(bu.v)}</b> <i>${bu.k}${isNum(bu.line) && bu.line !== +propLine(e) ? ' ' + ln(bu.line) : ''}</i></span>` : ''}`}</div>
+    <div class="ball">${BKS.filter(k => (e.books || {})[k]).map(k => { const o = e.books[k]; return `<span>${k} ${e.kind === 'yes' ? od(o.yes) : `${isNum(o.line) ? ln(o.line) + ' ' : ''}${od(o.over)}/${od(o.under)}`}</span>`; }).join('')}</div></div>`; }
+function viewBoard(d, B){ const m = d.meta; S.board = S.board || {g: 'all', q: '', open: {}};
+  if(!B) return `<div class="view"><div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(m.label || '')}</span><h1>Board</h1><p>The full prop board is not available for this slate.</p></div></div>`;
+  const q = nkey(S.board.q || ''); const gs = B.games.filter(g => S.board.g === 'all' || String(g.gid) === S.board.g);
+  const nP = B.games.reduce((a, g) => a + g.players.length, 0), nE = B.games.reduce((a, g) => a + g.players.reduce((x, P) => x + P.n, 0), 0);
+  return `<div class="view"><div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(m.label || '')}</span><h1>Board</h1><p>Every player prop posted for this slate: ${nP} players, ${nE.toLocaleString()} props, best price across DraftKings, FanDuel, BetMGM, BetRivers and Caesars. The model's projection shows where it has one.</p></div>
+    <div class="fld search"><label for="bq" class="sr">Find a player on the board</label>${Icon.svg('search', {size: 18})}<input id="bq" type="search" autocomplete="off" placeholder="Find a player on this board" value="${esc(S.board.q || '')}"></div>
+    <div class="chips" role="tablist"><button class="chip tap" data-bg="all" aria-pressed="${S.board.g === 'all'}">All games</button>${B.games.map(g => `<button class="chip tap" data-bg="${g.gid}" aria-pressed="${S.board.g === String(g.gid)}">${esc(g.away)} @ ${esc(g.home)}</button>`).join('')}</div>
+    ${gs.map(g => { const ps = g.players.filter(P => !q || nkey(P.name).includes(q)); if(!ps.length) return '';
+      return `<section class="sec"><div class="hd"><h2>${esc(g.away)} @ ${esc(g.home)}</h2><span class="sub">${esc(g.kick_et)} ET · ${ps.length} players</span></div><div class="group bplist">${ps.map(P => { const k = g.gid + ':' + P.name; const op = q || S.board.open[k];
+        return `<div class="bp"><button class="bph" data-bo="${esc(k)}"><span><b>${esc(P.name)}</b> <span class="sub">${esc(P.team || '')} · ${esc(P.pos || '')}</span></span><span class="sub">${P.n} props ${op ? '▴' : '▾'}</span></button>
+          ${op ? `<div class="bpb"><button class="link" data-prof="${esc(P.name)}|${esc(P.team || '')}">Player profile, stats and game log ›</button>${P.props.map(e => boardRow(e, P)).join('')}</div>` : ''}</div>`; }).join('')}</div></section>`; }).join('')}
+    <section class="sec"><div class="sub">Prices: ${esc(B.source)} · pulled ${esc(new Date(B.pulled).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit'}))} ET. Best price = highest payout among the five books.</div></section></div>`; }
+function wireBoard(d, B){ const m = $('#main'); bindTaps(m, d);
+  $$('[data-bg]', m).forEach(b => b.onclick = () => { S.board.g = b.dataset.bg; render(); });
+  $$('[data-bo]', m).forEach(b => b.onclick = () => { const k = b.dataset.bo; S.board.open[k] = !S.board.open[k]; render(); });
+  $$('[data-prof]', m).forEach(b => b.onclick = () => { const [n, t] = b.dataset.prof.split('|'); openProfileByName(n, t); });
+  const i = $('#bq', m); if(i){ i.oninput = () => { S.board.q = i.value; clearTimeout(wireBoard._t); wireBoard._t = setTimeout(() => { const pos = i.selectionStart; render().then(() => { const j = $('#bq'); if(j){ j.focus(); j.setSelectionRange(pos, pos); } }); }, 250); }; } }
+
+/* ---------------- Universal search + player profiles (nflverse rosters and play-by-play, every rostered player) */
+let PIDX = null;
+async function loadPlayerIndex(){ if(!PIDX){ try{ PIDX = await getJSON('data/nflp/index.json'); }catch(e){ PIDX = {players: []}; } } return PIDX; }
+async function openProfileByName(name, team){ const I = await loadPlayerIndex(); const k = nkey(name);
+  const hit = I.players.find(r => nkey(r[1]) === k && (!team || r[2] === team)) || I.players.find(r => nkey(r[1]) === k);
+  if(hit) return openProfile(hit[0]); toast('No profile found for ' + name); }
+function openSearch(){ pushSheet('Search', `<div class="body"><div class="lt"><h1>Find any player</h1><p>Every player on a 2026 NFL roster, including depth and practice squad.</p></div>
+  <div class="fld search"><label for="uq" class="sr">Player name or team</label>${Icon.svg('search', {size: 18})}<input id="uq" type="search" autocomplete="off" placeholder="Name, or team like PHI" autofocus></div><div id="ures" class="list"></div></div>`, async el => {
+    const I = await loadPlayerIndex(); const inp = $('#uq', el), out = $('#ures', el);
+    const draw = () => { const q = nkey(inp.value), up = inp.value.trim().toUpperCase(); if(q.length < 2 && up.length < 2){ out.innerHTML = `<p class="sub">${I.players.length.toLocaleString()} players. Start typing.</p>`; return; }
+      const r = I.players.filter(p => nkey(p[1]).includes(q) || p[2] === up).slice(0, 60);
+      out.innerHTML = r.length ? r.map(p => `<button class="row" data-pid="${esc(p[0])}"><div><div class="nm">${esc(p[1])}</div><div class="mt">${esc(p[2] || 'FA')} · ${esc(p[3] || '')}${p[4] ? ' · #' + esc(p[4]) : ''}${p[5] && p[5] !== 'ACT' ? ' · ' + esc(p[5]) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`).join('') : `<p class="sub">No player matches “${esc(inp.value)}”.</p>`;
+      $$('[data-pid]', out).forEach(b => b.onclick = () => openProfile(b.dataset.pid)); };
+    inp.oninput = draw; draw(); setTimeout(() => inp.focus(), 350); }); }
+const STATCOLS = [['tgt', 'Tgt'], ['rec', 'Rec'], ['rec_yds', 'RecYd'], ['rec_td', 'RecTD'], ['car', 'Car'], ['rush_yds', 'RuYd'], ['rush_td', 'RuTD'], ['att', 'Att'], ['cmp', 'Cmp'], ['pass_yds', 'PaYd'], ['pass_td', 'PaTD'], ['sacks', 'Sk']];
+function statTable(rows, lead){ if(!rows || !rows.length) return '<p class="sub">No games.</p>'; const cols = STATCOLS.filter(([k]) => rows.some(r => isNum(r[k]) && r[k] !== 0));
+  return `<div class="tbl"><table><thead><tr>${lead.map(l => `<th>${l[1]}</th>`).join('')}${cols.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${lead.map(l => `<td>${esc(r[l[0]] ?? '')}</td>`).join('')}${cols.map(([k]) => `<td class="num">${isNum(r[k]) ? (Number.isInteger(r[k]) ? r[k] : r[k].toFixed(1)) : ''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; }
+async function openProfile(pid){ let P; try{ P = await getJSON(`data/nflp/p/${pid}.json`); }catch(e){ toast('Profile not available'); return; }
+  const props = []; for(const B of Object.values(BOARDS)){ if(!B) continue; for(const g of B.games) for(const x of g.players) if(nkey(x.name) === nkey(P.name) && (!x.team || x.team === P.team)) props.push(...x.props.map(e => ({e, g, x}))); }
+  const sp = P.splits || {}; const spRows = [['season', '2026 avg'], ['l5', 'Last 5'], ['l3', 'Last 3']].filter(([k]) => sp[k]).map(([k, l]) => ({span: l, ...sp[k]}));
+  const html = `<div class="body"><div class="lt"><span class="sp" style="--c:${SPORTHEX.NFL}">NFL · ${esc(P.team || 'FA')}${P.jersey ? ' · #' + esc(P.jersey) : ''}</span><h1>${esc(P.name)}</h1><p>${esc(P.pos || '')}${P.depth && P.depth !== P.pos ? ' (' + esc(P.depth) + ')' : ''} · ${esc(P.status_label || P.status || '')}</p></div>
+    <div class="group pad pgrid">${[['Age', P.age], ['Height', P.height_ft], ['Weight', P.weight ? P.weight + ' lb' : null], ['College', P.college], ['Experience', isNum(P.exp) ? (P.exp ? P.exp + ' yr' : 'Rookie') : null], ['Draft', P.draft ? `${P.draft.club} #${P.draft.pick}` : 'Undrafted / n/a']].filter(x => x[1] != null && x[1] !== '').map(([k, v]) => `<div><span class="label">${k}</span><b>${esc(v)}</b></div>`).join('')}</div>
+    ${P.injury ? `<section class="sec"><h2>Injury report</h2><div class="group pad t2">Week ${esc(P.injury.week)}: <b style="color:var(--t1)">${esc(P.injury.status || 'listed')}</b>${P.injury.practice ? ' · practice: ' + esc(P.injury.practice) : ''}</div></section>` : ''}
+    ${props.length ? `<section class="sec"><div class="hd"><h2>Props this week</h2><span class="sub">${props.length} · ${esc(props[0].g.away)} @ ${esc(props[0].g.home)}</span></div><div class="group bpb">${props.map(o => boardRow(o.e, o.x)).join('')}</div></section>` : ''}
+    ${spRows.length ? `<section class="sec"><h2>Averages</h2>${statTable(spRows, [['span', '']])}</section>` : ''}
+    <section class="sec"><div class="hd"><h2>2026 game log</h2><span class="sub">${(P.log || []).length} games</span></div>${statTable((P.log || []).map(r => ({...r, g: `${r.wk} ${r.ha === '@' ? '@' : 'vs'} ${r.opp}`, sn: isNum(r.snap) ? r.snap + '%' : ''})), [['g', 'Wk'], ['res', 'Result'], ['sn', 'Snap']])}</section>
+    <section class="sec"><h2>Career</h2>${statTable((P.career || []).map(r => ({...r, tm: r.team || r['team(s)'] || ''})), [['season', 'Yr'], ['tm', 'Tm'], ['g', 'G']])}</section>
+    <section class="sec"><div class="sub">Stats from nflverse play-by-play (regular season). Bio from nflverse rosters. Props from Action Network.</div></section></div>`;
+  pushSheet(P.name, html, el => { const d = SLATE[S.slate]; if(d) bindTaps(el, d); }); }
+
 function leanRow(p, d){ const r = resultOf(d, p); return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · ${esc(p.window || '')} · 25D ${sg(p.score25, 1)}</span></span><span class="r">${od(p.odds)}<br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : ''}</span></span></button>`; }
 function gradedStrip(d){ const s = d.results.summary, b = s.bets || {}, t = s.by_tier || {}, L = s.lines || {};
   const cell = (v, l) => `<div><b>${v}</b><span>${l}</span></div>`;
@@ -699,7 +764,7 @@ function pullToRefresh(){ const ind = $('#ptr'); let y0 = null, dy = 0, busy = f
 /* ================================================================ boot */
 async function boot(){ store.load(); drawTabs();
   addEventListener('scroll', () => $('#top').classList.toggle('scrolled', window.scrollY > 4), {passive: true});
-  $('#wm').onclick = () => go('lobby'); $('#slatebtn').onclick = slatePicker;
+  $('#wm').onclick = () => go('lobby'); $('#slatebtn').onclick = slatePicker; $('#srchbtn').onclick = openSearch;
   try{ await loadIndex(); }catch(e){ $('#main').innerHTML = `<div class="view"><div class="lt"><h1>Not available</h1><p>The slate list could not be loaded. Check your connection and pull down to retry.</p></div></div>`; pullToRefresh(); return; }
   const hs = (location.hash || '').slice(1); const want = TABS.find(t => t[0] === hs) ? hs : (store.d.ui.tab || 'lobby');
   const newest = INDEX.slates.slice().sort((x, y) => x.start_utc < y.start_utc ? 1 : -1)[0];
