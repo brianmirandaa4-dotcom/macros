@@ -120,11 +120,6 @@ function viewLobby(){ const sums = sportSummaries(); const ss = INDEX.slates.sli
   const up = (INDEX.upcoming || []).map(u => { const cd = countdown(u.first); return `<div class="sl off" style="--c:${SPORTHEX[u.sport]}"><div class="t">${esc(u.sport)} ${esc(u.label)}</div><div class="w">${cd ? `First game in <span class="cd">${cd}</span> · ` : ''}${u.games} games. ${esc(u.note)}</div><div class="cnt"><span class="sp" style="--c:${SPORTHEX[u.sport]}">${esc(u.sport)}</span></div></div>`; }).join('');
   const off = SPORTS.filter(sp => !INDEX.slates.some(s => s.sport === sp)).map(sp => { const m = (INDEX.sports || {})[sp] || {}; return `<div class="sl off"><div class="t">${sp} · ${m.status === 'offseason' ? 'Offseason' : 'Not built yet'}</div><div class="w">${esc(m.note || 'Not available')}</div><div class="cnt"><span class="sp" style="--c:${SPORTHEX[sp]}">${sp}</span></div></div>`; }).join('');
   return `<div class="view">
-    <div class="room" id="room">
-      <div id="roomCanvas"></div>${room2d(sums)}
-      <div class="ov"><b>The Book</b><span>Tap a screen to open its slate</span></div>
-      <div class="bt">${sums.map(s => `<button class="tap" data-sport="${s.key}" style="--c:${SPORTHEX[s.sport]}" ${s.built ? '' : 'disabled style="opacity:.45"'}>${Icon.svg(s.key.toLowerCase(), {size: 18})}${s.sport}${s.built && s.bets ? ` <span class="m">${s.bets}</span>` : ''}</button>`).join('')}</div>
-    </div>
     <section class="sec"><div class="hd"><h2>Slates</h2><span class="sub">${INDEX.slates.length} loaded · newest first</span></div>
       <div class="slates">${up}${ss.map(slateCard).join('')}${off}</div></section>
     <section class="sec"><div class="help"><b>Bet only what you can afford to lose.</b><span>If betting stops being fun, call or text 1-800-GAMBLER, any time.</span></div>
@@ -139,7 +134,7 @@ function wireLobby(){ const m = $('#main');
   $$('[data-slate]', m).forEach(b => b.onclick = () => setSlate(b.dataset.slate, 'card'));
   $$('[data-sport]', m).forEach(b => b.onclick = () => openSport(b.dataset.sport));
   clearInterval(wireLobby._t); wireLobby._t = setInterval(() => { if(S.tab === 'lobby' && !document.hidden) $$('.cd', m).length && (render()); }, 60000);
-  startRoom(); }
+  }
 function openSport(sp){ const s = INDEX.slates.filter(x => x.sport === sp).sort((a, b) => a.start_utc < b.start_utc ? 1 : -1)[0]; if(s) setSlate(s.id, 'card'); else toast(`${sp}: not available yet`); }
 /* 3D room: lazy, after the first screen is usable; never on reduced motion or when turned off */
 let roomState = 'idle';
@@ -289,13 +284,14 @@ const ab = a => ESPN_AB[a] || a;
 async function livePoll(d){
   try{ await loadLiveParams();
     const sb = await getJSON('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard', true); if(!Array.isArray(sb.events)) throw new Error('ESPN scoreboard schema changed');
-    const teams = new Set(d.games.flatMap(g => [g.away.abbr, g.home.abbr])); LV.games = {};
+    LV.games = {};
     for(const ev of sb.events){ const c = ev.competitions && ev.competitions[0]; if(!c) continue; const cs = c.competitors || []; const h = cs.find(x => x.homeAway === 'home'), a = cs.find(x => x.homeAway === 'away'); if(!h || !a) continue;
-      const H = ab(h.team.abbreviation), A = ab(a.team.abbreviation); if(!teams.has(H) && !teams.has(A)) continue;
+      const H = ab(h.team.abbreviation), A = ab(a.team.abbreviation);
       const per = c.status.period || 1, ck = String(c.status.displayClock || '15:00').split(':'); const el = Math.min(3600, (per - 1) * 900 + (900 - ((+ck[0] || 0) * 60 + (+ck[1] || 0))));
       LV.games[A + '@' + H] = {id: ev.id, state: c.status.type.state, detail: c.status.type.shortDetail, away: A, home: H, as: +a.score || 0, hs: +h.score || 0, f: per > 4 ? 1 : Math.max(0, el / 3600)}; }
-    const live = Object.values(LV.games).filter(g => g.state === 'in');
-    for(const g of live){ const sm = await getJSON('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + g.id, true); const bs = (sm.boxscore || {}).players; if(!Array.isArray(bs)) continue;
+    const live = Object.values(LV.games).filter(g => g.state === 'in'); LV.done = LV.done || {};
+    const want = new Set(Object.values(SLATE).filter(x => x && x.sport === 'NFL').flatMap(x => x.games.flatMap(g => [g.away.abbr, g.home.abbr])));
+    for(const g of Object.values(LV.games).filter(g => (g.state === 'in' || (g.state === 'post' && !LV.done[g.id])) && (want.has(g.away) || want.has(g.home)))){ if(g.state === 'post') LV.done[g.id] = 1; const sm = await getJSON('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + g.id, true); const bs = (sm.boxscore || {}).players; if(!Array.isArray(bs)) continue;
       for(const t of bs){ const tm = ab(t.team.abbreviation); for(const st of t.statistics || []){ const L = st.labels || []; for(const at of st.athletes || []){ const k = nkey(at.athlete.displayName) + '|' + tm; const o = LV.stats[k] = LV.stats[k] || {};
         const v = lab => { const i = L.indexOf(lab); return i < 0 ? null : at.stats[i]; };
         if(st.name === 'passing'){ const ca = String(v('C/ATT') || '0/0').split('/'); o.pass_yds = +v('YDS') || 0; o.cmp = +ca[0] || 0; o.att = +ca[1] || 0; }
@@ -314,7 +310,7 @@ function liveLoop(d){ clearTimeout(LV.t); if(!['live', 'card', 'board'].includes
   livePoll(d).then(n => { if(!['live', 'card', 'board'].includes(S.tab)) return; const box = S.tab === 'live' && $('#livenow'); if(box){ box.innerHTML = liveNowHTML(d); bindTaps(box, d); } applyProgress($('#main'), d);
     const anyLive = Object.values(LV.games).some(g => g.state === 'in'); LV.t = setTimeout(() => liveLoop(d), (LV.fails >= 3 ? 30 : anyLive ? 10 : 60) * 1000); }); }
 document.addEventListener('visibilitychange', () => { const d = SLATE[S.slate]; if(d && ['live', 'card', 'board'].includes(S.tab) && document.visibilityState === 'visible') liveLoop(d); });
-function liveNowHTML(d){ const G = Object.values(LV.games); if(!LV.at) return `<div class="group pad"><span class="sub">${LV.err ? 'Live data not available right now (' + esc(LV.err) + '). Retrying.' : 'Checking for live games…'}</span></div>`;
+function liveNowHTML(d){ const tms = new Set(d.games.flatMap(g => [g.away.abbr, g.home.abbr])); const G = Object.values(LV.games).filter(g => tms.has(g.away) || tms.has(g.home)); if(!LV.at) return `<div class="group pad"><span class="sub">${LV.err ? 'Live data not available right now (' + esc(LV.err) + '). Retrying.' : 'Checking for live games…'}</span></div>`;
   const live = G.filter(g => g.state === 'in'); const t = LV.at.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', second: '2-digit'});
   if(!live.length) return `<div class="group pad"><span class="sub">No game on this slate is live right now. ${G.filter(g => g.state === 'pre').length} still to come. Checked ${t}${LV.err ? ' · ' + esc(LV.err) : ''}.</span></div>`;
   return live.map(g => { const ps = d.props.filter(p => (p.team === g.away || p.team === g.home) && isNum(p.line) && !p.no_prediction);
@@ -379,6 +375,30 @@ function applyProgress(root, d){ if(!root || !Object.keys(LV.games).length) retu
     el.style.setProperty('--pg', (state === 'win' ? 100 : frac * 100).toFixed(1) + '%');
     let tag = el.querySelector(':scope > .pgtag'); if(!tag){ tag = document.createElement('span'); tag.className = 'pgtag'; el.appendChild(tag); }
     tag.textContent = state === 'win' ? `✓ CASHED · ${ln(now)}` : state === 'loss' ? `✕ ${over ? 'Missed' : 'Over the line'} · ${ln(now)}` : `${ln(now)} / ${ln(lb.line)} ${over ? '' : '(under)'}`.trim(); } }
+
+
+/* ---------------- Ticker banner: scores of every game + every model pick that has cashed, scrolling across the top */
+function pickState(p){ const g = Object.values(LV.games).find(x => x.away === p.team || x.home === p.team); if(!g || g.state === 'pre') return null;
+  const sk = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', rec_yds: 'rec_yds', receptions: 'receptions', pass_yds: 'pass_yds'}[p.market]; if(!sk || !isNum(p.line) || !p.side) return null;
+  const now = (LV.stats[nkey(p.player) + '|' + p.team] || {})[sk] || 0; const over = p.side !== 'under', hit = now > p.line, done = g.state === 'post';
+  return {now, win: over ? hit : (done && !hit), loss: over ? (done && !hit) : hit}; }
+async function tickerLoop(){ clearTimeout(tickerLoop._t); if(document.visibilityState !== 'visible'){ tickerLoop._t = setTimeout(tickerLoop, 15000); return; }
+  try{ const nfl = INDEX.slates.filter(s => s.sport === 'NFL').sort((a, b) => a.start_utc < b.start_utc ? 1 : -1); const wk = nfl[0] && nfl[0].week;
+    for(const s of nfl.filter(s => s.week === wk)) await loadSlate(s.id).catch(() => {});
+    const d = SLATE[S.slate] || SLATE[nfl[0] && nfl[0].id]; if(d && (!LV.at || Date.now() - LV.at > 8000)) await livePoll(d); }catch(e){}
+  drawTicker(); const live = Object.values(LV.games).some(g => g.state === 'in'); tickerLoop._t = setTimeout(tickerLoop, (live ? 15 : 60) * 1000); }
+function drawTicker(){ const el = $('#tktrack'); if(!el) return; const items = [];
+  const G = Object.values(LV.games).sort((a, b) => (a.state === 'in' ? 0 : a.state === 'post' ? 1 : 2) - (b.state === 'in' ? 0 : b.state === 'post' ? 1 : 2));
+  for(const g of G){ if(g.state === 'pre') continue; items.push(`<span class="tk ${g.state === 'in' ? 'tk-live' : ''}"><i>${g.state === 'in' ? 'LIVE' : 'FINAL'}</i> ${esc(g.away)} <b>${g.as}</b> · ${esc(g.home)} <b>${g.hs}</b>${g.state === 'in' ? ' · ' + esc(g.detail) : ''}</span>`); }
+  const seen = new Set(); let w = 0, l = 0;
+  for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; for(const p of d.props){ if(p.no_prediction || !(p.tier === 'bet' || (pSide(p) || 0) >= .55)) continue; const st = pickState(p); if(!st) continue; const k = p.player + p.market;
+    if(seen.has(k)) continue; seen.add(k); if(st.win){ w++; items.push(`<span class="tk tk-win" data-tkp="${esc(p.id)}">✓ ${esc(p.player)} ${esc(selText(p))} · ${ln(st.now)}${p.tier === 'bet' ? ' · BET' : ''}</span>`); } else if(st.loss) l++; } }
+  if(w + l) items.unshift(`<span class="tk tk-sum"><i>MODEL PICKS</i> ${w} cashed · ${l} missed</span>`);
+  if(!items.length){ const next = Object.values(LV.games).filter(g => g.state === 'pre').length; items.push(`<span class="tk">No NFL game live${next ? ` · ${next} game${next > 1 ? 's' : ''} still to play this week` : ''} · picks light up here as they cash</span>`); }
+  const html = items.join('<span class="tk-dot">•</span>'); if(el.dataset.h === html) return; el.dataset.h = html;
+  el.innerHTML = `<div class="tk-run">${html}<span class="tk-dot">•</span></div><div class="tk-run" aria-hidden="true">${html}<span class="tk-dot">•</span></div>`;
+  const sp = Math.max(25, el.firstChild.scrollWidth / 45); el.style.setProperty('--tkdur', sp + 's');
+  $$('[data-tkp]', el).forEach(b => b.onclick = () => { const d = Object.values(SLATE).find(x => x && x.props.some(p => p.id === b.dataset.tkp)); if(d) openProp(d, b.dataset.tkp); }); }
 
 function leanRow(p, d){ const r = resultOf(d, p); return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · ${esc(p.window || '')} · 25D ${sg(p.score25, 1)}</span></span><span class="r">${od(p.odds)}<br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : ''}</span></span></button>`; }
 function gradedStrip(d){ const s = d.results.summary, b = s.bets || {}, t = s.by_tier || {}, L = s.lines || {};
@@ -680,7 +700,7 @@ function viewMore(){ const s = S.slate && slateInfo(S.slate);
   const open = store.d.bets.filter(b => b.status === 'open').length;
   return `<div class="view"><div class="lt"><h1>More</h1>${s ? `<p>${s.sport} · ${esc(s.label)}</p>` : '<p>Pick a slate in the Lobby for game lines and parlays.</p>'}</div>
     <div class="menu">${s ? item('lines', 'lines', 'Game lines', 'Spread, total and moneyline, ranked') + item('parlays', 'parlay', 'Parlays', 'Joint replay win rates vs the payout') : ''}${item('results', 'results', 'Results & model report', 'Graded leans, bets and calibration')}${item('bets', 'bets', 'My bets', open ? `${open} open` : 'Log, bankroll and ROI')}</div>
-    <div class="menu">${item('learn', 'learn', 'How the model works', 'Plain English, no stats needed')}${item('import', 'import', 'Import a slate', 'Paste or pick a JSON file')}${item('settings', 'gear', 'Settings', 'Units, bankroll, 3D room, your data')}</div>
+    <div class="menu">${item('learn', 'learn', 'How the model works', 'Plain English, no stats needed')}${item('import', 'import', 'Import a slate', 'Paste or pick a JSON file')}${item('settings', 'gear', 'Settings', 'Units, bankroll, your data')}</div>
     <div class="help"><b>Bet only what you can afford to lose.</b><span>Call or text 1-800-GAMBLER for free, confidential help, any time.</span></div></div>`; }
 function wireMore(){ $$('[data-more]').forEach(b => b.onclick = () => ({lines: openLines, parlays: openParlays, results: openResults, bets: openBets, learn: openLearn, import: openImport, settings: openSettings})[b.dataset.more]()); }
 
@@ -816,8 +836,7 @@ function importData(){ modal(`<h2>Import my data</h2><p class="note" style="marg
   $('#md-c', C).onclick = close; $('#md-go', C).onclick = () => { try{ const d = JSON.parse($('#md-t', C).value); if(!Array.isArray(d.bets)) throw new Error('No bets list in this file.'); store.d = Object.assign(store.d, d); store.save(); close(); toast('Data imported'); STACK.length && popSheet(); openBets(); }catch(e){ $('#md-e', C).innerHTML = `<div class="help"><b>Could not import.</b><span>${esc(e.message)}</span></div>`; } }; }); }
 function openSettings(){ const s = store.d.settings; pushSheet('Settings', `<div class="body"><div class="lt"><h1>Settings</h1></div>
   <div class="calc"><div class="fgrid"><div class="fld"><label for="s-unit">1 unit ($)</label><input id="s-unit" type="number" inputmode="decimal" value="${s.unit}"></div><div class="fld"><label for="s-bank">Starting bankroll ($)</label><input id="s-bank" type="number" inputmode="decimal" value="${s.bankroll}"></div></div>
-    <div class="fld"><label>3D room in the lobby</label><div class="seg" id="s-room"><button data-r="auto" aria-pressed="${s.room !== 'off'}">On</button><button data-r="off" aria-pressed="${s.room === 'off'}">Off (low power)</button></div></div>
-    <p class="note" style="margin:0">The room never loads when Reduce Motion is on. Off saves battery in a loud bar.</p></div>
+    </div>
   <div class="btns"><button class="btn quiet" id="s-ex">Export my data</button><button class="btn quiet" id="s-im">Import my data</button></div>
   <button class="btn quiet" id="s-reset" style="color:var(--loss)">Erase bets and settings</button>
   <div class="help"><b>Bet only what you can afford to lose.</b><span>1-800-GAMBLER · free, confidential help, any time.</span></div>
@@ -874,7 +893,7 @@ async function boot(){ store.load(); drawTabs();
   const seen = store.d.ui.seen || (store.d.ui.slate ? [store.d.ui.slate] : []); const fresh = newest && !seen.includes(newest.id);
   const sl = fresh ? newest.id : store.d.ui.slate && slateInfo(store.d.ui.slate) ? store.d.ui.slate : newest ? newest.id : null; if(sl){ S.slate = sl; store.d.ui.slate = sl; drawSlateBtn(); }
   store.d.ui.seen = INDEX.slates.map(x => x.id); store.save();
-  go(fresh && want === 'lobby' ? 'card' : want); if(fresh) setTimeout(() => toast('New slate: ' + (newest.label || newest.id)), 600); pullToRefresh();
+  go(fresh && want === 'lobby' ? 'card' : want); tickerLoop(); document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') tickerLoop(); }); if(fresh) setTimeout(() => toast('New slate: ' + (newest.label || newest.id)), 600); pullToRefresh();
   addEventListener('hashchange', () => { const h = location.hash.slice(1); if(h !== S.tab && TABS.find(t => t[0] === h)) go(h); });
   addEventListener('keydown', e => { if(e.key === 'Escape'){ if($('#modal').classList.contains('on')){ $('#modal').classList.remove('on'); } else if(STACK.length) popSheet(); } });
   if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js', {scope: './'}).catch(() => {}); }

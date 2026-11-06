@@ -349,3 +349,11 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .pgtag{position:absolute;top:8px;right:10px;font:700 11px/1 var(--f-ui);letter-spacing:.02em;padding:4px 7px;border-radius:999px;background:rgba(0,0,0,.45);color:var(--t1);pointer-events:none}
 .pg-win .pgtag{background:var(--edge);color:#04150c}.pg-loss .pgtag{background:rgba(232,90,90,.9);color:#fff}
 .pg{padding-bottom:36px!important}.pgtag{top:auto;bottom:9px;left:14px;right:auto;font-size:12px;padding:5px 9px}
+
+.ticker{position:relative;margin-inline:calc(-1 * max(var(--side),env(safe-area-inset-left,0px))) calc(-1 * max(var(--side),env(safe-area-inset-right,0px)));height:30px;overflow:hidden;background:linear-gradient(90deg,#0c1a12,#121212 40%,#121212 60%,#0c1a12);box-shadow:inset 0 -.5px 0 var(--hair2),inset 0 .5px 0 var(--hair2)}
+.tk-track{display:flex;width:max-content;height:30px;align-items:center;animation:tkmove var(--tkdur,40s) linear infinite}.tk-track:active{animation-play-state:paused}
+.tk-run{display:flex;align-items:center;white-space:nowrap}
+.tk{font:600 12.5px/1 var(--f-ui);color:var(--t2);padding:0 4px}.tk b{color:var(--t1);font-variant-numeric:tabular-nums}.tk i{font-style:normal;font-size:10px;letter-spacing:.06em;padding:3px 6px;border-radius:5px;background:rgba(255,255,255,.08);color:var(--t2);margin-right:4px}
+.tk-live i{background:#c0392b;color:#fff}.tk-win{color:var(--edge);cursor:pointer}.tk-sum i{background:var(--edge);color:#04150c}.tk-dot{color:var(--t3);padding:0 10px}
+@keyframes tkmove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion: reduce){.tk-track{animation:none}}
