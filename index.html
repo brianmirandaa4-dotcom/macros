@@ -1367,8 +1367,112 @@ header.top{z-index:20}
 
 .fd-hub{max-width:none;overflow-x:auto;scrollbar-width:none;display:flex!important;gap:3px}.fd-hub::-webkit-scrollbar{display:none}.fd-hub button{flex:1 0 auto;white-space:nowrap;padding:9px 12px;font-size:13.5px}
 #fdPanel>.pg{display:flex;flex-direction:column;gap:14px}
+
+/* today: collapsible meals */
+.meal.shut .grade,.meal.shut .maim,.meal.shut .entries,.meal.shut .meal-f,.meal.shut .mgrade,.meal.shut>*:not(.meal-h){display:none!important}
+.meal.shut .meal-h{border-bottom:0}
+.meal-h[data-mtog]{cursor:pointer}
+.meal-h[data-mtog] h3::after{content:"›";display:inline-block;margin-left:8px;color:var(--muted);transition:transform .2s}
+.meal.open .meal-h[data-mtog] h3::after{transform:rotate(90deg)}
+.meal-empty{padding:12px 14px}.me-h{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.me-row{display:flex;flex-wrap:wrap;gap:8px}
+.me-c{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);color:var(--fg);font:inherit;font-size:14px;cursor:pointer}
+.me-c .thumb{width:28px;height:28px;border-radius:50%;background-size:cover;background-position:center;flex:none}.me-c i{font-style:normal;color:var(--kcal);font-weight:800;font-size:16px}
+.me-rep{flex-basis:100%;text-align:left;background:none;border:0;color:var(--kcal);font:inherit;font-size:13px;padding:2px 4px;cursor:pointer}
+#tip-today{display:none!important}
+.glist.tgrid{display:flex!important;flex-wrap:wrap;gap:8px;padding:0}
+.glist.tgrid .gr{display:flex!important;flex:0 0 auto;align-items:center;gap:8px;min-height:0!important;padding:7px 14px 7px 7px!important;border-radius:99px!important;width:auto!important}
+.glist.tgrid .gr::before{display:none}
+.glist.tgrid .gi{order:-1;width:30px!important;height:30px!important}.glist.tgrid .gi svg{width:15px!important;height:15px!important}
+.glist.tgrid .gt b{font-size:13.5px!important;white-space:nowrap;-webkit-line-clamp:unset!important;display:block!important}
+.glist.tgrid .gv{font-size:12px!important}
+
+.meal .meal-h>div:nth-child(2){min-width:0;flex:1}.meal .meal-h h3{white-space:nowrap}.meal .meal-h .m{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
+
+/* ================= DS3: one calm system. Flat surfaces, hairlines, one accent ================= */
+:root{--s1:#14161D;--s2:#1C1F28;--hair:rgba(255,255,255,.065)}
+main .wrap{gap:12px!important}
+.card,.glist:not(.tgrid){background:var(--s1)!important;border:0!important;box-shadow:none!important;border-radius:20px!important}
+.card{padding:16px!important}
+.card .card{background:none!important;padding:0!important;border-radius:0!important}
+.card.hero{background:var(--s1)!important}
+.card-h{margin-bottom:10px!important;align-items:center!important}
+.card-h h2{font:650 16px/1.3 var(--f-body)!important;letter-spacing:0!important;margin:0}
+.eyebrow{font-size:11px!important;letter-spacing:.07em!important}
+.pnav h1{font-size:24px!important}
+.pnav .sub{font-size:12.5px}
+.tip[id^="tip-"]{display:none!important}
+/* hero: flat macro columns separated by hairlines */
+.hv-mac{gap:0!important;border-top:1px solid var(--hair);padding-top:12px;margin-top:2px}
+.hm{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 12px!important}
+.hm::before,.hm::after{display:none!important}
+.hm:first-child{padding-left:0!important}.hm+.hm{border-left:1px solid var(--hair)!important}
+/* quick stats: one strip, not separate tiles */
+.qgrid{background:var(--s1);border-radius:20px;gap:0!important;overflow:hidden}
+.qgrid .qt{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:12px 14px!important}
+.qgrid .qt:nth-child(even){border-left:1px solid var(--hair)!important}
+.qgrid .qt:nth-child(n+3){border-top:1px solid var(--hair)!important}
+@media (min-width:900px){.qgrid .qt:nth-child(n+2){border-left:1px solid var(--hair)!important}.qgrid .qt:nth-child(n+3){border-top:0!important}}
+.qgrid .qt .qr{width:36px!important;height:36px!important}
+/* Today: the daily overview reads as one block */
+#hero{border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;padding-bottom:12px!important}
+#hero+#quick{margin-top:-12px;border-radius:0 0 20px 20px;border-top:1px solid var(--hair)}
+#quick:empty{display:none}
+#hero:has(+#quick:empty){border-radius:20px!important}
+/* shortcuts are quiet chips */
+.glist.tgrid .gr{background:var(--s1)!important;border:0!important;box-shadow:none!important}
+.glist.tgrid .gt>span,.glist.tgrid .gr>svg:last-child{display:none!important}
+/* repeated stat tiles under the Progress hero */
+#wTiles,#mTiles{display:none!important}
+/* composer: the input is the hero, help text goes */
+.composer h2{font:650 16px/1.3 var(--f-body)!important}
+.composer .hint>span{display:none}
+.composer .hint{margin-top:2px}
+/* setup + backup prompts: slim rows */
+.coach .coach-h p{display:none}
+.coach .coach-h h2{font-size:16px!important}
+.ac-band{padding:10px 12px!important;border-radius:16px!important;background:var(--s1)!important;border:0!important}
+.ac-band .mb-bt>span{display:none}
+/* one idea, expand for details */
+.idea-card{gap:10px!important}
+.idea-card:not(.open) .idea-t p,.idea-card:not(.open) .idea-mac,.idea-card:not(.open) .mchips,.idea-card:not(.open) .micro,.idea-card:not(.open)>.note{display:none!important}
+.idea-card .idea-top{cursor:pointer}
+.idea-card h2{font-size:17px!important}
+.idea-card:not(.open) .ic.thumb{width:44px!important;height:44px!important}
+/* meals: one list, hairlines between */
+.meals{background:var(--s1);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;gap:0!important}
+.meals:empty{display:none}
+.meals>.card,.meals>.meal-empty{background:none!important;border-radius:0!important;margin:0!important}
+.meals>*+*{border-top:1px solid var(--hair)!important}
+/* train */
+.gym-cta{border:0!important;background:var(--s1)!important;border-radius:20px!important;padding:12px 14px!important}
+.gym-card{border:0!important}
+.wnow{background:var(--s1)!important}
+.wnow h2{font-size:19px!important}
+.live{gap:0!important}
+.live div{background:none!important;border:0!important;border-radius:0!important;padding:0 10px!important}
+.live div:first-child{padding-left:0!important}.live div+div{border-left:1px solid var(--hair)!important}
+details.why summary{cursor:pointer;color:var(--muted);font-size:13px;list-style:none}
+details.why summary::-webkit-details-marker{display:none}
+details.why summary::after{content:" ›"}
+.coach.slim{padding:6px 8px!important;flex-direction:row!important;align-items:center;gap:4px!important}
+.coach.slim .coach-h{display:none}.coach.slim .todo{flex:1;margin:0}
+.coach.slim .todo button{background:none!important;border:0!important;padding:8px!important}
+.coach.slim .coach-x{font-size:0!important;width:32px;height:32px;flex:none;border-radius:50%;background:var(--s2)!important;padding:0!important;border:0!important}
+.coach.slim .coach-x::after{content:"✕";font-size:13px;color:var(--muted)}
+.coach .todo button{border-color:var(--hair)!important}
+.glist.tgrid .gr{flex-direction:row!important}.glist.tgrid .gv{position:static!important;order:3;color:var(--muted);font:600 12px var(--f-num)!important;white-space:nowrap}.glist.tgrid .gv:empty{display:none}
+.meal .meal-h{padding-block:10px!important}
+.hk1{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:6px 0 2px}
+.hk1-ic{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:#FF5E7A;background:color-mix(in srgb,#FF5E7A 14%,var(--s2))}
+.hk1 h3{margin:4px 0 0}.hk1 p{margin:0;color:var(--muted);font-size:14px;line-height:1.45;max-width:30ch}
+.hk1-go{width:100%;padding:15px!important;font-size:16px!important}
+.hk1-s{margin:-4px 0 0;text-align:center;font-size:13px;color:var(--muted)}
+.hk-diy{border-top:1px solid var(--hair);padding-top:10px}.hk-diy summary{cursor:pointer;font-weight:600;font-size:14px}
+/* calmer accents: purple only for the main action and selection */
+.statstrip b.c-p{color:var(--fg)!important}
 </style>
 </head>
 <body>
@@ -1396,8 +1500,8 @@ header.top{z-index:20}
     </div>
 
     <div class="card hero v2" id="hero"></div>
-    <div id="acNudge"></div>
     <div class="qgrid" id="quick" aria-label="Quick look"></div>
+    <div id="acNudge"></div>
     <div class="card prep-card" id="prepCard" hidden></div>
     <div class="card coach" id="coach" hidden></div>
 
@@ -1438,11 +1542,11 @@ header.top{z-index:20}
         <div class="glist tgrid" id="trRows"></div>
         <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
-          <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="tplOrder" type="button">Order &amp; days</button><button class="pill-btn" data-pg="progs" type="button">Programs</button></div></div>
+          <div class="card-h"><div><h2>Start a workout</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="tplOrder" type="button">Order &amp; days</button><button class="pill-btn" data-pg="progs" type="button">Programs</button></div></div>
           <div class="tpl-grid" id="tplGrid"></div>
         </div>
         <div class="card">
-          <div class="card-h"><div><div class="eyebrow">History · your lifts and watch sessions</div><h2>Recent workouts</h2></div></div>
+          <div class="card-h"><div><h2>Recent workouts</h2></div></div>
           <ul class="hist" id="hist"></ul>
         </div>
       </div>
@@ -1462,20 +1566,20 @@ header.top{z-index:20}
     <div id="wTop" class="prog-top"></div>
     <div class="tiles" id="wTiles"></div>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Calories by macro</div><h2>Each day, split into protein, carbs and fat</h2></div>
+      <div class="card-h"><div><h2>Calories by macro</h2></div>
         <div class="legend"><span><i style="background:var(--pro)"></i>Protein</span><span><i style="background:var(--carb)"></i>Carbs</span><span><i style="background:var(--fat)"></i>Fat</span><span><i class="dash"></i>Goal</span></div></div>
       <div class="chart" id="wChart"></div>
     </div>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Macro split</div><h2>Where your calories come from</h2></div></div>
+      <div class="card-h"><div><h2>Macro split</h2></div></div>
       <div class="cmp" id="wSplit"></div>
     </div>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Day by day</div><h2>Tap a day to open it</h2></div></div>
+      <div class="card-h"><div><h2>Day by day</h2></div></div>
       <div class="tbl-wrap" id="wTable"></div>
     </div>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Sleep &amp; recovery</div><h2>How your body handled the week</h2></div></div>
+      <div class="card-h"><div><h2>Sleep &amp; recovery</h2></div></div>
       <div class="tbl-wrap" id="wRec"></div>
     </div>
   </section>
@@ -1493,17 +1597,17 @@ header.top{z-index:20}
     <div class="tiles" id="mTiles"></div>
     <button class="ghost" type="button" id="mReport" style="padding:13px">See this month’s report</button>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Calendar</div><h2>Each day against your calorie goal</h2></div>
+      <div class="card-h"><div><h2>Calendar</h2></div>
         <div class="legend"><span><i style="background:var(--fat)"></i>Under 85%</span><span><i style="background:var(--good)"></i>85–110%</span><span><i style="background:var(--over)"></i>Over 110%</span></div></div>
       <div class="cal" id="mCal"></div>
     </div>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Trend</div><h2>Daily calories and the 7-day average</h2></div>
+      <div class="card-h"><div><h2>Trend</h2></div>
         <div class="legend"><span><i class="line" style="background:var(--faint)"></i>Daily</span><span><i class="line" style="background:var(--kcal)"></i>7-day avg</span><span><i class="dash"></i>Goal</span></div></div>
       <div class="chart" id="mChart"></div>
     </div>
     <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Most logged</div><h2>Your top foods this month</h2></div></div>
+      <div class="card-h"><div><h2>Most logged</h2></div></div>
       <div class="tbl-wrap" id="mTop"></div>
     </div>
   </section>
@@ -1689,13 +1793,13 @@ header.top{z-index:20}
 
 </div>
   <div class="pg" id="pg-strength">        <div class="card">
-          <div class="card-h"><div><div class="eyebrow">Strength progress</div><h2>Estimated 1-rep max over time</h2></div><select id="exSel" class="pill-btn" aria-label="Exercise"></select></div>
+          <div class="card-h"><div><h2>Strength progress</h2></div><select id="exSel" class="pill-btn" aria-label="Exercise"></select></div>
           <div class="chart" id="exChart"></div>
           <p class="note" id="exNote" style="margin-top:10px"></p>
         </div>
 </div>
   <div class="pg" id="pg-muscle">        <div class="card">
-          <div class="card-h"><div><div class="eyebrow">This week · hard sets per muscle</div><h2>Are you training enough?</h2></div><div class="legend"><span><i style="background:color-mix(in srgb,var(--good) 35%,transparent)"></i>10–20 sets: the range most research supports for growth</span></div></div>
+          <div class="card-h"><div><h2>This week · hard sets per muscle</h2></div><div class="legend"><span><i style="background:color-mix(in srgb,var(--good) 35%,transparent)"></i>10–20 sets: the range most research supports for growth</span></div></div>
           <div class="mus-bars" id="musBars"></div>
         </div>
 </div>
@@ -2671,7 +2775,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.74';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.75';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2914,17 +3018,21 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
   animateHero(k);
   $('mealPick').innerHTML=MEALS.map(([m,l])=>`<button type="button" class="chip" data-meal="${m}" aria-pressed="${S.mealSel===m}">${l}</button>`).join('');
   const list=S.days[k]||[], prev=S.days[addDays(k,-1)]||[];
-  $('meals').innerHTML=MEALS.map(([m,l])=>{
-    const es=list.filter(e=>(e.meal||'snack')===m),mt=sumEntries(es),ms=mt.p*4+mt.c*4+mt.f*9||1;
+  const emp=MEALS.filter(([m])=>!list.some(e=>(e.meal||'snack')===m));
+  const empHTML=emp.length?`<div class="card meal-empty"><div class="me-h">Add to</div><div class="me-row">${emp.map(([m,l])=>{const pe=prev.filter(e=>(e.meal||'snack')===m);return `<button type="button" class="me-c" data-addto="${m}"><span class="ic thumb" style='background-image:${thumbURL(m)}'></span><b>${l}</b><i>+</i></button>${pe.length?`<button type="button" class="me-rep" data-repeat="${m}">Repeat yesterday's ${l.toLowerCase()} · ${fmt(sumEntries(pe).k)}</button>`:''}`}).join('')}</div></div>`:'';
+  if(!window._mealOpen)window._mealOpen={};
+  $('meals').innerHTML=MEALS.filter(([m])=>list.some(e=>(e.meal||'snack')===m)).map(([m,l])=>{
+    const es=list.filter(e=>(e.meal||'snack')===m),mt=sumEntries(es),ms=mt.p*4+mt.c*4+mt.f*9||1;const open=!!window._mealOpen[k+m];
     const pe=prev.filter(e=>(e.meal||'snack')===m),gr=gradeMeal(m,es,g),aim=es.length?null:mealAim(m,k,g);
-    return `<div class="card meal"><div class="meal-h"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num">P ${r0(mt.p)} · C ${r0(mt.c)} · F ${r0(mt.f)}</span>`:'Empty'}</div></div>
+    return `<div class="card meal${open?' open':' shut'}" data-mk="${m}"><div class="meal-h" data-mtog="${m}" role="button" tabindex="0" aria-expanded="${open}"><div class="ic thumb" style='background-image:${thumbURL(m)}'></div><div><h3>${l}</h3><div class="m">${es.length?`${es.length} item${es.length>1?'s':''} · <span class="num"><i style="color:var(--pro);font-style:normal">${r0(mt.p)}P</i> <i style="color:var(--carb);font-style:normal">${r0(mt.c)}C</i> <i style="color:var(--fat);font-style:normal">${r0(mt.f)}F</i></span>`:'Empty'}</div></div>
       <button class="meal-add" data-addto="${m}" aria-label="Add food to ${l}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       <div class="k"><b>${fmt(mt.k)}</b><small>kcal</small>${es.length?`<div class="mini"><i style="width:${mt.p*4/ms*100}%;background:var(--pro)"></i><i style="width:${mt.c*4/ms*100}%;background:var(--carb)"></i><i style="width:${mt.f*9/ms*100}%;background:var(--fat)"></i></div>`:''}</div></div>
       ${gr?gradeHTML(m,gr):''}${aim?`<div class="maim"><span>Aim for</span><b class="num" style="color:var(--pro)">${aim.p} P</b><b class="num" style="color:var(--carb)">${aim.c} C</b><b class="num" style="color:var(--fat)">${aim.f} F</b>${aim.behind?`<em>Furthest behind today: ${aim.behind}</em>`:''}</div>`:''}
       ${es.length?`<ul class="entries">${es.map(e=>`<li><button class="entry" data-edit="${e.id}"><span class="n">${esc(e.n)}${e.src==='guess'?'<span class="tag">check</span>':''}</span><span class="kc">${fmt(e.k)}</span><span class="a">${esc(e.a)}${e.g?` · ${r0(e.g)} g`:''}</span><span class="mc"><span style="--c:var(--pro)">${r0(e.p)}P</span><span style="--c:var(--carb)">${r0(e.c)}C</span><span style="--c:var(--fat)">${r0(e.f)}F</span></span></button></li>`).join('')}</ul><div class="meal-f"><button class="save-meal" data-savemeal="${m}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Save as a meal</button></div>`
         :`<div class="empty-meal"><span>Nothing yet. Tap <b>+</b> to add ${l.toLowerCase()}.</span>${pe.length?`<button class="repeat" data-repeat="${m}">Repeat yesterday's ${l.toLowerCase()} <span>· ${fmt(sumEntries(pe).k)} kcal</span></button>`:''}</div>`}</div>`;
-  }).join('');
+  }).join('')+empHTML;
 }
+$('meals').addEventListener('click',e=>{const h=e.target.closest('[data-mtog]');if(!h||e.target.closest('button'))return;const key=S.day+h.dataset.mtog;window._mealOpen[key]=!window._mealOpen[key];renderToday()});
 $('mealPick').addEventListener('click',e=>{const b=e.target.closest('[data-meal]');if(!b)return;S.mealSel=b.dataset.meal;renderToday();$('foodIn').focus()});
 $('dPrev').onclick=()=>{S.day=addDays(S.day,-1);renderToday()};
 $('dNext').onclick=()=>{S.day=addDays(S.day,1);renderToday()};
@@ -2940,7 +3048,7 @@ $('meals').addEventListener('click',e=>{const gb=e.target.closest('[data-grade]'
 function addEntries(entries,k=S.day,meal=S.mealSel){
   if(!entries.length)return;const _before=dayTotals(k);setTimeout(()=>checkRewards(k,_before),0);
   if(meal!=='drinks'&&entries.every(e=>isBooze(e.n))){meal='drinks';setTimeout(()=>toast('Added to Drinks 🍺'),400)}
-  entries.forEach(e=>e.meal=meal);
+  entries.forEach(e=>e.meal=meal);try{window._mealOpen=window._mealOpen||{};window._mealOpen[k+meal]=true}catch(_){}
   const ids=entries.map(e=>e.id),kc=entries.reduce((a,e)=>a+e.k,0);
   S.just={k,ids};
   S.days[k]=[...(S.days[k]||[]),...entries]; save(); renderAll();
@@ -3718,7 +3826,7 @@ function renderPlanLive(){
   }else track=`<div class="tile"><div class="eyebrow">On track?</div><div class="v">—</div><div class="d">Log a weigh-in to compare</div></div>`;
   const pct=notStarted?0:Math.min(1,((parseKey(tk)-parseKey(pl.start))/864e5+1)/(pl.weeks.length*7));
   const label=pl.type==='cut'?'Cut':pl.type==='bulk'?'Bulk':'Maintain';
-  el.innerHTML=`<div class="card-h"><div><div class="eyebrow">Active plan · ${label}</div><h2>${notStarted?`Starts ${niceDate(pl.start,{weekday:'long',month:'short',day:'numeric'})}`:pi.done?'Plan complete, now at maintenance':pi.rec?`Recovery week ${pi.i-pl.N+1} of ${pl.weeks.length-pl.N}`:`Week ${pi.i+1} of ${pl.N} · ${pi.wk.ph}`}</h2></div><div class="row"><button class="pill-btn" id="pRebuild">Rebuild from latest weight</button></div></div>
+  el.innerHTML=`<div class="card-h"><div><h2>Active plan · ${label}</h2></div><div class="row"><button class="pill-btn" id="pRebuild">Rebuild from latest weight</button></div></div>
     <div class="progress"><i style="width:${pct*100}%"></i></div>
     <div class="tiles" style="margin-top:14px">
       <div class="tile"><div class="eyebrow">Today's target</div><div class="v c-k">${fmt(gk)}<small> kcal</small></div><div class="d">P ${r0(g.p)} · C ${r0(g.c)} · F ${r0(g.f)}${g.rf?` · refeed day: +${g.rf} g carbs`:''}</div></div>
@@ -4764,8 +4872,7 @@ const THC={};function thumbURL(m){return THC[m]||(THC[m]=artURL(ART.thumb(m)))}
 function mealOfNow(){const h=new Date().getHours();return h<11?'breakfast':h<16?'lunch':'dinner'}
 function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySelector('.pnav');if(!pn)return;
   const kind=S.view==='today'?mealOfNow():S.view==='week'||S.view==='month'?'all':S.view==='friends'?'all':S.view;
-  pn.classList.add('banner');pn.classList.toggle('flush',pn===sec.firstElementChild||(pn.previousElementSibling&&pn.previousElementSibling.classList.contains('tip')&&pn.previousElementSibling===sec.firstElementChild));
-  pn.style.setProperty('--bnr',bnr(kind,S.view));pn.classList.add('compact')}
+  pn.classList.remove('banner','flush','compact');pn.style.removeProperty('--bnr')}
 /* ================= QUICK TILES: the things you check all day, one tap away on Today ================= */
 function qRing(fr,col){const R=17,C=2*Math.PI*R,f=Math.max(0,Math.min(1,fr||0));return `<svg class="qr" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="22" cy="22" r="${R}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" transform="rotate(-90 22 22)" style="transition:stroke-dasharray .6s var(--ease-out)"/></svg>`}
 function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayKey();
@@ -5267,10 +5374,10 @@ function renderIdeasCard(){
   el.innerHTML=`<div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(slot==='snack'?'snack':slot)}'></div><div class="idea-t"><div class="eyebrow" ${fl?'style="color:var(--good)"':''}>${fl||mealName(slot)+' idea · fits your macros'}</div><h2>${esc(best.idea.name)}</h2><p>${best.entries.map(e=>`${esc(e.a)} ${esc(e.n.toLowerCase())}`).join(' · ')}</p></div></div>
     <div class="idea-mac">${macPill('P',best.got.p,T.p,'--pro')}${macPill('C',best.got.c,T.c,'--carb')}${macPill('F',best.got.f,T.f,'--fat')}<span class="idea-fit">${Math.round(best.fit*100)}% match</span></div>${microChips(best.entries)}${fl?`<p class="note" style="margin:0">${FUEL_TXT[fuel].s}</p>`:''}
     <div class="row" style="gap:8px"><button class="primary" type="button" data-ilog="0">Log it to ${mealName(slot).toLowerCase()}</button><button class="ghost" type="button" data-pg="ideas">More ideas</button></div>`;
-  el.dataset.slot=slot;el._best=best;
+  el.dataset.slot=slot;el._best=best;el.classList.toggle('open',!!window._ideaOpen);
 }
 function macPill(l,v,t,c){return `<span class="mp" style="--c:var(${c})"><b>${r0(v)}</b>/${r0(Math.max(0,t))}g ${l}</span>`}
-$('ideasCard')&&$('ideasCard').addEventListener('click',e=>{if(e.target.closest('[data-ilog]')){const b=$('ideasCard')._best;if(b)addEntries(b.entries.map(x=>({...x,id:uid(),t:Date.now()})),S.day,$('ideasCard').dataset.slot)}});
+$('ideasCard')&&$('ideasCard').addEventListener('click',e=>{if(e.target.closest('.idea-top')){window._ideaOpen=!window._ideaOpen;$('ideasCard').classList.toggle('open',window._ideaOpen);return}if(e.target.closest('[data-ilog]')){const b=$('ideasCard')._best;if(b)addEntries(b.entries.map(x=>({...x,id:uid(),t:Date.now()})),S.day,$('ideasCard').dataset.slot)}});
 function renderIdeas(){
   const mode=S.ideaMode||'meal',{R,T,n,slot,left}=ideaTarget(mode),list=mealIdeas(mode,slot).slice(0,8),g=goalsFor(S.day);
   const bar=(l,v,goal,c)=>{const left2=Math.max(0,v);return `<div class="rem" style="--c:var(${c})"><span>${l}</span><b>${r0(left2)} g</b><i><u style="width:${goal?Math.min(100,Math.max(0,(goal-v)/goal*100)):0}%"></u></i></div>`};
@@ -5584,7 +5691,7 @@ async function refreshFriend(){renderFriendPage();if(fpUid!=='me'){await socBoar
 async function openFriends(){renderFriends();const c=socCfg();if(c.on&&(!c.boardAt||Date.now()-c.boardAt>20000)){await socPush(true);await socBoard();if(S.view==='friends')renderFriends()}}
 function friendsRow(){const c=socCfg();if(!c.on)return grow({ga:'friends',ic:'laurel',c:'--good',t:'Compete with friends',s:'Weekly leaderboard, streaks and cheers'});
   const b=c.board,ws=weekStart(todayKey()),me=myWeek().stats.score,frs=((b&&b.friends)||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0),rank=1+frs.filter(x=>x>me).length,top=Math.max(0,...frs);
-  return grow({ga:'friends',ic:'laurel',c:'--good',t:frs.length?`You're #${rank} of ${frs.length+1} this week`:'Friends',s:frs.length?(rank===1?`Leading by ${fmt(me-Math.max(0,...frs.filter(x=>x<=me)))} pts`:`${fmt(top-me)} pts behind first`):'Invite friends to start competing',v:`${fmt(me)} pts`,vc:'on'})}
+  return grow({ga:'friends',ic:'laurel',c:'--good',t:frs.length?`#${rank} of ${frs.length+1} this week`:'Friends',s:frs.length?(rank===1?`Leading by ${fmt(me-Math.max(0,...frs.filter(x=>x<=me)))} pts`:`${fmt(top-me)} pts behind first`):'Invite friends to start competing',v:`${fmt(me)} pts`,vc:'on'})}
 GACT.backupNow=()=>{backup();renderTodayRows()};
 GACT.friends=()=>{closePages();setView('friends')};
 
@@ -5991,7 +6098,7 @@ function coachItems(){
 let coachGo=[];
 function renderCoach(){
   const el=$('coach');if(!el)return;if(S.day!==todayKey()||(S.prefs&&S.prefs.hideCoach)){el.hidden=true;return}
-  const {mode,items}=coachItems();coachGo=items.map(i=>i.go);el.hidden=false;
+  const {mode,items}=coachItems();coachGo=items.map(i=>i.go);el.hidden=false;el.classList.toggle('slim',mode==='setup'&&items.length<=2);
   const done=items.filter(i=>i.done).length,f=mode==='setup'?0:done/items.length,next=items.findIndex(i=>!i.done);
   const head=mode==='setup'?`<div class="coach-h"><span class="tip" style="margin:0;padding:0;border:0;background:none"><span class="tic" style="width:46px;height:46px;font-size:20px">${items.length}</span></span><div><h2>Let's get you set up</h2><p>${items.length} quick step${items.length>1?'s':''} so your targets fit you.</p></div></div>`
     :`<div class="coach-h">${ringSVG(f,f>=1?'var(--good)':'var(--kcal)')}<div><h2>${f>=1?'Day complete':next===0?'Start your day':'Your day'}</h2><p>${f>=1?'Everything done. See you tomorrow.':`${done} of ${items.length} done. Next: ${items[next].t.toLowerCase()}.`}</p></div></div>`;
@@ -6004,11 +6111,11 @@ function renderTodayRows(){
   const el=$('todayRows');if(!el)return;const k=S.day,h=hv(k),c=S.checkins[k],cfg=syncCfg();
   const hs=[h.recovery!=null?`${h.recovery}% recovery`:'',h.sleep!=null?`${h.sleep}h sleep`:'',h.hrv!=null?`HRV ${h.hrv}`:'',h.steps!=null?`${fmt(h.steps)} steps`:''].filter(Boolean).slice(0,3).join(' · ');
   const rc=h.recovery!=null?(h.recovery>=67?'on':h.recovery<34?'warn':''):'';
-  el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'moon',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.oura||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP, Oura or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
+  el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()
     +(()=>{const tk=todayKey(),pm=prevYM();if(k!==tk||+tk.slice(8)>7||!monthHasData(pm))return '';const [y,m]=pm.split('-').map(Number);return grow({ga:'report',ic:'chart',c:'--good',t:`Your ${MON[m-1]} report is ready`,s:'How the month went: nutrition, vitamins, water, training, sleep',v:'New',vc:'on'})})()
-    +(()=>{const hp=hydPlan(k),hd=hydDay(k);return grow({pg:'hyd',ic:'drop',c:'--fat',t:'Hydration',s:`${fmt(hd.oz)} of ${fmt(hp.oz.total)} oz${hp.types.length?' · '+hp.label.toLowerCase():''}${hd.na?` · ${fmt(hd.na)} mg sodium`:''}`,v:hd.oz>=hp.oz.total?'✓':`${Math.round(hd.oz/Math.max(1,hp.oz.total)*100)}%`,vc:hd.oz>=hp.oz.total?'on':''})})()
-    +grow({ga:'fd_cook',ic:'cloche',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
-    +grow({ga:'fd_prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'quill',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
+    
+    
+    +grow({pg:'checkin',ic:'quill',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
 const TIPS={today:['Welcome to Trainer','Type what you ate or drank in plain words, like “2 eggs and toast” or “2 orange crushes”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
   train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
@@ -6795,31 +6902,33 @@ function openHealthEdit(){
 const SHORTCUT_URL='';// iCloud link to the shared "Trainer Sync" shortcut
 async function hkLink(){const c=await ensureSync();let code=c.hk;if(!code){const j=await api('/api/hk-code',{method:'POST'});code=j.code;syncSave({...syncCfg(),hk:code})}return `${c.url}/api/hk/in?k=${code}`}
 function openHealthGuide(){
-  sheet(`<div><div class="eyebrow">Apple Health</div><h3>Connect Apple Watch</h3><p class="note" style="margin:4px 0 0">Also brings in WHOOP, Garmin and Oura data that those apps share with Apple Health. Set it up once and Trainer updates every time you open it.</p></div>
-    <ol class="hk-steps">
-      <li><span class="hk-n">1</span><div><b>Copy your private sync link</b><span>It only lets your shortcut send health data to your account.</span><button class="ghost" type="button" id="hkCopy">Copy link</button></div></li>
-      <li><span class="hk-n">2</span><div><b>Add the Trainer Sync shortcut</b><span>Tap Add Shortcut, then paste your link when it asks.</span>${SHORTCUT_URL?`<a class="primary" id="hkAdd" href="${SHORTCUT_URL}" target="_blank" rel="noopener">Add shortcut</a>`:`<button class="ghost" type="button" disabled>Shortcut link coming soon</button>`}</div></li>
-      <li><span class="hk-n">3</span><div><b>Run it once and tap Allow</b><span>Your iPhone asks which Health data to share. Allow steps, sleep, heart rate, HRV, active energy and weight.</span><a class="ghost" href="shortcuts://run-shortcut?name=Trainer%20Sync">Run it now</a></div></li>
-      <li><span class="hk-n">4</span><div><b>Make it automatic</b><span>In Shortcuts → Automation → + → Time of Day (for example 8 AM) → Run Immediately → Trainer Sync.</span></div></li>
-    </ol>
-    <details class="hk-diy"><summary>Build the shortcut yourself instead</summary>
+  const ready=!!SHORTCUT_URL;let link=null;const lp=hkLink().then(l=>link=l).catch(()=>null);
+  sheet(`<div class="hk1"><span class="hk1-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 20.5s-7.5-4.4-7.5-10.1A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.8c0 5.7-7.5 10.1-7.5 10.1z"/></svg></span><h3>Connect Apple Watch</h3><p>Steps, sleep, heart rate, HRV and weight from Apple Health. Takes about 30 seconds.</p></div>
+    <button class="primary hk1-go" type="button" id="hkGo">${ready?'Connect Apple Watch':'Copy my sync link'}</button>
+    <p class="hk1-s">${ready?'Then tap <b>Add Shortcut</b>, paste when it asks, and tap <b>Allow</b>.':'Then follow the steps below once. One-tap connect is coming.'}</p>
+    <details class="hk-diy"${ready?'':' open'}><summary>${ready?'Set it up by hand instead':'Set it up in Shortcuts'}</summary>
       <ol class="steps-guide">
         <li>Open Shortcuts → + → name it <b>Trainer Sync</b>.</li>
         <li>Add <b>Find Health Samples</b> for each: Steps (Sum), Active Energy (Sum), Resting Heart Rate (latest), Heart Rate Variability (latest), Sleep Analysis asleep (sum of durations, hours), Weight (latest). Filter to today (sleep: last 1 day).</li>
         <li>Add a <b>Text</b> action:</li></ol>
-      <div class="codebox">TRAINER-HEALTH
+      <div class="codebox" id="hkTpl">TRAINER-HEALTH
 date=[Current Date, format yyyy-MM-dd]
 steps=[Steps]
 active=[Active Energy]
 rhr=[Resting Heart Rate]
 hrv=[HRV]
 sleep=[Sleep hours]
-weight=[Weight]</div>
+weight=[Weight]</div><button class="ghost" type="button" id="hkTplCp" style="margin-top:8px">Copy this text</button>
       <ol class="steps-guide" start="4"><li>Add <b>Get Contents of URL</b>: paste your sync link, Method POST, Request Body File → the Text.</li></ol>
     </details>
-    <button class="primary" type="button" id="hkDone" style="width:100%">Done</button>`,{nofocus:true});
+    <details class="hk-diy"><summary>Sync every morning by itself</summary><p class="note" style="margin:6px 0 0">Shortcuts → Automation → + → Time of Day → Run Immediately → Trainer Sync.</p></details>
+    <button class="ghost" type="button" id="hkDone" style="width:100%">Check for data now</button>`,{nofocus:true});
+  const copy=async l=>{try{await navigator.clipboard.writeText(l);return true}catch(e){prompt('Copy your sync link',l);return false}};
+  $('hkGo').onclick=async()=>{const b=$('hkGo');
+    if(ready&&link){copy(link);location.href=SHORTCUT_URL;return}
+    b.disabled=true;b.textContent='One moment…';try{const l=link||await lp||await hkLink();await copy(l);toast('Sync link copied');b.textContent='Link copied ✓';if(ready)location.href=SHORTCUT_URL}catch(e){toast(esc(niceErr(e,'Trainer')))}finally{b.disabled=false;if(!ready)setTimeout(()=>{if($('hkGo'))$('hkGo').textContent='Copy my sync link'},2500)}};
+  $('hkTplCp')&&($('hkTplCp').onclick=async()=>{try{await navigator.clipboard.writeText($('hkTpl').textContent);toast('Text copied')}catch(e){}});
   $('hkDone').onclick=()=>{closeSheet();pullHK(true)};
-  $('hkCopy').onclick=async()=>{const b=$('hkCopy');b.disabled=true;b.textContent='One moment…';try{const l=await hkLink();try{await navigator.clipboard.writeText(l)}catch(e){prompt('Copy your sync link',l)}b.textContent='Copied ✓';toast('Sync link copied')}catch(e){b.disabled=false;b.textContent='Copy link';toast(esc(niceErr(e,'Trainer')))}};
 }
 let hkBusy=false;
 async function pullHK(loud){const c=syncCfg();if(!c.hk||hkBusy)return;hkBusy=true;try{const j=await api('/api/hk');const since=(S.prefs&&S.prefs.hkAt)||0;let n=0,last=null;
@@ -7017,7 +7126,7 @@ function renderWatchNow(){
     <h2>${esc(d.name)}</h2>
     <div class="live"><div style="--c:var(--pro)"><b>${d.min??'—'}</b><span>minutes</span></div><div style="--c:var(--good)"><b>${d.strain??'—'}</b><span>strain</span></div><div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div></div>
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
-    <p class="note" style="margin:0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Trainer what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p>
+    <details class="why"><summary>Why log the lifts?</summary><p class="note" style="margin:6px 0 0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Trainer what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p></details>
     <div class="wn-acts">${rec.map((w,j)=>`<button class="chip ${j?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button><button class="chip" data-wnotme>Not me</button></div>`;
 }
 $('wNow').addEventListener('click',e=>{const id=$('wNow').dataset.id,d=devList().find(x=>x.id===id);if(!d)return;
