@@ -39,7 +39,7 @@ main{padding-top:var(--sp1)}
 .lt{display:grid;gap:var(--sp2);padding-top:var(--sp2)}
 .lt h1{margin:0;font:700 var(--fs-34)/1.05 var(--f-ui);letter-spacing:-.022em;text-wrap:balance}
 .lt p{margin:0;color:var(--t2);font-size:var(--fs-15);max-width:58ch}
-.eyebrow,.wl{font:600 var(--fs-11)/1 var(--f-ui);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t3)}
+.eyebrow,.wlh{font:600 var(--fs-11)/1 var(--f-ui);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--t3)}
 h2{margin:0;font:700 var(--fs-22)/1.2 var(--f-ui);letter-spacing:-.012em;text-wrap:balance}
 h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 .sec{display:grid;gap:var(--sp3)}
@@ -131,11 +131,11 @@ h3{margin:0;font:600 var(--fs-17)/1.3 var(--f-ui)}
 
 /* ---------- lists of rows */
 .list{display:grid;background:var(--s1);border-radius:var(--r16);overflow:hidden}
-.wl{padding:var(--sp4) var(--sp4) var(--sp2);display:flex;justify-content:space-between;color:var(--t3)}
-.wl span{font-family:var(--f-num);letter-spacing:0;text-transform:none}
+.wlh{padding:var(--sp4) var(--sp4) var(--sp2);display:flex;justify-content:space-between;color:var(--t3)}
+.wlh span{font-family:var(--f-num);letter-spacing:0;text-transform:none}
 .row{position:relative;width:100%;text-align:left;border:0;background:transparent;color:var(--t1);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px var(--sp3);padding:var(--sp3) var(--sp4);min-height:60px;align-items:center;transition:background var(--d1)}
-.row+.row::before,.wl+.row::before{content:"";position:absolute;left:var(--sp4);right:0;top:0;height:.5px;background:var(--hair)}
-.wl+.row::before{display:none}
+.row+.row::before,.wlh+.row::before{content:"";position:absolute;left:var(--sp4);right:0;top:0;height:.5px;background:var(--hair)}
+.wlh+.row::before{display:none}
 .row:active{background:var(--s2)}
 .row .nm{font:600 var(--fs-17)/1.25 var(--f-ui)}
 .row .mt{color:var(--t2);font-size:var(--fs-13)}
@@ -475,3 +475,10 @@ body::before{background:#1C0E3D}
 .sp2-look{margin-top:22px}.sp2-seg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:4px;border-radius:14px;background:rgba(255,255,255,.05)}
 .sp2-seg button{min-height:40px;border:0;border-radius:10px;background:transparent;color:var(--t2);font:700 13.5px/1 var(--f-ui)}
 .sp2-seg button[aria-pressed=true]{background:var(--t1);color:var(--s0)}
+/* list group headers use .wlh: welcome.css owns .wl (a fixed full-screen overlay) */
+/* log-bet book picker + book logo on logged bets */
+.b-bk{display:flex;align-items:center;gap:8px}.b-bk select{flex:1;min-width:0}.b-bk #b-blogo:empty{display:none}
+.mb-bk{display:inline-flex;align-items:center;gap:5px;vertical-align:middle}.mb-bk .bk-lg.sm{width:16px;height:16px;border-radius:4px}
+/* window chips: six windows (early international game + 1 PM/4 PM/SNF/MNF) fit a 393pt phone without hiding MNF */
+.seg[data-seg="card"] button,.seg[data-seg="pwin"] button,.seg[data-seg="lwin"] button{padding:0 7px}
+.seg[data-seg="card"] button .n,.seg[data-seg="lwin"] button .n{margin-left:4px}
