@@ -8,6 +8,8 @@ const P = {
   card:    '<path d="M5 4.5h14a1 1 0 0 1 1 1V9a2.4 2.4 0 0 0 0 4.8v3.7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3.7A2.4 2.4 0 0 0 4 9V5.5a1 1 0 0 1 1-1Z"/><path d="M9 9.5h6M9 13.5h3.5"/>',
   props:   '<path d="M4 19.5h16"/><path d="M7 19.5v-5M12 19.5V6M17 19.5v-9"/><circle cx="12" cy="4.6" r=".9" fill="currentColor" stroke="none"/>',
   live:    '<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/><path d="M19.5 5.5l1.2-1.2M4.5 5.5 3.3 4.3"/>',
+  mybets:  '<path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2v-17Z"/><path d="M9 8.5h6M9 12h6M9 15.5h3"/>',
+  players: '<circle cx="12" cy="8" r="3.6"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>',
   more:    '<circle cx="5.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.2" fill="currentColor" stroke="none"/>',
   bets:    '<rect x="3.5" y="6" width="17" height="12.5" rx="2.5"/><path d="M3.5 10h17M7 14.5h4"/>',
   /* sports */

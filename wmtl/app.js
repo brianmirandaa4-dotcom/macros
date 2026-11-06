@@ -93,11 +93,12 @@ function resultTag(r){ if(!r || !r.result) return ''; const c = r.result === 'wo
 
 /* ================================================================ state + routing */
 const S = {tab: 'lobby', slate: null, win: 'all', props: {mk: null, mode: 'strong', q: '', n: 50}, liveWin: 'all', resSport: 'NFL'};
-const TABS = [['lobby', 'Lobby'], ['card', 'Card'], ['board', 'Board'], ['props', 'Props'], ['live', 'Live'], ['more', 'More']];
+const TABS = [['lobby', 'Home'], ['live', 'Live Now'], ['card', 'Picks'], ['mybets', 'My Bets'], ['players', 'Players']];
+const ROUTES = ['board', 'props', 'more'];
 function drawTabs(){ const n = S.slate && slateInfo(S.slate) ? slateInfo(S.slate).bets : 0;
   $('#tabs').innerHTML = TABS.map(([k, l]) => `<button data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${ICON[k]}${k === 'card' && n ? `<span class="badge">${n}</span>` : ''}<span>${l}</span></button>`).join('');
   $$('#tabs button').forEach(b => b.onclick = () => { if(b.dataset.tab === S.tab){ window.scrollTo({top: 0, behavior: RM ? 'auto' : 'smooth'}); return; } go(b.dataset.tab); }); }
-function go(tab, opts = {}){ if(!TABS.find(t => t[0] === tab)) tab = 'lobby'; if(tab !== 'lobby' && tab !== 'more' && !S.slate) tab = 'lobby';
+function go(tab, opts = {}){ if(!TABS.find(t => t[0] === tab) && !ROUTES.includes(tab)) tab = 'lobby'; if(!['lobby', 'more', 'live', 'mybets', 'players'].includes(tab) && !S.slate) tab = 'lobby';
   const same = S.tab === tab; S.tab = tab; store.d.ui.tab = tab; store.save(); try{ history.replaceState(null, '', '#' + tab); }catch(e){}
   drawTabs(); render(); if(!same && !opts.keepScroll) window.scrollTo(0, 0); }
 async function setSlate(id, tab){ S.slate = id; S.win = 'all'; S.liveWin = 'all'; S.props.mk = null; store.d.ui.slate = id; store.save(); drawSlateBtn(); try{ await loadSlate(id); }catch(e){ toast('Could not load that slate'); } if(tab) go(tab); else render(); }
@@ -105,8 +106,11 @@ function drawSlateBtn(){ const b = $('#slatebtn'); const s = S.slate && slateInf
 
 async function render(){ const m = $('#main'); const v = S.tab;
   if(v !== 'lobby' && window.World && World.ready) World.pause(true);
-  if(v === 'lobby'){ m.innerHTML = viewLobby(); wireLobby(); return; }
+  if(v === 'lobby'){ if(window.viewHome2){ m.innerHTML = '<div class="view"><p class="sub">Loading…</p></div>'; await viewHome2(); applyProgress(m, SLATE[S.slate] || {props: []}); return; } m.innerHTML = viewLobby(); wireLobby(); return; }
   if(v === 'more'){ m.innerHTML = viewMore(); wireMore(); return; }
+  if(v === 'live' && window.viewLiveNow2){ await viewLiveNow2(); return; }
+  if(v === 'players' && window.viewPlayers2){ await viewPlayers2(); return; }
+  if(v === 'mybets'){ m.innerHTML = `<div class="view" id="mybets">${betsHTML()}</div>`; wireBetsIn(m, () => render()); return; }
   let d; try{ d = await loadSlate(S.slate); }catch(e){ m.innerHTML = `<div class="view"><div class="lt"><h1>Not available</h1><p>This slate could not be loaded. Pull down to try again.</p></div></div>`; return; }
   if(S.tab !== v) return;
   if(v === 'board'){ const B = await loadBoard(d); if(S.tab !== v) return; m.innerHTML = viewBoard(d, B); wireBoard(d, B); return; }
@@ -236,14 +240,15 @@ function viewBoard(d, B){ const m = d.meta; S.board = S.board || {g: 'all', q: '
     <div class="fld search"><label for="bq" class="sr">Find a player on the board</label>${Icon.svg('search', {size: 18})}<input id="bq" type="search" autocomplete="off" placeholder="Find a player on this board" value="${esc(S.board.q || '')}"></div>
     <div class="chips" role="tablist"><button class="chip tap" data-bg="all" aria-pressed="${S.board.g === 'all'}">All games</button>${B.games.map(g => `<button class="chip tap" data-bg="${g.gid}" aria-pressed="${S.board.g === String(g.gid)}">${esc(g.away)} @ ${esc(g.home)}</button>`).join('')}</div>
     ${gs.map(g => { const ps = g.players.filter(P => !q || nkey(P.name).includes(q)); if(!ps.length) return '';
-      return `<section class="sec"><div class="hd"><h2>${esc(g.away)} @ ${esc(g.home)}</h2><span class="sub">${esc(g.kick_et)} ET · ${ps.length} players</span></div><div class="group bplist">${ps.map(P => { const k = g.gid + ':' + P.name; const op = q || S.board.open[k];
+      return `<section class="sec"><div class="hd"><h2><button class="x-link" style="font-size:20px;color:var(--t1)" data-og="${esc(g.away)}|${esc(g.home)}">${esc(g.away)} @ ${esc(g.home)} ›</button></h2><span class="sub">${esc(g.kick_et)} ET · ${ps.length} players</span></div><div class="group bplist">${ps.map(P => { const k = g.gid + ':' + P.name; const op = q || S.board.open[k];
         return `<div class="bp"><button class="bph" data-bo="${esc(k)}"><span><b>${esc(P.name)}</b> <span class="sub">${esc(P.team || '')} · ${esc(P.pos || '')}</span></span><span class="sub">${P.n} props ${op ? '▴' : '▾'}</span></button>
           ${op ? `<div class="bpb"><button class="link" data-prof="${esc(P.name)}|${esc(P.team || '')}">Player profile, stats and game log ›</button>${P.props.map(e => boardRow(e, P)).join('')}</div>` : ''}</div>`; }).join('')}</div></section>`; }).join('')}
     <section class="sec"><div class="sub">Prices: ${esc(B.source)} · pulled ${esc(new Date(B.pulled).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit'}))} ET. Best price = highest payout among the five books.</div></section></div>`; }
 function wireBoard(d, B){ const m = $('#main'); bindTaps(m, d); applyProgress(m, d); liveLoop(d);
   $$('[data-bg]', m).forEach(b => b.onclick = () => { S.board.g = b.dataset.bg; render(); });
-  $$('[data-bo]', m).forEach(b => b.onclick = () => { const k = b.dataset.bo; S.board.open[k] = !S.board.open[k]; render(); });
+  $$('[data-bo]', m).forEach(b => b.onclick = () => { const [gid, ...rest] = b.dataset.bo.split(':'); const nm = rest.join(':'); const G = B.games.find(g => String(g.gid) === gid); const P = G && G.players.find(x => x.name === nm); openCard(nm, P && P.team); });
   $$('[data-prof]', m).forEach(b => b.onclick = () => { const [n, t] = b.dataset.prof.split('|'); openProfileByName(n, t); });
+  $$('[data-og]', m).forEach(b => b.onclick = () => { const [aw, hm] = b.dataset.og.split('|'); const g = d.games.find(x => x.away.abbr === aw && x.home.abbr === hm); if(g) openGame(d.id, g.id); });
   const i = $('#bq', m); if(i){ i.oninput = () => { S.board.q = i.value; clearTimeout(wireBoard._t); wireBoard._t = setTimeout(() => { const pos = i.selectionStart; render().then(() => { const j = $('#bq'); if(j){ j.focus(); j.setSelectionRange(pos, pos); } }); }, 250); }; } }
 
 /* ---------------- Universal search + player profiles (nflverse rosters and play-by-play, every rostered player) */
@@ -310,7 +315,7 @@ function liveLoop(d){ clearTimeout(LV.t); if(!['live', 'card', 'board'].includes
   livePoll(d).then(n => { if(!['live', 'card', 'board'].includes(S.tab)) return; const box = S.tab === 'live' && $('#livenow'); if(box){ box.innerHTML = liveNowHTML(d); bindTaps(box, d); } applyProgress($('#main'), d);
     const anyLive = Object.values(LV.games).some(g => g.state === 'in'); LV.t = setTimeout(() => liveLoop(d), (LV.fails >= 3 ? 30 : anyLive ? 10 : 60) * 1000); }); }
 document.addEventListener('visibilitychange', () => { const d = SLATE[S.slate]; if(d && ['live', 'card', 'board'].includes(S.tab) && document.visibilityState === 'visible') liveLoop(d); });
-function liveNowHTML(d){ const tms = new Set(d.games.flatMap(g => [g.away.abbr, g.home.abbr])); const G = Object.values(LV.games).filter(g => tms.has(g.away) || tms.has(g.home)); if(!LV.at) return `<div class="group pad"><span class="sub">${LV.err ? 'Live data not available right now (' + esc(LV.err) + '). Retrying.' : 'Checking for live games…'}</span></div>`;
+function liveNowHTML(d, only){ const tms = new Set(d.games.flatMap(g => [g.away.abbr, g.home.abbr])); const G = Object.values(LV.games).filter(g => only ? (g.away === only.away && g.home === only.home) : (tms.has(g.away) || tms.has(g.home))); if(!LV.at) return `<div class="group pad"><span class="sub">${LV.err ? 'Live data not available right now (' + esc(LV.err) + '). Retrying.' : 'Checking for live games…'}</span></div>`;
   const live = G.filter(g => g.state === 'in'); const t = LV.at.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', second: '2-digit'});
   if(!live.length) return `<div class="group pad"><span class="sub">No game on this slate is live right now. ${G.filter(g => g.state === 'pre').length} still to come. Checked ${t}${LV.err ? ' · ' + esc(LV.err) : ''}.</span></div>`;
   return live.map(g => { const ps = d.props.filter(p => (p.team === g.away || p.team === g.home) && isNum(p.line) && !p.no_prediction);
@@ -386,7 +391,7 @@ async function tickerLoop(){ clearTimeout(tickerLoop._t); if(document.visibility
   try{ const nfl = INDEX.slates.filter(s => s.sport === 'NFL').sort((a, b) => a.start_utc < b.start_utc ? 1 : -1); const wk = nfl[0] && nfl[0].week;
     for(const s of nfl.filter(s => s.week === wk)) await loadSlate(s.id).catch(() => {});
     const d = SLATE[S.slate] || SLATE[nfl[0] && nfl[0].id]; if(d && (!LV.at || Date.now() - LV.at > 8000)) await livePoll(d); }catch(e){}
-  drawTicker(); const live = Object.values(LV.games).some(g => g.state === 'in'); tickerLoop._t = setTimeout(tickerLoop, (live ? 15 : 60) * 1000); }
+  drawTicker(); if(window.onLiveTick) onLiveTick(); const live = Object.values(LV.games).some(g => g.state === 'in'); tickerLoop._t = setTimeout(tickerLoop, (live ? 15 : 60) * 1000); }
 function drawTicker(){ const el = $('#tktrack'); if(!el) return; const items = [];
   const G = Object.values(LV.games).sort((a, b) => (a.state === 'in' ? 0 : a.state === 'post' ? 1 : 2) - (b.state === 'in' ? 0 : b.state === 'post' ? 1 : 2));
   for(const g of G){ if(g.state === 'pre') continue; items.push(`<span class="tk ${g.state === 'in' ? 'tk-live' : ''}"><i>${g.state === 'in' ? 'LIVE' : 'FINAL'}</i> ${esc(g.away)} <b>${g.as}</b> · ${esc(g.home)} <b>${g.hs}</b>${g.state === 'in' ? ' · ' + esc(g.detail) : ''}</span>`); }
@@ -656,7 +661,7 @@ function trendSVG(games, key, line){ const g = games.filter(x => x.st).slice(-8)
   const bw = W / g.length; const y = v => H - pb - v / mx * (H - pb - pt);
   const bars = g.map((x, i) => { const v = vals[i]; const hit = isNum(line) ? v > line : false; return `<rect x="${(i * bw + bw * .18).toFixed(1)}" y="${y(v).toFixed(1)}" width="${(bw * .64).toFixed(1)}" height="${(H - pb - y(v)).toFixed(1)}" rx="4" fill="${isNum(line) ? (hit ? 'var(--edge)' : 'var(--line2)') : 'var(--fair)'}" opacity="${isNum(line) && hit ? .85 : 1}"/><text x="${(i * bw + bw / 2).toFixed(1)}" y="${(y(v) - 5).toFixed(1)}" text-anchor="middle" font-size="24" fill="var(--t2)" font-family="ui-monospace,SF Mono,Menlo,monospace">${ln(v)}</text><text x="${(i * bw + bw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" font-size="21" fill="var(--t3)" font-family="-apple-system,system-ui,sans-serif">${esc(x.opp || '')}</text>`; }).join('');
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Last ${g.length} games">${bars}<line x1="0" x2="${W}" y1="${H - pb}" y2="${H - pb}" stroke="var(--line2)"/>${isNum(line) ? `<line x1="0" x2="${W}" y1="${y(line)}" y2="${y(line)}" stroke="var(--brass)" stroke-width="2" stroke-dasharray="6 5"/><text x="${W - 4}" y="${y(line) - 8}" text-anchor="end" font-size="22" fill="var(--brass)" font-family="ui-monospace,SF Mono,Menlo,monospace">line ${ln(line)}</text>` : ''}</svg>`; }
-async function openPlayer(sport, key, d){ const PF = await loadPlayers(sport); const P = PF && PF.players && PF.players[key]; const todays = d && d.byPlayer[key] || [];
+async function openPlayer(sport, key, d){ if(window.openCard && sport === 'NFL'){ const p = d && d.props.find(x => x.pkey === key); return openCard(p ? p.player : key.replace(/^nfl:/, ''), p && p.team, p && ({receptions: 'Receptions', rec_yds: 'Receiving yards', rush_yds: 'Rushing yards', pass_yds: 'Passing yards'})[p.market]); } const PF = await loadPlayers(sport); const P = PF && PF.players && PF.players[key]; const todays = d && d.byPlayer[key] || [];
   const nm = (P && P.name) || (todays[0] && todays[0].player) || 'Player';
   if(!P){ pushSheet(nm, `<div class="body"><div class="lt"><h1>${esc(nm)}</h1><p>Game history is not available for this player.</p></div>${todays.length ? todayChips(todays, d) : ''}</div>`, el => d && bindTaps(el, d)); return; }
   const games = (P.games || []).slice(); const played = games.filter(g => g.st); const inj = await injuryFor(sport, key);
@@ -795,6 +800,9 @@ function logBet(d, p, pre = {}){ if(!p) return; const books = [...new Set((p.off
     if(!isNum(odds) || Math.abs(odds) < 100 || !isNum(stake) || stake <= 0 || (!yes && !isNum(line))){ toast('Check the odds, line and stake'); return; }
     store.d.bets.unshift({id: 'b' + Date.now().toString(36), t: new Date().toISOString(), slate: d.id, sport: d.sport, prop: p.id, gid: p.gid, player: p.player, market: p.market, market_label: p.market_label, side: yes ? 'yes' : $('#b-side', C).value, line, odds, book: $('#b-book', C).value, stake, live: !!pre.live, status: 'open'});
     store.save(); close(); gradeMyBets(d); const L = $('#logged'); L.classList.add('on'); setTimeout(() => L.classList.remove('on'), 1100); if(S.tab === 'more') render(); }; }
+function wireBetsIn(el, draw){ $$('[data-del]', el).forEach(b => b.onclick = () => { if(b.dataset.armed){ store.d.bets = store.d.bets.filter(x => x.id !== b.dataset.del); store.save(); draw(); } else { b.dataset.armed = 1; b.textContent = 'Tap again to delete'; } });
+  $$('[data-settle]', el).forEach(b => b.onclick = () => { const x = store.d.bets.find(y => y.id === b.dataset.id); if(!x) return; const r = b.dataset.settle; x.status = r; x.pl = r === 'won' ? +(x.stake * (decOdds(x.odds) - 1)).toFixed(2) : r === 'lost' ? -x.stake : 0; store.save(); draw(); });
+  const ex = $('#b-export', el); if(ex) ex.onclick = exportData; const im = $('#b-import', el); if(im) im.onclick = importData; }
 function openBets(){ const el = pushSheet('My bets', `<div class="body" id="mybets"></div>`); const draw = () => { $('#mybets', el).innerHTML = betsHTML(); wire(); };
   const wire = () => { $$('[data-del]', el).forEach(b => b.onclick = () => { if(b.dataset.armed){ store.d.bets = store.d.bets.filter(x => x.id !== b.dataset.del); store.save(); draw(); } else { b.dataset.armed = 1; b.textContent = 'Tap again to delete'; } });
     $$('[data-settle]', el).forEach(b => b.onclick = () => { const x = store.d.bets.find(y => y.id === b.dataset.id); if(!x) return; const r = b.dataset.settle; x.status = r; x.pl = r === 'won' ? +(x.stake * (decOdds(x.odds) - 1)).toFixed(2) : r === 'lost' ? -x.stake : 0; store.save(); draw(); });
@@ -893,7 +901,7 @@ async function boot(){ store.load(); drawTabs();
   const seen = store.d.ui.seen || (store.d.ui.slate ? [store.d.ui.slate] : []); const fresh = newest && !seen.includes(newest.id);
   const sl = fresh ? newest.id : store.d.ui.slate && slateInfo(store.d.ui.slate) ? store.d.ui.slate : newest ? newest.id : null; if(sl){ S.slate = sl; store.d.ui.slate = sl; drawSlateBtn(); }
   store.d.ui.seen = INDEX.slates.map(x => x.id); store.save();
-  go(fresh && want === 'lobby' ? 'card' : want); tickerLoop(); document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') tickerLoop(); }); if(fresh) setTimeout(() => toast('New slate: ' + (newest.label || newest.id)), 600); pullToRefresh();
+  go(TABS.find(t => t[0] === want) ? want : 'lobby'); tickerLoop(); document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') tickerLoop(); }); if(fresh) setTimeout(() => toast('New slate: ' + (newest.label || newest.id)), 600); pullToRefresh();
   addEventListener('hashchange', () => { const h = location.hash.slice(1); if(h !== S.tab && TABS.find(t => t[0] === h)) go(h); });
   addEventListener('keydown', e => { if(e.key === 'Escape'){ if($('#modal').classList.contains('on')){ $('#modal').classList.remove('on'); } else if(STACK.length) popSheet(); } });
   if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js', {scope: './'}).catch(() => {}); }

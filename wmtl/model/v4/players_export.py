@@ -18,6 +18,7 @@ from pathlib import Path
 import pandas as pd
 
 SEASON = 2026
+LAST10_SEASONS = (SEASON, SEASON - 1)  # "last10" spans 2026 then 2025
 TODAY = date(2026, 11, 5)
 NFL = Path("/home/claude/nfl")
 OUT = Path("/home/claude/wmtl/data/nflp")
@@ -150,6 +151,25 @@ def avg(rows, keys):
     return out
 
 
+def game_entry(g, gmap, pos):
+    """One game-log entry (wk/date/opp/ha/res/snap + position-relevant stats)."""
+    gi = gmap.get(g.game_id, {})
+    home = g.team == g.home_team
+    opp = g.away_team if home else g.home_team
+    hs, as_ = clean(gi.get("home_score")), clean(gi.get("away_score"))
+    res = None
+    if hs is not None and as_ is not None:
+        us, them = (hs, as_) if home else (as_, hs)
+        res = f"{'W' if us > them else 'L' if us < them else 'T'} {us}-{them}"
+    snap = clean(g.offense_pct)
+    stats = {k: num(g[k]) for k in STAT_KEYS}
+    e = {"wk": int(g.week), "date": clean(g.gameday) or clean(gi.get("gameday")),
+         "opp": opp, "ha": "vs" if home else "@", "res": res,
+         "snap": None if snap is None else int(round(snap * 100))}
+    e.update(stat_dict(stats, pos))
+    return e, stats
+
+
 def wjson(path, obj, compact=True):
     with open(path, "w", encoding="utf-8") as f:
         if compact:
@@ -238,7 +258,7 @@ def main():
         bd = str(bd)[:10] if bd else None
 
         df = pg_by.get(pid)
-        log, career, season_tot, splits = [], [], None, None
+        log, last10, career, season_tot, splits = [], [], [], None, None
         if df is not None:
             # career (newest first)
             for season, sdf in sorted(df.groupby("season"), key=lambda x: -x[0]):
@@ -251,23 +271,16 @@ def main():
             d26 = df[df.season == SEASON]
             raw_rows = []
             for _, g in d26.iterrows():
-                gi = gmap.get(g.game_id, {})
-                home = g.team == g.home_team
-                opp = g.away_team if home else g.home_team
-                hs, as_ = clean(gi.get("home_score")), clean(gi.get("away_score"))
-                res = None
-                if hs is not None and as_ is not None:
-                    us, them = (hs, as_) if home else (as_, hs)
-                    res = f"{'W' if us > them else 'L' if us < them else 'T'} {us}-{them}"
-                snap = clean(g.offense_pct)
-                stats = {k: num(g[k]) for k in STAT_KEYS}
+                e, stats = game_entry(g, gmap, pos)
                 raw_rows.append(stats)
-                e = {"wk": int(g.week), "date": clean(g.gameday) or clean(gi.get("gameday")),
-                     "opp": opp, "ha": "vs" if home else "@", "res": res,
-                     "snap": None if snap is None else int(round(snap * 100))}
-                e.update(stat_dict(stats, pos))
                 log.append(e)
             log.reverse()  # newest first
+
+            # last 10 regular-season games across LAST10_SEASONS, newest first
+            dl = df[df.season.isin(LAST10_SEASONS)].tail(10)
+            for _, g in dl.iloc[::-1].iterrows():
+                e, _ = game_entry(g, gmap, pos)
+                last10.append({"season": int(g.season), **e})
 
             if raw_rows:
                 tot = {k: num(sum(r_[k] for r_ in raw_rows)) for k in STAT_KEYS}
@@ -294,7 +307,7 @@ def main():
             "draft": {"club": dclub, "pick": dpick} if dclub else None,
             "injury": injury,
             "season": {str(SEASON): season_tot} if season_tot else {},
-            "career": career, "log": log, "splits": splits,
+            "career": career, "log": log, "last10": last10, "splits": splits,
         }
         wjson(OUT / "p" / f"{pid}.json", rec)
 

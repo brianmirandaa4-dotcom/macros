@@ -1,19 +1,19 @@
-/* Overlay · design tokens · direction "Instrument"
+/* Overlay · design tokens · direction "Stadium at night"
    The single source for color, type, space, radii and motion. Every screen and the style guide read only these.
    Layout concept: a precision instrument on warm black. Hairlines instead of boxes, one hero per screen, the Overlay ring as the signature gauge. */
 :root{
   /* ---- surfaces: warm black, five elevations, each a step lighter */
-  --s0:#0C0B0A;   /* canvas */
-  --s1:#141311;   /* grouped section */
-  --s2:#1B1A17;   /* card, row group */
-  --s3:#23211E;   /* raised: pressed rows, chips, inputs */
-  --s4:#2C2A26;   /* floating: sheets, popovers, toasts */
-  --glass:rgba(20,19,17,.72);          /* frosted bars and sheets, used with --blur */
-  --glass-hi:rgba(255,250,240,.06);    /* the thin inner highlight on glass */
+  --s0:#0B1222;   /* canvas */
+  --s1:#0F182B;   /* grouped section */
+  --s2:#131C31;   /* card, row group */
+  --s3:#1B2742;   /* raised: pressed rows, chips, inputs */
+  --s4:#243254;   /* floating: sheets, popovers, toasts */
+  --glass:rgba(11,18,34,.82);          /* frosted bars and sheets, used with --blur */
+  --glass-hi:rgba(200,220,255,.06);    /* the thin inner highlight on glass */
   --blur:saturate(1.6) blur(22px);
 
   /* ---- text: one warm white at three opacities (all AA on every surface) */
-  --w:242,239,232;
+  --w:240,244,252;
   --t1:rgb(var(--w));
   --t2:rgba(var(--w),.66);
   --t3:rgba(var(--w),.54);
@@ -21,23 +21,26 @@
   --hair2:rgba(var(--w),.14);          /* emphasized hairline */
 
   /* ---- the one brand accent: brass. Primary actions and "bet passes" only */
-  --brass:#D9B266;
-  --brass-ink:#1A1408;
-  --brass-wash:rgba(217,178,102,.13);
+  --brass:#F5C451;
+  --brass-ink:#1E1600;
+  --brass-wash:rgba(245,196,81,.14);
 
   /* ---- semantic set (never color alone: always paired with a word or a shape) */
-  --edge:#46C98A;  --edge-wash:rgba(70,201,138,.14);    /* clears break-even by 5+ */
-  --fair:#93A4B6;  --fair-wash:rgba(147,164,182,.14);   /* price is about right */
-  --pass:#9A958B;  --pass-wash:rgba(154,149,139,.12);   /* no bet */
-  --live:#F2A93B;  --live-wash:rgba(242,169,59,.14);    /* live watch */
-  --loss:#F07272;  --loss-wash:rgba(240,114,114,.13);   /* lost, pulls the score down */
+  --edge:#2BD576;  --edge-wash:rgba(43,213,118,.15);    /* clears break-even by 5+ */
+  --fair:#8FB4FF;  --fair-wash:rgba(59,130,246,.16);   /* price is about right */
+  --pass:#8A97B2;  --pass-wash:rgba(138,151,178,.12);   /* no bet */
+  --live:#FF9F43;  --live-wash:rgba(255,159,67,.15);    /* live watch */
+  --loss:#FF5A5F;  --loss-wash:rgba(255,90,95,.14);   /* lost, pulls the score down */
+
+  /* ---- action blue: every tappable price */
+  --act:#3B82F6; --act-ink:#FFFFFF; --act-wash:rgba(59,130,246,.16);
 
   /* ---- one restrained hue per sport (dots, 3px bars, wayfinding only) */
   --nfl:#6E9BF0; --cfb:#B596EA; --nba:#EC9455; --nhl:#8FD0EE; --mlb:#63C7B2;
 
   /* ---- type: the system stack, so it is native and works offline */
   --f-ui:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Segoe UI',Roboto,sans-serif;
-  --f-num:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  --f-num:ui-rounded,'SF Pro Rounded',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --fs-11:11px; --fs-13:13px; --fs-15:15px; --fs-17:17px; --fs-22:22px; --fs-28:28px; --fs-34:34px; --fs-48:48px; --fs-64:64px;
   --track-label:.06em;   /* uppercase labels */
   --track-hero:-.045em;  /* hero numerals */
