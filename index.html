@@ -364,7 +364,7 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 /* profile button */
 .avatar{width:36px;height:36px;border-radius:50%;border:0;background:conic-gradient(from 200deg,var(--pro),var(--carb),var(--fat),var(--pro));padding:2px;flex:none;display:grid;place-items:center}
 .avatar span{width:100%;height:100%;border-radius:50%;background:var(--surface);display:grid;place-items:center;font:800 12px/1 var(--f-display);letter-spacing:.04em;color:var(--fg)}
-@media (max-width:780px){.tabbar{grid-template-columns:repeat(6,1fr)!important}.tabbar .tab{font-size:10.5px}}
+@media (max-width:780px){.tabbar{grid-template-columns:repeat(5,1fr)!important}.tabbar .tab{font-size:11px}}
 
 /* onboarding */
 .onb{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;display:flex;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
@@ -1453,7 +1453,7 @@ header.top{z-index:20}
   <!-- WEEK -->
   <section class="view" id="v-week" aria-label="Week" hidden>
     <div class="tip" id="tip-week" hidden></div>
-    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="true">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button><button type="button" data-goto="friends" aria-pressed="false">Friends</button></div>
+    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="true">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button><button type="button" data-goto="plan" aria-pressed="false">Plan</button><button type="button" data-goto="friends" aria-pressed="false">Friends</button></div>
     <div class="pnav">
       <button class="icon-btn" id="wPrev" aria-label="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="title"><div class="sub" id="wSub">This week</div><h1 id="wTitle">—</h1></div>
@@ -1483,7 +1483,7 @@ header.top{z-index:20}
   <!-- MONTH -->
   <section class="view" id="v-month" aria-label="Month" hidden>
     <div class="tip" id="tip-month" hidden></div>
-    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="true">Month</button><button type="button" data-goto="friends" aria-pressed="false">Friends</button></div>
+    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="true">Month</button><button type="button" data-goto="plan" aria-pressed="false">Plan</button><button type="button" data-goto="friends" aria-pressed="false">Friends</button></div>
     <div class="pnav">
       <button class="icon-btn" id="mPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="title"><div class="sub" id="mSub">This month</div><h1 id="mTitle">—</h1></div>
@@ -1520,7 +1520,7 @@ header.top{z-index:20}
 
   <!-- FRIENDS -->
   <section class="view" id="v-friends" aria-label="Friends" hidden>
-    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button><button type="button" data-goto="friends" aria-pressed="true">Friends</button></div>
+    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button><button type="button" data-goto="plan" aria-pressed="false">Plan</button><button type="button" data-goto="friends" aria-pressed="true">Friends</button></div>
     <div class="pnav"><div class="title"><div class="sub">Weekly leaderboard</div><h1>Friends</h1></div><button class="pill-btn fr-privb" type="button" data-privacy><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg>Privacy</button></div>
     <div class="tip" id="tip-friends" hidden></div>
     <div id="frBody" style="display:flex;flex-direction:column;gap:16px"></div>
@@ -1528,6 +1528,7 @@ header.top{z-index:20}
 
   <!-- PLAN -->
   <section class="view" id="v-plan" aria-label="Plan" hidden>
+    <div class="seg2" role="group" aria-label="Range"><button type="button" data-goto="week" aria-pressed="false">Week</button><button type="button" data-goto="month" aria-pressed="false">Month</button><button type="button" data-goto="plan" aria-pressed="true">Plan</button><button type="button" data-goto="friends" aria-pressed="false">Friends</button></div>
     <div class="pnav"><div class="title"><div class="sub">Cut · Maintain · Bulk</div><h1>Your plan</h1></div></div>
     <div class="tip" id="tip-plan" hidden></div>
     <div class="card plan-live" id="planLive" hidden></div>
@@ -1732,7 +1733,7 @@ const IC = {
 };
 const VIEWS=[['today','Today'],['train','Train'],['week','Week'],['month','Month'],['friends','Friends'],['foods','Foods'],['plan','Plan']];
 const TABS=[['today','Today'],['train','Train'],['progress','Progress'],['foods','Foods'],['plan','Plan'],['add','Log']];
-const TABS_M=[['today','Today'],['foods','Foods'],['train','Train'],['add','Log'],['progress','Progress'],['plan','Plan']];
+const TABS_M=[['today','Today'],['foods','Foods'],['add','Log'],['train','Train'],['progress','Progress']];
 const MEALS=[['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snacks'],['drinks','Drinks']];
 // alcoholic drinks go to the Drinks section on their own (food that just sounds similar, like sour cream or hard-boiled eggs, does not)
 const DRINK_RX=/(^|[^a-z])(beer|lager|ipa|stout|porter|pilsner|seltzer|twisted tea|cider|wine|champagne|prosecco|sangria|sake|soju|vodka|tequila|mezcal|rum\b|whisk|bourbon|scotch|cognac|brandy|liqueur|schnapps|fireball|jager|baileys|kahlua|amaretto|margarita|mojito|martini|daiquiri|mai tai|bloody mary|mimosa|bellini|spritz|negroni|old fashioned|manhattan|colada|long island|paloma|russian|toddy|shot\b|michelada|white claw|truly|high noon|corona|modelo|heineken|bud light|budweiser|michelob|coors|miller|stella|guinness|yuengling|pacifico|loko)/i,NOT_DRINK_RX=/cream|egg|candy|cake|dough|bread|chicken|pork|beef|sauce|glaze|marinade|braised|battered|cheese/i;
@@ -2670,7 +2671,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.73';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.74';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2852,7 +2853,7 @@ function entryFor(food,qty,unit,alias){
 function mk(n,a,g,k,p,c,f,src){return {id:uid(),n,a,g:r1(g),k:r0(k),p:r1(p),c:r1(c),f:r1(f),src,t:Date.now()}}
 
 /* ---------- tabs / routing ---------- */
-function tabsHTML(list=TABS){const cur=(S.view==='week'||S.view==='month'||S.view==='friends')?'progress':S.view;return list.map(([k,l])=>`<button class="tab${k==='add'?' add':''}" data-v="${k}" ${cur===k?'aria-current="page"':''} ${k==='add'?'aria-label="Log something"':''}><i class="ti">${IC[k]}</i><span>${l}</span></button>`).join('')}
+function tabsHTML(list=TABS){const cur=(S.view==='week'||S.view==='month'||S.view==='friends'||(S.view==='plan'&&list===TABS_M))?'progress':S.view;return list.map(([k,l])=>`<button class="tab${k==='add'?' add':''}" data-v="${k}" ${cur===k?'aria-current="page"':''} ${k==='add'?'aria-label="Log something"':''}><i class="ti">${IC[k]}</i><span>${l}</span></button>`).join('')}
 function setView(v){
   if(typeof pgStack!=='undefined'&&pgStack.length)closePages();closeSheet();
   if(v==='progress')v=S.prog||'week';
