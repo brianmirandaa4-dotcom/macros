@@ -287,12 +287,13 @@ const LV = {t: null, fails: 0, at: null, games: {}, lines: {}, stats: {}, err: n
 const ESPN_AB = {WSH: 'WAS', LAR: 'LA', JAC: 'JAX'}; const AN_TYPES = {core_bet_type_9_passing_yards: 'pass_yds', core_bet_type_12_rushing_yards: 'rush_yds', core_bet_type_15_receptions: 'receptions', core_bet_type_16_receiving_yards: 'rec_yds'};
 const ab = a => ESPN_AB[a] || a;
 async function livePoll(d){
-  try{
+  try{ await loadLiveParams();
     const sb = await getJSON('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard', true); if(!Array.isArray(sb.events)) throw new Error('ESPN scoreboard schema changed');
     const teams = new Set(d.games.flatMap(g => [g.away.abbr, g.home.abbr])); LV.games = {};
     for(const ev of sb.events){ const c = ev.competitions && ev.competitions[0]; if(!c) continue; const cs = c.competitors || []; const h = cs.find(x => x.homeAway === 'home'), a = cs.find(x => x.homeAway === 'away'); if(!h || !a) continue;
       const H = ab(h.team.abbreviation), A = ab(a.team.abbreviation); if(!teams.has(H) && !teams.has(A)) continue;
-      LV.games[A + '@' + H] = {id: ev.id, state: c.status.type.state, detail: c.status.type.shortDetail, away: A, home: H, as: a.score, hs: h.score}; }
+      const per = c.status.period || 1, ck = String(c.status.displayClock || '15:00').split(':'); const el = Math.min(3600, (per - 1) * 900 + (900 - ((+ck[0] || 0) * 60 + (+ck[1] || 0))));
+      LV.games[A + '@' + H] = {id: ev.id, state: c.status.type.state, detail: c.status.type.shortDetail, away: A, home: H, as: +a.score || 0, hs: +h.score || 0, f: per > 4 ? 1 : Math.max(0, el / 3600)}; }
     const live = Object.values(LV.games).filter(g => g.state === 'in');
     for(const g of live){ const sm = await getJSON('https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=' + g.id, true); const bs = (sm.boxscore || {}).players; if(!Array.isArray(bs)) continue;
       for(const t of bs){ const tm = ab(t.team.abbreviation); for(const st of t.statistics || []){ const L = st.labels || []; for(const at of st.athletes || []){ const k = nkey(at.athlete.displayName) + '|' + tm; const o = LV.stats[k] = LV.stats[k] || {};
@@ -316,15 +317,51 @@ document.addEventListener('visibilitychange', () => { const d = SLATE[S.slate]; 
 function liveNowHTML(d){ const G = Object.values(LV.games); if(!LV.at) return `<div class="group pad"><span class="sub">${LV.err ? 'Live data not available right now (' + esc(LV.err) + '). Retrying.' : 'Checking for live games…'}</span></div>`;
   const live = G.filter(g => g.state === 'in'); const t = LV.at.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', second: '2-digit'});
   if(!live.length) return `<div class="group pad"><span class="sub">No game on this slate is live right now. ${G.filter(g => g.state === 'pre').length} still to come. Checked ${t}${LV.err ? ' · ' + esc(LV.err) : ''}.</span></div>`;
-  return live.map(g => { const ps = d.props.filter(p => (p.team === g.away || p.team === g.home) && isNum(p.line) && !p.no_prediction).sort((a, b) => (b.tier === 'bet') - (a.tier === 'bet') || (pSide(b) || 0) - (pSide(a) || 0));
-    return `<section class="sec"><div class="hd"><h2>${esc(g.away)} ${esc(g.as)} · ${esc(g.home)} ${esc(g.hs)}</h2><span class="sub"><span class="pill pill-live">LIVE</span> ${esc(g.detail)}</span></div>
+  return live.map(g => { const ps = d.props.filter(p => (p.team === g.away || p.team === g.home) && isNum(p.line) && !p.no_prediction);
+    for(const p of ps){ p._lm = null; const st = LV.stats[nkey(p.player) + '|' + p.team] || {}; const sk = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', rec_yds: 'rec_yds', receptions: 'receptions', pass_yds: 'pass_yds'}[p.market]; if(!sk) continue;
+      const diff = p.team === g.home ? g.hs - g.as : g.as - g.hs; const Q = liveQ(p, st[sk] || 0, g.f, diff); if(!Q) continue;
+      const L = (LV.lines[nkey(p.player) + '|' + p.team + '|' + LMK(p.market)] || {}).live; const line = L ? L.line : p.line; const po = qOver(Q, line);
+      const side = po >= .5 ? 'over' : 'under', ps_ = side === 'over' ? po : 1 - po; const price = L ? L[side] : null; const be_ = isNum(price) ? (price < 0 ? -price / (-price + 100) : 100 / (price + 100)) : null;
+      p._lm = {Q, p: ps_, side, line, price, edge: be_ == null ? null : ps_ - be_, bet: be_ != null && ps_ - be_ >= .03 && ps_ <= .9 && g.f < .95}; }
+    ps.sort((a, b) => ((b._lm && b._lm.bet) - (a._lm && a._lm.bet)) || ((b._lm ? b._lm.edge ?? -1 : -1) - (a._lm ? a._lm.edge ?? -1 : -1)));
+    const nb = ps.filter(p => p._lm && p._lm.bet).length;
+    return `<section class="sec"><div class="hd"><h2>${esc(g.away)} ${esc(g.as)} · ${esc(g.home)} ${esc(g.hs)}</h2><span class="sub"><span class="pill pill-live">LIVE</span> ${esc(g.detail)} · ${nb} live bet${nb === 1 ? '' : 's'}</span></div>
       <div class="group lvlist">${ps.map(p => { const st = LV.stats[nkey(p.player) + '|' + p.team] || {}; const sk = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', rec_yds: 'rec_yds', receptions: 'receptions', pass_yds: 'pass_yds'}[p.market]; const now = sk ? (st[sk] ?? 0) : null; const ln_ = LV.lines[nkey(p.player) + '|' + p.team + '|' + (p.market === 'qb_rush' ? 'rush_yds' : p.market)] || {}; const L = ln_.live;
         const book = k => ln_[k] ? `${k} ${ln(ln_[k].line)} ${od(ln_[k].over)}/${od(ln_[k].under)}` : `${k} —`;
-        return `<div class="lv" data-prop="${esc(p.id)}"><div class="lvt"><b>${esc(p.player)}</b> <span class="sub">${esc(p.market_label)}</span>${p.tier === 'bet' ? ' <span class="pill pill-bet">Bet</span>' : ''}</div>
+        const lm = p._lm; return `<div class="lv${lm && lm.bet ? ' lvbet' : ''}" data-prop="${esc(p.id)}"><div class="lvt"><b>${esc(p.player)}</b> <span class="sub">${esc(p.market_label)}</span>${lm && lm.bet ? ' <span class="pill pill-edge">Live bet</span>' : p.tier === 'bet' ? ' <span class="pill pill-bet">Bet</span>' : ''}</div>
           <div class="lvg"><div><span class="label">Now</span><b class="num">${isNum(now) ? ln(now) : '—'}</b></div><div><span class="label">Pregame</span><b class="num">${ln(p.line)}</b><span class="sub">${esc(p.side === 'under' ? 'U' : 'O')} ${pc(pSide(p))}</span></div>
-          <div><span class="label">Live line</span>${L ? `<b class="num">${ln(L.line)}</b><span class="sub">O ${od(L.over)} · U ${od(L.under)}</span>` : '<b>—</b><span class="sub">not posted</span>'}</div><div><span class="label">In-game model</span><b class="na">no prediction</b><span class="sub">validating</span></div></div>
+          <div><span class="label">Live line</span>${L ? `<b class="num">${ln(L.line)}</b><span class="sub">O ${od(L.over)} · U ${od(L.under)}</span>` : '<b>—</b><span class="sub">not posted</span>'}</div><div><span class="label">In-game model</span>${lm ? `<b class="num">${ln(Math.round(qMed(lm.Q) * 10) / 10)}</b><span class="sub ${lm.bet ? 'pos' : ''}">${lm.side === 'under' ? 'U' : 'O'} ${pc(lm.p)}${lm.bet ? ' · LIVE BET' : ''}</span>` : '<b class="na">no prediction</b><span class="sub">not covered</span>'}</div></div>
           <div class="sub lvb">${book('DK')} · ${book('FD')} <i>(pregame)</i></div><div class="bkrow">${bookBtns(p)}</div></div>`; }).join('') || '<div class="pad sub">No props with a line for this game.</div>'}</div></section>`; }).join('') +
-    `<p class="note">Updated ${t}, every 10 seconds while live. Stats: ESPN. Live line: Action Network consensus (its public feed has no book-by-book live lines; DraftKings/FanDuel shown are pregame). In-game model shows “no prediction” until it passes validation on 2026 games.</p>`; }
+    `<p class="note">Updated ${t}, every 10 seconds while live. Stats: ESPN. Live line: Action Network consensus (its public feed has no book-by-book live lines; DraftKings/FanDuel shown are pregame). In-game model: re-simulation from the stat so far, time left and score (validated on 2026 games). Live bet = its chance at the live consensus line beats that price's break-even by 3+ points.</p>`; }
+
+
+/* ---------------- In-game model (data/nfl/live_params.json, fit 2018-24, calibrated 2025, validated on 2026) and checkpoint plans */
+let LP = null; async function loadLiveParams(){ if(!LP){ try{ LP = await getJSON('data/nfl/live_params.json'); }catch(e){ LP = {markets: {}}; } } return LP; }
+const LMK = m => m === 'qb_rush' ? 'rush_yds' : m;
+const BKT = d => d <= -14 ? 'down14' : d <= -7 ? 'down7' : d < 7 ? 'close' : d < 14 ? 'up7' : 'up14';
+function liveQ(p, soFar, f, diff){ const M = LP && LP.markets[LMK(p.market)]; if(!M || !M.validated || !isNum(p.projection)) return null;
+  const pre = p.projection, r = 1 - f, pace = soFar / Math.max(f, .1), b = BKT(diff), B = M.beta; const ind = k => b === k ? 1 : 0;
+  const x = [pre * r, pace * r, r, r * ind('down14'), r * ind('down7'), r * ind('up7'), r * ind('up14'), pre * r * ind('down14'), pre * r * ind('down7'), pre * r * ind('up7'), pre * r * ind('up14')];
+  const rem = Math.max(.05, x.reduce((a, v, i) => a + v * B[i], 0)); const T = (1 - f) * 3600;
+  const g = String(LP.snapshots_seconds_remaining.reduce((a, s) => Math.abs(s - T) < Math.abs(a - T) ? s : a)); const zq = M.zq[g];
+  return {q: zq.map(z => soFar + Math.max(0, rem + z * Math.sqrt(Math.max(rem, .25)))), k: M.k}; }
+function qOver(Q, line){ const L = LP.quantile_levels; const q = Q.q.slice(); for(let i = 1; i < q.length; i++) q[i] = Math.max(q[i], q[i - 1]);
+  let F; if(line < q[0]) F = 0; else if(line >= q[q.length - 1]) F = 1; else { let i = 0; while(q[i + 1] <= line) i++; F = q[i + 1] === q[i] ? L[i + 1] : L[i] + (L[i + 1] - L[i]) * (line - q[i]) / (q[i + 1] - q[i]); }
+  const p = Math.min(.99, Math.max(.01, 1 - F)); const lgt = Math.log(p / (1 - p)); return 1 / (1 + Math.exp(-Q.k * lgt)); }
+const qMed = Q => Q.q[Math.floor(Q.q.length / 2)];
+function checkpointHTML(p){ if(!LP || !LP.markets[LMK(p.market)] || !isNum(p.projection) || !isNum(p.line)) return '';
+  const CK = [[2700, 'End Q1'], [1800, 'Half'], [900, 'End Q3']], SS = [[-14, 'Down 14'], [-7, 'Down 7'], [0, 'Close'], [7, 'Up 7'], [14, 'Up 14']];
+  const rows = CK.map(([T, l]) => { const f = 1 - T / 3600; const onPace = p.projection * f;
+    const cells = SS.map(([dd]) => { const Q = liveQ(p, onPace, f, dd); return Q ? ln(Math.round(qMed(Q) * 10) / 10) : '—'; });
+    let need = null; for(let s_ = 0; s_ <= Math.max(3, p.line * 1.5); s_ += (p.market === 'receptions' ? 1 : Math.max(1, Math.round(p.line / 30)))){ const Q = liveQ(p, s_, f, 0); if(Q && qOver(Q, p.line) >= .55){ need = s_; break; } }
+    return `<tr><td>${l}</td><td class="num">${ln(Math.round(onPace * 10) / 10)}</td>${cells.map(c => `<td class="num">${c}</td>`).join('')}<td class="num">${need == null ? '—' : ln(need) + '+'}</td></tr>`; }).join('');
+  return `<section class="sec"><div class="hd"><h2>Checkpoints</h2><span class="sub">in-game model</span></div><div class="tbl"><table><thead><tr><th></th><th>On pace</th>${SS.map(x => `<th>${x[1]}</th>`).join('')}<th>Over needs</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="note">Projected final ${esc(STATWORD[p.market] || p.market_label)} if he is exactly on pregame pace at each checkpoint, by score (his team's view). “Over needs” is the stat he needs by then, in a close game, for the in-game model to give the over ${ln(p.line)} at least 55%.</p></section>`; }
+
+
+function watchPlansHTML(d){ if(!LP || !LP.markets) return ''; const ps = d.props.filter(p => !p.no_prediction && isNum(p.line) && isNum(p.projection) && LP.markets[LMK(p.market)] && (p.tier === 'bet' || p.tier === 'lean' || (pSide(p) || 0) >= .58)).sort((a, b) => (b.tier === 'bet') - (a.tier === 'bet') || (pSide(b) || 0) - (pSide(a) || 0)).slice(0, 12);
+  if(!ps.length) return ''; return `<div class="list">${ps.map(p => { const f = .5, onP = p.projection * f; const Q0 = liveQ(p, onP, f, 0); let need = null; for(let s_ = 0; s_ <= Math.max(3, p.line * 1.5); s_ += (p.market === 'receptions' ? 1 : Math.max(1, Math.round(p.line / 30)))){ const Q = liveQ(p, s_, f, 0); if(Q && qOver(Q, p.line) >= .55){ need = s_; break; } }
+    return `<button class="row" data-prop="${esc(p.id)}"><div><div class="nm">${esc(p.player)} · ${esc(selText(p))}</div><div class="mt">${teamOpp(p)} · proj ${ln(p.projection)} · at half on pace ${ln(Math.round(onP * 10) / 10)}${need != null ? ` · over live at ${ln(need)}+ by half` : ''}</div></div><div class="rt">${p.tier === 'bet' ? '<span class="pill pill-bet">Bet</span>' : `<span class="sub">${pc(pSide(p))}</span>`}</div></button>`; }).join('')}</div><p class="note">Tap a player for the full checkpoint table (end Q1, half, end Q3 × down 14 to up 14).</p>`; }
 
 function leanRow(p, d){ const r = resultOf(d, p); return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · ${esc(p.window || '')} · 25D ${sg(p.score25, 1)}</span></span><span class="r">${od(p.odds)}<br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : ''}</span></span></button>`; }
 function gradedStrip(d){ const s = d.results.summary, b = s.bets || {}, t = s.by_tier || {}, L = s.lines || {};
@@ -405,9 +442,10 @@ function viewLive(d){ const L = liveProps(d); const inW = p => S.liveWin === 'al
   const groups = []; rows.forEach(p => { const g = groups.find(x => x.w === p.window); if(g) g.ps.push(p); else groups.push({w: p.window, ps: [p]}); });
   return `<div class="view">
     <div class="lt"><span class="sp" style="--c:${SPORTHEX[d.sport]}">${d.sport} · ${esc(d.meta.label || '')}</span><h1>Live</h1></div><div id="livenow">${liveNowHTML(d)}</div>
-    <div class="lt" style="margin-top:12px"><h2>Live watch plans</h2><p>Players with a high or low report card. If the first quarter or half goes against the card, the model has a buy number ready. Tap a player to check a live line.</p></div>
+    <div class="lt" style="margin-top:12px"><h2>Live watch plans</h2><p>${LP && LP.markets ? 'The model\'s strongest props with their checkpoint plan: where he should be at halftime on pace, and the number that makes the over live. Tap for end Q1, half and end Q3 by score.' : 'Players with a high or low report card. If the first quarter or half goes against the card, the model has a buy number ready. Tap a player to check a live line.'}</p></div>
     ${L.length ? windowSeg(d, S.liveWin, 'lwin', w => L.filter(p => w === 'all' || p.window === w).length) : ''}
-    ${groups.length ? groups.map(g => `<div class="list"><div class="wl">${esc(g.w)}<span>${g.ps.length}</span></div>${g.ps.map(p => liveRow(p)).join('')}</div>`).join('') : `<div class="group pad"><h3>No live-watch plans</h3><p class="sub" style="margin:6px 0 0">This slate exported no live-watch scenarios${S.liveWin !== 'all' ? ' in this window' : ''}.</p></div>`}
+    ${watchPlansHTML(d)}
+    ${groups.length ? groups.map(g => `<div class="list"><div class="wl">${esc(g.w)}<span>${g.ps.length}</span></div>${g.ps.map(p => liveRow(p)).join('')}</div>`).join('') : watchPlansHTML(d) ? '' : `<div class="group pad"><h3>No live-watch plans</h3><p class="sub" style="margin:6px 0 0">This slate exported no live-watch scenarios${S.liveWin !== 'all' ? ' in this window' : ''}.</p></div>`}
   </div>`; }
 function liveRow(p){ const L = p.live, buy = L.plan === 'BUY LOW';
   return `<button class="row" data-live="${esc(p.id)}"><div><div class="nm">${esc(p.player)}</div><div class="mt">${teamOpp(p)} · ${esc(p.market_label)}</div></div><div class="rt">${scoreChip(p)}<span>open ${ln(L.open ?? p.line)}</span></div>
@@ -525,6 +563,7 @@ async function openProp(d, id){ const p = d.props.find(x => x.id === id); if(!p)
     </div>
     ${modelOnly && !yes && !p.no_prediction ? `<section class="sec"><div class="hd"><h2>Check a price</h2><span class="sub">DraftKings price not on ESPN</span></div><div class="calc"><div class="fgrid"><div class="fld"><label for="pc-odds">Price you see on the ${p.side === 'under' ? 'under' : 'over'} ${ln(p.line)}</label><input id="pc-odds" inputmode="numeric" type="text" placeholder="−115"></div><div class="fld"><label>Model chance</label><input value="${pc(pm, 1)}" disabled></div></div><div id="pc-out" class="b15 t2">Enter a price to see what it needs.</div><p class="note" style="margin:0">This compares the price with the model's own replays only. The model's market check needs both sides' prices, so a prop priced here can't become a bet on the card.</p></div></section>` : ''}
     ${prosHTML(d, p.id)}
+    ${checkpointHTML(p)}
     ${p.model ? `<section class="sec"><div class="hd"><h2>The model</h2><span class="sub">${esc(p.model)}</span></div><div class="group pad" style="display:grid;gap:10px">
       ${p.no_prediction ? `<div class="t2">The model makes no prediction here.</div>` : `<div class="t2">Calibrated chance <b class="num" style="color:var(--t1)">${pc(p.p_raw, 1)}</b> on the ${esc(p.side)} · raw simulation ${pc(p.p_uncal, 1)}</div>`}
       ${(p.ood || []).length ? `<div><span class="label">Flags</span>${p.ood.map(f => `<div class="soft">• ${esc(f)}</div>`).join('')}</div>` : '<div class="sub">No out-of-distribution flags.</div>'}
@@ -811,6 +850,7 @@ function pullToRefresh(){ const ind = $('#ptr'); let y0 = null, dy = 0, busy = f
 async function boot(){ store.load(); drawTabs();
   addEventListener('scroll', () => $('#top').classList.toggle('scrolled', window.scrollY > 4), {passive: true});
   $('#wm').onclick = () => go('lobby'); $('#slatebtn').onclick = slatePicker; $('#srchbtn').onclick = openSearch;
+  loadLiveParams();
   try{ await loadIndex(); }catch(e){ $('#main').innerHTML = `<div class="view"><div class="lt"><h1>Not available</h1><p>The slate list could not be loaded. Check your connection and pull down to retry.</p></div></div>`; pullToRefresh(); return; }
   const hs = (location.hash || '').slice(1); const want = TABS.find(t => t[0] === hs) ? hs : (store.d.ui.tab || 'lobby');
   const newest = INDEX.slates.slice().sort((x, y) => x.start_utc < y.start_utc ? 1 : -1)[0];
