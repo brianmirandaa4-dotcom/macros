@@ -1,13 +1,13 @@
 {
-  "name": "Overlay",
-  "short_name": "Overlay",
-  "description": "Overlay by whomadethisline: the model finds the prices that pay more than their real chance, across NFL, CFB and NBA.",
+  "name": "tail.",
+  "short_name": "tail.",
+  "description": "tail. \u2014 the model finds the props worth tailing, across NFL, CFB and NBA.",
   "start_url": "./#lobby",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0B0C0E",
-  "theme_color": "#0B0C0E",
+  "background_color": "#1C0E3D",
+  "theme_color": "#1C0E3D",
   "icons": [
     {
       "src": "icons/icon-192.png",

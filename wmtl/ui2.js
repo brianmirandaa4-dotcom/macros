@@ -1,4 +1,4 @@
-/* Overlay UI v2 · "Stadium at night": sportsbook-native Home, Game screen and Player card.
+/* tail. UI v2 · purple, gold, black: sportsbook-native Home, Game screen and Player card.
    Reads the same data as the rest of the app (slate files, the week's prop board, the player library, defense-vs-position);
    every number shown is copied from those files or counted from game logs. Nothing here estimates anything. */
 (function(){
@@ -21,6 +21,7 @@ function mainLine(e){ const o = BOOKS.map(k => (e.books || {})[k]).find(x => x &
 const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${esc(b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
 
 /* ---------- Home */
+const TSEAL = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#2B1466"/><circle cx="50" cy="50" r="42.2" fill="none" stroke="#E7C46A" stroke-width="3.6"/><g fill="none" stroke="#E7C46A" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"><path d="M46 19 V63 Q46 78 61 78 L69 76"/><path d="M29 44 L72 36.5"/></g></svg>`; window.TSEAL = TSEAL;
 window.viewHome2 = async function(){ const m = $('#main'); const ds = await weekSlates(); const B = await weekBoard(ds);
   const games = ds.flatMap(d => d.games.map(g => ({g, d}))).sort((a, b) => a.g.kick_utc < b.g.kick_utc ? -1 : 1);
   const bets = ds.flatMap(d => d.props.filter(p => p.tier === 'bet').map(p => ({p, d}))).sort((a, b) => (b.p.edge_pts || 0) - (a.p.edge_pts || 0));
@@ -38,7 +39,7 @@ window.viewHome2 = async function(){ const m = $('#main'); const ds = await week
       <div class="x-edge" style="--e:${Math.min(100, Math.max(0, (p.edge_pts || 0) * 5))}%"><span></span></div></button>`;
   const MK = [['Receptions', 'receptions'], ['Receiving yards', 'rec_yds'], ['Rushing yards', 'rush_yds'], ['Passing yards', 'pass_yds'], ['Anytime TD', null]];
   m.innerHTML = `<div class="view x-home">
-    <div class="x-hero"><h1>Week ${esc(wk)}</h1><p>${games.length} games · ${bets.length} model bets · ${B ? B.games.reduce((a, g) => a + g.players.reduce((x, P) => x + P.n, 0), 0).toLocaleString() + ' props' : ''}</p></div>
+    <div class="x-hero t-banner">${TSEAL.replace('<svg ','<svg class="t-wm" aria-hidden="true" ')}<div class="t-kick">${TSEAL.replace('<svg ','<svg aria-hidden="true" ')}Members\u2019 board</div><h1>Week ${esc(wk)}</h1><p>${games.length} games · ${bets.length} model bets · ${B ? B.games.reduce((a, g) => a + g.players.reduce((x, P) => x + P.n, 0), 0).toLocaleString() + ' props' : ''}</p></div>
     <div id="x-livehero-slot">${window.liveHeroHTML ? liveHeroHTML() : ''}</div>
     <div class="x-shelf"><div class="x-shead"><h2>Games</h2><button class="x-link" data-go="board">All games</button></div><div class="x-row">${games.map(gameCard).join('')}</div></div>
     ${bets.length ? `<div class="x-shelf"><div class="x-shead"><h2>Model bets</h2><button class="x-link" data-go="card">See all ${bets.length}</button></div><div class="x-row">${bets.slice(0, 10).map(betCard).join('')}</div></div>` : ''}

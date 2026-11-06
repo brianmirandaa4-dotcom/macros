@@ -1,0 +1,31 @@
+<title>whomadethisline</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0B0C0E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WMTL">
+<meta name="description" content="whomadethisline: the model's betting command center for NFL, CFB, NBA, NHL and MLB.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/favicon-64.png">
+<link rel="preload" href="data/index.json" as="fetch" crossorigin>
+<link rel="stylesheet" href="app.css">
+<header class="top" id="top">
+  <div class="col">
+    <button class="wm" id="wm" aria-label="whomadethisline home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#16181C"/><rect x="5" y="19.5" width="22" height="1.6" rx=".8" fill="#D9B266"/><rect x="7.4" y="16.6" width="2.4" height="2" rx=".8" fill="#5A6068"/><rect x="10.6" y="13.6" width="2.4" height="5" rx=".8" fill="#5A6068"/><rect x="13.8" y="9" width="2.4" height="9.6" rx=".8" fill="#F2F1EC"/><rect x="17" y="12" width="2.4" height="6.6" rx=".8" fill="#5A6068"/><rect x="20.2" y="15.2" width="2.4" height="3.4" rx=".8" fill="#5A6068"/><circle cx="15" cy="6.3" r="1.5" fill="#3FD08F"/></svg>
+      <b>whomadethisline</b>
+    </button>
+    <button class="slatebtn" id="slatebtn" aria-label="Choose a slate" hidden><i></i><span></span></button>
+  </div>
+</header>
+<div class="ptr" id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4"/></svg></div>
+<main class="col" id="main" aria-live="polite"></main>
+<nav class="tabs" id="tabs" aria-label="Sections"></nav>
+<div id="sheets"></div>
+<div class="modal" id="modal" aria-hidden="true"><div class="card" id="mcard" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div class="logged" id="logged" aria-hidden="true"><div class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><b style="font-size:14px">Bet logged</b></div></div>
+<div id="roomLabel"></div>
+<script src="app.js"></script>
