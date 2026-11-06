@@ -245,7 +245,7 @@ function viewBoard(d, B){ const m = d.meta; S.board = S.board || {g: 'all', q: '
         return `<div class="bp"><button class="bph" data-bo="${esc(k)}"><span><b>${esc(P.name)}</b> <span class="sub">${esc(P.team || '')} · ${esc(P.pos || '')}</span></span><span class="sub">${P.n} props ${op ? '▴' : '▾'}</span></button>
           ${op ? `<div class="bpb"><button class="link" data-prof="${esc(P.name)}|${esc(P.team || '')}">Player profile, stats and game log ›</button>${P.props.map(e => boardRow(e, P)).join('')}</div>` : ''}</div>`; }).join('')}</div></section>`; }).join('')}
     <section class="sec"><div class="sub">Prices: ${esc(B.source)} · pulled ${esc(new Date(B.pulled).toLocaleString('en-US', {timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit'}))} ET. Best price = highest payout among the five books.</div></section></div>`; }
-function wireBoard(d, B){ const m = $('#main'); bindTaps(m, d);
+function wireBoard(d, B){ const m = $('#main'); bindTaps(m, d); applyProgress(m, d); liveLoop(d);
   $$('[data-bg]', m).forEach(b => b.onclick = () => { S.board.g = b.dataset.bg; render(); });
   $$('[data-bo]', m).forEach(b => b.onclick = () => { const k = b.dataset.bo; S.board.open[k] = !S.board.open[k]; render(); });
   $$('[data-prof]', m).forEach(b => b.onclick = () => { const [n, t] = b.dataset.prof.split('|'); openProfileByName(n, t); });
@@ -310,10 +310,10 @@ async function livePoll(d){
           const slot = x.is_live ? 'live' : (+b === 68 ? 'DK' : +b === 69 ? 'FD' : null); if(!slot) continue; const s_ = e[slot] = e[slot] || {}; s_.line = x.value; s_[x.side] = x.odds; } } }
     LV.at = new Date(); LV.fails = 0; LV.err = null; return live.length;
   }catch(e){ LV.fails++; LV.err = e.message; return -1; } }
-function liveLoop(d){ clearTimeout(LV.t); if(S.tab !== 'live' || document.visibilityState !== 'visible') return;
-  livePoll(d).then(n => { if(S.tab !== 'live') return; const box = $('#livenow'); if(box) box.innerHTML = liveNowHTML(d); bindTaps(box || $('#main'), d);
+function liveLoop(d){ clearTimeout(LV.t); if(!['live', 'card', 'board'].includes(S.tab) || document.visibilityState !== 'visible') return;
+  livePoll(d).then(n => { if(!['live', 'card', 'board'].includes(S.tab)) return; const box = S.tab === 'live' && $('#livenow'); if(box){ box.innerHTML = liveNowHTML(d); bindTaps(box, d); } applyProgress($('#main'), d);
     const anyLive = Object.values(LV.games).some(g => g.state === 'in'); LV.t = setTimeout(() => liveLoop(d), (LV.fails >= 3 ? 30 : anyLive ? 10 : 60) * 1000); }); }
-document.addEventListener('visibilitychange', () => { const d = SLATE[S.slate]; if(d && S.tab === 'live' && document.visibilityState === 'visible') liveLoop(d); });
+document.addEventListener('visibilitychange', () => { const d = SLATE[S.slate]; if(d && ['live', 'card', 'board'].includes(S.tab) && document.visibilityState === 'visible') liveLoop(d); });
 function liveNowHTML(d){ const G = Object.values(LV.games); if(!LV.at) return `<div class="group pad"><span class="sub">${LV.err ? 'Live data not available right now (' + esc(LV.err) + '). Retrying.' : 'Checking for live games…'}</span></div>`;
   const live = G.filter(g => g.state === 'in'); const t = LV.at.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', second: '2-digit'});
   if(!live.length) return `<div class="group pad"><span class="sub">No game on this slate is live right now. ${G.filter(g => g.state === 'pre').length} still to come. Checked ${t}${LV.err ? ' · ' + esc(LV.err) : ''}.</span></div>`;
@@ -329,7 +329,7 @@ function liveNowHTML(d){ const G = Object.values(LV.games); if(!LV.at) return `<
     return `<section class="sec"><div class="hd"><h2>${esc(g.away)} ${esc(g.as)} · ${esc(g.home)} ${esc(g.hs)}</h2><span class="sub"><span class="pill pill-live">LIVE</span> ${esc(g.detail)} · ${nb} live bet${nb === 1 ? '' : 's'}</span></div>
       <div class="group lvlist">${ps.map(p => { const st = LV.stats[nkey(p.player) + '|' + p.team] || {}; const sk = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', rec_yds: 'rec_yds', receptions: 'receptions', pass_yds: 'pass_yds'}[p.market]; const now = sk ? (st[sk] ?? 0) : null; const ln_ = LV.lines[nkey(p.player) + '|' + p.team + '|' + (p.market === 'qb_rush' ? 'rush_yds' : p.market)] || {}; const L = ln_.live;
         const book = k => ln_[k] ? `${k} ${ln(ln_[k].line)} ${od(ln_[k].over)}/${od(ln_[k].under)}` : `${k} —`;
-        const lm = p._lm; return `<div class="lv${lm && lm.bet ? ' lvbet' : ''}" data-prop="${esc(p.id)}"><div class="lvt"><b>${esc(p.player)}</b> <span class="sub">${esc(p.market_label)}</span>${lm && lm.bet ? ' <span class="pill pill-edge">Live bet</span>' : p.tier === 'bet' ? ' <span class="pill pill-bet">Bet</span>' : ''}</div>
+        const lm = p._lm; return `<div class="lv${lm && lm.bet ? ' lvbet' : ''}" data-prop="${esc(p.id)}"${lm && lm.bet ? ` data-lside="${lm.side}" data-lline="${lm.line}"` : ''}><div class="lvt"><b>${esc(p.player)}</b> <span class="sub">${esc(p.market_label)}</span>${lm && lm.bet ? ' <span class="pill pill-edge">Live bet</span>' : p.tier === 'bet' ? ' <span class="pill pill-bet">Bet</span>' : ''}</div>
           <div class="lvg"><div><span class="label">Now</span><b class="num">${isNum(now) ? ln(now) : '—'}</b></div><div><span class="label">Pregame</span><b class="num">${ln(p.line)}</b><span class="sub">${esc(p.side === 'under' ? 'U' : 'O')} ${pc(pSide(p))}</span></div>
           <div><span class="label">Live line</span>${L ? `<b class="num">${ln(L.line)}</b><span class="sub">O ${od(L.over)} · U ${od(L.under)}</span>` : '<b>—</b><span class="sub">not posted</span>'}</div><div><span class="label">In-game model</span>${lm ? `<b class="num">${ln(Math.round(qMed(lm.Q) * 10) / 10)}</b><span class="sub ${lm.bet ? 'pos' : ''}">${lm.side === 'under' ? 'U' : 'O'} ${pc(lm.p)}${lm.bet ? ' · LIVE BET' : ''}</span>` : '<b class="na">no prediction</b><span class="sub">not covered</span>'}</div></div>
           <div class="sub lvb">${book('DK')} · ${book('FD')} <i>(pregame)</i></div><div class="bkrow">${bookBtns(p)}</div></div>`; }).join('') || '<div class="pad sub">No props with a line for this game.</div>'}</div></section>`; }).join('') +
@@ -364,12 +364,28 @@ function watchPlansHTML(d){ if(!LP || !LP.markets) return ''; const ps = d.props
   if(!ps.length) return ''; return `<div class="list">${ps.map(p => { const f = .5, onP = p.projection * f; const Q0 = liveQ(p, onP, f, 0); let need = null; for(let s_ = 0; s_ <= Math.max(3, p.line * 1.5); s_ += (p.market === 'receptions' ? 1 : Math.max(1, Math.round(p.line / 30)))){ const Q = liveQ(p, s_, f, 0); if(Q && qOver(Q, p.line) >= .55){ need = s_; break; } }
     return `<button class="row" data-prop="${esc(p.id)}"><div><div class="nm">${esc(p.player)} · ${esc(selText(p))}</div><div class="mt">${teamOpp(p)} · proj ${ln(p.projection)} · at half on pace ${ln(Math.round(onP * 10) / 10)}${need != null ? ` · over live at ${ln(need)}+ by half` : ''}</div></div><div class="rt">${p.tier === 'bet' ? '<span class="pill pill-bet">Bet</span>' : `<span class="sub">${pc(pSide(p))}</span>`}</div></button>`; }).join('')}</div><p class="note">Tap a player for the full checkpoint table (end Q1, half, end Q3 × down 14 to up 14).</p>`; }
 
+
+/* ---------------- Bet progress: faded bar behind every pick toward its line; green CASHED when it hits, red when an under is blown */
+function applyProgress(root, d){ if(!root || !Object.keys(LV.games).length) return;
+  for(const el of root.querySelectorAll('[data-prop]')){ const p = d.props.find(x => x.id === el.dataset.prop); if(!p || !p.side || p.no_prediction) continue;
+    const g = Object.values(LV.games).find(x => x.away === p.team || x.home === p.team); if(!g || g.state === 'pre') continue;
+    const sk = {qb_rush: 'rush_yds', rush_yds: 'rush_yds', rec_yds: 'rec_yds', receptions: 'receptions', pass_yds: 'pass_yds'}[p.market]; if(!sk) continue;
+    const now = (LV.stats[nkey(p.player) + '|' + p.team] || {})[sk] || 0;
+    const lb = el.dataset.lside ? {side: el.dataset.lside, line: +el.dataset.lline} : {side: p.side, line: p.line}; if(!isNum(lb.line)) continue;
+    const over = lb.side !== 'under', hit = now > lb.line, done = g.state === 'post';
+    const state = over ? (hit ? 'win' : done ? 'loss' : 'run') : (hit ? 'loss' : done ? 'win' : 'run');
+    const frac = Math.max(0, Math.min(1, lb.line > 0 ? now / lb.line : (now > 0 ? 1 : 0)));
+    el.classList.add('pg'); el.classList.toggle('pg-win', state === 'win'); el.classList.toggle('pg-loss', state === 'loss'); el.classList.toggle('pg-under', !over);
+    el.style.setProperty('--pg', (state === 'win' ? 100 : frac * 100).toFixed(1) + '%');
+    let tag = el.querySelector(':scope > .pgtag'); if(!tag){ tag = document.createElement('span'); tag.className = 'pgtag'; el.appendChild(tag); }
+    tag.textContent = state === 'win' ? `✓ CASHED · ${ln(now)}` : state === 'loss' ? `✕ ${over ? 'Missed' : 'Over the line'} · ${ln(now)}` : `${ln(now)} / ${ln(lb.line)} ${over ? '' : '(under)'}`.trim(); } }
+
 function leanRow(p, d){ const r = resultOf(d, p); return `<button class="ir" data-prop="${esc(p.id)}"><span><b>${esc(p.player)}</b> · ${esc(selText(p))}<br><span class="s">${teamOpp(p)} · ${esc(p.window || '')} · 25D ${sg(p.score25, 1)}</span></span><span class="r">${od(p.odds)}<br><span class="s">${r && r.result ? (r.result === 'won' ? 'hit' : r.result === 'lost' ? 'miss' : r.result) + (isNum(r.actual) ? ' · ' + ln(r.actual) : '') : ''}</span></span></button>`; }
 function gradedStrip(d){ const s = d.results.summary, b = s.bets || {}, t = s.by_tier || {}, L = s.lines || {};
   const cell = (v, l) => `<div><b>${v}</b><span>${l}</span></div>`;
   const rec = x => x ? `${x.w}–${x.l}${x.p ? '–' + x.p : ''}` : '—';
   return `<div class="statstrip">${cell(rec(b), 'Bets')}${cell(isNum(b.units) && (b.w + b.l) ? sg(b.units, 2) + 'u' : '—', 'Bet units')}${cell(rec(t.lean), 'Leans (info)')}${cell(`${L.won || 0}–${L.lost || 0}`, 'Game lines')}</div>`; }
-function wireCard(d){ const m = $('#main'); bindTaps(m, d);
+function wireCard(d){ const m = $('#main'); bindTaps(m, d); applyProgress(m, d); liveLoop(d);
   $$('[data-seg="card"] button', m).forEach(b => b.onclick = () => { S.win = b.dataset.w; render(); });
   const la = $('[data-leanall]', m); if(la) la.onclick = () => { S.leanAll = true; render(); };
   swipeWindows(m, d, () => S.win, w => { S.win = w; render(); }); }
@@ -451,7 +467,7 @@ function viewLive(d){ const L = liveProps(d); const inW = p => S.liveWin === 'al
 function liveRow(p){ const L = p.live, buy = L.plan === 'BUY LOW';
   return `<button class="row" data-live="${esc(p.id)}"><div><div class="nm">${esc(p.player)}</div><div class="mt">${teamOpp(p)} · ${esc(p.market_label)}</div></div><div class="rt">${scoreChip(p)}<span>open ${ln(L.open ?? p.line)}</span></div>
     <div class="pl" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px"><span class="tag live">${buy ? '↑ Buy low · over' : '↓ Sell high · under'}</span><span class="sub m">Q1 ${esc(L.q1_trigger || '—')} · Half ${esc(L.ht_trigger || '—')}</span>${isNum(L.number) ? `<span class="sub">ready at <b class="m" style="color:var(--text)">${ln(L.number)}</b></span>` : ''}</div></button>`; }
-function wireLive(d){ const m = $('#main'); bindTaps(m, d); liveLoop(d); $$('[data-live]', m).forEach(b => b.onclick = () => openLive(d, b.dataset.live)); $$('[data-seg="lwin"] button', m).forEach(b => b.onclick = () => { S.liveWin = b.dataset.w; render(); }); swipeWindows(m, d, () => S.liveWin, w => { S.liveWin = w; render(); }); }
+function wireLive(d){ const m = $('#main'); bindTaps(m, d); applyProgress(m, d); liveLoop(d); $$('[data-live]', m).forEach(b => b.onclick = () => openLive(d, b.dataset.live)); $$('[data-seg="lwin"] button', m).forEach(b => b.onclick = () => { S.liveWin = b.dataset.w; render(); }); swipeWindows(m, d, () => S.liveWin, w => { S.liveWin = w; render(); }); }
 /* scenario matching for the live calculator */
 function scenTest(s){ let m; s = String(s); if((m = s.match(/^Up (\d+)\+/i))) return {k: 'up', n: +m[1]}; if((m = s.match(/^Down (\d+)\+/i))) return {k: 'down', n: +m[1]}; if(/within one score/i.test(s)) return {k: 'within', n: 8}; if((m = s.match(/^Within (\d+)/i))) return {k: 'within', n: +m[1]}; if(/tied/i.test(s)) return {k: 'within', n: 0}; return null; }
 function pickScen(rows, margin){ const t = rows.map(r => ({r, t: scenTest(r.scen)})).filter(x => x.t);
