@@ -2520,7 +2520,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.57';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.58';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -6035,7 +6035,7 @@ function finishWorkout(){
   const end=a.wEnd||Date.now(),cmin=ex.reduce((t,x)=>t+(x.cardio?x.cardio.min:0),0),st=Math.min(a.wStart||a.start,end-cmin*60000),prs=[];
   ex.forEach(x=>{const top=Math.max(...x.sets.map(s=>e1rm(s.w,s.r)));const prev=bestBefore(x.n,end);if(top>0&&prev>0&&top>prev+0.01)prs.push({n:x.n,e:r1(top),prev:r1(prev)})});
   const wk={id:a.id,...(a.tid?{tid:a.tid}:{}),name:a.name.trim()||'Workout',date:a.date,start:st,end,ex,prs,...(a.devId?{devId:a.devId}:{})};
-  S.workouts.unshift(wk);S.workouts.sort((x,y)=>y.end-x.end);S.active=null;S.rest=null;save();renderTrain();renderRest();
+  S.workouts.unshift(wk);S.workouts.sort((x,y)=>y.end-x.end);S.active=null;if(S.rest)restPushCancel();S.rest=null;save();renderTrain();renderRest();
   const vol=ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0),sets=ex.reduce((b,x)=>b+x.sets.length,0),cds=ex.filter(x=>x.cardio),ct=cds.reduce((t,x)=>({min:t.min+x.cardio.min,mi:t.mi+x.cardio.mi,kcal:t.kcal+x.cardio.kcal}),{min:0,mi:0,kcal:0});
   sheet(`<div class="done-hd"><span class="done-badge">${prs.length?'🏆':'✓'}</span><div><div class="eyebrow">Workout complete</div><h3>${prs.length?`${prs.length} new personal record${prs.length>1?'s':''}`:`${esc(wk.name)} done`}</h3></div></div>
     <div class="live"><div style="--c:var(--pro)"><b>${fmtDur(end-st)}</b><span>time</span></div>${sets||!cds.length?`<div style="--c:var(--kcal)"><b>${sets}</b><span>sets</span></div><div style="--c:var(--fat)"><b>${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div>`:`<div style="--c:var(--kcal)"><b>${ct.mi?r1(ct.mi):'—'}</b><span>miles</span></div><div style="--c:var(--fat)"><b>${r0(ct.min)}</b><span>cardio min</span></div>`}<div style="--c:var(--carb)"><b>${cds.length?fmt(ct.kcal):prs.length}</b><span>${cds.length?'cardio kcal':'new PRs'}</span></div></div>
@@ -6275,7 +6275,25 @@ document.addEventListener('pointerdown',()=>restLockEnsure(true),true);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){sessType(restAudio?'playback':'ambient');if(S.rest){restWakeOn();if(S.rest.end-Date.now()>300)restArm();renderRest()}}restLockEnsure(false)});
 addEventListener('pagehide',()=>restLockEnsure(false));
 function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else{rsUnlock();playRestSound(null,S.rest.end)}}
-function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();if(restSoundId()==='custom')rsLoadCustom();restArm();restLockStart();restWakeOn();renderRest()}
+/* ================= REST-OVER NOTIFICATION: a real banner on the lock screen (and your watch) =================
+   The sync server queues one push for the moment your rest ends; skipping or changing the rest replaces it. Free:
+   Cloudflare Queues + Web Push, no keys to manage (the server makes its own). iPhone needs Syncope on the Home Screen. */
+function pushOn(){try{return localStorage.getItem('syncope.push')==='1'}catch(e){return false}}
+const isStandalone=()=>navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+const isIOS=()=>/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function u8(b){const s=atob(b.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-b.length%4)%4));return Uint8Array.from(s,c=>c.charCodeAt(0))}
+async function pushSub(){const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
+  if(!sub){const {key}=await api('/api/vapid');sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(key)})}return sub}
+async function enablePush(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
+    if(isIOS()&&!isStandalone()){sheet(`<div><div class="eyebrow">Rest-over alerts</div><h3>Add Syncope to your Home Screen first</h3><p class="note">iPhone only sends notifications to apps on the Home Screen. In Safari tap <b>Share</b> → <b>Add to Home Screen</b>, open Syncope from that icon, then tap 🔔 again.</p></div><div class="row" style="justify-content:flex-end"><button class="primary" id="pnOk">Got it</button></div>`);$('pnOk').onclick=closeSheet}
+    else toast('This browser can’t show notifications');return false}
+  const perm=await Notification.requestPermission();if(perm!=='granted'){toast('Notifications are off. Turn them on in Settings → Notifications → Syncope.');return false}
+  try{await ensureSync();await pushSub();localStorage.setItem('syncope.push','1');return true}catch(e){toast(esc(e.message||'Couldn’t turn on alerts'));return false}}
+async function restPushSchedule(){if(!pushOn()||!S.rest)return;const end=S.rest.end;
+  try{const sub=await pushSub();if(!S.rest||S.rest.end!==end)return;await api('/api/rest',{method:'POST',body:JSON.stringify({at:end,sub:sub.toJSON()})})}catch(e){}}
+function restPushCancel(){if(pushOn())api('/api/rest',{method:'POST',body:JSON.stringify({cancel:1})}).catch(()=>{})}
+function startRest(){S.rest={end:Date.now()+((S.active&&S.active.restSec)||S.restSec||120)*1000};restCtx();if(restSoundId()==='custom')rsLoadCustom();restArm();restLockStart();restWakeOn();restPushSchedule();renderRest()}
 function renderRest(){
   let el=$('restBar');
   if(!S.rest||!S.active){if(el)el.remove();if(Date.now()>restTail){restLockStop();if(!S.rest&&rsSrc&&restBeeped>Date.now())rsCancel()}restWakeOff();return}
@@ -6284,14 +6302,16 @@ function renderRest(){
       if(b.dataset.lock!=null){S.prefs=S.prefs||{};S.prefs.restLock=!restLockOn();save();
         if(restLockOn()){rsCancel();restLockStart();toast('Lock-screen timer on · pauses music while resting')}else{restLockStop();restArm();toast('Lock-screen timer off · music keeps playing')}
         renderRest();return}
-      if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save();restArm();restLockStart()}else{S.rest=null;rsCancel()}renderRest()}}
+      if(b.dataset.notify!=null){if(pushOn()){localStorage.setItem('syncope.push','0');restPushCancel();toast('Rest-over notifications off')}else enablePush().then(ok=>{if(ok){restPushSchedule();toast('You’ll get a notification when rest ends 🔔')}renderRest()});renderRest();return}
+      if(b.dataset.adj){S.rest.end+= +b.dataset.adj*1000;S.restSec=Math.max(30,Math.min(600,(S.restSec||120)+ +b.dataset.adj));save();restArm();restLockStart();restPushSchedule()}else{S.rest=null;rsCancel();restPushCancel()}renderRest()}}
   const left=S.rest.end-Date.now();
   if(left>2000&&restLockOn()&&(!restAudio||restAudio.paused))restLockEnsure(false);
+  if(left<2500&&left>0&&pushOn()&&document.visibilityState==='visible'&&!S.rest._cx){S.rest._cx=1;restPushCancel()}
   if(left<=0){const end=S.rest.end,late=Date.now()-end;S.rest=null;el.remove();restWakeOff();
     const au=restAudio,playing=au&&!au.paused&&!au.ended;restBuzz();
     if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&Math.abs(restBeeped-end)>1500)restBeep();restLockStop()}
     toast('Rest is over. Next set!');return}
-  el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
+  el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button data-notify aria-pressed="${pushOn()}" aria-label="Notify me when rest ends" title="Notify me when rest ends" class="rest-lk">${pushOn()?'🔔':'🔕'}</button><button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
 }
 setInterval(()=>{if(S.active&&!S.active.wStart){const t=$('wkTime');if(t)t.textContent=clock(Date.now()-S.active.start)}if(S.rest)renderRest()},1000);
 

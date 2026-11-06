@@ -1,5 +1,5 @@
 // MACROS offline cache. Bump VERSION whenever you upload new files.
-const VERSION='syncope-v73';
+const VERSION='syncope-v74';
 const FILES=['./','./index.html','./manifest.webmanifest','./apple-touch-icon.png','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./foods-db.json','./micro-db.json'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VERSION&&k!=='syncope-img'&&!k.startsWith('span-')&&!k.startsWith('wmtl-')).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
@@ -13,3 +13,7 @@ self.addEventListener('fetch',e=>{
   if(e.request.mode==='navigate'){e.respondWith(fetch(e.request.url,{cache:'no-cache',credentials:'same-origin'}).then(r=>{if(r.ok){const cp=r.clone();caches.open(VERSION).then(c=>c.put('./index.html',cp))}return r}).catch(()=>caches.match('./index.html')));return}
   e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
 });
+
+// Rest-over alert from the Syncope sync server (no payload: the push itself means "rest is over")
+self.addEventListener('push',e=>{e.waitUntil(self.registration.showNotification('Rest is over',{body:'Time for your next set 💪',tag:'syncope-rest',renotify:true,icon:'./icon-192.png',badge:'./icon-192.png',vibrate:[200,100,200]}))});
+self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(cs=>{const c=cs.find(x=>x.url.includes('/macros/'));return c?c.focus():self.clients.openWindow('./#train')}))});
