@@ -911,6 +911,23 @@ header.top .wrap{gap:8px}
 .fp-priv{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;padding:4px 6px}.fp-priv svg{width:16px;height:16px;flex:none}
 .fp-priv .link{font-size:13px;padding:0 0 0 2px}
 .fr-privb{display:inline-flex;align-items:center;gap:6px}
+.me2{display:flex;flex-direction:column;gap:14px}
+.me2-top{display:flex;align-items:center;gap:16px;padding:4px 2px 2px}
+.me2-top .avatar{width:84px;height:84px;padding:3px}.me2-top .avatar span{font-size:26px}
+.me2-id{min-width:0;display:flex;flex-direction:column;gap:6px}
+.me2-id h2{margin:0;font:800 28px/1.05 var(--f-display);letter-spacing:-.01em}
+.me2-id p{margin:0;color:var(--muted);font-size:14px}
+.me2-q .qt{cursor:pointer}
+.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mt{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px 12px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0) 50%),var(--surface);border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 20px rgba(0,0,0,.22);color:var(--fg);text-align:left;text-decoration:none;cursor:pointer;min-width:0;transition:transform .15s var(--ease-out)}
+.mt:active{transform:scale(.96)}
+.mt-i{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.mt-i svg{width:20px;height:20px}
+.mt b{font:700 14.5px/1.15 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mt em{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:-4px}
+.mt em.on{color:var(--good)}.mt em.warn{color:var(--carb)}
+.me2-foot{display:flex;justify-content:center;gap:22px;padding-top:4px}
+.me2-foot .link{color:var(--muted);font-size:13px}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
@@ -2432,7 +2449,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.45';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.46';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3677,38 +3694,62 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-pg]');if(g
 function streak(){let k=todayKey(),n=0;if(!(S.days[k]||[]).length)k=addDays(k,-1);while((S.days[k]||[]).length){n++;k=addDays(k,-1)}return n}
 function bodyLine(){const c=S.calc||{},lw=latestWeight(),w=(lw&&lw.w)||c.wt;if(!c.age&&!w)return '';return [c.ht?`${Math.floor(c.ht/12)}′${r0(c.ht%12)}″`:'',w?`${r1(w)} lb`:'',c.age?`${c.age} y`:''].filter(Boolean).join(' · ')}
 function planLabel(){if(!S.plan)return 'No plan';return S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}
+/* Profile: a dashboard, not a settings list. Who you are and how you're doing up top, then big tap targets. */
+function mtile(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:'';
+  const inner=`<span class="mt-i" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><b>${o.t}</b>${o.v!=null&&o.v!==''?`<em class="${o.vc||''}">${o.v}</em>`:''}`;
+  return o.href?`<a class="mt" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`:`<button class="mt" type="button" ${attr}>${inner}</button>`}
 function renderMe(){
   const c=syncCfg(),st=c.st||{},lw=latestWeight(),g=goalsFor(todayKey()),nWk=trainFeed().length,nd=Object.keys(S.days).filter(k=>(S.days[k]||[]).length).length,sk=streak();
-  const conn=[st.whoop?'WHOOP':'',st.oura?'Oura':'',st.garmin?'Garmin':''].filter(Boolean);
-  $('pg-me').innerHTML=`<div class="me-hero art" style='--bnr:${bnr("plan","me")}'><button class="avatar" type="button" data-ga="avatar" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p></div>
-    <div class="live"><div style="--c:var(--carb)"><b>${sk}</b><span>day streak</span></div><div style="--c:var(--kcal)"><b>${nd}</b><span>days logged</span></div><div style="--c:var(--pro)"><b>${nWk}</b><span>workouts</span></div><div style="--c:var(--fat)"><b>${lw?r1(lw.w):'—'}</b><span>latest lb</span></div></div>
-    <div class="glabel">Account</div><div class="glist">
-      ${grow({pg:'account',ic:'user',c:'--kcal',t:'Personal info',s:'Name and the devices you wear',v:esc(S.profile.name||'')})}
-      ${grow({pg:'body',ic:'body',c:'--fat',t:'Body metrics',s:'Height, weight, age, body fat, activity',v:bodyLine()||'Not set',vc:bodyLine()?'':'warn'})}</div>
-    <div class="glabel">Goals</div><div class="glist">
-      ${grow({ga:'plan',ic:'plan',c:'--good',t:'Your plan',s:'Cut, maintain or bulk',v:planLabel()})}
-      ${grow({pg:'weigh',ic:'scale',c:'--carb',t:'Weigh-ins',s:'Log weight and see your trend',v:lw?`${r1(lw.w)} lb`:''})}
-      ${grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:'Set protein, carbs and fat yourself',v:S.plan?'From plan':fmt(goalKcal(S.goals))+' kcal'})}
-      ${grow({pg:'ideas',ic:'fire',c:'--good',t:'Meals that fit',s:'Ideas sized to your remaining macros'})}
-      ${grow({pg:'fuel',ic:'heart',c:'--carb',t:'Fuel & timing',s:'What to eat before and after training'})}
-      ${grow({pg:'prep',ic:'list',c:'--carb',t:'Weekly meal prep',s:'New high-protein recipes every Sunday'})}</div>
-    <div class="glabel">Friends</div><div class="glist">${friendsRow()}</div>
-    <div class="glabel">Connections</div><div class="glist">
-      ${grow({pg:'conn',ic:'watch',c:'--good',t:'Wearables',s:'WHOOP, Oura Ring, Garmin, Apple Watch',v:conn.length?conn.join(' + '):'Connect',vc:conn.length?'on':''})}
-      ${grow({ga:'apple',ic:'heart',c:'--over',t:'Apple Health',s:'Through an iPhone Shortcut'})}
-      ${grow({pg:'scan',ic:'camera',c:'--kcal',t:'Photo scanning',s:'Snap a meal, get the macros',v:AI.key?'Own key':'On',vc:'on'})}</div>
-    <div class="glabel">App</div><div class="glist">
-      ${grow({pg:'prefs',ic:'sliders',c:'--carb',t:'Settings',s:'Training fuel, rest timer, accent color, sync'})}
-      ${grow({ga:'foods',ic:'list',c:'--carb',t:'My foods & meals',s:'Saved meals and the food library',v:String((S.meals||[]).length+(S.custom||[]).length)})}
-      ${grow({ga:'templates',ic:'dumbbell',c:'--pro',t:'Workout templates',v:String(S.templates.length)})}
-      ${grow({pg:'data',ic:'download',c:'--fat',t:'Backup & export',s:'Save or move your data',v:S.lastBackup?niceDate(keyOf(new Date(S.lastBackup)),{month:'short',day:'numeric'}):'Never',vc:S.lastBackup?'':'warn'})}</div>
-    <div class="glabel">About</div><div class="glist">
-      ${grow({pg:'help',ic:'info',c:'--kcal',t:'How to use Syncope',s:'Quick answers to common questions'})}
-      ${grow({pg:'method',ic:'book',c:'--good',t:'The science',s:'How your plan sets macros'})}
-      ${grow({href:'privacy.html',ic:'shield',c:'--muted',t:'Privacy',s:'Your log stays on this phone'})}
-      ${grow({ga:'redo',ic:'refresh',c:'--muted',t:'Redo welcome setup'})}</div>
-    <p class="ver">Syncope 2.0</p>`;
+  const conn=[st.whoop?'WHOOP':'',st.oura?'Oura':'',st.garmin?'Garmin':''].filter(Boolean),sc=socCfg();
+  const ws=weekStart(todayKey()),me=sc.on?myWeek().stats.score:0,frs=sc.on?(((sc.board||{}).friends)||[]).map(f=>f.stats&&f.stats.week===ws?f.stats.score:0):[],rank=1+frs.filter(x=>x>me).length;
+  const pl=S.plan&&planInfo(todayKey()),tw=S.plan&&S.plan.targetW;
+  // next weigh-in nudge: weight older than 3 days
+  const wAge=lw?Math.round((parseKey(todayKey())-parseKey(lw.k))/864e5):null;
+  $('pg-me').innerHTML=`<div class="me2">
+    <div class="me2-top"><button class="avatar" type="button" data-ga="avatar" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button>
+      <div class="me2-id"><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p>
+      ${conn.length?`<div class="srcrow">${conn.map(x=>srcBadge(x)).join('')}</div>`:`<button class="link" data-pg="conn" style="padding:4px 0">+ Connect your watch</button>`}</div></div>
+    <div class="qgrid me2-q">
+      <div class="qt" style="--c:var(--carb)" role="button" tabindex="0" data-ga="friends">${qRing(Math.min(1,sk/30),'var(--carb)')}<div class="qt-t"><span>Streak</span><b class="num">${sk}<small> day${sk===1?'':'s'}</small></b><em>${sk>=30?'Legend status 🔥':`${30-sk} more to hit 30`}</em></div></div>
+      <div class="qt" style="--c:var(--good)" role="button" tabindex="0" data-ga="friends">${qRing(sc.on&&frs.length?(frs.length+1-rank+1)/(frs.length+1):0,'var(--good)')}<div class="qt-t"><span>This week</span><b class="num">${sc.on?`#${rank}`:'—'}<small>${sc.on?` of ${frs.length+1}`:''}</small></b><em>${sc.on?`${fmt(me)} pts`:'Join Friends'}</em></div></div>
+      <div class="qt" style="--c:var(--fat)" role="button" tabindex="0" data-pg="weigh">${qRing(pl&&tw&&lw?Math.max(0,Math.min(1,1-Math.abs(lw.w-tw)/Math.max(1,Math.abs(S.plan.startW-tw)))):0,'var(--fat)')}<div class="qt-t"><span>Weight</span><b class="num">${lw?r1(lw.w):'—'}<small> lb</small></b><em>${wAge!=null&&wAge>3?'Weigh in today':tw?`Goal ${r1(tw)} lb`:lw?'Tap for trend':'Log your weight'}</em></div></div>
+      <div class="qt" style="--c:var(--pro)" role="button" tabindex="0" data-ga="templates">${qRing(Math.min(1,nWk/100),'var(--pro)')}<div class="qt-t"><span>Workouts</span><b class="num">${nWk}</b><em>${nd} day${nd===1?'':'s'} logged</em></div></div>
+    </div>
+    <div class="glabel">Your goals</div>
+    <div class="mgrid">
+      ${mtile({ga:'plan',ic:'plan',c:'--good',t:'Plan',v:pl?`${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · wk ${Math.min(pl.i+1,S.plan.N)}`:'Set up',vc:pl?'':'warn'})}
+      ${mtile({pg:'targets',ic:'target',c:'--pro',t:'Targets',v:`${fmt(goalKcal(g))} kcal`})}
+      ${mtile({pg:'body',ic:'body',c:'--fat',t:'Body',v:bodyLine()?bodyLine().split(' · ')[0]:'Add',vc:bodyLine()?'':'warn'})}
+      ${mtile({pg:'ideas',ic:'fire',c:'--good',t:'Meal ideas'})}
+      ${mtile({pg:'prep',ic:'list',c:'--carb',t:'Meal prep'})}
+      ${mtile({pg:'fuel',ic:'heart',c:'--carb',t:'Fueling'})}
+      ${mtile({pg:'report',ic:'chart',c:'--kcal',t:'Report'})}
+      ${mtile({pg:'hyd',ic:'drop',c:'--fat',t:'Water'})}
+      ${mtile({pg:'health',ic:'heart',c:'--good',t:'Recovery'})}
+    </div>
+    <div class="glabel">Connect & share</div>
+    <div class="mgrid">
+      ${mtile({pg:'conn',ic:'watch',c:'--good',t:'Wearables',v:conn.length?`${conn.length} on`:'Connect',vc:conn.length?'on':'warn'})}
+      ${mtile({ga:'apple',ic:'heart',c:'--over',t:'Apple Health'})}
+      ${mtile({ga:'friends',ic:'user',c:'--good',t:'Friends',v:sc.on?`${frs.length} friend${frs.length===1?'':'s'}`:'Join'})}
+      ${mtile({ga:'privacy',ic:'shield',c:'--kcal',t:'Privacy',v:sc.on?'What friends see':''})}
+      ${mtile({pg:'scan',ic:'camera',c:'--kcal',t:'Scanning',v:'On',vc:'on'})}
+      ${mtile({ga:'foods',ic:'list',c:'--carb',t:'My foods',v:String((S.meals||[]).length+(S.custom||[]).length)})}
+    </div>
+    <div class="glabel">App</div>
+    <div class="mgrid">
+      ${mtile({pg:'prefs',ic:'sliders',c:'--carb',t:'Settings'})}
+      ${mtile({pg:'account',ic:'user',c:'--kcal',t:'Account'})}
+      ${mtile({pg:'data',ic:'download',c:'--fat',t:'Backup',v:S.lastBackup?niceDate(keyOf(new Date(S.lastBackup)),{month:'short',day:'numeric'}):'Never',vc:S.lastBackup?'':'warn'})}
+      ${mtile({ga:'tour',ic:'info',c:'--kcal',t:'Tour'})}
+      ${mtile({pg:'help',ic:'book',c:'--good',t:'Help'})}
+      ${mtile({pg:'method',ic:'book',c:'--muted',t:'The science'})}
+    </div>
+    <div class="me2-foot"><button class="link" data-ga="redo">Redo welcome setup</button><a class="link" href="privacy.html" target="_blank" rel="noopener">Privacy policy</a></div>
+    <p class="ver">Syncope ${esc(APP_VER.replace('syncope-',''))}</p></div>`;
 }
+GACT.tour=()=>{closePages();setTimeout(startTour,200)};
+GACT.privacy=()=>{closePages();openPrivacy()};
 function renderAccount(){
   const wear=S.profile.wear||[];
   $('pg-account').innerHTML=`<div class="me-hero"><button class="avatar" type="button" id="acAv" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button></div>
