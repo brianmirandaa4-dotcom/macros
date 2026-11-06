@@ -6,5 +6,5 @@ const COL = {ARI:'#B3274A',ATL:'#C8203A',BAL:'#6A4CD8',BUF:'#2F6BE0',CAR:'#1D9BE
   PHI:'#1A8A93',PIT:'#FFB612',SF:'#D42020',SEA:'#69BE28',TB:'#E5262A',TEN:'#4B92DB',WAS:'#B53A2E'};
 const url = a => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/${ESPN[a] || String(a).toLowerCase()}.png&w=96&h=96`;
 window.TCOL = a => COL[a] || '#8A8F98';
-window.TL = (a, cls = '') => COL[a] ? `<i class="tl ${cls}" style="--tc:${COL[a]}" aria-hidden="true"><img src="${url(a)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('nologo')"></i>` : '';
+window.TL = (a, cls = '') => COL[a] ? `<i class="tl ${cls}" style="--tc:${COL[a]}" aria-hidden="true"><img src="${url(a)}" alt="" decoding="async" onerror="this.parentNode.classList.add('nologo')"></i>` : '';
 })();
