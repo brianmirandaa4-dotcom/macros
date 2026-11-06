@@ -182,6 +182,13 @@ window.viewPlayers2 = async function(){ const m = $('#main'); const I = await lo
   $('[data-more]', m).onclick = () => go('more'); };
 /* game screen v2: solid scoreboard + Picks / Live / Props / Players */
 const _old = window.openGame;
+
+/* projections-only view (no prices posted yet): every player's model projections, straight from the slate file */
+const projHTML = window.projHTML = function(ps, d){ const by = {}; for(const p of ps){ if(p.no_prediction || !isNum(p.projection)) continue; (by[p.player + '|' + p.team] = by[p.player + '|' + p.team] || []).push(p); }
+  const rows = Object.entries(by).map(([k, L]) => { const [n, t] = k.split('|'); const pts = L.find(x => x.market === 'pts'); return {n, t, L, s: pts ? pts.projection : Math.max(...L.map(x => x.projection))}; }).sort((a, b) => b.s - a.s);
+  if(!rows.length) return '';
+  return `<h3 class="x-h3">Model projections</h3><p class="pj-note">No sportsbook prices are posted for this game yet, so there are no picks. These are the model's projected stat lines.${d.sport === 'NBA' ? ' Points and PRA are projections only (their ranges did not pass calibration).' : ''}</p>
+    <div class="pj-list">${rows.map(r => `<button class="pj-row" data-pl="${esc(r.n)}|${esc(r.t)}|"><div class="pj-who">${window.TL ? TL(r.t, 'sm', d.sport) : ''}<b>${esc(r.n)}</b></div><div class="pj-stats">${r.L.filter(x => ['pts', 'reb', 'ast', 'tpm', 'receptions', 'rec_yds', 'rush_yds', 'pass_yds'].includes(x.market)).slice(0, 4).map(x => `<span><b>${ln(x.projection)}</b><i>${esc(({pts: 'PTS', reb: 'REB', ast: 'AST', tpm: '3PM', receptions: 'REC', rec_yds: 'REC YDS', rush_yds: 'RUSH', pass_yds: 'PASS'})[x.market] || x.market)}</i></span>`).join('')}</div></button>`).join('')}</div>`; }
 window.openGame = async function(slId, gid){ const d = SLATE[slId] || await loadSlate(slId); const g = d.games.find(x => x.id === gid); if(!g) return;
   const yr = (d.meta.date || '2026').slice(0, 4), wk = String(d.meta.week || '').padStart(2, '0'); const path = `data/nfl/board-${yr}-wk${wk}.json`;
   if(!(path in BOARDS)){ try{ BOARDS[path] = await getJSON(path); }catch(e){ BOARDS[path] = null; } } const B = BOARDS[path]; const bg = B && B.games.find(x => x.away === g.away.abbr && x.home === g.home.abbr);
@@ -193,7 +200,7 @@ window.openGame = async function(slId, gid){ const d = SLATE[slId] || await load
   const body = el => { const box = $('#x-gb', el); $$('[data-gt2]', el).forEach(b => b.setAttribute('aria-pressed', b.dataset.gt2 === tab));
     if(tab === 'Picks'){ const bets = ps.filter(p => p.tier === 'bet').sort((a, b) => (b.edge_pts || 0) - (a.edge_pts || 0)); const sides = ps.filter(p => p.tier !== 'bet' && !p.no_prediction && p.side && isNum(pSide(p)) && isNum(p.line)).sort((a, b) => pSide(b) - pSide(a));
       box.innerHTML = `${bets.length ? `<h3 class="x-h3">Model bets</h3><div class="cardlist">${bets.map(p => ticket(p, d)).join('')}</div>` : '<div class="x-take off"><b>No priced model bets in this game</b><small>The strongest model sides are below.</small></div>'}
-        <h3 class="x-h3">Model side on every prop</h3><div class="info" style="padding:0">${sides.map(p => sideRow(p, d)).join('')}</div>`; bindTaps(box, d); applyProgress(box, d); }
+        ${sides.length ? `<h3 class="x-h3">Model side on every prop</h3><div class="info" style="padding:0">${sides.map(p => sideRow(p, d)).join('')}</div>` : projHTML(ps, d)}`; bindTaps(box, d); applyProgress(box, d); $$('[data-pl]', box).forEach(b => b.onclick = () => { const [n, t2] = b.dataset.pl.split('|'); if(d.sport === 'NBA' && window.NBA) NBA.openCard(n, t2); else openCard(n, t2); }); }
     else if(tab === 'Live'){ box.innerHTML = `${liveNowHTML(d, {away: g.away.abbr, home: g.home.abbr})}<h3 class="x-h3">Checkpoint plans</h3>${(window.watchPlansHTML ? watchPlansHTML({...d, props: ps}) : '') || '<p class="sub">No checkpoint plans for this game.</p>'}`; bindTaps(box, d); applyProgress(box, d); }
     else if(tab === 'Props'){ box.innerHTML = '<div id="x-gbody"></div>'; window.__propsTab(el, bg); }
     else if(tab === 'Weather'){ box.innerHTML = '<div id="wx-host"></div>'; if(window.WX) WX.renderGame($('#wx-host', box), g); }
