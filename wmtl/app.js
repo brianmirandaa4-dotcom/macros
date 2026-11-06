@@ -98,7 +98,7 @@ const ROUTES = ['board', 'props', 'more'];
 function drawTabs(){ const n = S.slate && slateInfo(S.slate) ? slateInfo(S.slate).bets : 0;
   $('#tabs').innerHTML = TABS.map(([k, l]) => `<button data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${ICON[k]}${k === 'card' && n ? `<span class="badge">${n}</span>` : ''}<span>${l}</span></button>`).join('');
   $$('#tabs button').forEach(b => b.onclick = () => { if(b.dataset.tab === S.tab){ window.scrollTo({top: 0, behavior: RM ? 'auto' : 'smooth'}); return; } go(b.dataset.tab); }); }
-function go(tab, opts = {}){ if(!TABS.find(t => t[0] === tab) && !ROUTES.includes(tab)) tab = 'lobby'; if(!['lobby', 'more', 'live', 'mybets', 'players'].includes(tab) && !S.slate) tab = 'lobby';
+function go(tab, opts = {}){ if(!TABS.find(t => t[0] === tab) && !ROUTES.includes(tab)) tab = 'lobby'; if(!['lobby', 'more', 'live', 'mybets', 'players', 'club'].includes(tab) && !S.slate) tab = 'lobby';
   const same = S.tab === tab; S.tab = tab; store.d.ui.tab = tab; store.save(); try{ history.replaceState(null, '', '#' + tab); }catch(e){}
   drawTabs(); render(); if(!same && !opts.keepScroll) window.scrollTo(0, 0); if(window.ENG) ENG.tick(); }
 async function setSlate(id, tab){ S.slate = id; S.win = 'all'; S.liveWin = 'all'; S.props.mk = null; store.d.ui.slate = id; store.save(); drawSlateBtn(); try{ await loadSlate(id); }catch(e){ toast('Could not load that slate'); } if(tab) go(tab); else render(); }
@@ -114,6 +114,7 @@ async function render(){ const m = $('#main'); const v = S.tab;
   if(v !== 'lobby' && window.World && World.ready) World.pause(true);
   if(v === 'lobby'){ if(window.viewHome2){ m.innerHTML = '<div class="view"><p class="sub">Loading…</p></div>'; await viewHome2(); applyProgress(m, SLATE[S.slate] || {props: []}); if(window.ENG) ENG.home(m); return; } m.innerHTML = viewLobby(); wireLobby(); return; }
   if(v === 'more'){ m.innerHTML = viewMore(); wireMore(); return; }
+  if(v === 'club' && window.CLUB){ await CLUB.view(m); return; }
   if(v === 'live' && window.viewLiveNow2){ await viewLiveNow2(); return; }
   if(v === 'players' && window.viewPlayers2){ await viewPlayers2(); return; }
   if(v === 'mybets'){ m.innerHTML = `<div class="view" id="mybets">${betsHTML()}</div>`; wireBetsIn(m, () => render()); if(window.ENG) ENG.mybets(m); return; }
