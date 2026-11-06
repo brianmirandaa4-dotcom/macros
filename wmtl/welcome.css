@@ -1,0 +1,33 @@
+/* tail. welcome — Private Bank: warm graphite, bone type, brushed steel */
+.wl{--wl-ink:var(--pb-steel-ink,#0E141B);position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom));
+  background:radial-gradient(120% 70% at 80% -10%,rgba(150,175,200,.16),transparent 60%),radial-gradient(90% 60% at 0% 110%,rgba(150,175,200,.07),transparent 60%),var(--s0);color:var(--t1);overflow:hidden;transition:opacity .38s var(--ease-out),transform .38s var(--ease-out)}
+.wl.wl-bye{opacity:0;transform:scale(1.03)}
+html.wl-open,html.wl-open body{overflow:hidden}
+.wl-glow{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(115deg,rgba(241,235,223,.018) 0 1px,transparent 1px 7px);mask:radial-gradient(70% 50% at 70% 10%,#000,transparent 70%);-webkit-mask:radial-gradient(70% 50% at 70% 10%,#000,transparent 70%)}
+.wl-step{position:relative;width:100%;max-width:380px;display:grid;gap:16px;justify-items:center;text-align:center;opacity:0;transform:translateY(12px);transition:opacity .4s var(--ease-out),transform .4s var(--ease-out)}
+.wl-step.wl-in{opacity:1;transform:none}.wl-step.wl-out{opacity:0;transform:translateY(-10px)}
+.wl-seal{width:76px;height:76px;color:var(--pb-steel,#96AFC8);filter:drop-shadow(0 10px 30px rgba(150,175,200,.35));margin-bottom:6px}
+.wl-seal svg,.wl-card-seal svg{width:100%;height:100%;display:block}
+.wl h1{margin:0;font:800 32px/1.08 var(--f-disp);letter-spacing:-.03em}
+.wl-sub{margin:0;max-width:30ch;font:500 15.5px/1.45 var(--f-ui);color:var(--t2)}
+.wl-fld{width:100%;display:grid;gap:8px;text-align:left;margin-top:10px}
+.wl-fld span{font:600 13px/1 var(--f-ui);color:var(--t3);padding-left:4px}
+.wl-fld input{width:100%;box-sizing:border-box;min-height:56px;border:0;border-radius:16px;padding:0 18px;font:700 19px/1 var(--f-disp);color:var(--t1);background:var(--s2);box-shadow:inset 0 0 0 1px var(--hair2);-webkit-appearance:none;appearance:none}
+.wl-fld input::placeholder{color:var(--t3);font-weight:600}
+.wl-fld input:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--pb-steel,#96AFC8),0 0 0 4px rgba(150,175,200,.14)}
+.wl-btn{width:100%;min-height:56px;border:0;border-radius:16px;font:800 18px/1 var(--f-disp);letter-spacing:-.01em;color:var(--pb-steel-ink,#0E141B);
+  background:linear-gradient(180deg,var(--pb-steel-hi,#C3D2E0) 0%,var(--pb-steel,#96AFC8) 55%,#7F98B2 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 14px 30px -14px rgba(150,175,200,.7);transition:transform .15s var(--ease-out),opacity .2s}
+.wl-btn:active{transform:scale(.98)}.wl-btn:disabled{opacity:.38;box-shadow:none}
+.wl-fine{margin:4px 0 0;font:500 12px/1.4 var(--f-ui);color:var(--t3)}
+.wl-card{position:relative;width:100%;aspect-ratio:1.586;box-sizing:border-box;border-radius:22px;padding:20px 22px;display:flex;flex-direction:column;text-align:left;overflow:hidden;
+  border:1px solid transparent;background:linear-gradient(150deg,#2A2E33 0%,#1A1917 55%,#0F0E0C 100%) padding-box,var(--foil,linear-gradient(135deg,#D9E3EC,#7F93A8,#C3D2E0,#5E6F80)) border-box;
+  box-shadow:0 30px 60px -28px rgba(0,0,0,.9),0 0 50px -20px rgba(150,175,200,.45)}
+.wl-card::after{content:"";position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 42%,rgba(195,210,224,.16) 50%,transparent 58%);transform:translateX(-35%);animation:wl-sheen 1.8s .3s var(--ease-out) 1 both;pointer-events:none}
+@keyframes wl-sheen{to{transform:translateX(35%)}}
+.wl-card-top{display:flex;align-items:center;justify-content:space-between}
+.wl-card-seal{width:38px;height:38px;color:var(--pb-steel,#96AFC8)}
+.wl-card-brand{font:800 20px/1 var(--f-disp);letter-spacing:-.03em;color:var(--t1)}
+.wl-card-name{margin-top:auto;font:800 30px/1.05 var(--f-disp);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wl-card-foot{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font:600 12px/1 var(--f-ui);color:var(--t3)}.wl-card-foot b{color:var(--t2);font-weight:700}
+@media (prefers-reduced-motion:reduce){.wl,.wl-step,.wl-card::after{transition:none;animation:none}}
+.wl,.wl *{text-transform:none!important;letter-spacing:normal}.wl h1{letter-spacing:-.03em}.wl-card-name{letter-spacing:-.02em}

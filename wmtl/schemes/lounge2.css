@@ -1,0 +1,183 @@
+/* tail. scheme · "Whiskey" — a whiskey & cigar lounge, members only.
+   Charcoal with a whisper of warmth (never brown), aged-ivory type, and ONE signature colour:
+   cognac, as whiskey looks with a lamp behind the glass. Cognac is spent only on what's worth reaching for:
+   Tail it, the seal, the model's calls, the active tab. Wins are felt green, losses claret, in-play is cigar smoke.
+   Depth comes from lamp-light glows and leather-like cards (top light, inner highlight, soft bottom shade). No textures.
+   Team check: cognac #CF8F55 sits >= 10 dE2000 from all 32 teams' colours, 15-24 from every black+gold/orange pair
+   (PIT 17.1, CIN 18.5, CLE 20.7, NO 15.4, CHI 23.8). Loaded after mono.css + weather.css. */
+
+:root{
+  /* ---- palette */
+  --wh-s0:#0C0B0A;        /* Char: canvas */
+  --wh-s1:#131210;        /* Smoked oak 1: grouped section */
+  --wh-s2:#1A1816;        /* Smoked oak 2: card */
+  --wh-s3:#211F1C;        /* Smoked oak 3: raised */
+  --wh-s4:#282522;        /* Smoked oak 4: floating sheet */
+  --wh-ivory:#EEE5D3;     /* Aged ivory: type */
+  --wh-cognac:#CF8F55;    /* Cognac: the signature */
+  --wh-honey:#E9B47E;     /* Honey: the lit edge of the glass, highlights */
+  --wh-oak:#9C6534;       /* Barrel oak: cognac in shadow */
+  --wh-ember:#2A1A0E;     /* Ember wash: deep glows */
+  --wh-ink:#1C1006;       /* Ink on cognac */
+  --wh-felt:#74C08C;      /* Felt green: cashed */
+  --wh-claret:#E36A63;    /* Claret: lost, live game */
+  --wh-smoke:#9DB9CC;     /* Cigar smoke: in-play / watching */
+
+  /* ---- surfaces */
+  --s0:var(--wh-s0); --s1:var(--wh-s1); --s2:var(--wh-s2); --s3:var(--wh-s3); --s4:var(--wh-s4);
+  --glass:rgba(12,11,10,.86); --glass-hi:rgba(207,143,85,.05);
+
+  /* ---- type: ivory at three strengths (t3 >= 5:1 on every surface) */
+  --w:238,229,211;
+  --t1:var(--wh-ivory);
+  --t2:rgba(238,229,211,.72);
+  --t3:rgba(238,229,211,.58);
+  --hair:rgba(238,229,211,.08); --hair2:rgba(238,229,211,.14);
+  --rule:rgba(238,229,211,.085); --rule2:rgba(207,143,85,.32);
+
+  /* ---- one accent, every place the old gold lived */
+  --gold:var(--wh-cognac); --gold-d:var(--wh-oak); --pk:var(--wh-cognac);
+  --brass:var(--wh-cognac); --brass-ink:var(--wh-ink); --brass-wash:rgba(207,143,85,.13);
+  --act:var(--wh-ivory); --act-ink:var(--wh-s0); --act-wash:rgba(238,229,211,.08);
+  --foil:linear-gradient(135deg,#F2CB9C 0%,#B97A43 34%,#E9B47E 55%,#8E5A2E 80%,#D99F68 100%);
+  --violet:#1D1A17; --violet-d:#100F0D;
+  --banner:linear-gradient(160deg,#25211D 0%,#171513 60%,#0C0B0A 100%);
+  --float:0 24px 60px -16px rgba(0,0,0,.75),0 2px 8px rgba(0,0,0,.4);
+
+  /* ---- semantic */
+  --edge:var(--wh-felt); --edge-wash:rgba(116,192,140,.14);
+  --loss:var(--wh-claret); --loss-wash:rgba(227,106,99,.13);
+  --live:var(--wh-smoke); --live-wash:rgba(157,185,204,.13);
+  --fair:#CBC1AE; --fair-wash:rgba(238,229,211,.07);
+  --pass:#8F887C; --pass-wash:rgba(238,229,211,.06);
+  --nfl:var(--wh-ivory); --cfb:#CBC1AE;
+
+  /* ---- hero card: a leather-topped card under a reading lamp (top-right), cognac light pooled in the corner */
+  --hc-bg:radial-gradient(85% 65% at 100% 0%,rgba(207,143,85,.19) 0%,rgba(207,143,85,.05) 45%,transparent 70%),linear-gradient(170deg,#252321 0%,#1A1917 46%,#0F0E0D 100%);
+  --hc-ink:var(--wh-ivory);
+  --hc-foil:radial-gradient(60% 40% at 50% 100%,rgba(0,0,0,.35),transparent 70%),linear-gradient(180deg,rgba(255,236,210,.05) 0%,transparent 22%);
+  --hc-foil-o:1;
+  --hc-sh:inset 0 1px 0 rgba(255,236,210,.12),inset 0 0 0 1px rgba(207,143,85,.22),inset 0 -14px 24px -18px rgba(0,0,0,.8),0 30px 60px -28px rgba(0,0,0,.95),0 0 60px -30px rgba(207,143,85,.35);
+  --hc-badge:rgba(207,143,85,.14); --hc-badge-ink:var(--wh-honey);
+  --tail-bg:linear-gradient(180deg,#E0A86E 0%,#CC8A4E 46%,#B07440 100%); --tail-ink:var(--wh-ink);
+
+  /* ---- bet cards: leather depth, cognac foil edge */
+  --bc-surface:linear-gradient(180deg,#221F1B 0%,var(--s1) 50%,var(--s0) 100%);
+  --bc-frame:rgba(238,229,211,.09);
+  --bc-gold-dim:rgba(207,143,85,.38);
+  --bc-run:rgba(238,229,211,.045); --bc-run-solid:var(--wh-cognac);
+  --bc-win-wash:rgba(116,192,140,.18);
+}
+
+/* ---- canvas: one warm lamp above the room, never flat black */
+html,body{background:var(--s0)!important}
+body{background:radial-gradient(120% 46% at 50% 0%,rgba(207,143,85,.075),transparent 72%) no-repeat,var(--s0)!important;color:var(--t1)}
+body::before{background:var(--s0)!important}
+.page{background:radial-gradient(120% 46% at 50% 0%,rgba(207,143,85,.07),transparent 72%) no-repeat,var(--s0)}
+
+/* ---- frame: header, ticker, tab bar */
+.top{background:var(--s0)!important;box-shadow:inset 0 -1px 0 var(--rule)!important}
+.page .sbar,.sbar{background:var(--glass)!important;box-shadow:inset 0 -1px 0 var(--rule)}
+.ticker{background:linear-gradient(180deg,#141210,#0F0E0C)!important;box-shadow:inset 0 1px 0 rgba(238,229,211,.06),inset 0 -1px 0 rgba(0,0,0,.6)!important;color:var(--t2)}
+.tk-win{color:var(--wh-felt)!important}.tk-sum i{background:var(--wh-felt)!important;color:#07170D!important}
+.tk-live i{background:var(--wh-claret)!important;color:#1A0605!important}
+.tk-dot{color:var(--wh-cognac)!important;opacity:.55}
+.tabbar{background:rgba(12,11,10,.94)!important;box-shadow:inset 0 1px 0 var(--rule)!important}
+.tabbar button{color:rgba(238,229,211,.5)!important}
+.tabbar button[aria-current=page],.tabbar button[aria-current=page] svg{color:var(--wh-ivory)!important}
+.tabbar button[aria-current=page]::after{background:var(--wh-cognac)!important;box-shadow:0 0 12px 1px rgba(207,143,85,.55)}
+.tabbar .badge{background:var(--wh-cognac)!important;color:var(--wh-ink)!important;box-shadow:0 0 0 2px var(--s0)}
+
+/* ---- seal + lockup: a cognac coin with an ink t, ivory wordmark, cognac full stop */
+.lockup>circle:first-child,svg[viewBox="0 0 100 100"]>circle[r="44"]{fill:var(--wh-cognac)}
+.lockup>g:first-of-type,svg[viewBox="0 0 100 100"]>g{stroke:var(--wh-ink)}
+.lockup>g:nth-of-type(2){stroke:var(--wh-ivory)}
+.lockup>circle[cy="29"]{fill:var(--wh-ivory)}
+.lockup>circle[cy="78"]{fill:var(--wh-cognac)}
+.lockup{filter:drop-shadow(0 0 10px rgba(207,143,85,.18))}
+
+/* ---- links + numbers: ivory by default; cognac only where the model speaks */
+.x-link,a,.link,.back{color:var(--wh-ivory)!important}
+.x-shead .x-link{color:var(--t2)!important}
+.x-pct,.x-chance,.bc-pct,.x-gfoot em{color:var(--wh-cognac)!important}
+
+/* ---- hero card */
+.h-card .h-badge{box-shadow:inset 0 0 0 1px rgba(207,143,85,.3)}
+.h-card .h-player{color:#F7EFE0;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+.h-card .h-nums b{color:var(--wh-ivory)}
+.h-card .h-nums div:nth-child(2) b,.h-card .h-nums div:last-child b{color:var(--wh-honey)}
+.h-tail{box-shadow:inset 0 1px 0 rgba(255,240,220,.65),inset 0 -2px 0 rgba(90,50,20,.3),0 14px 30px -14px rgba(207,143,85,.65),0 0 0 1px rgba(28,16,6,.4);letter-spacing:-.01em}
+.h-stats div{background:linear-gradient(180deg,var(--s2),var(--s1));box-shadow:inset 0 1px 0 rgba(255,236,210,.06),inset 0 0 0 1px var(--rule)}
+
+/* ---- game tickets + boards: leather tiles */
+.x-game{background:linear-gradient(180deg,#1A1815 0%,#121110 100%)!important;box-shadow:inset 0 1px 0 rgba(255,236,210,.06),inset 0 0 0 1px var(--rule),0 10px 22px -16px rgba(0,0,0,.9)!important}
+.x-game.is-live{box-shadow:inset 0 1px 0 rgba(255,236,210,.06),inset 0 0 0 1px rgba(227,106,99,.6)!important}
+.x-gtop{color:var(--t3)!important}
+.x-board,.x-sb.big{border:0!important;background:var(--hc-bg)!important;box-shadow:inset 0 1px 0 rgba(255,236,210,.1),inset 0 0 0 1px rgba(207,143,85,.2),0 24px 48px -28px rgba(0,0,0,.95)!important}
+.x-board.live,.x-sb.big.live{box-shadow:inset 0 1px 0 rgba(255,236,210,.1),inset 0 0 0 1.5px rgba(227,106,99,.65)!important}
+.x-board .x-lines div,.x-sb.big .x-lines div{background:rgba(10,9,8,.5)!important;box-shadow:inset 0 0 0 1px rgba(238,229,211,.08)!important}
+.x-sb{background:var(--s1);box-shadow:inset 0 0 0 1px var(--rule)}
+.x-sbfoot{color:var(--wh-cognac)}
+.x-lines div,.x-sel,.x-hit,.x-match,.x-books,.x-more{background:var(--s1)!important;box-shadow:inset 0 1px 0 rgba(255,236,210,.04),inset 0 0 0 1px var(--rule)!important}
+.x-take{background:rgba(238,229,211,.05)}
+.x-take.bet{background:rgba(207,143,85,.09);box-shadow:inset 0 0 0 1px var(--rule2)}
+.sr3{background:linear-gradient(180deg,var(--s2),var(--s1));box-shadow:inset 0 1px 0 rgba(255,236,210,.05),inset 0 0 0 1px var(--hair2)}
+
+/* ---- sport marks: app.js writes NFL as violet inline; retone it to brass-ivory (inline loses to !important) */
+[style*="--c:#A08BF7"]{--c:#B9AD97!important}
+[style*="--c:#E7C46A"]{--c:#8F887C!important}
+
+/* ---- team logo chips: a dark lacquered disc on charcoal, glow in the team's colour */
+.tl{background:radial-gradient(120% 120% at 30% 20%,rgba(255,240,220,.14) 0%,rgba(255,240,220,.03) 45%,transparent 70%),radial-gradient(closest-side,color-mix(in srgb,var(--tc) 50%,transparent),color-mix(in srgb,var(--tc) 16%,transparent) 70%,transparent),#121110}
+
+/* ---- bet cards */
+.x-bet{background:var(--bc-surface)!important;box-shadow:inset 0 1px 0 rgba(255,236,210,.07),inset 0 0 0 1px var(--bc-frame),0 16px 32px -22px rgba(0,0,0,.95)!important}
+.x-bet::before,.betcard::before{background:var(--foil)!important}
+.betcard{box-shadow:inset 0 1px 0 rgba(255,236,210,.07),inset 0 0 0 1px var(--bc-frame),0 18px 36px -24px rgba(0,0,0,.95)}
+.betcard .bc-price b,.x-bet .xb-price b,.betcard .bc-edge b,.x-bet .xb-foot .xb-edge b{color:var(--wh-cognac)}
+.betcard .bc-tier,.x-bet .xb-tier{color:var(--t2)!important}
+.bc-over{background:linear-gradient(90deg,var(--wh-oak),var(--wh-cognac) 55%,var(--wh-honey))!important;box-shadow:0 0 12px -2px rgba(207,143,85,.6)!important}
+.bc-pct i{color:var(--wh-oak)}
+
+/* ---- chips + segmented tabs: pressed = ivory (cognac stays rare) */
+.x-chip{background:rgba(238,229,211,.03)!important;box-shadow:inset 0 0 0 1px rgba(238,229,211,.15)!important;color:var(--t1)}
+.x-chip:active,.x-chip[aria-pressed=true]{background:var(--wh-ivory)!important;color:var(--wh-s0)!important;box-shadow:none!important}
+.x-tabs{background:transparent!important}
+.page .x-tabs{background:linear-gradient(180deg,var(--s0) 70%,rgba(12,11,10,0))}
+.x-tabs button{box-shadow:inset 0 0 0 1px rgba(238,229,211,.14)!important;color:var(--t2)!important}
+.x-tabs button[aria-pressed=true]{background:var(--wh-ivory)!important;color:var(--wh-s0)!important;box-shadow:none!important}
+.x-sub button[aria-pressed=true]{color:var(--wh-ivory)!important;background:rgba(238,229,211,.09)!important}
+.x-tag.gold{background:var(--wh-cognac)!important;color:var(--wh-ink)!important}
+
+/* ---- prices: the model's pick is lit cognac */
+.x-odd{background:var(--s1)!important;box-shadow:inset 0 1px 0 rgba(255,236,210,.04),inset 0 0 0 1px rgba(238,229,211,.11)!important}
+.x-odd.pick{background:linear-gradient(180deg,rgba(207,143,85,.24),rgba(207,143,85,.1))!important;box-shadow:inset 0 0 0 1.5px var(--wh-cognac),0 0 18px -8px rgba(207,143,85,.6)!important}
+.x-odd.pick b{color:var(--wh-honey)!important}.x-odd.pick small,.x-odd.pick i{color:rgba(233,180,126,.85)!important}
+.x-model{color:var(--t1)!important}.x-model.bet{color:var(--wh-cognac)!important}
+
+/* ---- slate pill + picker sheet */
+.slatebtn.sb2{background:linear-gradient(180deg,rgba(238,229,211,.07),rgba(238,229,211,.02));box-shadow:inset 0 0 0 1px rgba(238,229,211,.12),inset 0 1px 0 rgba(255,236,210,.08),0 6px 18px -10px rgba(0,0,0,.8)}
+.sb2-ic{background:var(--wh-cognac);color:var(--wh-ink);box-shadow:0 0 0 3px rgba(207,143,85,.13),0 0 14px -2px rgba(207,143,85,.45)}
+.sb2-ch{background:rgba(238,229,211,.07);color:var(--t2)}
+.modal{background:rgba(5,4,3,.64)}
+.sheet,.modal .card{background:radial-gradient(80% 28% at 50% 0%,rgba(207,143,85,.06),transparent 70%),linear-gradient(180deg,#232120 0%,#1B1A18 40%,#151413 100%);box-shadow:inset 0 1px 0 rgba(255,236,210,.1),var(--float)}
+.sp2-row{background:rgba(10,9,8,.35);box-shadow:inset 0 1px 0 rgba(255,236,210,.04),inset 0 0 0 1px rgba(238,229,211,.08)}
+.sp2-row.cur{background:rgba(207,143,85,.055);box-shadow:inset 0 0 0 1.5px var(--wh-cognac)}
+.sp2-cur{background:var(--wh-cognac);color:var(--wh-ink)}
+.sp2-date{background:var(--s0);box-shadow:inset 0 0 0 1px rgba(238,229,211,.1)}
+.sp2-date small{color:var(--t3)!important}
+.sp2-row.cur .sp2-date small{color:var(--wh-cognac)!important}
+.sp2-row.live .sp2-date small{color:var(--wh-claret)!important}
+.sp2-st{background:rgba(238,229,211,.07)}
+.sp2-imp{box-shadow:inset 0 0 0 1px rgba(238,229,211,.11)}
+.btn.primary{background:var(--tail-bg);color:var(--tail-ink)}
+:focus-visible{outline-color:var(--wh-cognac)}
+
+/* ---- the reward moment: cashed glows felt green; nothing else is green */
+.betcard.pg-win::before,.x-bet.pg-win::before{background:var(--wh-felt)!important}
+.betcard.pg-loss::before,.x-bet.pg-loss::before{background:var(--wh-claret)!important;opacity:.6}
+.betcard.pg.pg-win,.x-bet.pg.pg-win{box-shadow:inset 0 0 0 1.5px var(--wh-felt),0 18px 44px -20px rgba(116,192,140,.55)!important}
+.betcard.pg-win .pgtag,.x-bet.pg-win .pgtag{background:var(--wh-felt);color:#07170D}
+.betcard.pg-loss .pgtag,.x-bet.pg-loss .pgtag{color:#1A0605}
+/* live pills: dark ink on claret so small text clears AA */
+.sp2-st.live,.x-live{color:#1A0605!important;background:var(--wh-claret)!important}.sp2-st.live i{background:#1A0605!important}

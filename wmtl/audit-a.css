@@ -1,0 +1,167 @@
+/* tail. audit A — Home (#lobby), the game screen (scoreboard + Picks / Live / Props / Players / Weather) and the player card.
+   Tokens only (--s0..--s4, --t1..--t3, --hair, --hair2, --edge, --loss, --live, --f-ui, --f-num, --f-disp), so every scheme keeps its colours.
+   8pt rhythm: cards 16px inside, 18-20px radius; numbers tabular and right-aligned; text ellipsizes instead of running out of a card. */
+
+/* ================= HOME ================= */
+
+/* hero: three stat columns share one top line, numbers on one baseline (the book name no longer pushes "Best price" up) */
+.h-card .h-nums{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.h-card .h-nums>div{display:grid;grid-template-rows:auto auto auto;gap:6px;align-content:start;min-width:0}
+.h-card .h-nums>div:last-child{justify-items:end;text-align:right}
+.h-card .h-nums b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.h-card .h-nums small,.h-card .h-nums i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-card .h-row:first-of-type{min-width:0}
+.h-card .h-badge{flex:none}
+.h-card .h-match{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;gap:4px!important}
+.h-card .h-player{overflow-wrap:anywhere}
+.h-stats b{font-variant-numeric:tabular-nums}
+.h-stats span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* section heads: the "All games" / "See all" links get a 44pt target without growing the row */
+.x-shead{align-items:center!important;gap:12px}
+.x-shead h2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.x-shead .x-link{flex:none;min-height:44px;display:inline-flex;align-items:center;margin-block:-10px;padding-inline:4px;margin-right:-4px}
+
+/* game cards: kickoff/status line first, weather chip on its own line (ellipsized), 16px inside */
+.x-home .x-game{flex:0 0 168px!important;padding:16px!important;gap:8px!important;align-content:start}
+.x-home .x-gtop{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0;line-height:1.25!important;white-space:nowrap}
+.x-home .x-gtop .x-live{margin-right:0}
+.x-home .x-gtop .wx-slot{order:2;flex:1 0 100%;min-width:0;overflow:hidden}
+.x-home .x-gtop .wx-slot:empty{display:none}
+.x-home .x-game .wx-c{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.x-home .x-team{gap:8px;min-height:32px}
+.x-home .x-team b{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.x-home .x-team span{flex:none;min-width:3ch;text-align:right;font-variant-numeric:tabular-nums}
+.x-home .x-gfoot{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;padding-top:8px;box-shadow:inset 0 1px 0 var(--hair)}
+
+/* model-bet cards: matchup label never collides with the tier label */
+.x-bet .xb-top{min-width:0}
+.x-bet .xb-tier{flex:none}
+.x-bet .xb-mu{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.x-bet .xb-price b,.x-bet .xb-foot b{font-variant-numeric:tabular-nums}
+.x-bet .xb-sel{min-width:0;overflow-wrap:anywhere}
+
+/* live-now hero scoreboards: status chip and clock on one line, score rows with room to breathe */
+.x-sbtop{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-sbtop .x-live{margin-right:0}
+.x-sb{gap:8px!important}
+.x-sb.big{padding:16px 20px!important;border-radius:20px!important}
+.x-sbrow{gap:10px;min-height:36px}
+.x-sb.big .x-sbrow{min-height:44px}
+.x-sbrow span{font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.x-sbfoot{margin-top:4px!important;padding-top:12px;box-shadow:inset 0 1px 0 var(--hair)}
+
+/* grouped lists (Strongest model sides, Weather watch, game Players tab): inset cards, rows 16px in, hairline separators */
+.x-home .x-list,#x-gb .x-list{background:var(--s1)!important;border-radius:18px!important;box-shadow:inset 0 0 0 1px var(--hair)!important;overflow:hidden}
+.x-home .x-list .x-li,#x-gb .x-list .x-li{min-height:60px;padding:12px 16px!important;gap:16px;box-shadow:inset 0 -1px 0 var(--hair)!important}
+.x-home .x-list .x-li:last-child,#x-gb .x-list .x-li:last-child{box-shadow:none!important}
+.x-home .x-li>div:first-child,#x-gb .x-li>div:first-child{min-width:0;gap:4px}
+.x-home .x-li b,.x-home .x-li span,#x-gb .x-li b,#x-gb .x-li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-home .x-pct{flex:none;min-width:4ch;text-align:right;font-variant-numeric:tabular-nums}
+/* weather-watch rows: emoji column top-aligned with the matchup line; the sentence wraps (it is the content) */
+.x-home .wx-li{gap:12px!important;align-items:flex-start!important}
+.x-home .wx-li .wx-e{min-width:56px;font-size:17px;line-height:24px}
+.x-home .wx-li>div{min-width:0;flex:1}
+.x-home .wx-li b{display:flex;align-items:center;gap:6px;line-height:24px}
+.x-home .wx-li b .tl{margin:0}
+.x-home .wx-li>div>span{white-space:normal!important;overflow:visible!important;line-height:1.4}
+.x-home .wx-note{margin:-4px 0 12px}
+
+/* ================= GAME SCREEN ================= */
+
+/* tighter vertical rhythm: header, tabs and content read as one screen (was 32px between each) */
+.page .body:has(> #x-gb),.page .body:has(> #x-cbody){gap:16px}
+
+/* scoreboard: status left, weather chip right; wraps cleanly instead of colliding */
+.x-board{padding:16px!important;border-radius:20px!important;gap:16px!important}
+.x-board .x-bt{flex-wrap:wrap;row-gap:6px;line-height:1.3!important;font-variant-numeric:tabular-nums}
+.x-board .x-bt .x-live{margin-right:0}
+.x-board .x-bt .wx-slot{order:2;margin-left:auto;min-width:0;max-width:100%}
+.x-board .x-bt .wx-c{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.x-board .x-bt .wx-slot:empty{display:none}
+.sbd-s b{font-variant-numeric:tabular-nums}
+/* line cells: label on top, value on the first line of every cell (moneyline's 2 lines no longer push Spread/Total down) */
+.x-board .x-lines{gap:8px!important}
+.x-board .x-lines>div{align-content:start;gap:6px!important;border-radius:14px}
+.x-board .x-lines b{font-variant-numeric:tabular-nums}
+
+/* game tabs: one segmented control, all five always visible, 44pt, nothing cut off at the edge */
+.page .x-tabs:has([data-gt2]){display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px!important;overflow:visible!important;padding-block:8px!important}
+.page .x-tabs:has([data-gt2])::after{display:none}
+.page .x-tabs [data-gt2]{min-width:0;min-height:44px;padding:0 4px!important;font-size:14px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+
+/* Props sub-tabs: full-bleed scroll rail, 44pt, no chip clipped against the content edge */
+#x-gb .x-sub{width:calc(100% + 2 * var(--side));max-width:none!important;margin:0 calc(-1 * var(--side)) 12px!important;padding:0 var(--side);scroll-padding-inline:var(--side);gap:4px}
+#x-gb .x-sub::after{content:"";flex:none;width:1px}
+#x-gb .x-sub button{min-height:44px;padding:0 12px!important;white-space:nowrap}
+/* market groups: inset cards with the rows 16px in */
+#x-gb .x-grp{background:var(--s1)!important;border-radius:18px!important;box-shadow:inset 0 0 0 1px var(--hair)!important;padding:0 16px;margin-bottom:16px;overflow:hidden}
+#x-gb .x-grp h3{padding:16px 0 8px!important;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#x-gb .x-grp .x-mrow{padding:12px 0!important;gap:12px;min-height:64px;box-shadow:inset 0 1px 0 var(--hair)!important}
+#x-gb .x-mrow .x-mline{flex:none}
+#x-gb .x-odd{min-width:60px;min-height:44px;font-variant-numeric:tabular-nums}
+#x-gb .x-odd small,#x-gb .x-odd i{white-space:nowrap}
+
+/* Picks: section headings on the 8pt grid */
+#x-gb>.x-h3,#x-gb>h3{margin:24px 0 8px}
+#x-gb>.x-h3:first-child,#x-gb>h3:first-child{margin-top:8px}
+#x-gb>.x-take.off{padding:16px!important;border-radius:18px;display:grid;gap:4px}
+#x-gb>.x-take.off small{margin:0;font-size:13px;line-height:1.35}
+.sr3-p b,.sr3-price{font-variant-numeric:tabular-nums}
+
+/* Live: four stat columns share label and value rows, so every number sits on one line */
+#x-gb .lv{padding:16px!important;gap:12px}
+#x-gb .lvt{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;line-height:1.3}
+#x-gb .lvt b{min-width:0;overflow-wrap:anywhere}
+#x-gb .lvg{grid-template-rows:auto auto auto;row-gap:4px;column-gap:8px}
+#x-gb .lvg>div{grid-row:span 3;display:grid;grid-template-rows:subgrid;row-gap:4px;min-width:0}
+#x-gb .lvg .label{align-self:end;line-height:1.2!important}
+#x-gb .lvg b{align-self:start;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+#x-gb .lvg .sub{align-self:start;font-size:12px;line-height:1.3;font-variant-numeric:tabular-nums}
+#x-gb .lvb{font:500 12px/1.35 var(--f-num)!important;color:var(--t3);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#x-gb .lv .bkrow{justify-content:flex-end}
+#x-gb .sec>.hd{align-items:center;row-gap:6px}
+#x-gb .sec>.hd h2{font-variant-numeric:tabular-nums}
+#x-gb .list .row{min-height:64px}
+#x-gb .list .row .nm,#x-gb .list .row .mt{overflow-wrap:anywhere}
+#x-gb .list .row .rt{flex:none;font-variant-numeric:tabular-nums}
+
+/* Players tab: team headings on the rhythm */
+#x-gb>h3.x-h3+.x-list{margin-bottom:8px}
+
+/* Weather tab */
+#wx-host .wx-card{padding:16px!important;border-radius:20px!important;gap:12px!important}
+#wx-host .wx-top{align-items:center;min-width:0}
+#wx-host .wx-top>div:last-child{min-width:0}
+#wx-host .wx-top b{overflow-wrap:anywhere}
+#wx-host .wx-big{flex:none;white-space:nowrap}
+#wx-host .wx-alert{padding:12px 16px!important}
+#wx-host .wx-alert span{overflow-wrap:anywhere}
+/* four stat tiles: labels on one shared row (bottom-aligned), values on the next, units tucked under */
+#wx-host .wx-stats{grid-template-rows:auto auto;row-gap:0;gap:8px}
+#wx-host .wx-stats>div{grid-row:span 2;display:grid;grid-template-rows:subgrid;row-gap:6px;padding:12px 10px!important;min-width:0}
+#wx-host .wx-stats small{align-self:end}
+#wx-host .wx-stats b{align-self:start;font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:3px;row-gap:2px}
+#wx-host .wx-stats b i{white-space:nowrap}
+/* chart: section labels and values get a halo so dashed guide lines never strike through text */
+.wx-ch text{paint-order:stroke;stroke:var(--s1);stroke-width:3px;stroke-linejoin:round}
+.wx-ch .e{stroke:none}
+
+/* ================= PLAYER CARD (leftovers; audit C owns the rest) ================= */
+.x-ch h1{overflow-wrap:anywhere}
+.x-sel .x-selh{gap:12px;min-width:0}
+.x-sel .x-selh>div:first-child{min-width:0}
+.x-sel .x-selh small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.x-rates b{font-variant-numeric:tabular-nums}
+.x-match .x-rank{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ================= 375pt and narrower ================= */
+@media (max-width:380px){
+  .page .x-tabs [data-gt2]{font-size:13px!important}
+  .x-home .x-game{flex-basis:160px!important}
+  .h-card .h-nums b{font-size:22px!important}
+  #x-gb .lvg{column-gap:6px}
+  #x-gb .lvg b{font-size:15px}
+  #wx-host .wx-stats{gap:6px}
+  #wx-host .wx-stats>div{padding:10px 8px!important}
+}

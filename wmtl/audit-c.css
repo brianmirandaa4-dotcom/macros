@@ -1,0 +1,144 @@
+/* tail. audit C — Board, Players, Search + profiles, slate picker, sheets, modals, toast, pull-to-refresh, header, market sheets.
+   Tokens only (--s0..--s4, --t1..--t3, --hair, --hair2, --edge, --loss, --live, --f-ui, --f-num, --f-disp). 8pt rhythm. Loads last. */
+
+/* ---------- 1. Chrome: header, sheet bar and tab bar are solid, so scrolled text never shows through as ghost letters */
+.top{background:var(--s0)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.page .sbar{background:var(--s0)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.page.scrolled .sbar{box-shadow:inset 0 -1px 0 var(--hair)!important}
+.tabbar{background:color-mix(in srgb,var(--s0) 97%,transparent)!important;-webkit-backdrop-filter:saturate(1.4) blur(24px)!important;backdrop-filter:saturate(1.4) blur(24px)!important}
+/* header controls: 44pt targets */
+.srchbtn{width:44px;height:44px;margin-right:4px}
+.slatebtn{min-height:44px}
+
+/* ---------- 2. Horizontal chip rails bleed to the screen edge and never cut a chip against the content edge */
+.chips{padding-block:2px;scroll-padding-inline:var(--side);gap:var(--s-gap,8px)}
+.view>.chips{max-width:none!important;width:calc(100% + max(var(--side),env(safe-area-inset-left,0px)) + max(var(--side),env(safe-area-inset-right,0px)))}
+.chips::after,.x-tabs::after{content:"";flex:none;width:1px}
+.chip.tap{min-height:44px;padding-inline:16px;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- 3. Board */
+.view .sec>.hd{align-items:center;gap:12px;min-width:0}
+.view .sec>.hd h2{min-width:0}
+.view .sec>.hd .x-link{min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+.view .sec>.hd>.sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-variant-numeric:tabular-nums}
+.bplist{border-radius:var(--r16);overflow:hidden}
+.bph{min-height:52px;padding:8px 16px!important;gap:12px!important}
+.bph>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bph>span:last-child{flex:none;display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bph>span:last-child svg{width:16px;height:16px;color:var(--t3)}
+.bpb{padding:0 16px 8px!important;gap:0!important}
+.bpb>.link{min-height:44px;justify-self:start;display:inline-flex;align-items:center}
+/* one prop: label + line on the left, best prices right-aligned in a tabular column, every book in a tidy 2-up grid */
+.brow{grid-template-columns:minmax(0,1fr) auto!important;align-items:start;gap:8px 16px!important;padding:12px 0!important}
+.brow .bm{min-width:0;font:600 15px/1.3 var(--f-ui)!important;overflow-wrap:anywhere}
+.brow .bm .num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.brow .bm>div{margin-top:4px}
+.brow .bb{display:grid!important;gap:4px!important;justify-items:end;font:600 14px/1.2 var(--f-num)!important;font-variant-numeric:tabular-nums;color:var(--t2)}
+.brow .bb>span{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+.brow .bb b{color:var(--t1);min-width:4.2ch;text-align:right}
+.brow .bb i,.rung i{font:600 11px/1 var(--f-ui)!important;font-style:normal;color:var(--t3);min-width:3ch;text-align:left}
+.brow .ball{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px!important;font:500 12px/1.35 var(--f-num)!important;font-variant-numeric:tabular-nums;color:var(--t3)}
+.brow .ball>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.mdl{display:inline-block;padding-block:12px;margin-block:-12px;font:600 13px/20px var(--f-ui)!important;font-variant-numeric:tabular-nums}
+.mdl b{font-family:var(--f-num)}
+/* ladders: an even grid that fills the row; threshold small, price big, book quiet */
+.brow.lad{grid-template-columns:1fr!important}
+.blad{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px!important;margin-top:4px}
+.brow .rung{display:grid!important;gap:4px;min-width:0;padding:8px 10px!important;border-radius:var(--r10)!important;background:var(--s2);box-shadow:inset 0 0 0 1px var(--hair)!important;
+  font:700 15px/1.1 var(--f-num)!important;font-variant-numeric:tabular-nums;color:var(--t1)!important;white-space:nowrap;overflow:hidden}
+.brow .rung b{font:600 11px/1 var(--f-ui)!important;color:var(--t2);letter-spacing:.02em}
+/* empty search result (board) and other in-list empty states */
+.c-empty{display:grid;gap:4px;justify-items:center;text-align:center;padding:32px 16px;margin-top:16px;border-radius:var(--r16);background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair)}
+.c-empty b{font:600 16px/1.3 var(--f-ui);color:var(--t1);overflow-wrap:anywhere}
+.c-empty span{font:500 14px/1.4 var(--f-ui);color:var(--t3)}
+
+/* ---------- 4. Players tab */
+#pres:empty{display:none}
+#pres{margin-top:16px!important}
+.x-teams{gap:8px!important}
+.x-teams .x-chip,.x-chips .x-chip{min-height:44px}
+.x-shelf>.x-link[data-more]{min-height:44px;display:inline-flex;align-items:center}
+.x-li{min-height:56px;padding-inline:4px!important}
+.x-li>div:first-child{min-width:0}
+.x-li b,.x-li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-li>div:last-child{flex:none;color:var(--t3)}
+
+/* ---------- 5. Search sheet */
+.page .list>p.sub{margin:0;padding:24px 16px;text-align:center;color:var(--t3)}
+.page .row .nm,.page .row .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page .row>div:first-child{min-width:0}
+.page .row .rt{color:var(--t3)}
+
+/* ---------- 6. Player profile (openCard) */
+/* market rail: full-bleed, sticks flush under the solid sheet bar, 44pt pills */
+.page .x-tabs{width:calc(100% + 2 * var(--side))!important;max-width:none!important;margin-inline:calc(-1 * var(--side))!important;padding-inline:var(--side)!important;scroll-padding-inline:var(--side);
+  top:calc(48px + env(safe-area-inset-top,0px))!important;background:var(--s0)!important;box-shadow:inset 0 -1px 0 var(--hair)}
+.page .x-tabs button{min-height:44px;padding-inline:16px!important;white-space:nowrap}
+.x-ch>div{min-width:0}
+.x-ch h1{overflow-wrap:anywhere}
+.x-ch p{font-variant-numeric:tabular-nums}
+/* model take: labels share one top line, the Report link centres */
+.x-take{align-items:start!important;grid-template-columns:minmax(0,1.25fr) repeat(2,minmax(0,1fr)) auto!important;gap:8px 12px!important;padding:12px 16px!important}
+.x-take>div{min-width:0}
+.x-take b{font-variant-numeric:tabular-nums}
+.x-take .x-go{align-self:center;min-height:44px;display:inline-flex;align-items:center}
+.x-take.off small{white-space:normal;overflow-wrap:anywhere}
+/* hit-rate chart: value labels never clip at the top, and get a halo so the dashed line never strikes through them */
+.x-chart{overflow:visible;margin-top:16px}
+.x-chart text{paint-order:stroke;stroke:var(--s1);stroke-width:3px;stroke-linejoin:round}
+/* every-book table: fixed tabular columns so chips line up even when one side is missing */
+.x-brow{grid-template-columns:minmax(0,1fr) 56px 64px 64px!important;gap:8px!important;min-height:44px;padding:4px 0!important}
+.x-brow>span:first-child{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-brow>span:nth-child(2){text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.x-brow>span:nth-child(n+3){text-align:center;justify-self:stretch;font-variant-numeric:tabular-nums;white-space:nowrap}
+.x-odd.sm{min-width:0!important;justify-self:stretch}
+/* bio disclosure: a real 48pt row with its own chevron */
+.x-more{padding:0 16px!important}
+.x-more>summary{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none}
+.x-more>summary::-webkit-details-marker{display:none}
+.x-more>summary::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--t3);border-bottom:2px solid var(--t3);transform:rotate(45deg) translateY(-2px);transition:transform var(--d2,200ms)}
+.x-more[open]>summary::after{transform:rotate(-135deg) translateX(-2px)}
+.x-more[open]{padding-bottom:16px!important}
+.x-more .pgrid{gap:16px 12px}
+.x-more .pgrid>div{min-width:0}
+.x-more .pgrid .label{display:block;margin-bottom:4px}
+.x-book{min-height:44px}
+/* empty card body (no props this week) */
+#x-cbody>p.sub:only-child{margin:0;padding:24px 16px;text-align:center;border-radius:var(--r16);background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair);color:var(--t3)}
+/* stat tables inside sheets: one line per row, tabular, a soft fade shows there is more to scroll */
+.page .tbl{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 16px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 16px),transparent);padding-right:16px}
+.page .tbl th,.page .tbl td{padding:10px 8px}
+.page .tbl td:first-child,.page .tbl th:first-child{white-space:nowrap;padding-left:4px}
+.page .tbl td{font-variant-numeric:tabular-nums}
+.x-h3{margin:24px 0 8px}
+
+/* ---------- 7. Slate picker + modals */
+.sp2-seg button{min-height:44px}
+.sp2-mid{min-width:0}
+.sp2-mid>b,.sp2-mid>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp2-end{flex:none}
+.sp2-imp{min-height:48px}
+
+/* ---------- 8. Toast: wide enough for a copied bet slip, never a 5-line tower */
+.toastfix{width:max-content;max-width:min(360px,calc(100vw - 32px))!important}
+.toast{display:flex!important;align-items:flex-start!important;gap:10px!important;padding:12px 16px!important;border-radius:var(--r16)!important;font:600 14px/1.35 var(--f-ui)!important;text-align:left;overflow-wrap:anywhere}
+.toast svg{flex:none;margin-top:0}
+
+/* ---------- 9. Pull to refresh sits below the header + ticker, not on top of it */
+.ptr{top:calc(env(safe-area-inset-top,0px) + 96px)!important;box-shadow:inset 0 0 0 1px var(--hair2)}
+
+/* ---------- 10. Loading state: a centred spinner, not a lone grey word in the corner */
+.view>p.sub:only-child{display:grid;justify-items:center;gap:12px;padding:96px 0;margin:0;text-align:center;color:var(--t3)}
+.view>p.sub:only-child::before{content:"";width:24px;height:24px;border-radius:50%;border:2.5px solid var(--hair2);border-top-color:var(--t2);animation:spin .8s linear infinite}
+@media (prefers-reduced-motion:reduce){.view>p.sub:only-child::before{animation:none}}
+
+/* ---------- 11. Narrow phones (375 and below) */
+@media (max-width:380px){
+  .brow .ball{grid-template-columns:1fr}
+  .x-brow{grid-template-columns:minmax(0,1fr) 48px 60px 60px!important}
+  .x-take{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .x-take .x-go{grid-column:1/-1;justify-self:start;min-height:32px}
+}
+/* stat tables inside the bio card run to the card edges; the fade only marks "more to scroll" */
+.x-more .tbl{margin-inline:-16px;padding-right:24px}
+.x-more .tbl td:first-child,.x-more .tbl th:first-child{padding-left:16px}

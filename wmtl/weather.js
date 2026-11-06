@@ -75,19 +75,20 @@ async function fill(root){ const els = [...(root || document).querySelectorAll('
 function chart(w, kick){ const H = w.win, n = H.length, W = 340, X0 = 26, X1 = W - 10, step = (X1 - X0) / Math.max(1, n - 1); const x = i => X0 + i * step;
   const k = new Date(kick).getTime(); const tx = t => X0 + (t - H[0].t) / (H[n - 1].t - H[0].t || 1) * (X1 - X0);
   const maxW = Math.max(25, ...H.map(h => Math.max(h.wind || 0, h.gust || 0)));
-  const yP = v => 150 - v / 100 * 60, yW = v => 212 - v / maxW * 38;
+  const yP = v => 150 - v / 100 * 50, yW = v => 222 - v / maxW * 30;
   const wl = H.map((h, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${yW(h.wind || 0).toFixed(1)}`).join(''); const gl = H.some(h => h.gust) ? H.map((h, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${yW(h.gust || h.wind || 0).toFixed(1)}`).join('') : '';
   const now = Date.now(); const showNow = now >= H[0].t && now <= H[n - 1].t;
   const hr = t => new Date(t).toLocaleTimeString('en-US', {hour: 'numeric', timeZone: 'America/New_York'}).replace(' ', '').toLowerCase();
-  return `<svg class="wx-ch" viewBox="0 0 ${W} 250" role="img" aria-label="Hourly forecast through the game">
+  return `<svg class="wx-ch" viewBox="0 0 ${W} 262" role="img" aria-label="Hourly forecast through the game">
+    <line class="kick" x1="${tx(k)}" x2="${tx(k)}" y1="56" y2="224"/>${showNow ? `<line class="now" x1="${tx(now)}" x2="${tx(now)}" y1="56" y2="224"/>` : ''}
     ${H.map((h, i) => `<text class="e" x="${x(i)}" y="24">${emoji(h)}</text><text class="t" x="${x(i)}" y="46">${h.temp}°</text>`).join('')}
     <text class="lab" x="0" y="88">Rain/snow chance</text>${H.map((h, i) => `<rect class="pb${/snow|flurr/i.test(h.sf) ? ' sn' : ''}" x="${x(i) - 8}" y="${yP(h.pop)}" width="16" height="${150 - yP(h.pop)}" rx="3"/><text class="v" x="${x(i)}" y="${yP(h.pop) - 4}">${h.pop ? h.pop + '%' : ''}</text>`).join('')}
     <line class="base" x1="${X0 - 12}" x2="${X1 + 6}" y1="150" y2="150"/>
-    <text class="lab" x="0" y="166">Wind (mph)${gl ? ', gusts dashed' : ''}</text>${gl ? `<path class="gl" d="${gl}"/>` : ''}<path class="wl" d="${wl}"/>${H.map((h, i) => `<circle class="wd" cx="${x(i)}" cy="${yW(h.wind || 0)}" r="3"/><text class="v" x="${x(i)}" y="${yW(h.wind || 0) - 7}">${h.wind ?? ''}</text>`).join('')}
-    <line class="base" x1="${X0 - 12}" x2="${X1 + 6}" y1="212" y2="212"/>
-    ${H.map((h, i) => `<text class="hr" x="${x(i)}" y="232">${hr(h.t)}</text>`).join('')}
-    <line class="kick" x1="${tx(k)}" x2="${tx(k)}" y1="56" y2="214"/><text class="kl" x="${tx(k)}" y="246">Kickoff</text>
-    ${showNow ? `<line class="now" x1="${tx(now)}" x2="${tx(now)}" y1="56" y2="214"/><text class="nl" x="${tx(now)}" y="64">Now</text>` : ''}</svg>`; }
+    <text class="lab" x="0" y="166">Wind (mph)${gl ? ', gusts dashed' : ''}</text>${gl ? `<path class="gl" d="${gl}"/>` : ''}<path class="wl" d="${wl}"/>${H.map((h, i) => `<circle class="wd" cx="${x(i)}" cy="${yW(h.wind || 0)}" r="3"/><text class="v" x="${x(i)}" y="${yW(Math.max(h.wind || 0, h.gust || 0)) - 7}">${h.wind ?? ''}</text>`).join('')}
+    <line class="base" x1="${X0 - 12}" x2="${X1 + 6}" y1="222" y2="222"/>
+    ${H.map((h, i) => `<text class="hr" x="${x(i)}" y="242">${hr(h.t)}</text>`).join('')}
+    <text class="kl" x="${tx(k)}" y="258">Kickoff</text>
+    ${showNow ? `<text class="nl" x="${tx(now)}" y="64">Now</text>` : ''}</svg>`; }
 
 function sentence(w){ const out = []; const hr = t => new Date(t).toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'});
   if(w.onset) out.push(`${/snow|flurr/i.test(w.onset.sf) ? 'Snow' : 'Rain'} chance jumps to ${w.onset.pop}% around ${hr(w.onset.t)} ET.`);
