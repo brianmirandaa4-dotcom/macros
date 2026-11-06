@@ -364,7 +364,7 @@ textarea:focus{outline:none;border-color:var(--kcal)}
 /* profile button */
 .avatar{width:36px;height:36px;border-radius:50%;border:0;background:conic-gradient(from 200deg,var(--pro),var(--carb),var(--fat),var(--pro));padding:2px;flex:none;display:grid;place-items:center}
 .avatar span{width:100%;height:100%;border-radius:50%;background:var(--surface);display:grid;place-items:center;font:800 12px/1 var(--f-display);letter-spacing:.04em;color:var(--fg)}
-@media (max-width:780px){.tabbar{grid-template-columns:repeat(5,1fr)!important}.tabbar .tab{font-size:11px}}
+@media (max-width:780px){.tabbar{grid-template-columns:repeat(6,1fr)!important}.tabbar .tab{font-size:10.5px}}
 
 /* onboarding */
 .onb{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;display:flex;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
@@ -1364,6 +1364,9 @@ header.top{z-index:20}
 .hbtn{width:40px!important;height:40px!important;touch-action:manipulation;position:relative}
 .hbtn::after,#profBtn::after{content:"";position:absolute;inset:-6px;border-radius:50%}
 #profBtn{touch-action:manipulation;position:relative;cursor:pointer}
+
+.fd-hub{max-width:none;overflow-x:auto;scrollbar-width:none;display:flex!important;gap:3px}.fd-hub::-webkit-scrollbar{display:none}.fd-hub button{flex:1 0 auto;white-space:nowrap;padding:9px 12px;font-size:13.5px}
+#fdPanel>.pg{display:flex;flex-direction:column;gap:14px}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -1509,8 +1512,10 @@ header.top{z-index:20}
   <section class="view" id="v-foods" aria-label="Foods" hidden>
     <div class="tip" id="tip-foods" hidden></div>
     <div class="fd-head"><div><div class="sub">Food library</div><h1>Foods</h1></div><button class="ghost fd-new" id="newFood" type="button">+ New food</button></div>
+    <div class="seg2 fd-hub" id="fdHub" role="tablist" aria-label="Foods sections"></div>
     <div class="fd-sbar"><label class="fd-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="fSearch" type="search" placeholder="Search foods, drinks, meals" aria-label="Search foods" autocomplete="off" enterkeyhint="search"><button type="button" class="fd-clr" id="fClear" aria-label="Clear search" hidden>✕</button></label></div>
     <div id="fdBody"></div>
+    <div id="fdPanel"></div>
   </section>
 
   <!-- FRIENDS -->
@@ -1704,6 +1709,12 @@ header.top{z-index:20}
 <script>
 (() => {
 'use strict';
+/* Computers show the exact phone app inside a phone-sized frame (same layout, same data), unless ?desktop=1 */
+if(window.top===window&&!/[?&](inframe|desktop)=1/.test(location.search)&&Math.min(screen.width,innerWidth)>700&&!/iPhone|iPad|Android/i.test(navigator.userAgent)){
+  const src=location.pathname+(location.search?location.search+'&':'?')+'inframe=1'+location.hash;
+  document.body.innerHTML=`<div class="pf-wrap"><div class="pf-phone"><iframe class="pf-frame" src="${src}" title="Trainer" allow="camera; microphone; clipboard-read; clipboard-write; fullscreen; geolocation"></iframe></div><p class="pf-cap">Exact iPhone view · <a href="?desktop=1">open full width</a></p></div>`;
+  const st=document.createElement('style');st.textContent=`html,body{margin:0;height:100%;background:#050608;overflow:hidden}.pf-wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:13px/1.4 system-ui,-apple-system,sans-serif;color:#8C92A4}.pf-phone{width:402px;height:min(874px,calc(100vh - 60px));border-radius:46px;padding:10px;background:#111318;box-shadow:0 0 0 2px #2a2e38,0 30px 80px rgba(0,0,0,.6)}.pf-frame{width:100%;height:100%;border:0;border-radius:38px;background:#0B0C10;display:block}.pf-cap a{color:#C7B6FF}`;document.head.appendChild(st);
+  return}
 const $ = id => document.getElementById(id);
 const IC = {
   today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8"/></svg>',
@@ -1721,7 +1732,7 @@ const IC = {
 };
 const VIEWS=[['today','Today'],['train','Train'],['week','Week'],['month','Month'],['friends','Friends'],['foods','Foods'],['plan','Plan']];
 const TABS=[['today','Today'],['train','Train'],['progress','Progress'],['foods','Foods'],['plan','Plan'],['add','Log']];
-const TABS_M=[['today','Today'],['foods','Foods'],['add','Log'],['train','Train'],['progress','Progress']];
+const TABS_M=[['today','Today'],['foods','Foods'],['train','Train'],['add','Log'],['progress','Progress'],['plan','Plan']];
 const MEALS=[['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snacks'],['drinks','Drinks']];
 // alcoholic drinks go to the Drinks section on their own (food that just sounds similar, like sour cream or hard-boiled eggs, does not)
 const DRINK_RX=/(^|[^a-z])(beer|lager|ipa|stout|porter|pilsner|seltzer|twisted tea|cider|wine|champagne|prosecco|sangria|sake|soju|vodka|tequila|mezcal|rum\b|whisk|bourbon|scotch|cognac|brandy|liqueur|schnapps|fireball|jager|baileys|kahlua|amaretto|margarita|mojito|martini|daiquiri|mai tai|bloody mary|mimosa|bellini|spritz|negroni|old fashioned|manhattan|colada|long island|paloma|russian|toddy|shot\b|michelada|white claw|truly|high noon|corona|modelo|heineken|bud light|budweiser|michelob|coors|miller|stella|guinness|yuengling|pacifico|loko)/i,NOT_DRINK_RX=/cream|egg|candy|cake|dough|bread|chicken|pork|beef|sauce|glaze|marinade|braised|battered|cheese/i;
@@ -2659,7 +2670,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.72';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.73';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3387,7 +3398,15 @@ function fdSearch(q){const ql=q.toLowerCase(),words=ql.split(/\s+/).filter(Boole
     <div class="fd-list">${meals.map(([m,i])=>fdMealRow(m,i)).join('')}${foods.slice(0,cap).map(fdFoodRow).join('')}</div>
     ${foods.length>12?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show fewer':`Show all ${Math.min(foods.length,60)}`}</button>`:''}
     ${q.length>=2?`<button type="button" class="fd-online" data-olq="${esc(q)}"><span>${GI.book}</span><span><b>Search 6,500+ foods and every brand</b><em>USDA and Open Food Facts for “${esc(q)}”</em></span>${CHEV}</button>`:''}</section>`}
-function renderFoods(){renderTip('foods');const q=$('fSearch').value.trim();$('fClear').hidden=!q;
+const FD_HUB=[['library','Library'],['ideas','Meals that fit'],['cook','Recipes'],['prep','Meal prep'],['fuel','Fuel']];let fdSec='library';
+function fdShowSec(){const lib=fdSec==='library';$('fdHub').innerHTML=FD_HUB.map(([k,l])=>`<button type="button" role="tab" data-fsec="${k}" aria-pressed="${fdSec===k}">${l}</button>`).join('');
+  document.querySelector('#v-foods .fd-sbar').hidden=!lib;$('fdBody').hidden=!lib;const P=$('fdPanel');
+  if(lib){if(P.firstElementChild)$('pageStore').appendChild(P.firstElementChild);return false}
+  const el=$('pg-'+fdSec);if(el&&el.parentNode!==P){if(P.firstElementChild)$('pageStore').appendChild(P.firstElementChild);P.appendChild(el)}
+  try{(PG_R[fdSec]||(()=>{}))()}catch(e){}return true}
+$('fdHub').addEventListener('click',e=>{const b=e.target.closest('[data-fsec]');if(!b)return;fdSec=b.dataset.fsec;renderFoods();window.scrollTo({top:0,behavior:'instant'})});
+function openFoodsSec(k){fdSec=k;if(typeof closePages==='function'&&pgStack.length)closePages();setView('foods')}
+function renderFoods(){renderTip('foods');if(fdShowSec())return;const q=$('fSearch').value.trim();$('fClear').hidden=!q;
   $('fdBody').innerHTML=q?fdSearch(q):`<div class="fd-cols">${fdLists()}${fdBrowse()}</div>`}
 $('fSearch').addEventListener('input',()=>{fdMore=false;renderFoods()});
 $('fClear').onclick=()=>{$('fSearch').value='';fdMore=false;renderFoods();$('fSearch').focus()};
@@ -4292,8 +4311,8 @@ function renderMe(){
     </div>
     <div class="glabel">Food & water</div>
     <div class="mgrid">
-      ${mtile({pg:'ideas',ic:'cloche',c:'--good',t:'Meal ideas'})}
-      ${mtile({pg:'prep',ic:'list',c:'--carb',t:'Meal prep'})}
+      ${mtile({ga:'fd_ideas',ic:'cloche',c:'--good',t:'Meal ideas'})}
+      ${mtile({ga:'fd_prep',ic:'list',c:'--carb',t:'Meal prep'})}
       ${mtile({pg:'hyd',ic:'drop',c:'--fat',t:'Water & fueling'})}
       ${mtile({pg:'report',ic:'chart',c:'--kcal',t:'Monthly report'})}
     </div>
@@ -4316,7 +4335,7 @@ function renderMe(){
 }
 GACT.tour=()=>{closePages();setTimeout(startTour,200)};
 GACT.privacy=()=>{closePages();openPrivacy()};
-GACT.account2=()=>openAccount('create');GACT.signin=()=>openAccount('signin');GACT.recover=()=>openAccount('recover');
+GACT.fd_ideas=()=>openFoodsSec('ideas');GACT.fd_prep=()=>openFoodsSec('prep');GACT.fd_cook=()=>openFoodsSec('cook');GACT.account2=()=>openAccount('create');GACT.signin=()=>openAccount('signin');GACT.recover=()=>openAccount('recover');
 function renderAccount(){
   const wear=S.profile.wear||[];
   $('pg-account').innerHTML=`<div class="me-hero"><button class="avatar" type="button" id="acAv" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button></div>
@@ -5300,7 +5319,7 @@ function renderPrep(){
   const have=((S.prefs.groc||{})[wk])||[];
   const uL=(u,q)=>({lb:'lb',oz:'oz',cup:q===1?'cup':'cups',tbsp:'tbsp',each:'',scoop:q===1?'scoop':'scoops'}[u]??u);
   $('pg-prep').innerHTML=`<div class="card prep-hero" style='--bnr:${bnr("dinner","prep")}'><div class="eyebrow">Week of ${niceDate(wk,{month:'short',day:'numeric'})}</div><h2>3 high-protein meals to prep this Sunday</h2><p>About ${r0(rs.reduce((a,r)=>a+r.min,0)/60*10)/10} hours of cooking for ${rs.reduce((a,r)=>a+r.sv,0)} meals. New recipes every Sunday.</p></div>
-    <div class="glist">${grow({pg:'cook',ic:'cloche',c:'--good',t:'More meal ideas & recipes',s:'Built from your favourite foods · bump servings to prep'})}</div>
+    <div class="glist">${grow({ga:'fd_cook',ic:'cloche',c:'--good',t:'More meal ideas & recipes',s:'Built from your favourite foods · bump servings to prep'})}</div>
     ${rs.map((r,i)=>{const s=prepServing(r);return `<div class="card" style="display:flex;flex-direction:column;gap:12px">
       <div class="idea-top"><div class="ic thumb" style='background-image:${thumbURL(['lunch','dinner','breakfast'][i%3])}'></div><div class="idea-t"><div class="eyebrow">${r.sv} servings · ${r.min} min</div><h2>${esc(r.name)}</h2></div></div>
       <div class="idea-mac"><span class="mp" style="--c:var(--kcal)"><b>${fmt(s.k)}</b> kcal</span><span class="mp" style="--c:var(--pro)"><b>${r0(s.p)}</b>g P</span><span class="mp" style="--c:var(--carb)"><b>${r0(s.c)}</b>g C</span><span class="mp" style="--c:var(--fat)"><b>${r0(s.f)}</b>g F</span><span class="idea-fit">per serving</span></div>
@@ -5987,8 +6006,8 @@ function renderTodayRows(){
   el.innerHTML=microRow()+liftReviewRow()+(S.needBackup?grow({ga:'backupNow',ic:'download',c:'--carb',t:'Back up your log',s:S.lastBackup?`Last backup ${Math.floor((Date.now()-S.lastBackup)/864e5)} days ago`:'You haven’t saved a copy yet · 2 seconds',v:'Save',vc:'warn'}):'')+friendsRow()+grow({pg:'health',ic:'moon',c:'--good',t:'Recovery & sleep',s:(typeof syncing!=='undefined'&&syncing&&!hs)?'<i class="skel-line"></i>':hs||((cfg.st&&(cfg.st.whoop||cfg.st.oura||cfg.st.garmin))?'Waiting for today’s data':'Connect WHOOP, Oura or Garmin'),v:h.recovery!=null?`${h.recovery}%`:'',vc:rc})
     +(()=>{const tk=todayKey(),pm=prevYM();if(k!==tk||+tk.slice(8)>7||!monthHasData(pm))return '';const [y,m]=pm.split('-').map(Number);return grow({ga:'report',ic:'chart',c:'--good',t:`Your ${MON[m-1]} report is ready`,s:'How the month went: nutrition, vitamins, water, training, sleep',v:'New',vc:'on'})})()
     +(()=>{const hp=hydPlan(k),hd=hydDay(k);return grow({pg:'hyd',ic:'drop',c:'--fat',t:'Hydration',s:`${fmt(hd.oz)} of ${fmt(hp.oz.total)} oz${hp.types.length?' · '+hp.label.toLowerCase():''}${hd.na?` · ${fmt(hd.na)} mg sodium`:''}`,v:hd.oz>=hp.oz.total?'✓':`${Math.round(hd.oz/Math.max(1,hp.oz.total)*100)}%`,vc:hd.oz>=hp.oz.total?'on':''})})()
-    +grow({pg:'cook',ic:'cloche',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
-    +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'quill',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
+    +grow({ga:'fd_cook',ic:'cloche',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
+    +grow({ga:'fd_prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'quill',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
 const TIPS={today:['Welcome to Trainer','Type what you ate or drank in plain words, like “2 eggs and toast” or “2 orange crushes”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
   train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
