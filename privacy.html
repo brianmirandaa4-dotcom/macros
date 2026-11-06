@@ -1,15 +1,52 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Syncope Privacy</title>
-<style>body{background:#0B0C10;color:#ECEEF4;font:16px/1.6 system-ui,-apple-system,sans-serif;margin:0;padding:32px max(20px,env(safe-area-inset-left))}main{max-width:640px;margin:0 auto}h1{font-size:28px}h2{font-size:18px;margin-top:28px}p,li{color:#B8BDCA}a{color:#C7B6FF}</style></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Syncope Privacy</title>
+<style>body{background:#0B0C10;color:#ECEEF4;font:16px/1.6 system-ui,-apple-system,sans-serif;margin:0;padding:32px max(20px,env(safe-area-inset-left))}main{max-width:680px;margin:0 auto}h1{font-size:28px;margin-bottom:4px}h2{font-size:18px;margin-top:28px}p,li{color:#B8BDCA}a{color:#C7B6FF}.sum{background:#13151B;border:1px solid #262A36;border-radius:14px;padding:14px 18px}.sum li{margin:4px 0}</style></head>
 <body><main>
 <h1>Syncope privacy policy</h1>
-<p>Last updated November 4, 2026.</p>
-<h2>What Syncope stores</h2>
-<p>Everything you log in Syncope (food, workouts, weigh-ins, check-ins, your plan and profile) is saved only in your browser on your own device. It is not uploaded to us.</p>
-<h2>WHOOP and Garmin data</h2>
-<p>If you choose to connect WHOOP or Garmin, a small sync server operated by the Syncope owner on Cloudflare stores the sign-in tokens needed to read your data (recovery, sleep, heart rate, strain, workouts, steps and similar metrics) and a short-lived copy of the last few weeks of that data, so Syncope can show it to you. This data is only sent back to your own copy of Syncope. It is never sold, shared, or used for advertising.</p>
-<h2>Disconnecting</h2>
-<p>Use Plan → Connections → Disconnect in Syncope to remove your tokens and cached data from the sync server. You can also revoke access from your WHOOP or Garmin account settings at any time.</p>
+<p>Last updated November 6, 2026.</p>
+
+<div class="sum"><b>The short version</b><ul>
+<li>Your food log, workouts, weigh-ins and plan live on your own phone.</li>
+<li>We never sell your data, never use it for advertising, and never share it with data brokers.</li>
+<li>Wearable data (WHOOP, Garmin, Oura, Apple Health) is only used to show you your own health and fitness information, and is never sent to an AI model.</li>
+<li>Friends only see what you choose to share, and you can stop sharing at any time.</li>
+</ul></div>
+
+<h2>What stays on your device</h2>
+<p>Everything you log in Syncope (food, drinks, water, workouts, weigh-ins, check-ins, body measurements, your plan and profile) is saved in your browser on your own device. It is not uploaded to us unless you turn on one of the features below.</p>
+
+<h2>Wearables: WHOOP, Garmin and Oura</h2>
+<p>If you connect a wearable, you sign in with that company and approve access yourself. Our sync server (run on Cloudflare) stores the access tokens and a short-lived copy of recent data (such as recovery, sleep, heart rate, HRV, strain, steps and workouts) so Syncope can show it to you. That data is only sent back to your own copy of Syncope. It is not shared with other companies, not used to train or prompt any AI model, and not used for advertising.</p>
+
+<h2>Apple Health</h2>
+<p>If you import or connect Apple Health data, it is used only for health and fitness features inside Syncope. It is never used for advertising, never sold, and never shared with a third party without your express permission.</p>
+
+<h2>Photo and label scanning</h2>
+<p>When you scan a meal, label, barcode or drink with the camera, or ask about a food by name, that photo or text is sent to Anthropic's Claude service (directly, or through our sync server) to estimate nutrition. Only the food photo or text is sent, not your wearable or health data. We do not keep the photo. Barcode and brand searches are looked up in the public Open Food Facts database.</p>
+
+<h2>Syncope Friends</h2>
+<p>If you join Syncope Friends, our server stores your username, profile picture, an optional one-way hashed phone number (so friends can find you), and the daily summaries you choose to share (for example calories, macros, water, workouts and recovery). Use Friends → Privacy to choose what is shared. Use "Leave Syncope Friends" to delete your social profile.</p>
+
+<h2>Notifications</h2>
+<p>If you turn on rest-timer notifications, our server stores a push subscription so it can send you a "rest is over" alert. It contains no health data.</p>
+
+<h2>Children</h2>
+<p>Syncope is not meant for children under 13, and we do not knowingly collect information from them. Syncope never sets a calorie deficit for anyone under 18.</p>
+
+<h2>Security and breaches</h2>
+<p>Data on our server is transmitted over HTTPS and access tokens are never shown to other users. If a breach ever exposes your information, we will notify you, and regulators where required, without unreasonable delay.</p>
+
+<h2>Your choices</h2>
+<ul>
+<li>Disconnect a wearable in Syncope (Profile → Wearables) to delete its tokens and cached data from our server. You can also revoke access in your WHOOP, Garmin, Oura or Apple Health settings.</li>
+<li>Export or delete your log at any time in Profile → Backup &amp; export.</li>
+<li>Ask us to delete anything we hold about you by emailing the address below.</li>
+</ul>
+
+<h2>Not medical advice</h2>
+<p>Syncope gives general nutrition and fitness information. See our <a href="terms.html">terms</a>.</p>
+
 <h2>Contact</h2>
-<p>Questions: brianmirandaa4@gmail.com</p>
+<p>Questions or deletion requests: brianmirandaa4@gmail.com</p>
 </main></body></html>
