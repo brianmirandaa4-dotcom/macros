@@ -2430,7 +2430,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.43';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.44';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4154,7 +4154,7 @@ const TOUR=[
   ['#findBtn','Can’t find something?','Search jumps straight to any screen. Try “water”, “report” or “rest sound”.'],
   ['#helpBtn','That’s it','Replay this tour anytime from the ? up here. Now go log your first meal.']];
 let tourI=-1;
-function startTour(){closeSheet&&closeSheet();if(S.view!=='today')setView('today');tourI=0;setTimeout(tourStep,180)}
+function startTour(){closeSheet&&closeSheet();if(typeof pgStack!=='undefined'&&pgStack.length)closePages();if(S.view!=='today')setView('today');tourI=0;setTimeout(tourStep,180)}
 function tourEnd(){tourI=-1;const o=$('tourO');if(o)o.remove();try{localStorage.setItem('syncope.tour','1')}catch(e){}}
 function tourStep(){let o=$('tourO');if(tourI<0||tourI>=TOUR.length)return tourEnd();
   const [sel,h,b]=TOUR[tourI];let el=document.querySelector(sel);
@@ -4170,8 +4170,8 @@ function tourStep(){let o=$('tourO');if(tourI<0||tourI>=TOUR.length)return tourE
     card.style.top=(below+cardH<innerHeight-10?below:Math.max(12,r.top-pad-16-cardH))+'px'})}
 $('helpBtn').onclick=startTour;
 addEventListener('resize',()=>{if(tourI>=0)tourStep()});
-function maybeTour(){let seen=null;try{seen=localStorage.getItem('syncope.tour')}catch(e){}if(seen||!S.profile||!S.profile.onboarded||!$('onb').hidden)return;
-  setTimeout(()=>{if(S.view==='today'&&$('onb').hidden)startTour()},900)}
+function maybeTour(){let seen=null;try{seen=localStorage.getItem('syncope.tour')}catch(e){}if(seen||!S.profile||!S.profile.onboarded||!$('onb').hidden||(typeof pgStack!=='undefined'&&pgStack.length)||S.view!=='today'||document.querySelector('#sheetRoot .sheet'))return;
+  setTimeout(()=>{if(S.view==='today'&&$('onb').hidden&&!(typeof pgStack!=='undefined'&&pgStack.length))startTour()},900)}
 /* ================= MEAL IDEAS: meals sized to close your remaining macros ================= */
 // name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Syncope adjusts the amount, x = fixed)
 const IDEA_SRC=`Greek yogurt power bowl|bsR|3|greek yogurt:p:cup:1:0.5:2.5;granola:c:cup:0.25:0:1;blueberries:c:cup:0.5:0:1.5;honey:c:tbsp:1:0:2;almonds:f:oz:0.5:0:1.5
