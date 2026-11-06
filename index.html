@@ -979,6 +979,13 @@ header.top .wrap{gap:8px}
 .gym-tl li.now b{color:var(--fat)}
 .gym-tl li.done .gt-ic{background:var(--good);color:#0B0C10}.gym-tl li.done b{color:var(--muted);text-decoration:line-through}
 .gym-tl li.past:not(.done){opacity:.6}
+/* exercise header: name gets the full width, muscle tag sits under it, actions on the right */
+.ex-card .ex-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-areas:"g t s r" "g m s r";column-gap:6px;row-gap:5px;align-items:center}
+.ex-card .ex-h .ex-grip{grid-area:g;align-self:center}
+.ex-card .ex-h h3{grid-area:t;overflow-wrap:anywhere;line-height:1.2}
+.ex-card .ex-h .mus{grid-area:m;justify-self:start;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex-card .ex-h [data-exswap]{grid-area:s}.ex-card .ex-h [data-exdel]{grid-area:r}
+#trainActive.reo .ex-card .ex-h{grid-template-areas:"g t s r" "g t s r"}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
@@ -2513,7 +2520,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.55';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.56';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -5438,7 +5445,7 @@ function microOf(list){const names=(list||[]).map(e=>String(e.n||'').toLowerCase
 function microChips(list){const has=microOf(list);return has.length?`<div class="micro">${MICRO.filter(m=>has.includes(m[0])).map(([,l,c])=>`<span style="--c:var(${c})">${l}</span>`).join('')}</div>`:''}
 function microRow(){const k=S.day,list=S.days[k]||[];if(list.length<2)return '';const has=microOf(list),miss=MICRO.filter(m=>!has.includes(m[0])&&m[0]!=='omega');
   const tip={iron:'lean beef, spinach, beans (pair plants with vitamin C)',calcium:'Greek yogurt, milk, cheese',vitd:'salmon, eggs, fortified milk',vitc:'berries, peppers, oranges, broccoli'};
-  return grow({pg:'fuel',ic:'heart',c:'--good',t:miss.length?`Micronutrients: add ${miss.map(m=>m[1].toLowerCase()).join(', ')}`:'Micronutrients covered today',s:miss.length?`Try ${tip[miss[0][0]]}`:'Iron, calcium, vitamin D and vitamin C all have a food source today',v:`${4-miss.length}/4`,vc:miss.length?'':'on'})}
+  return grow({pg:'fuel',ic:'heart',c:'--good',t:'Micronutrients',s:miss.length?`Add ${miss.map(m=>m[1].toLowerCase()).join(', ')}: try ${tip[miss[0][0]]}`:'Iron, calcium, vitamin D and vitamin C all have a food source today',v:`${4-miss.length}/4`,vc:miss.length?'':'on'})}
 /* ---- Meal grades: how balanced each meal is against your own targets ---- */
 const MEAL_SHARE={breakfast:.25,lunch:.3,dinner:.3,snack:.15};
 const PRODUCE=/apple|banana|berr|orange|grape|mango|pineapple|kiwi|peach|pear|melon|cherr|fruit|salad|lettuce|spinach|kale|broccoli|carrot|pepper|tomato|cucumber|onion|zucchini|asparagus|green bean|veg|cauliflower|brussels|mushroom|avocado|sweet potato|corn\b|\bpeas?\b|beans?\b|lentil|salsa|greens|cabbage|celery|plantain|squash|raisin|date|fig|apricot|edamame|chickpea/;
