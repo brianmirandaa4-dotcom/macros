@@ -1,0 +1,142 @@
+# tail. (WHOMADETHISLINE) - fully automatic NFL player-prop refresh for the iPhone PWA in wmtl/.
+#
+# Every 15 minutes the gate decides (model/auto/gate.py):
+#   * refit    weekly, once the most recent Tuesday 06:00 ET has passed (validated before it replaces the live parameters)
+#   * refresh  inside 3 hours of any kickoff: every tick (<= 20 min apart); otherwise when the last refresh is >= 2h45m old
+#   * skip     otherwise (the gate job takes a few seconds and installs nothing)
+# The refresh job rebuilds the model inputs from approved sources only (nflverse releases, ESPN, Action Network with an ESPN
+# fallback, api.weather.gov, the official injury report via nflverse), reruns the trained model, checks every invariant,
+# and commits ONLY wmtl/data/** plus the wmtl/sw.js version bump, and only when something changed.
+name: tail-refresh
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'auto = let the gate decide; dry-run = build everything, publish nothing'
+        type: choice
+        default: auto
+        options: [auto, refresh, refit, dry-run]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tail-refresh
+  cancel-in-progress: false
+
+env:
+  TAIL_SEASON: '2026'
+  PYTHONUNBUFFERED: '1'
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.gate.outputs.mode }}
+      reason: ${{ steps.gate.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            model/auto
+            model/seed/params_meta.json
+            wmtl/data/index.json
+            wmtl/data/nfl/run_log.json
+            wmtl/data/nfl/state/schedule.json
+            wmtl/data/nfl/state/params/params_meta.json
+          sparse-checkout-cone-mode: false
+      - name: Restore run stamp
+        uses: actions/cache/restore@v4
+        with:
+          path: .tail-stamp
+          key: tail-stamp-${{ github.run_id }}
+          restore-keys: tail-stamp-
+      - name: Gate
+        id: gate
+        env:
+          TAIL_MODE: ${{ inputs.mode || 'auto' }}
+        run: python3 model/auto/gate.py --stamp .tail-stamp/stamp.json --mode "$TAIL_MODE"
+
+  refresh:
+    needs: gate
+    if: needs.gate.outputs.mode != 'skip'
+    runs-on: ubuntu-latest
+    # max runtime: a refresh takes ~8-12 min, a refit ~60-110 min; run.py stops before publishing when its own budget runs out
+    timeout-minutes: ${{ needs.gate.outputs.mode == 'refit' && 170 || 45 }}
+    env:
+      TAIL_MODE: ${{ needs.gate.outputs.mode }}
+      TAIL_REASON: ${{ needs.gate.outputs.reason }}
+      TAIL_MAX_MIN: ${{ needs.gate.outputs.mode == 'refit' && '150' || '35' }}
+      TAIL_SW_BUMP: ${{ vars.TAIL_SW_BUMP || 'always' }}
+      TAIL_STAMP: ${{ github.workspace }}/.tail-stamp/stamp.json
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: model/requirements.txt
+
+      - name: Install pinned requirements
+        run: python -m pip install --only-binary ':all:' -r model/requirements.txt
+
+      - name: Restore run stamp
+        uses: actions/cache/restore@v4
+        with:
+          path: .tail-stamp
+          key: tail-stamp-${{ github.run_id }}
+          restore-keys: tail-stamp-
+
+      - name: Restore nflverse history (past seasons; never changes)
+        id: hist
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            model/nfl/raw/*.parquet
+            !model/nfl/raw/*_${{ env.TAIL_SEASON }}.parquet
+          key: nflverse-hist-v1-2018-${{ env.TAIL_SEASON }}
+
+      - name: Run model refresh
+        id: run
+        run: |
+          mkdir -p .tail-stamp
+          python model/auto/run.py --mode "$TAIL_MODE" --reason "$TAIL_REASON"
+
+      - name: Save nflverse history
+        if: success() && steps.hist.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            model/nfl/raw/*.parquet
+            !model/nfl/raw/*_${{ env.TAIL_SEASON }}.parquet
+          key: nflverse-hist-v1-2018-${{ env.TAIL_SEASON }}
+
+      - name: Commit and push wmtl/data (only if something changed)
+        if: success() && steps.run.outputs.changed == 'true' && env.TAIL_MODE != 'dry-run'
+        run: |
+          git config user.name 'tail-refresh[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- wmtl/data wmtl/sw.js
+          # guard: nothing outside wmtl/data and wmtl/sw.js may be committed
+          if git diff --cached --name-only | grep -vE '^(wmtl/data/|wmtl/sw\.js$)'; then echo 'refusing to commit files outside wmtl/data'; exit 1; fi
+          if git diff --cached --quiet; then echo 'nothing staged'; exit 0; fi
+          git commit -q -m "tail.: data refresh $(date -u +%Y-%m-%dT%H:%MZ) ($TAIL_MODE)"
+          for i in 1 2 3; do
+            if git pull -q --rebase origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"; then echo pushed; exit 0; fi
+            sleep $((i * 10))
+          done
+          echo 'push failed after 3 attempts'; exit 1
+
+      - name: Save run stamp
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .tail-stamp
+          key: tail-stamp-${{ github.run_id }}-${{ github.run_attempt }}
