@@ -1358,6 +1358,12 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .dp-o{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:16px;background:var(--surface-2);border:1px solid transparent;color:var(--fg);font:inherit;cursor:pointer}
 .dp-o b{font-size:24px;line-height:1}.dp-o span{font-size:13px;font-weight:600;text-align:center}
 .dp-o[aria-pressed=true]{border-color:var(--kcal);background:color-mix(in srgb,var(--kcal) 12%,var(--surface-2))}
+
+/* header buttons: bigger tap targets, never blocked */
+header.top{z-index:20}
+.hbtn{width:40px!important;height:40px!important;touch-action:manipulation;position:relative}
+.hbtn::after,#profBtn::after{content:"";position:absolute;inset:-6px;border-radius:50%}
+#profBtn{touch-action:manipulation;position:relative;cursor:pointer}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -2653,7 +2659,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.70';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.71';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -6801,6 +6807,7 @@ async function pullHK(loud){const c=syncCfg();if(!c.hk||hkBusy)return;hkBusy=tru
     const top=(j.list||[]).reduce((a,x)=>Math.max(a,x.t),since);if(top>since){S.prefs={...(S.prefs||{}),hkAt:top};save()}
     if(n)toast(`Apple Health synced${last?` for ${niceDate(last,{month:'short',day:'numeric'})}`:''}`);else if(loud)toast('No new Apple Health data yet. Run Trainer Sync in Shortcuts.')}catch(e){if(loud)toast(esc(niceErr(e,'Apple Health')))}finally{hkBusy=false}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pullHK(false)});setTimeout(()=>pullHK(false),2500);
+$('profBtn').onclick=()=>openPage('me');$('hSync').onclick=()=>{const c=syncCfg();if(c.url&&c.uid){syncDevices(true);pullHK(false)}else syncHealth()};$('hEdit').onclick=openHealthEdit;$('hHow').onclick=openSetupChooser;
 function renderJust(){
   const el=$('justAdded');if(!el)return;const j=S.just;
   const list=j&&j.k===S.day?(S.days[S.day]||[]).filter(e=>j.ids.includes(e.id)):[];
