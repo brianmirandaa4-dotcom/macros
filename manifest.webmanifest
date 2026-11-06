@@ -1,6 +1,6 @@
 {
- "name": "Syncope",
- "short_name": "Syncope",
+ "name": "Trainer",
+ "short_name": "Trainer",
  "description": "Food, macros, lifts, recovery and your cut, bulk or maintenance plan.",
  "start_url": "./index.html#today",
  "scope": "./",

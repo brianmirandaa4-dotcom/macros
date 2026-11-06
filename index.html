@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0B0C10">
 <meta name="color-scheme" content="dark">
-<title>Syncope</title>
+<title>Trainer</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Syncope">
+<meta name="apple-mobile-web-app-title" content="Trainer">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="heart-180.png">
@@ -270,7 +270,7 @@ button.cell:hover{filter:brightness(1.25)}
 .check input{width:18px;height:18px;accent-color:var(--kcal)}
 
 /* sheet */
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:45;display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px 22px 0 0;width:100%;max-width:520px;padding:22px max(20px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;max-height:92vh;overflow:auto;animation:up .22s cubic-bezier(.2,.8,.2,1)}
 @media (min-width:781px){.scrim{align-items:center}.sheet{border-radius:22px}}
 @keyframes up{from{transform:translateY(24px);opacity:.4}}
@@ -1290,6 +1290,62 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .me3-stats b{font:700 20px/1 var(--f-num)}.me3-stats span{font-size:11.5px;color:var(--muted)}
 .me3-app{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:12px 4px;margin-top:6px}
 .me3-app button{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font:inherit;font-size:11.5px;cursor:pointer}.me3-app svg{width:20px;height:20px;color:var(--fg);stroke-width:1.7}
+
+/* foods, redesigned */
+.fd-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:4px}.fd-head h1{font:800 clamp(28px,5vw,36px)/1.05 var(--f-display);margin:2px 0 0;letter-spacing:-.01em}.fd-head .sub{color:var(--muted);font-size:13px;font-weight:600}
+.fd-new{padding:9px 14px;border-radius:12px;font-size:14px;white-space:nowrap}
+.fd-sbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:5;margin:-4px -4px 0;padding:4px;background:linear-gradient(var(--bg) 70%,transparent)}
+.fd-search{display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border-radius:16px;background:var(--surface);border:1px solid rgba(255,255,255,.09);box-shadow:0 10px 26px rgba(0,0,0,.28);cursor:text}
+.fd-search:focus-within{border-color:color-mix(in srgb,var(--kcal) 60%,transparent)}
+.fd-search svg{width:20px;height:20px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;flex:none}
+.fd-search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--fg);font-size:17px;padding:0}
+.fd-search input::-webkit-search-cancel-button{display:none}
+.fd-clr{width:26px;height:26px;border-radius:50%;border:0;background:var(--surface-2);color:var(--muted);font-size:12px;display:grid;place-items:center;flex:none}
+#fdBody{display:flex;flex-direction:column;gap:14px}
+.fd-cols{display:flex;flex-direction:column;gap:14px}
+@media (min-width:900px){.fd-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:start}}
+.fd-card{background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,0) 45%),var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 34px rgba(0,0,0,.24);display:flex;flex-direction:column;gap:8px;min-width:0}
+.fd-tabs{max-width:none}
+.fd-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:2px 4px}.fd-h b{font:700 17px/1.2 var(--f-display)}.fd-h span{font-size:12.5px;color:var(--muted);text-align:right}
+.fd-list{display:flex;flex-direction:column}
+.fd-row{display:grid;grid-template-columns:minmax(0,1fr) auto 36px;align-items:center;gap:10px;padding:10px 4px 10px 6px;border-top:1px solid var(--line);cursor:pointer;border-radius:10px;transition:background .15s}
+.fd-row:first-child{border-top:0}.fd-row:hover,.fd-row:focus-visible{background:var(--surface-2);outline:0}
+.fd-t{display:flex;flex-direction:column;gap:3px;min-width:0}.fd-t b{font-size:15px;font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-t>span{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.3}
+.fd-m{display:inline-flex;gap:6px}.fd-m i{font-style:normal;font:600 12px/1 var(--f-num);color:var(--c)}
+.fd-k{text-align:right;font:600 16px/1 var(--f-num);white-space:nowrap}.fd-k small{display:block;font:500 10.5px/1.3 var(--f-body);color:var(--muted)}
+.fd-add{width:34px;height:34px;border-radius:50%;border:1px solid color-mix(in srgb,var(--kcal) 45%,transparent);background:color-mix(in srgb,var(--kcal) 12%,transparent);display:grid;place-items:center;padding:0;transition:transform .12s}
+.fd-add:active{transform:scale(.88)}.fd-add svg{width:16px;height:16px;fill:none;stroke:var(--kcal);stroke-width:2.4;stroke-linecap:round}
+.fd-star{font-style:normal;color:var(--carb);margin-right:5px;font-size:13px}
+.fd-flag{font-style:normal;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:color-mix(in srgb,var(--carb) 22%,transparent);color:var(--carb);font-size:11px;font-weight:800;margin-left:6px;vertical-align:1px}
+.fd-empty{margin:0;padding:14px 6px;color:var(--muted);font-size:14px;text-align:center}
+.fd-more{background:none;border:0;color:var(--kcal);font-weight:600;font-size:14px;padding:8px;align-self:center}
+.fd-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.fd-cat{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px 10px;border-radius:16px;background:var(--surface-2);border:1px solid transparent;color:var(--fg);font:inherit;cursor:pointer;min-width:0;transition:border-color .15s,background .15s}
+.fd-cat.on{border-color:color-mix(in srgb,var(--kcal) 55%,transparent);background:color-mix(in srgb,var(--kcal) 9%,var(--surface-2))}
+.fd-ci{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.04)}.fd-ci svg{width:20px;height:20px;fill:none;stroke:var(--fg);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.fd-cat.on .fd-ci svg{stroke:var(--kcal)}
+.fd-cat b{font-size:12px;font-weight:600;line-height:1.2;text-align:center}.fd-cat>span{font-size:11px;color:var(--muted)}
+@media (max-width:360px){.fd-cat b{font-size:11px}}
+.fd-panel{display:flex;flex-direction:column;gap:6px;padding-top:4px;animation:fdin .22s var(--ease-out)}
+@keyframes fdin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.fd-subs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}.fd-subs::-webkit-scrollbar{display:none}.fd-subs .chip{flex:none}
+.fd-online{display:grid;grid-template-columns:32px minmax(0,1fr) 14px;align-items:center;gap:12px;width:100%;padding:12px;border-radius:14px;background:var(--surface-2);border:0;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.fd-online>span:first-child{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--kcal) 14%,transparent);color:var(--kcal)}.fd-online svg{width:16px;height:16px}
+.fd-online b{display:block;font-size:14.5px}.fd-online em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.fd-sh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.fd-fav{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--carb);font-size:19px;flex:none}
+.fd-qs{display:flex;gap:6px;flex-wrap:wrap}
+.fd-warn{margin:0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--carb) 10%,transparent);border:1px solid color-mix(in srgb,var(--carb) 30%,transparent);color:#f3dca0;font-size:13px;line-height:1.4}
+
+/* accounts */
+.ac-u{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 12px}.ac-u span{color:var(--muted)}.ac-u input{border:0!important;background:none!important;padding-left:0!important;flex:1;min-width:0}
+.ac-rules{display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:-4px}.ac-rules .on{color:var(--good)}
+.ac-x{background:none;border:0;color:var(--muted);font-size:14px;padding:6px;margin-left:auto;flex:none}
+.ac-alt{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}.ac-alt .link{font-size:13.5px}
+.ac-band{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;text-align:left;color:var(--fg);cursor:pointer;background:var(--surface);border:1px solid rgba(255,255,255,.07);font:inherit}
+.ac-band.warn{border-color:color-mix(in srgb,var(--carb) 45%,transparent);background:color-mix(in srgb,var(--carb) 7%,var(--surface))}
+.ac-band .mb-crest{color:var(--good)}.ac-band.warn .mb-crest{color:var(--carb)}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -1297,10 +1353,10 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 <body>
 
 <header class="top"><div class="wrap">
-  <button class="brand hp-btn" id="hpBtn" type="button" aria-label="Today's heart"><svg class="logo hp-logo" id="hpLogo" viewBox="0 0 100 100" aria-hidden="true"></svg><span>syncope</span></button>
+  <button class="brand hp-btn" id="hpBtn" type="button" aria-label="Today's heart"><svg class="logo hp-logo" id="hpLogo" viewBox="0 0 100 100" aria-hidden="true"></svg><span>trainer</span></button>
   <nav class="tabs" aria-label="Views" id="tabsTop"></nav>
   <div class="saved" id="saved">Saved on this device</div>
-  <button class="hbtn" id="findBtn" aria-label="Search Syncope" title="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
+  <button class="hbtn" id="findBtn" aria-label="Search Trainer" title="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
   <button class="hbtn" id="helpBtn" aria-label="Show me around" title="Show me around"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.1-2.4 3.6M12 17.2v.1"/></svg></button>
   <button class="avatar" id="profBtn" aria-label="Profile"><span>ME</span></button>
 </div></header>
@@ -1319,6 +1375,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
     </div>
 
     <div class="card hero v2" id="hero"></div>
+    <div id="acNudge"></div>
     <div class="qgrid" id="quick" aria-label="Quick look"></div>
     <div class="card prep-card" id="prepCard" hidden></div>
     <div class="card coach" id="coach" hidden></div>
@@ -1433,24 +1490,9 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
   <!-- FOODS -->
   <section class="view" id="v-foods" aria-label="Foods" hidden>
     <div class="tip" id="tip-foods" hidden></div>
-    <div class="pnav"><div class="title"><div class="sub">Food library</div><h1>Foods</h1></div><button class="primary" id="newFood">+ New food</button></div>
-    <div class="card" style="display:flex;flex-direction:column;gap:14px">
-      <input class="search" id="fSearch" type="search" placeholder="Search foods" aria-label="Search foods">
-      <div class="cats" id="fCats"></div>
-      <p class="note">Tap a food to log it. Foods you save yourself are matched first when you type them on the Today page.</p>
-    </div>
-    <div class="card">
-      <div class="card-h"><div><div class="eyebrow">My meals</div><h2>Meals you eat often, one tap to log</h2></div></div>
-      <ul class="flist" id="myMeals"></ul>
-    </div>
-    <div class="card" id="myFoodsCard">
-      <div class="card-h"><div><div class="eyebrow">My foods</div><h2>Saved from labels and your own recipes</h2></div></div>
-      <ul class="flist" id="myFoods"></ul>
-    </div>
-    <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Built-in</div><h2 id="dbCount">Common foods</h2></div></div>
-      <ul class="flist" id="dbFoods"></ul>
-    </div>
+    <div class="fd-head"><div><div class="sub">Food library</div><h1>Foods</h1></div><button class="ghost fd-new" id="newFood" type="button">+ New food</button></div>
+    <div class="fd-sbar"><label class="fd-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="fSearch" type="search" placeholder="Search foods, drinks, meals" aria-label="Search foods" autocomplete="off" enterkeyhint="search"><button type="button" class="fd-clr" id="fClear" aria-label="Clear search" hidden>✕</button></label></div>
+    <div id="fdBody"></div>
   </section>
 
   <!-- FRIENDS -->
@@ -1614,7 +1656,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
       <ol class="phases">
         <li style="--c:var(--fat)"><b>Phase 1 · Trim fat, hold carbs.</b> Early on the deficit comes mostly out of fat while carbs stay put to fuel training. Fat starts near 30% of calories and comes down to a floor of 20% (never under 0.25 g per lb). The ACSM sports nutrition position statement advises athletes against chronic intakes below 20%.</li>
         <li style="--c:var(--pro)"><b>Protein rises the whole time.</b> The leaner you get and the bigger the deficit, the more protein protects muscle. With body fat % entered, protein goes from 2.3 to 3.1 g per kg of lean mass (Helms, Aragon &amp; Fitschen, JISSN 2014). Without it, 1.8 to 2.4 g per kg of body weight (Roberts et al., 2020). Carbs are held steady while protein climbs.</li>
-        <li style="--c:var(--carb)"><b>Phase 2 · Lower carbs.</b> Once fat hits its floor, every further cut comes from carbs. Syncope warns if carbs fall under 2 g per kg, the low end for lifters (Roberts et al.). Lean or past week 8, a weekly <i>refeed day</i> is suggested: one training day with extra carbs, bringing that day to about maintenance.</li>
+        <li style="--c:var(--carb)"><b>Phase 2 · Lower carbs.</b> Once fat hits its floor, every further cut comes from carbs. Trainer warns if carbs fall under 2 g per kg, the low end for lifters (Roberts et al.). Lean or past week 8, a weekly <i>refeed day</i> is suggested: one training day with extra carbs, bringing that day to about maintenance.</li>
         <li style="--c:var(--good)"><b>Diet breaks and recovery.</b> An optional week at maintenance every 8 weeks gives you a mental and hormonal reset; research on structured breaks (e.g. the MATADOR trial) found they don't hurt fat loss. After the cut, 4 recovery weeks step calories back up. Fat climbs back toward 28%, carbs rise, and protein eases to 2.2 g per kg of lean mass.</li>
         <li style="--c:var(--muted)"><b>Pace.</b> Aim for 0.5–1% of body weight lost per week to keep muscle (Helms 2014). Slower, around 0.5%, is better the leaner you are. Bulks aim for 0.25–0.5% gained per week with protein around 1.8 g per kg (Iraki et al., 2019).</li>
       </ol>
@@ -2599,19 +2641,19 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.66';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.67';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
   return null}
 function snapshot(key){try{const cur=localStorage.getItem(LS);if(cur&&cur.length>20)localStorage.setItem(key,cur)}catch(e){}}
 function load(){try{try{const pv=localStorage.getItem('macros.appver');if(pv!==APP_VER){snapshot(LS+'.update');localStorage.setItem('macros.appver',APP_VER)}}catch(e){}
-  const j=readStore();if(j){S.days=j.days||{};if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.dev=j.dev||{days:{},workouts:[]};S.prefs=j.prefs||{};S.customLifts=j.customLifts||[];S.favLifts=j.favLifts||[];S.hyd=j.hyd||{log:{},bottles:[],day:{}};S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
-function save(){saveVer++;try{setTimeout(renderHP,0)}catch(e){}if(typeof socSchedule==='function')socSchedule();
+  const j=readStore();if(j){S.days=j.days||{};S.favFoods=j.favFoods||[];if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.lastBackup=j.lastBackup||0;S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];S.templates=j.templates||[];S.tplSeeded=!!j.tplSeeded;S.active=j.active||null;S.health=j.health||{};S.restSec=j.restSec||120;S.dev=j.dev||{days:{},workouts:[]};S.prefs=j.prefs||{};S.customLifts=j.customLifts||[];S.favLifts=j.favLifts||[];S.hyd=j.hyd||{log:{},bottles:[],day:{}};S.pType=(j.calc&&j.calc.type)||'cut'}}catch(e){storageOK=false}}
+function save(){saveVer++;try{setTimeout(renderHP,0);cloudSoon()}catch(e){}if(typeof socSchedule==='function')socSchedule();
   if(loadBlocked)return;
   try{const cur=localStorage.getItem(LS);if(cur&&!wipeOK){const had=(cur.match(/"id":/g)||[]).length,now=Object.values(S.days).reduce((a,l)=>a+l.length,0)+S.workouts.length;if(had>20&&now===0)return}}catch(e){}
   try{const t=+localStorage.getItem(LS+'.safeAt')||0;if(Date.now()-t>12*36e5){snapshot(LS+'.safe');localStorage.setItem(LS+'.safeAt',String(Date.now()))}}catch(e){}
-  try{localStorage.setItem(LS,JSON.stringify({v:1,days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,lastBackup:S.lastBackup,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,tplSeeded:S.tplSeeded,active:S.active,health:S.health,restSec:S.restSec,dev:S.dev,prefs:S.prefs,customLifts:S.customLifts,favLifts:S.favLifts,hyd:S.hyd}));storageOK=true}catch(e){storageOK=false}
+  try{localStorage.setItem(LS,JSON.stringify({v:1,days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,lastBackup:S.lastBackup,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,tplSeeded:S.tplSeeded,active:S.active,health:S.health,restSec:S.restSec,dev:S.dev,prefs:S.prefs,customLifts:S.customLifts,favLifts:S.favLifts,hyd:S.hyd,favFoods:S.favFoods||[]}));storageOK=true}catch(e){storageOK=false}
   const s=$('saved'); s.textContent=storageOK?'Saved on this device':'Not saving — storage blocked'; s.style.color=storageOK?'':'var(--over)'; checkBackup();}
 let FOODS=[],ALIAS=[];
 function buildFoods(){
@@ -2664,10 +2706,10 @@ const per=x=>x.sg?`${fmt(x.k*x.sg/100)} kcal per ${esc(x.sn||'serving')} (${r0(x
 const macroLine=x=>{const m=x.sg?x.sg/100:1;return `<span style="color:var(--pro)">${r0(x.p*m)}P</span> <span style="color:var(--carb)">${r0(x.c*m)}C</span> <span style="color:var(--fat)">${r0(x.f*m)}F</span>`};
 /* the search sheet. o.mode: 'log' (from the food box), 'save' (Foods tab), 'pick' (favourites) */
 function openOnline(q,o={}){let res=[],busy=false,loc=[];
-  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches Syncope’s foods and drinks, 6,500 USDA foods and millions of brands. Not there? Ask Claude.</p></div>
+  const draw=()=>{sheet(`<div><div class="eyebrow">${o.mode==='pick'?'Add a favourite':'Food search'}</div><h3>${o.mode==='log'?`Find “${esc(q)}”`:'Search every food'}</h3><p class="note" style="margin:0">Searches Trainer’s foods and drinks, 6,500 USDA foods and millions of brands. Not there? Ask Claude.</p></div>
     <div class="inrow"><div class="inbox"><input id="olQ" type="search" value="${esc(q)}" placeholder="e.g. banana bread, lamb chop, burrito" autocomplete="off" autocapitalize="off"></div><button class="go" type="button" id="olGo">Search</button></div>
     ${o.mode==='pick'?`<div class="field"><label>Use it as my</label><div class="wn-acts" id="olG">${LIKE_GROUPS.map(([g,l,c],i)=>`<button type="button" class="chip" data-g="${g}" aria-pressed="${(o.g||'p')===g}" style="--c:var(${c})">${l.replace('Healthy ','').replace(/s$/,'')}</button>`).join('')}</div></div>`:''}
-    <ul class="ol-list" id="olL">${loc.map((f,i)=>`<li><button type="button" data-ol="l${i}"><span class="ol-n"><b>${esc(cap(f.name))}</b><span>${f.custom?'My foods':'Syncope library'} · ${fmt(servKcal(f))} kcal per ${esc(servLabel(f))}</span></span><span class="ol-m num">${macroLine({p:f.p*f.units[f.def]/100,c:f.c*f.units[f.def]/100,f:f.f*f.units[f.def]/100})}</span></button></li>`).join('')}
+    <ul class="ol-list" id="olL">${loc.map((f,i)=>`<li><button type="button" data-ol="l${i}"><span class="ol-n"><b>${esc(cap(f.name))}</b><span>${f.custom?'My foods':'Trainer library'} · ${fmt(servKcal(f))} kcal per ${esc(servLabel(f))}</span></span><span class="ol-m num">${macroLine({p:f.p*f.units[f.def]/100,c:f.c*f.units[f.def]/100,f:f.f*f.units[f.def]/100})}</span></button></li>`).join('')}
       ${busy?`<li class="note ol-busy">Searching…</li>`:res.map((x,i)=>`<li><button type="button" data-ol="o${i}"><span class="ol-n"><b>${esc(x.name)}</b><span>${x.src==='Claude'?'✨ Claude estimate · ':''}${x.brand?esc(x.brand)+' · ':''}${per(x)}${x.note?' · '+esc(x.note):''}</span></span><span class="ol-m num">${macroLine(x)}</span></button></li>`).join('')}
       ${!busy&&!res.length&&!loc.length?`<li class="note">${o.ai?'':'Not in the library. '}Try fewer words, ask Claude below, or add it from the label.</li>`:''}</ul>
     ${q&&q.length>=2&&!busy?`<button class="ghost ol-ai" type="button" id="olAi">${o.aiBusy?'Asking Claude…':`✨ Ask Claude about “${esc(q)}”`}</button><div class="status" id="olAiSt">${esc(o.aiErr||'')}</div>`:''}
@@ -2822,7 +2864,7 @@ function gaugeSVG(t,goal){
   let ticks='';for(let i=0;i<20;i++){const a=i/20*2*Math.PI-Math.PI/2,a1=104,a2=i%5===0?110:107;ticks+=`<line x1="${100+a1*Math.cos(a)}" y1="${100+a1*Math.sin(a)}" x2="${100+a2*Math.cos(a)}" y2="${100+a2*Math.sin(a)}" stroke="var(--faint)" stroke-width="${i%5===0?1.6:1}"/>`}
   return `<svg viewBox="-14 -14 228 228" role="img" aria-label="${fmt(t.k)} of ${fmt(goal)} calories"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${arcs}${over}${ticks}</svg>`;
 }
-function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack.length-1]:null;if(pgOpen==='checkin')renderCheckin();if(pgOpen==='health')renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();renderQuick();renderHP();
+function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack.length-1]:null;if(pgOpen==='checkin')renderCheckin();if(pgOpen==='health')renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();renderQuick();renderHP();renderAcNudge();
   const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk;
   $('dTitle').textContent=niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   const diff=Math.round((parseKey(k)-parseKey(tk))/864e5);
@@ -3089,7 +3131,10 @@ function openLogFood(fd){
   let meal=S.mealSel; const u=fd.def;
   const units=Object.keys(fd.units);if(!fd.noG&&!units.includes('g'))units.push('g');if(!fd.noG&&!units.includes('oz'))units.push('oz');
   let curU=u;
-  sheet(`<div><div class="eyebrow">${esc(fd.custom?'My food':fd.cat)} · per ${esc(servLabel(fd))}</div><h3>${esc(cap(fd.name))}</h3></div>
+  const fl=foodCheck(fd),fv=()=>(S.favFoods||[]).includes(fd.id);
+  sheet(`<div class="fd-sh"><div><div class="eyebrow">${esc(fd.custom?'My food':fd.cat)} · per ${esc(servLabel(fd))}</div><h3>${esc(fd.custom?fd.name:cap(fd.name))}</h3></div><button type="button" class="fd-fav" id="lFav" aria-pressed="${fv()}" aria-label="Favorite">${fv()?'★':'☆'}</button></div>
+    ${fl?`<p class="fd-warn">⚠ ${esc(fl)}</p>`:''}
+    <div class="fd-qs" id="lQs">${[.5,1,1.5,2].map(v=>`<button type="button" class="chip" data-q="${v}" aria-pressed="${v===1}">${v===.5?'½':v} ${esc(UNIT_LABEL(u,v,fd))}</button>`).join('')}</div>
     <div class="grid2"><div class="field"><label for="lQ">Amount</label><div class="stepper"><button type="button" id="lMinus" aria-label="Less">−</button><input id="lQ" type="number" inputmode="decimal" value="1" style="flex:1"><button type="button" id="lPlus" aria-label="More">+</button></div></div>
     <div class="field"><label for="lU">Unit</label><select id="lU">${units.map(x=>`<option value="${x}" ${x===u?'selected':''}>${esc(UNIT_LABEL(x,2,fd))}</option>`).join('')}</select></div></div>
     <div id="lLive"></div>
@@ -3103,6 +3148,8 @@ function openLogFood(fd){
   $('lMinus').onclick=()=>{q.value=Math.max(0,r1((+q.value||0)-step()));upd()};
   $('lPlus').onclick=()=>{q.value=r1((+q.value||0)+step());upd()};
   q.oninput=upd;upd();
+  $('lQs').onclick=ev=>{const b=ev.target.closest('[data-q]');if(!b)return;sel.value=u;curU=u;q.value=b.dataset.q;$('lQs').querySelectorAll('[data-q]').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));upd()};
+  $('lFav').onclick=()=>{const L=S.favFoods||(S.favFoods=[]),i=L.indexOf(fd.id);if(i>=0)L.splice(i,1);else L.unshift(fd.id);save();$('lFav').textContent=fv()?'★':'☆';$('lFav').setAttribute('aria-pressed',String(fv()));toast(fv()?'Added to Favorites':'Removed from Favorites');if(S.view==='foods')renderFoods()};
   wireChips('lMeal',m=>meal=m);
   $('lCancel').onclick=closeSheet;
   if(fd.custom)$('lEdit').onclick=()=>openManual('',false,fd.id);
@@ -3268,24 +3315,88 @@ $('mNext').onclick=()=>{const [y,m]=S.monthRef.split('-').map(Number),d=new Date
 /* ---------- FOODS ---------- */
 function fItem(fd){const k=servKcal(fd),sg=fd.units[fd.def],sc=sg/100;
   return `<li><button class="fitem" data-food="${esc(fd.id)}"><span class="n">${esc(cap(fd.name))}</span><span class="kc">${fmt(k)}</span><span class="s">${esc(servLabel(fd))}</span><span class="mc"><span style="--c:var(--pro)">${r0(fd.p*sc)}P</span><span style="--c:var(--carb)">${r0(fd.c*sc)}C</span><span style="--c:var(--fat)">${r0(fd.f*sc)}F</span></span></button></li>`}
-function renderFoods(){renderTip('foods');
-  const q=$('fSearch').value.trim().toLowerCase();
-  const hit=fd=>!q||fd.aliases.some(a=>a.includes(q));
-  $('fCats').innerHTML=['All',...CATS].map(c=>`<button class="chip" data-cat="${esc(c)}" aria-pressed="${S.fCat===c}">${esc(c)}</button>`).join('');
-  const ms=S.meals.map((m,i)=>[m,i]).filter(([m])=>!q||m.name.toLowerCase().includes(q)||m.items.some(x=>x.n.toLowerCase().includes(q)));
-  $('myMeals').innerHTML=ms.length?ms.map(([m,i])=>{const t=sumEntries(m.items);return `<li><button class="fitem" data-meal-i="${i}"><span class="n">★ ${esc(m.name)}</span><span class="kc">${fmt(t.k)}</span><span class="s">${esc(m.items.map(x=>x.n).join(', '))}</span><span class="mc"><span style="--c:var(--pro)">${r0(t.p)}P</span><span style="--c:var(--carb)">${r0(t.c)}C</span><span style="--c:var(--fat)">${r0(t.f)}F</span></span></button></li>`}).join(''):`<li class="note" style="grid-column:1/-1">${q?'No saved meals match.':'Log a meal on Today, then tap “Save as a meal” under it. Saved meals appear as ★ chips above the food box, and typing the meal name logs the whole thing.'}</li>`;
-  const mine=FOODS.filter(f=>f.custom&&hit(f));
-  $('myFoods').innerHTML=mine.length?mine.map(fItem).join(''):`<li class="note" style="grid-column:1/-1">${q?'No saved foods match.':'Nothing saved yet. Use “+ New food” for anything with a nutrition label, or your own recipes.'}</li>`;
-  const b=BUILTIN.filter(f=>hit(f)&&(q||S.fCat==='All'||f.cat===S.fCat));
-  setTimeout(()=>{const fb=$('fAllBtn');if(fb)fb.onclick=()=>{S.fAll=true;renderFoods()}},0);
-  $('dbCount').textContent=q?`${b.length} match${b.length===1?'':'es'}`:S.fCat==='All'?`${BUILTIN.length} common foods`:S.fCat;
-  const cap=!q&&!S.fAll&&b.length>24;
-  const olBtn=q.length>=2?`<li style="grid-column:1/-1;list-style:none"><button class="ghost ol-more" type="button" data-olq="${esc(q)}">Search 6,500+ foods for “${esc(q)}”</button></li>`:'';
-  $('dbFoods').innerHTML=(b.length?(cap?b.slice(0,24):b).map(fItem).join('')+(cap?`<li style="grid-column:1/-1;list-style:none"><button class="ghost" type="button" id="fAllBtn" style="width:100%">Show all ${b.length} foods</button></li>`:''):'<li class="note" style="grid-column:1/-1">Not in the built-in list yet.</li>')+olBtn;
-}
-$('fSearch').addEventListener('input',renderFoods);
-$('fCats').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(b){S.fCat=b.dataset.cat;renderFoods()}});
-$('v-foods').addEventListener('click',e=>{const ol=e.target.closest('[data-olq]');if(ol)return openOnline(ol.dataset.olq,{mode:'save'});const mb=e.target.closest('[data-meal-i]');if(mb)return openMeal(+mb.dataset.mealI);const b=e.target.closest('[data-food]');if(b){const fd=FOODS.find(f=>f.id===b.dataset.food);if(fd)openLogFood(fd)}});
+const FD_GROUPS=[
+  {id:'protein',n:'Protein',ic:'<path d="M15.5 4.5a4.5 4.5 0 0 1 0 9c-1 0-2-.3-2.8-.9L8 17.3a2 2 0 1 1-3.3-.8 2 2 0 1 1 .8-3.3l4.7-4.7A4.5 4.5 0 0 1 15.5 4.5z"/>',cats:['Protein','Meat & seafood']},
+  {id:'carbs',n:'Grains & carbs',ic:'<path d="M12 21V9"/><path d="M12 9c0-3 2-5 4-6 0 3-2 5-4 6zM12 9c0-3-2-5-4-6 0 3 2 5 4 6zM12 14c0-3 2-5 4-6 0 3-2 5-4 6zM12 14c0-3-2-5-4-6 0 3 2 5 4 6z"/>',cats:['Grains','Grains & pasta','Starches & veg']},
+  {id:'produce',n:'Fruit & veg',ic:'<path d="M12 7c-4-2-8 1-7 6 .7 4 3.5 8 7 7 3.5 1 6.3-3 7-7 1-5-3-8-7-6z"/><path d="M12 7c0-2 1-4 3-4"/>',cats:['Fruit','More fruit','Vegetables & sides']},
+  {id:'dairy',n:'Dairy & eggs',ic:'<path d="M8 3h8M9 3v3l-2 4v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V10l-2-4V3"/><path d="M7 13h10"/>',cats:['Dairy','More dairy','Breakfast']},
+  {id:'meals',n:'Meals & takeout',ic:'<path d="M4 13h16a8 8 0 0 1-16 0zM3 13h18M9 5c0 2 1 2 1 4M13 5c0 2 1 2 1 4"/>',cats:['Meals','Takeout & dishes','Fast food']},
+  {id:'snacks',n:'Snacks & sweets',ic:'<circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10" r="1"/><circle cx="14.5" cy="9" r="1"/><circle cx="13" cy="14.5" r="1"/><circle cx="8.5" cy="14" r=".6"/>',cats:['Snacks & sweets','More snacks','Bakery & desserts','Beans & nuts','Beans, nuts & seeds','Sauces & spreads','More sauces']},
+  {id:'drinks',n:'Drinks',ic:'<path d="M6 4h12l-1.5 15a2 2 0 0 1-2 1.8h-5a2 2 0 0 1-2-1.8z"/><path d="M6.5 9h11"/>',cats:['Drinks','More drinks']},
+  {id:'alcohol',n:'Beer, wine & spirits',ic:'<path d="M8 3h8l-.5 6a3.5 3.5 0 0 1-7 0z"/><path d="M12 12.5V20M8.5 20.5h7"/>',cats:['Beer','Hard seltzer & malt drinks','Wine','Spirits','Cocktails','More cocktails & shots']}];
+const FD_SUB={'Starches & veg':'Starches','More fruit':'Fruit','More dairy':'Dairy','More snacks':'Snacks','Beans, nuts & seeds':'Nuts & seeds','More sauces':'Sauces','More drinks':'Drinks','More cocktails & shots':'Shots','Hard seltzer & malt drinks':'Seltzers'};
+const fdGroupOf=cat=>FD_GROUPS.find(g=>g.cats.includes(cat));
+const FD_ALC=/\b(beer|ale|lager|ipa|stout|wine|vodka|whiskey|whisky|tequila|rum|gin|bourbon|liquor|seltzer|cocktail|margarita|shot|sake|cider|spirit|mimosa|sangria|liqueur|champagne|prosecco)\b/i;
+function foodCheck(fd){if(!fd||fd.k==null)return '';const p=+fd.p||0,c=+fd.c||0,f=+fd.f||0,k=+fd.k||0;
+  if(!fd.noG&&p+c+f>100.5)return 'Protein, carbs and fat add up to more than the food’s weight. Check the label.';
+  const g=fdGroupOf(fd.cat);if((g&&g.id==='alcohol')||FD_ALC.test(fd.name||'')||FD_ALC.test((fd.aliases||[]).join(' ')))return '';
+  const calc=4*p+4*c+9*f;if(Math.abs(k-calc)>Math.max(25,.2*Math.max(k,calc)))return `Calories (${fmt(r0(k))}) and macros (${fmt(r0(calc))} kcal) per 100 g don’t match. Fiber or sugar alcohols can explain it, but check the label.`;
+  return ''}
+let fdTab=null,fdOpen=null,fdSub=null,fdMore=false;
+const fdFavs=()=>S.favFoods||(S.favFoods=[]);
+function fdRecent(){const out=[],seen=new Set();Object.keys(S.days).sort().reverse().slice(0,30).forEach(k=>(S.days[k]||[]).slice().reverse().forEach(e=>{const key=(e.n+'|'+e.a).toLowerCase();if(!seen.has(key)&&out.length<15){seen.add(key);out.push(e)}}));return out}
+const fdMac=(p,c,f)=>`<span class="fd-m"><i style="--c:var(--pro)">${r0(p)}P</i><i style="--c:var(--carb)">${r0(c)}C</i><i style="--c:var(--fat)">${r0(f)}F</i></span>`;
+const FD_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>';
+function fdFoodRow(fd){const sc=fd.units[fd.def]/100,fl=foodCheck(fd),fav=fdFavs().includes(fd.id);
+  return `<div class="fd-row" data-food="${esc(fd.id)}" role="button" tabindex="0"><span class="fd-t"><b>${fav?'<em class="fd-star" aria-label="Favorite">★</em>':''}${esc(fd.custom?fd.name:cap(fd.name))}${fl?`<em class="fd-flag" title="${esc(fl)}" aria-label="Check this entry">!</em>`:''}</b><span>${esc(servLabel(fd))} · ${fdMac(fd.p*sc,fd.c*sc,fd.f*sc)}</span></span><span class="fd-k num">${fmt(r0(servKcal(fd)))}<small>kcal</small></span><button type="button" class="fd-add" data-qadd="${esc(fd.id)}" aria-label="Log 1 serving of ${esc(fd.name)}">${FD_PLUS}</button></div>`}
+function fdEntryRow(e,i,kind){return `<div class="fd-row" data-fe="${kind}:${i}" role="button" tabindex="0"><span class="fd-t"><b>${esc(e.n)}</b><span>${esc(e.a||'')} · ${fdMac(e.p,e.c,e.f)}</span></span><span class="fd-k num">${fmt(r0(e.k))}<small>kcal</small></span><button type="button" class="fd-add" data-fe-add="${kind}:${i}" aria-label="Log ${esc(e.n)} again">${FD_PLUS}</button></div>`}
+function fdMealRow(m,i){const t=sumEntries(m.items);return `<div class="fd-row" data-meal-i="${i}" role="button" tabindex="0"><span class="fd-t"><b><em class="fd-star">★</em>${esc(m.name)}</b><span>${m.items.length} item${m.items.length===1?'':'s'} · ${fdMac(t.p,t.c,t.f)}</span></span><span class="fd-k num">${fmt(r0(t.k))}<small>kcal</small></span><button type="button" class="fd-add" data-meal-add="${i}" aria-label="Log ${esc(m.name)}">${FD_PLUS}</button></div>`}
+function fdEmpty(t){return `<p class="fd-empty">${t}</p>`}
+function fdLists(){const rec=fdRecent(),fr=quickItems().top,favF=FOODS.filter(f=>fdFavs().includes(f.id)||f.custom);
+  const tabs=[['recent','Recent',rec.length],['fav','Favorites',S.meals.length+favF.length],['freq','Frequent',fr.length]];
+  if(!fdTab)fdTab=rec.length?'recent':(S.meals.length+favF.length)?'fav':'freq';
+  let body='';const cap=fdMore?15:5;
+  if(fdTab==='recent')body=rec.length?rec.slice(0,cap).map((e,i)=>fdEntryRow(e,i,'r')).join(''):fdEmpty('Foods you log show up here for one-tap logging.');
+  if(fdTab==='freq')body=fr.length?fr.slice(0,cap).map((e,i)=>fdEntryRow(e,i,'q')).join(''):fdEmpty('Log a few days and your usual foods appear here.');
+  if(fdTab==='fav'){const rows=[...S.meals.map((m,i)=>fdMealRow(m,i)),...favF.map(fdFoodRow)];body=rows.length?rows.slice(0,fdMore?40:5).join(''):fdEmpty('Tap ☆ on any food, or save a meal from Today, to keep it here.');}
+  const total=fdTab==='recent'?rec.length:fdTab==='freq'?fr.length:S.meals.length+favF.length;
+  return `<section class="fd-card"><div class="seg2 fd-tabs" role="tablist">${tabs.map(([k,l])=>`<button type="button" role="tab" data-ftab="${k}" aria-pressed="${fdTab===k}">${l}</button>`).join('')}</div>
+    <div class="fd-list">${body}</div>${total>5?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show less':`Show all ${Math.min(total,fdTab==='fav'?40:15)}`}</button>`:''}</section>`}
+function fdBrowse(){
+  const grid=FD_GROUPS.map(g=>{const n=BUILTIN.filter(f=>g.cats.includes(f.cat)).length;return `<button type="button" class="fd-cat${fdOpen===g.id?' on':''}" data-fgrp="${g.id}" aria-expanded="${fdOpen===g.id}"><span class="fd-ci"><svg viewBox="0 0 24 24" aria-hidden="true">${g.ic}</svg></span><b>${g.n}</b><span class="num">${n}</span></button>`}).join('');
+  let panel='';const g=FD_GROUPS.find(x=>x.id===fdOpen);
+  if(g){const subs=g.cats.filter(c=>BUILTIN.some(f=>f.cat===c)),lab=c=>FD_SUB[c]||c,uniq=[...new Map(subs.map(c=>[lab(c),c])).keys()];
+    const list=BUILTIN.filter(f=>g.cats.includes(f.cat)&&(!fdSub||lab(f.cat)===fdSub)),cap=fdMore?list.length:12;
+    panel=`<div class="fd-panel"><div class="fd-subs">${['All',...uniq].map(u=>`<button type="button" class="chip" data-fsub="${esc(u)}" aria-pressed="${(fdSub||'All')===u}">${esc(u)}</button>`).join('')}</div>
+      <div class="fd-list">${list.slice(0,cap).map(fdFoodRow).join('')}</div>${list.length>12?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show less':`Show all ${list.length}`}</button>`:''}</div>`}
+  return `<section class="fd-card"><div class="fd-h"><b>Browse</b><span>${fmt(BUILTIN.length)} foods · 6,500+ more in search</span></div><div class="fd-cats">${grid}</div>${panel}</section>`}
+function fdSearch(q){const ql=q.toLowerCase(),words=ql.split(/\s+/).filter(Boolean);
+  const score=f=>{const al=f.aliases;if(al.some(a=>a===ql))return 0;if(al.some(a=>a.startsWith(ql)))return 1;if(al.some(a=>a.includes(ql)))return 2;if(words.every(w=>al.some(a=>a.includes(w))))return 3;return 9};
+  const foods=FOODS.map(f=>[f,score(f)]).filter(x=>x[1]<9).sort((a,b)=>(b[0].custom?1:0)-(a[0].custom?1:0)||a[1]-b[1]||a[0].name.length-b[0].name.length).map(x=>x[0]);
+  const meals=S.meals.map((m,i)=>[m,i]).filter(([m])=>m.name.toLowerCase().includes(ql)||m.items.some(x=>x.n.toLowerCase().includes(ql)));
+  const cap=fdMore?60:12;
+  return `<section class="fd-card"><div class="fd-h"><b>${foods.length+meals.length?`${foods.length+meals.length} result${foods.length+meals.length===1?'':'s'}`:'No matches in your library'}</b><span>for “${esc(q)}”</span></div>
+    <div class="fd-list">${meals.map(([m,i])=>fdMealRow(m,i)).join('')}${foods.slice(0,cap).map(fdFoodRow).join('')}</div>
+    ${foods.length>12?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show fewer':`Show all ${Math.min(foods.length,60)}`}</button>`:''}
+    ${q.length>=2?`<button type="button" class="fd-online" data-olq="${esc(q)}"><span>${GI.book}</span><span><b>Search 6,500+ foods and every brand</b><em>USDA and Open Food Facts for “${esc(q)}”</em></span>${CHEV}</button>`:''}</section>`}
+function renderFoods(){renderTip('foods');const q=$('fSearch').value.trim();$('fClear').hidden=!q;
+  $('fdBody').innerHTML=q?fdSearch(q):`<div class="fd-cols">${fdLists()}${fdBrowse()}</div>`}
+$('fSearch').addEventListener('input',()=>{fdMore=false;renderFoods()});
+$('fClear').onclick=()=>{$('fSearch').value='';fdMore=false;renderFoods();$('fSearch').focus()};
+function fdQuickFood(fd){const e=entryFor(fd,1,fd.def,fd.name);addEntries([e],S.day,S.mealSel)}
+$('v-foods').addEventListener('click',e=>{const t=e.target;
+  const tb=t.closest('[data-ftab]');if(tb){fdTab=tb.dataset.ftab;fdMore=false;return renderFoods()}
+  if(t.closest('[data-fmore]')){fdMore=!fdMore;return renderFoods()}
+  const gp=t.closest('[data-fgrp]');if(gp){fdOpen=fdOpen===gp.dataset.fgrp?null:gp.dataset.fgrp;fdSub=null;fdMore=false;renderFoods();if(fdOpen)setTimeout(()=>{const pn=document.querySelector('.fd-panel');if(pn)pn.scrollIntoView({block:'nearest',behavior:'smooth'})},30);return}
+  const sb=t.closest('[data-fsub]');if(sb){fdSub=sb.dataset.fsub==='All'?null:sb.dataset.fsub;fdMore=false;return renderFoods()}
+  const ol=t.closest('[data-olq]');if(ol)return openOnline(ol.dataset.olq,{mode:'save'});
+  const qa=t.closest('[data-qadd]');if(qa){const fd=FOODS.find(f=>f.id===qa.dataset.qadd);if(fd)fdQuickFood(fd);return}
+  const fa=t.closest('[data-fe-add]');if(fa){const [k,i]=fa.dataset.feAdd.split(':'),src=k==='r'?fdRecent():quickItems().top,en=src[+i];if(en){const {id,t:_t,meal,...x}=en;addEntries([{...x,id:uid(),t:Date.now(),src:x.src==='guess'?'db':x.src}],S.day,S.mealSel)}return}
+  const ma=t.closest('[data-meal-add]');if(ma){const ml=S.meals[+ma.dataset.mealAdd];if(ml)addEntries(mealEntries(ml,1),S.day,S.mealSel);return}
+  const mb=t.closest('[data-meal-i]');if(mb)return openMeal(+mb.dataset.mealI);
+  const fe=t.closest('[data-fe]');if(fe){const [k,i]=fe.dataset.fe.split(':'),src=k==='r'?fdRecent():quickItems().top,en=src[+i];if(en)openLogEntry(en);return}
+  const b=t.closest('[data-food]');if(b){const fd=FOODS.find(f=>f.id===b.dataset.food);if(fd)openLogFood(fd)}});
+$('v-foods').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.fd-row')){e.preventDefault();e.target.click()}});
+function openLogEntry(en){let q=1,meal=S.mealSel;const {id,t:_t,meal:_m,...x}=en;
+  const mkE=()=>({...x,id:uid(),t:Date.now(),src:x.src==='guess'?'db':x.src,a:q===1?x.a:`${r1(q)} × ${x.a}`,g:r1((x.g||0)*q),k:r0(x.k*q),p:r1(x.p*q),c:r1(x.c*q),f:r1(x.f*q)});
+  sheet(`<div><div class="eyebrow">Log again · ${esc(x.a||'')}</div><h3>${esc(x.n)}</h3></div>
+    <div class="fd-qs">${[.5,1,1.5,2].map(v=>`<button type="button" class="chip" data-q="${v}" aria-pressed="${v===1}">${v===.5?'½':v}×</button>`).join('')}</div>
+    <div id="leLive"></div>
+    <div class="field"><label>Meal · ${esc(niceDate(S.day,{weekday:'short',month:'short',day:'numeric'}))}</label>${mealChips('leMeal',meal)}</div>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="leCancel">Cancel</button><button class="primary" id="leOk">Log it</button></div>`);
+  const upd=()=>{const e=mkE();$('leLive').innerHTML=liveHTML(e.k,e.p,e.c,e.f)};upd();
+  $('sheetRoot').querySelector('.fd-qs').onclick=ev=>{const b=ev.target.closest('[data-q]');if(!b)return;q=+b.dataset.q;$('sheetRoot').querySelectorAll('.fd-qs [data-q]').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));upd()};
+  wireChips('leMeal',m=>meal=m);$('leCancel').onclick=closeSheet;$('leOk').onclick=()=>{const e=mkE();closeSheet();addEntries([e],S.day,meal)}}
 $('newFood').onclick=()=>openManual('',true);
 
 /* ---------- PLAN ---------- */
@@ -3389,7 +3500,7 @@ function safeFloor(k){const c=S.calc||{};if(!c.age||!c.ht)return null;
   if(c.age<18)parts.push(['teen',tdee]);
   const [why,kc]=parts.reduce((a,b)=>b[1]>a[1]?b:a);
   return {k:Math.round(kc/10)*10,why,bmr:Math.round(bmr),tdee:Math.round(tdee/10)*10}}
-const SAFE_WHY={basic:'the 1,200 kcal (women) / 1,500 kcal (men) minimum health guidelines use without a doctor',rest:'your resting burn, what your body uses just to keep you alive',deficit:'the safe limit of 25% under your maintenance, the most that protects muscle',energy:'what your body needs on training days to keep hormones, bones and periods healthy',teen:'your maintenance, and under 18 Syncope never sets a deficit'};
+const SAFE_WHY={basic:'the 1,200 kcal (women) / 1,500 kcal (men) minimum health guidelines use without a doctor',rest:'your resting burn, what your body uses just to keep you alive',deficit:'the safe limit of 25% under your maintenance, the most that protects muscle',energy:'what your body needs on training days to keep hormones, bones and periods healthy',teen:'your maintenance, and under 18 Trainer never sets a deficit'};
 function applySafe(g,k){const f=safeFloor(k);if(!f)return g;const kc=g.p*4+g.c*4+g.f*9;if(kc>=f.k-5)return g;
   const add=f.k-kc,fAdd=Math.min(add*.3,Math.max(0,f.k*.25/9-g.f)*9);
   return {...g,c:r0(g.c+(add-fAdd)/4),f:r0(g.f+fAdd/9),safe:{from:r0(kc),to:f.k,why:f.why,tdee:f.tdee}}}
@@ -3418,15 +3529,15 @@ function openFuel(){
   const g=goalsFor(S.day),f=g.fuel;if(!f)return;
   sheet(`<div><div class="eyebrow">Fuel for training</div><h3>+${f.c} g carbs today</h3></div>
     <ul class="ml-items">${f.ws.map(w=>`<li><span>${esc(w.name)} ${srcBadge(w.src)}<span class="dim">${w.min?` · ${w.min} min`:''}</span></span><span class="num">${fmt(w.kcal)} kcal</span></li>`).join('')}</ul>
-    <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Syncope adds back ${f.pct}% of the rest as carbs, which refill the glycogen your training used. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
+    <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Trainer adds back ${f.pct}% of the rest as carbs, which refill the glycogen your training used. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="fuSet">Change in Settings</button><button class="primary" id="fuOk">Got it</button></div>`);
   $('fuOk').onclick=closeSheet;$('fuSet').onclick=()=>{closeSheet();openPage('prefs')};
 }
 document.addEventListener('click',e=>{if(e.target.closest('[data-fuel]'))openFuel();if(e.target.closest('[data-safe]'))openSafe()});
 function openSafe(){const g=goalsFor(S.day),s=g.safe;if(!s)return;
   sheet(`<div><div class="eyebrow">Eating enough</div><h3>${fmt(s.to)} kcal is your floor</h3></div>
-    <p class="note">Your plan asked for ${fmt(s.from)} kcal, which is below ${SAFE_WHY[s.why]||'a safe minimum'}. Syncope raised it to <b>${fmt(s.to)} kcal</b> (your maintenance is about ${fmt(s.tdee)}). You'll still lose fat, just with your muscle, energy and health protected.</p>
-    <p class="note" style="margin:0">Syncope never sets a target below your resting burn, more than 25% under maintenance, more than 1% of body weight a week, or under 1,200 kcal (women) / 1,500 (men). Talk to a doctor or dietitian before eating less than this.</p>
+    <p class="note">Your plan asked for ${fmt(s.from)} kcal, which is below ${SAFE_WHY[s.why]||'a safe minimum'}. Trainer raised it to <b>${fmt(s.to)} kcal</b> (your maintenance is about ${fmt(s.tdee)}). You'll still lose fat, just with your muscle, energy and health protected.</p>
+    <p class="note" style="margin:0">Trainer never sets a target below your resting burn, more than 25% under maintenance, more than 1% of body weight a week, or under 1,200 kcal (women) / 1,500 (men). Talk to a doctor or dietitian before eating less than this.</p>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="sfOk">Got it</button></div>`);$('sfOk').onclick=closeSheet}
 function rangeGoal(keys){const gs=keys.map(goalsFor),n=gs.length||1;return {p:gs.reduce((a,g)=>a+g.p,0)/n,c:gs.reduce((a,g)=>a+g.c,0)/n,f:gs.reduce((a,g)=>a+g.f,0)/n}}
 function wAvg(k){const v=[...Array(7)].map((_,j)=>S.weights[addDays(k,-j)]).filter(x=>x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null}
@@ -3695,7 +3806,7 @@ async function shrinkImage(file){
 }
 // Text-only Claude lookup: any food or drink that isn't in the library (house cocktails, regional dishes, restaurant items)
 /* Claude calls: with your own key (Plan → Photo scanning) they go straight to Anthropic; otherwise they go through the
-   Syncope server, which holds the app's key, so friends can scan without ever seeing or needing a key. */
+   Trainer server, which holds the app's key, so friends can scan without ever seeing or needing a key. */
 async function claudeReq(body){
   if(AI.key)return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AI.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
   const c=await ensureSync();return fetch(c.url+'/api/ai',{method:'POST',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,'Content-Type':'application/json'},body:JSON.stringify(body)})}
@@ -3772,7 +3883,7 @@ function openPhoto(file){
   $('phCancel').onclick=closeSheet;
   $('phLabel').onclick=()=>{if(!dataUrl)return;closeSheet();openManual('',true,null,dataUrl)};
   $('phStatus').textContent='Loading photo…';
-  shrinkImage(file).then(u=>{dataUrl=u;$('phImg').src=u;$('phStatus').textContent='';$('phGo').disabled=false}).catch(()=>{$('phStatus').className='status err';$('phStatus').innerHTML='This browser couldn\'t open that photo. Open Syncope in Safari or Chrome (not the in-app preview), or take a screenshot of the photo and scan the screenshot.'});
+  shrinkImage(file).then(u=>{dataUrl=u;$('phImg').src=u;$('phStatus').textContent='';$('phGo').disabled=false}).catch(()=>{$('phStatus').className='status err';$('phStatus').innerHTML='This browser couldn\'t open that photo. Open Trainer in Safari or Chrome (not the in-app preview), or take a screenshot of the photo and scan the screenshot.'});
   const drawItems=()=>{
     const on=items.filter(i=>i.on),t=on.reduce((a,i)=>({k:a.k+i.k*i.sc,p:a.p+i.p*i.sc,c:a.c+i.c*i.sc,f:a.f+i.f*i.sc}),{k:0,p:0,c:0,f:0});
     $('phBody').innerHTML=items.length?`<ul class="scan-list">${items.map((it,i)=>`<li class="${it.on?'':'off'}"><label class="check"><input type="checkbox" data-on="${i}" ${it.on?'checked':''}></label>
@@ -3820,7 +3931,7 @@ async function barcodeFlow(onFound,st){
   pickPhoto(async u=>{st('Reading the barcode…');const code=await readBarcode(u);if(!code){st('Couldn’t read a barcode. Get it flat, close and in focus, or type the numbers.',1);return}
     st(`Looking up ${code}…`);try{const o=await lookupBarcode(code);if(!o){st(`${code} isn’t in the food database yet. Snap the nutrition label instead.`,1);return}st('');onFound(o)}catch(e){st('No connection. Barcode lookup needs internet.',1)}})}
 function openBarcode(){
-  sheet(`<div><div class="eyebrow">Barcode</div><h3>Scan a package</h3><p class="note">Take a photo of the barcode. Syncope looks it up in Open Food Facts (3M+ products) and fills in the macros. You can change anything before you log it.</p></div>
+  sheet(`<div><div class="eyebrow">Barcode</div><h3>Scan a package</h3><p class="note">Take a photo of the barcode. Trainer looks it up in Open Food Facts (3M+ products) and fills in the macros. You can change anything before you log it.</p></div>
     <button class="primary big-act" id="bcShot" type="button">${'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7V5h3M17 5h3v2M20 17v2h-3M7 19H4v-2M7 9v6M10 9v6M13 9v6M16 9v6"/></svg>'} Photo of the barcode</button>
     <div class="field"><label for="bcIn">Or type the numbers</label><div class="inrow"><input id="bcIn" type="text" inputmode="numeric" placeholder="e.g. 096619756803"><button class="ghost" id="bcGo" type="button">Look up</button></div></div>
     <div class="status" id="bcSt"></div>
@@ -3841,7 +3952,7 @@ document.addEventListener('paste',e=>{if(S.view!=='today')return;const f=[...(e.
 
 /* data */
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-function backup(){S.lastBackup=Date.now();save();download(`syncope-backup-${todayKey()}.json`,JSON.stringify({app:'Syncope',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev,prefs:S.prefs,customLifts:S.customLifts,favLifts:S.favLifts,hyd:S.hyd},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
+function backup(){S.lastBackup=Date.now();save();download(`syncope-backup-${todayKey()}.json`,JSON.stringify({app:'Trainer',v:1,exported:new Date().toISOString(),days:S.days,goals:S.goals,calc:S.calc,custom:S.custom,weights:S.weights,plan:S.plan,meals:S.meals,checkins:S.checkins,profile:S.profile,workouts:S.workouts,templates:S.templates,health:S.health,dev:S.dev,prefs:S.prefs,customLifts:S.customLifts,favLifts:S.favLifts,hyd:S.hyd},null,1),'application/json');if(S.view==='plan')renderPlan();toast('Backup downloaded')}
 $('exportJson').onclick=backup; $('backupNow').onclick=backup;
 $('exportCsv').onclick=()=>{
   const rows=[['date','meal','food','amount','grams','kcal','protein_g','carbs_g','fat_g']];
@@ -3858,7 +3969,7 @@ $('importJson').onchange=e=>{
       $('rReplace').onclick=()=>{S.days=j.days;if(j.goals)S.goals=j.goals;if(j.calc)S.calc=j.calc;S.custom=j.custom||[];S.weights=j.weights||{};S.plan=j.plan||null;S.meals=j.meals||[];S.checkins=j.checkins||{};if(j.profile)S.profile=j.profile;S.workouts=j.workouts||[];if(j.templates){S.templates=j.templates;S.tplSeeded=true}S.health=j.health||{};if(j.prefs)S.prefs=j.prefs;if(j.customLifts)S.customLifts=j.customLifts;if(j.favLifts)S.favLifts=j.favLifts;if(j.hyd)S.hyd=j.hyd;applyPrefs();renderPlan.filled=false;done()};
       $('rMerge').onclick=()=>{Object.entries(j.days).forEach(([k,l])=>{const have=new Set((S.days[k]||[]).map(x=>x.id));S.days[k]=[...(S.days[k]||[]),...(l||[]).filter(x=>!have.has(x.id))]});const names=new Set(S.custom.map(c=>c.name.toLowerCase()));S.custom=[...S.custom,...(j.custom||[]).filter(c=>!names.has(c.name.toLowerCase()))];S.weights={...(j.weights||{}),...S.weights};if(!S.plan&&j.plan)S.plan=j.plan;const mn=new Set(S.meals.map(m=>m.name.toLowerCase()));S.meals=[...S.meals,...(j.meals||[]).filter(m=>!mn.has(m.name.toLowerCase()))];S.checkins={...(j.checkins||{}),...S.checkins};const wid=new Set(S.workouts.map(w=>w.id));S.workouts=[...S.workouts,...(j.workouts||[]).filter(w=>!wid.has(w.id))].sort((a,b)=>b.end-a.end);S.health={...(j.health||{}),...S.health};if(!S.profile.name&&j.profile)S.profile=j.profile;done()};
       function done(){buildFoods();save();closeSheet();renderAll();toast('Backup restored')}
-    }catch(err){$('dataStatus').className='status err';$('dataStatus').textContent='That file isn\'t a Syncope backup. Choose the .json file from “Download backup”.'}
+    }catch(err){$('dataStatus').className='status err';$('dataStatus').textContent='That file isn\'t a Trainer backup. Choose the .json file from “Download backup”.'}
     e.target.value=''};
   rd.readAsText(f);
 };
@@ -3878,7 +3989,7 @@ function checkBackup(){
 function initials(n){const s=(n||'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();return s||'ME'}
 function firstName(){return ((S.profile.name||'').trim().split(/\s+/)[0])||''}
 function greet(){const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'}
-/* Profile pictures: original illustrated characters (Syncope's own), your photo, or initials */
+/* Profile pictures: original illustrated characters (Trainer's own), your photo, or initials */
 const AVT=(()=>{const E=(x,y,r=6,c='#14161C')=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/><circle cx="${x+r*.35}" cy="${y-r*.35}" r="${r*.32}" fill="#fff"/>`,
   eyes=(y,sp=14,r=6)=>E(50-sp,y,r)+E(50+sp,y,r),smile=(y,w=10,c='#14161C')=>`<path d="M${50-w} ${y}q${w} ${w*.9} ${w*2} 0" fill="none" stroke="${c}" stroke-width="3.4" stroke-linecap="round"/>`,
   cheeks=(y,c='#FF8FA3')=>`<circle cx="30" cy="${y}" r="5" fill="${c}" opacity=".55"/><circle cx="70" cy="${y}" r="5" fill="${c}" opacity=".55"/>`;
@@ -3981,6 +4092,76 @@ function openHP(){const parts=hpParts(),n=parts.filter(p=>p.v>=1).length;
     <h2>${n===4?'Full heart today':'Fill your heart today'}</h2><p class="note" style="margin:0;text-align:center">Each bar fills as you hit a goal. Fill all four every day.</p>
     <div class="hp-rows">${parts.map(p=>`<div class="hp-row"><span class="hp-l">${p.l}</span><span class="hp-tr"><i style="width:${Math.round(p.v*100)}%"></i></span><span class="hp-d ${p.v>=1?'on':''}">${p.v>=1?'✓ ':''}${p.d}</span></div>`).join('')}</div>
     <button class="primary" type="button" id="hpOk" style="width:100%">Done</button></div>`,{nofocus:true});$('hpOk').onclick=closeSheet}
+
+/* ================= ACCOUNTS: username + password, cloud backup, recovery ================= */
+const ACK='syncope.acct';
+function acctCfg(){try{return JSON.parse(localStorage.getItem(ACK)||'null')||{}}catch(e){return {}}}
+function acctSave(o){try{localStorage.setItem(ACK,JSON.stringify(o))}catch(e){}}
+const pwRules=p=>[[p.length>=8,'8+ characters'],[/\d/.test(p),'a number'],[/[^A-Za-z0-9]/.test(p),'a special character']];
+const pwOk=p=>pwRules(p).every(x=>x[0]);
+async function acctPost(path,body){const url=(syncCfg().url||SYNC_URL).replace(/\/+$/,'');let r;try{r=await fetch(url+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}catch(e){throw new Error(niceErr(e,'your account'))}
+  const j=await r.json().catch(()=>({}));if(!r.ok){const er=new Error(j.error||`Server error (${r.status})`);er.claim=j.claim;throw er}return {...j,url}}
+async function b64gz(str){if(typeof CompressionStream==='undefined')return {z:'',d:str};const cs=new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'));const buf=new Uint8Array(await new Response(cs).arrayBuffer());let bin='';for(let i=0;i<buf.length;i+=32768)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+32768));return {z:'gz',d:btoa(bin)}}
+async function ungz(o){if(o.z!=='gz')return o.d;const bin=atob(o.d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return await new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}
+let cloudTimer=null,cloudBusy=false;
+async function cloudBackup(force){const a=acctCfg();if(!a.un||cloudBusy)return;if(!force&&a.at&&Date.now()-a.at<8*60e3){clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>cloudBackup(true),8*60e3-(Date.now()-a.at)+500);return}
+  const raw=localStorage.getItem(LS);if(!raw||raw.length<20)return;if(!force&&a.sig===raw.length+':'+saveVer)return;
+  cloudBusy=true;try{const pk=await b64gz(raw);const c=syncCfg();const r=await fetch(c.url+'/api/backup',{method:'POST',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,'Content-Type':'application/json'},body:JSON.stringify({v:1,app:APP_VER,at:Date.now(),...pk})});
+    if(r.ok){acctSave({...acctCfg(),at:Date.now(),sig:raw.length+':'+saveVer});if(pgStack&&pgStack.includes('me'))renderMe()}}catch(e){}finally{cloudBusy=false}}
+function cloudSoon(){if(!acctCfg().un)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>cloudBackup(false),20000)}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cloudBackup(false)});
+function restoreFromSoc(soc){if(!soc)return 0;const D=soc.detail||{},n0=Object.keys(S.days).length;let n=0;
+  (D.daily||[]).forEach((x,i,arr)=>{if(!x||!x.d)return;const last=i===arr.length-1;
+    if(!(S.days[x.d]||[]).length){if(last&&(D.foods||[]).length){S.days[x.d]=D.foods.map(f=>({id:uid(),n:f.n,a:f.a||'',g:0,k:+f.k||0,p:+f.p||0,c:+f.c||0,f:+f.f||0,meal:f.m||'snack',src:'restored',t:Date.now()}));n++}
+      else if(x.k>0){S.days[x.d]=[{id:uid(),n:'Day total (restored)',a:'from your saved summary',g:0,k:+x.k||0,p:+x.p||0,c:+x.c||0,f:+x.f||0,meal:'snack',src:'restored',t:Date.now()}];n++}}
+    if(x.w!=null&&S.weights[x.d]==null)S.weights[x.d]=x.w;
+    if(x.ho>0){const H=hydS();if(!(H.log[x.d]||[]).length)H.log[x.d]=[{id:uid(),t:Date.now(),oz:x.ho,kind:'water',l:'Restored total'}]}});
+  const have=new Set(S.templates.map(t=>t.name.toLowerCase()));(D.tpls||[]).forEach(t=>{if(!have.has(t.name.toLowerCase())){S.templates.push({id:'t'+uid(),name:t.name,ex:t.ex.map(e=>e.n)});n++}});S.tplSeeded=true;
+  const wid=new Set((S.workouts||[]).map(w=>w.name+'|'+w.date));(D.wks||[]).forEach(w=>{if(!w.d||w.src==='live'||(w.src&&w.src!=='')||!(w.ex||[]).length||wid.has(w.name+'|'+w.d))return;const st=new Date(w.d+'T12:00:00').getTime();
+    S.workouts=S.workouts||[];S.workouts.push({id:'w'+uid(),name:w.name,date:w.d,start:st,end:st+(w.min||45)*60000,restored:true,prs:[],ex:w.ex.map(e=>{const m=String(e.top||'').match(/([\d.]+)\D+(\d+)/);return {n:e.n,sets:Array.from({length:Math.max(1,e.sets||1)},()=>({w:m?+m[1]:0,r:m?+m[2]:0,done:true}))}})});n++});
+  if(soc.name&&!S.profile.name)S.profile.name=soc.name;if(soc.av&&!S.profile.avatar&&!S.profile.photo)S.profile.avatar=soc.av;S.profile.onboarded=true;
+  const sc=socCfg();socSave({...sc,on:true,code:soc.code,name:soc.name,color:soc.color,share:soc.share,username:soc.username,phoneLast4:soc.phLast4||null});
+  save();return n}
+async function acctFinish(j,mode){syncSave({url:j.url,uid:j.uid,token:j.token});acctSave({un:j.username||'me'});try{localStorage.setItem('syncope.tour2','1')}catch(e){}const ov=$('tourO');if(ov)ov.remove();
+  let restored=false;
+  if(j.hasBackup){try{const c=syncCfg();const r=await fetch(c.url+'/api/backup',{headers:{Authorization:`Bearer ${c.uid}.${c.token}`}});const b=await r.json();if(b&&b.d){const raw=await ungz(b);JSON.parse(raw);
+      const local=localStorage.getItem(LS);if(local&&local.length>20)localStorage.setItem(LS+'.before-restore',local);localStorage.setItem(LS,raw);restored=true;
+      if(j.soc){const sc=socCfg(),soc=j.soc;socSave({...sc,on:true,code:soc.code,name:soc.name,color:soc.color,share:soc.share,username:soc.username,phoneLast4:soc.phLast4||null})}
+      acctSave({un:j.username||'me',at:Date.now()});closeSheet();toast('Welcome back. Your data is restored.');setTimeout(()=>location.reload(),900);return}}catch(e){}}
+  const n=restoreFromSoc(j.soc);closeSheet();renderAll();
+  toast(n?`Welcome back, @${esc(j.username)}. Restored your templates, workouts and recent days.`:`Signed in as @${esc(j.username)}. Your data will back up automatically.`);
+  setTimeout(()=>cloudBackup(true),1500)}
+function openAccount(mode='signin',pre={}){
+  const a=acctCfg();
+  const T={signin:['Sign in','Sign in to get your data on this phone.'],create:[a.un?'Change password':'Create your account','Your data backs up to your account automatically, so you never lose it.'],recover:['Recover your account','Used Trainer Friends before? Enter your username or the phone number you added, then choose a password to get your data back.']}[mode];
+  const unPre=pre.un||a.un||socCfg().username||'';
+  sheet(`<div><div class="eyebrow">Account</div><h3>${T[0]}</h3><p class="note" style="margin:4px 0 0">${T[1]}</p></div>
+    ${mode==='create'?`<div class="field"><label for="acU">Username</label><div class="ac-u"><span>@</span><input id="acU" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(unPre)}" ${a.un?'readonly':''}></div></div>
+    ${a.un?'':`<div class="field"><label for="acPh">Phone number <span class="dim">(optional, lets you sign in with it)</span></label><input id="acPh" type="tel" autocomplete="tel" inputmode="tel" placeholder="(555) 123-4567"></div>`}`
+    :`<div class="field"><label for="acU">Username or phone number</label><input id="acU" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(unPre)}" placeholder="@username or (555) 123-4567"></div>`}
+    <div class="field"><label for="acP">${mode==='signin'?'Password':'Choose a password'}</label><input id="acP" type="password" autocomplete="${mode==='signin'?'current-password':'new-password'}"></div>
+    ${mode==='signin'?'':`<div class="ac-rules" id="acR"></div><div class="field"><label for="acP2">Confirm password</label><input id="acP2" type="password" autocomplete="new-password"></div>`}
+    <p class="status err" id="acE" hidden></p>
+    <button class="primary" type="button" id="acGo" style="width:100%;padding:14px">${mode==='signin'?'Sign in':mode==='recover'?'Recover and sign in':'Save'}</button>
+    <div class="ac-alt">${mode!=='signin'?'<button class="link" type="button" data-acm="signin">Have a password? Sign in</button>':''}${mode!=='recover'?'<button class="link" type="button" data-acm="recover">Recover my account</button>':''}${mode!=='create'&&!a.un?'<button class="link" type="button" data-acm="create">Create an account</button>':''}</div>`,{nofocus:true});
+  const R=()=>{const r=$('acR');if(r)r.innerHTML=pwRules($('acP').value).map(([ok,l])=>`<span class="${ok?'on':''}">${ok?'✓':'○'} ${l}</span>`).join('')};R();$('acP').oninput=R;
+  const err=m=>{const e=$('acE');e.hidden=false;e.textContent=m};
+  $('sheetRoot').querySelector('.ac-alt').onclick=e=>{const b=e.target.closest('[data-acm]');if(b)openAccount(b.dataset.acm,{un:$('acU').value})};
+  $('acGo').onclick=async()=>{const raw=$('acU').value.trim(),isPh=/^[+()\d\s.-]+$/.test(raw)&&raw.replace(/\D/g,'').length>=7,un=isPh?raw:raw.replace(/^@/,'').toLowerCase(),pw=$('acP').value;
+    if(mode==='create'&&!/^[a-z0-9_.]{3,20}$/.test(un))return err('Usernames are 3–20 letters, numbers, dots or underscores.');
+    if(mode!=='create'&&!isPh&&!/^[a-z0-9_.]{3,20}$/.test(un))return err('Enter your username or phone number.');
+    if(mode!=='signin'){if(!pwOk(pw))return err('Your password needs at least 8 characters, a number and a special character.');if(pw!==$('acP2').value)return err('The passwords don’t match.')}
+    const b=$('acGo');b.disabled=true;b.textContent='One moment…';
+    try{if(mode==='create'){const c=await ensureSync();const ph=$('acPh')?$('acPh').value.trim():'';const rs=await api('/api/acct-set',{method:'POST',body:JSON.stringify({username:un,password:pw,phone:ph})});acctSave({...acctCfg(),un});const sc=socCfg();if(sc.on)socSave({...sc,username:un});closeSheet();toast(a.un?'Password updated':'Account created. Your data now backs up automatically.');cloudBackup(true);if(pgStack&&pgStack.includes('me'))renderMe();return}
+      const j=await acctPost(mode==='signin'?'/api/acct/login':'/api/acct/claim',{id:un,password:pw});await acctFinish(j,mode)}
+    catch(e){b.disabled=false;b.textContent=mode==='signin'?'Sign in':mode==='recover'?'Recover and sign in':'Save';if(e.claim)return openAccount('recover',{un:raw});err(e.message)}}}
+
+function relAgo(t){const m=Math.round((Date.now()-t)/60000);return m<1?'just now':m<60?`${m} min ago`:m<1440?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} d ago`}
+function renderAcNudge(){const el=$('acNudge');if(!el)return;let off=null;try{off=localStorage.getItem('syncope.acnudge')}catch(e){}
+  const has=Object.keys(S.days).some(k=>(S.days[k]||[]).length);
+  if(acctCfg().un||!S.profile.onboarded||off===todayKey()){el.innerHTML='';return}
+  el.innerHTML=`<div class="ac-band warn" role="button" tabindex="0" data-ga="account2"><span class="mb-crest">${GI.shield}</span><span class="mb-bt"><b>${has?'Back up your data':'Create your account'}</b><span>${has?'Make an account so you never lose your log, even if you delete the app.':'Or sign in to bring back your data.'}</span></span><button type="button" class="ac-x" aria-label="Hide for today" data-acx>✕</button></div>${has?'':'<div class="ac-alt" style="margin-top:6px"><button class="link" type="button" data-ga="signin">Sign in</button><button class="link" type="button" data-ga="recover">Recover my account</button></div>'}`;
+  const x=el.querySelector('[data-acx]');if(x)x.onclick=e=>{e.stopPropagation();try{localStorage.setItem('syncope.acnudge',todayKey())}catch(_){}el.innerHTML=''}}
 /* ================= PAGES (profile, settings, details) ================= */
 const sv=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const GI={bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>'),drop:sv('<path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/>'),run:sv('<circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 12l3-4 4 1 2 4 3 1"/>'),user:sv('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),body:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 9.5a5 5 0 0 1 7 0L12 13z"/>'),
@@ -4004,7 +4185,7 @@ function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.
   if(o.href)return `<a class="gr" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`;
   if(o.ctl)return `<div class="gr static"><span class="gi" data-j="${JEWEL[o.ic]||''}" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv">${o.ctl}</span><span></span></div>`;
   return `<button class="gr" type="button" ${attr}>${inner}</button>`}
-const PG_T={member:'Membership',report:'Monthly report',hyd:'Hydration',cook:'Meal ideas & recipes',fuel:'Fuel & timing',progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Syncope',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'Wearables',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
+const PG_T={member:'Membership',report:'Monthly report',hyd:'Hydration',cook:'Meal ideas & recipes',fuel:'Fuel & timing',progs:'Programs',ftpl:'Friends’ templates',lifts:'Lift progress',tlog:'Training calendar',friend:'Friend',ideas:'Meals that fit',prep:'Sunday meal prep',health:'Recovery & sleep',checkin:'Daily check-in',help:'How to use Trainer',me:'Profile',account:'Account',prefs:'Settings',body:'Body metrics',weigh:'Weigh-ins',targets:'Daily targets',conn:'Wearables',scan:'Photo scanning',data:'Backup & export',method:'The science',strength:'Strength progress',muscle:'Sets per muscle'};
 const PG_R={member:renderMember,report:renderReport,hyd:renderHyd,cook:renderCook,fuel:renderFuel,progs:renderProgs,ftpl:async()=>{renderFtpl();if(socCfg().on){await socBoard();if(pgStack[pgStack.length-1]==='ftpl')renderFtpl()}},lifts:renderLifts,tlog:renderTlog,friend:refreshFriend,ideas:renderIdeas,prep:renderPrep,health:renderHealth,checkin:renderCheckin,help:renderHelp,me:renderMe,account:renderAccount,prefs:renderPrefs,body:renderPlan,weigh:renderPlan,targets:renderPlan,conn:renderPlan,scan:renderPlan,data:renderPlan,strength:renderTrain,muscle:renderTrain};
 let pgStack=[];
 function showPage(id){const r=$('pageRoot');let bt=$('pgBig');if(!bt){bt=document.createElement('h1');bt.id='pgBig';bt.className='page-big'}$('pgBody').appendChild(bt);$('pgBody').appendChild($('pg-'+id));$('pgTitle').textContent=PG_T[id]||'';bt.textContent=PG_T[id]||'';bt.hidden=id==='me';r.classList.remove('scrolled');
@@ -4042,6 +4223,8 @@ function renderMe(){
     <div class="me2-top"><button class="avatar" type="button" data-ga="avatar" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button>
       <div class="me2-id"><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p>
       ${conn.length?`<div class="srcrow">${conn.map(x=>srcBadge(x)).join('')}</div>`:`<button class="link" data-pg="conn" style="padding:4px 0">+ Connect your watch</button>`}</div></div>
+    ${(()=>{const ac=acctCfg();if(ac.un)return `<button class="ac-band" type="button" data-ga="account2"><span class="mb-crest">${GI.shield}</span><span class="mb-bt"><b>@${esc(ac.un)}</b><span>${ac.at?`Backed up ${relAgo(ac.at)}`:'Backing up…'} · Change password</span></span><span class="mb-go">${CHEV}</span></button>`;
+      return `<button class="ac-band warn" type="button" data-ga="account2"><span class="mb-crest">${GI.shield}</span><span class="mb-bt"><b>Protect your data</b><span>Create an account so your log is backed up and you can sign in on any phone.</span></span><span class="mb-go">${CHEV}</span></button><div class="ac-alt" style="margin-top:-6px"><button class="link" type="button" data-ga="signin">Sign in</button><button class="link" type="button" data-ga="recover">Recover my account</button></div>`})()}
     <button class="mb-band" type="button" data-pg="member"><span class="mb-crest">${GI.crown}</span><span class="mb-bt"><b>Membership: Free</b><span>Pro and Elite features are free during the beta</span></span><span class="mb-go">${CHEV}</span></button>
     <div class="me3-stats">
       <button type="button" data-ga="friends"><b class="num">${sk}</b><span>day streak</span></button>
@@ -4078,17 +4261,18 @@ function renderMe(){
       <button type="button" data-ga="tour">${GI.info}<span>Tour</span></button>
     </div>
     <div class="me2-foot"><button class="link" data-ga="redo">Redo welcome setup</button><a class="link" href="privacy.html" target="_blank" rel="noopener">Privacy</a><a class="link" href="terms.html" target="_blank" rel="noopener">Terms</a></div>
-    <p class="ver">Syncope ${esc(APP_VER.replace('syncope-',''))}</p></div>`;
+    <p class="ver">Trainer ${esc(APP_VER.replace('syncope-',''))}</p></div>`;
 }
 GACT.tour=()=>{closePages();setTimeout(startTour,200)};
 GACT.privacy=()=>{closePages();openPrivacy()};
+GACT.account2=()=>openAccount('create');GACT.signin=()=>openAccount('signin');GACT.recover=()=>openAccount('recover');
 function renderAccount(){
   const wear=S.profile.wear||[];
   $('pg-account').innerHTML=`<div class="me-hero"><button class="avatar" type="button" id="acAv" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button></div>
     <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="field"><label for="acN">Name</label><input id="acN" type="text" value="${esc(S.profile.name||'')}" placeholder="Your name" autocomplete="name"></div>
     <div class="field"><label>What you wear</label><div class="wn-acts" id="acW">${WEAR.map(([v,l])=>`<button type="button" class="chip" data-w="${v}" aria-pressed="${wear.includes(v)}">${l}</button>`).join('')}</div></div>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="acSave">Save</button></div></div>
-    <p class="note" style="padding:0 6px">Your profile and everything you log live only on this phone. Anyone else who opens the Syncope link gets their own separate copy.</p>`;
+    <p class="note" style="padding:0 6px">Your profile and everything you log live only on this phone. Anyone else who opens the Trainer link gets their own separate copy.</p>`;
   $('acAv').onclick=openAvatarPicker;
   $('acW').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;const on=b.getAttribute('aria-pressed')!=='true';if(b.dataset.w==='none'&&on)$('acW').querySelectorAll('[data-w]').forEach(x=>x.setAttribute('aria-pressed','false'));else if(on)$('acW').querySelector('[data-w="none"]').setAttribute('aria-pressed','false');b.setAttribute('aria-pressed',String(on))};
   $('acSave').onclick=()=>{S.profile.name=$('acN').value.trim();S.profile.wear=[...$('acW').querySelectorAll('[aria-pressed="true"]')].map(b=>b.dataset.w);save();renderProfileBtn();toast('Saved');pageBack()};
@@ -4117,7 +4301,7 @@ function renderPrefs(){
       ${grow({ic:'camera',c:'--carb',t:'Food photos',s:'Photo headers from Unsplash (needs internet)',ctl:`<input type="checkbox" class="sw" data-tog="photos" ${P.photos!==false?'checked':''} aria-label="Food photos">`})}
       ${grow({ic:'cal',c:'--fat',t:'Week starts on',ctl:' '})}${chips('wkSun',[[0,'Monday'],[1,'Sunday']],P.wkSun?1:0)}</div>
     <div class="glabel">Sync</div><div class="glist">
-      ${grow({ic:'refresh',c:'--good',t:'Auto-sync',s:'Pull WHOOP and Garmin data when you open Syncope',ctl:`<input type="checkbox" class="sw" data-tog="autoSync" ${P.autoSync!==false?'checked':''} aria-label="Auto-sync">`})}
+      ${grow({ic:'refresh',c:'--good',t:'Auto-sync',s:'Pull WHOOP and Garmin data when you open Trainer',ctl:`<input type="checkbox" class="sw" data-tog="autoSync" ${P.autoSync!==false?'checked':''} aria-label="Auto-sync">`})}
       ${grow({ga:'syncnow',ic:'watch',c:'--fat',t:'Sync now',v:syncCfg().last?new Date(syncCfg().last).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):''})}</div>`;
   const el=$('pg-prefs');
   el.onchange=e=>{const t=e.target.closest('[data-tog]');if(!t)return;if(t.dataset.tog==='showCoach')S.prefs.hideCoach=!t.checked;else S.prefs[t.dataset.tog]=t.checked;save();renderPrefs()};
@@ -4195,14 +4379,14 @@ function gymSteps(k=todayKey()){const g=gymGet(k);if(!g)return null;const kg=kgN
   return {g,t0,steps,next:nxt<0?null:steps[nxt],ni:nxt,pre,top}}
 function untilTxt(ms){const d=ms-Date.now(),a=Math.abs(d),h=Math.floor(a/3600e3),m=Math.round(a%3600e3/60e3);const t=h?`${h}h ${m}m`:`${m} min`;return d>=0?`in ${t}`:`${t} ago`}
 function gymCardHTML(k=todayKey(),compact){const G=gymSteps(k);
-  if(!G)return `<button type="button" class="gym-cta" data-gymplan><span>🕒</span><div><b>When are you training today?</b><em>Set a time and Syncope gets you hydrated for it</em></div>${CHEV}</button>`;
+  if(!G)return `<button type="button" class="gym-cta" data-gymplan><span>🕒</span><div><b>When are you training today?</b><em>Set a time and Trainer gets you hydrated for it</em></div>${CHEV}</button>`;
   const now=Date.now(),{g,t0,steps,ni}=G;
   return `<div class="card gym-card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Training ${t0>now?untilTxt(t0):t0+(+g.min||60)*60e3>now?'now':'done'}</div><h2 style="margin:2px 0 0">${hhmm(t0)} · ${(GYM_KINDS.find(x=>x[0]===g.t)||[,'Training'])[1]}</h2></div><button class="link" type="button" data-gymplan>Edit</button></div>
     <ol class="gym-tl">${steps.map((x,i)=>`<li class="${x.done?'done':i===ni?'now':x.t<now?'past':''}"><span class="gt-ic">${x.done?'✓':x.ic}</span><div><div class="row" style="justify-content:space-between;gap:8px"><b>${x.h}</b><time>${hhmm(x.t)}</time></div>${compact&&i!==ni?'':`<p>${x.b}${x.got!=null&&!x.done&&x.got>0?` You’ve had ${fmt(x.got)} oz in that window.`:''}</p>`}</div></li>`).join('')}</ol>
     ${ni>=0&&steps[ni].food?`<div class="row" style="gap:8px"><button class="primary" type="button" data-gymfood>Log it</button><button class="ghost" type="button" data-pg="ideas">Meal ideas that fit</button></div>`:ni>=0&&/^(Pre-load|Top up)/.test(steps[ni].h)?`<div class="row" style="gap:8px"><button class="primary" type="button" data-gymdrink="${steps[ni].h.startsWith('Pre')?G.pre[0]:G.top[0]}">+${steps[ni].h.startsWith('Pre')?G.pre[0]:G.top[0]} oz now</button><button class="ghost" type="button" data-gymdrink="8">+8 oz</button></div>`:''}
     <p class="note" style="margin:0;font-size:12px">From ACSM (2007, 2016), NATA (2017) and ISSN nutrient-timing (2017) guidance.</p></div>`}
 function openGymPlan(k=todayKey()){const g=gymGet(k)||{},nowH=new Date(),def=g.at||`${String(Math.min(22,nowH.getHours()+2)).padStart(2,'0')}:00`;let t=g.t||'lift',mn=+g.min||60;
-  sheet(`<div><div class="eyebrow">Plan today’s session</div><h3>When are you training?</h3><p class="note" style="margin:4px 0 0">Syncope adds it to your water target and tells you when to drink so you show up hydrated.</p></div>
+  sheet(`<div><div class="eyebrow">Plan today’s session</div><h3>When are you training?</h3><p class="note" style="margin:4px 0 0">Trainer adds it to your water target and tells you when to drink so you show up hydrated.</p></div>
     <div class="field"><label for="gyAt">Time</label><input id="gyAt" type="time" value="${def}" style="font-size:20px;padding:12px 14px"></div>
     <div class="field"><label>What</label><div class="wn-acts" id="gyT">${GYM_KINDS.map(([v,l])=>`<button type="button" class="chip" data-v="${v}" aria-pressed="${t===v}">${l}</button>`).join('')}</div></div>
     <div class="field"><label>How long</label><div class="wn-acts" id="gyM">${[30,45,60,75,90,120].map(v=>`<button type="button" class="chip" data-v="${v}" aria-pressed="${mn===v}">${v} min</button>`).join('')}</div></div>
@@ -4571,7 +4755,7 @@ const FIND=[
   ['Help & FAQ','help faq questions how',()=>openPage('help')],
   ['Show me around (tour)','tour tutorial guide walkthrough intro',()=>startTour()]];
 function openFind(){
-  sheet(`<div class="find"><div class="find-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="findIn" type="search" placeholder="Search: water, report, rest sound…" autocomplete="off" enterkeyhint="go" aria-label="Search Syncope"></div><div class="glist find-l" id="findL"></div></div>`);
+  sheet(`<div class="find"><div class="find-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="findIn" type="search" placeholder="Search: water, report, rest sound…" autocomplete="off" enterkeyhint="go" aria-label="Search Trainer"></div><div class="glist find-l" id="findL"></div></div>`);
   const draw=()=>{const q=$('findIn').value.trim().toLowerCase(),ws=q.split(/\s+/).filter(Boolean);
     const hits=FIND.map((f,i)=>{const hay=(f[0]+' '+f[1]).toLowerCase();let sc=0;for(const w of ws){if(f[0].toLowerCase().startsWith(w))sc+=5;else if(hay.includes(' '+w)||hay.startsWith(w))sc+=3;else if(hay.includes(w))sc+=1;else return null}return {i,sc}}).filter(Boolean).sort((a,b)=>b.sc-a.sc).slice(0,ws.length?8:9);
     $('findL').innerHTML=hits.length?hits.map(h=>`<button class="gr" data-fi="${h.i}"><span class="gt"><b>${FIND[h.i][0]}</b></span>${CHEV}</button>`).join(''):`<p class="note" style="padding:14px">Nothing for “${esc(q)}”. Try water, lift, weight or report.</p>`};
@@ -4586,11 +4770,11 @@ const TOUR=[
   ['today','#quick','One-tap tiles','+12 adds a glass of water. Training starts today’s workout. Recovery and steps come from your watch.'],
   ['today','.composer','Log in plain words','Type “2 eggs and a coffee”. ▥ scans a barcode, the camera scans your plate or a label. Tap anything you logged to fix it.'],
   ['today','#todayRows','Your shortcuts','Water, meal ideas, meal prep and your daily check-in, right here.'],
-  ['train','#gymSlot','Plan your session','Tell Syncope when you’re training. It adds that to your water goal and counts you down: when to drink, how much, and when to top up.'],
+  ['train','#gymSlot','Plan your session','Tell Trainer when you’re training. It adds that to your water goal and counts you down: when to drink, how much, and when to top up.'],
   ['train','#tplGrid','Train','Tap a template to start. Tick ✓ after each set and the rest timer runs. Hold ⋮⋮ to reorder exercises.'],
   ['train','#trRows','See your gains','Training calendar, lift progress, sets per muscle and ready-made programs.'],
   ['week','#wTop','Progress','Days on target, weight, workouts, water and recovery for the week or month. Friends lives here too: tap anyone to see their day.'],
-  ['plan','#planRows','Plan','Pick cut, maintain or bulk. Syncope sets safe targets and adjusts them as you weigh in.'],
+  ['plan','#planRows','Plan','Pick cut, maintain or bulk. Trainer sets safe targets and adjusts them as you weigh in.'],
   ['today','#profBtn','You','Streak, rank, wearables, privacy and settings.'],
   ['today','#findBtn','Find anything','Type “water”, “report” or “rest sound” and jump straight there.'],
   ['today','#helpBtn','You’re set','Replay this anytime from the ?. Now log your first meal.']];
@@ -4614,7 +4798,7 @@ addEventListener('resize',()=>{if(tourI>=0)tourStep()});
 function maybeTour(){let seen=null;try{seen=localStorage.getItem('syncope.tour2')}catch(e){}if(seen||!S.profile||!S.profile.onboarded||!$('onb').hidden||(typeof pgStack!=='undefined'&&pgStack.length)||S.view!=='today'||document.querySelector('#sheetRoot .sheet'))return;
   setTimeout(()=>{if(S.view==='today'&&$('onb').hidden&&!(typeof pgStack!=='undefined'&&pgStack.length))startTour()},900)}
 /* ================= MEAL IDEAS: meals sized to close your remaining macros ================= */
-// name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Syncope adjusts the amount, x = fixed)
+// name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Trainer adjusts the amount, x = fixed)
 const IDEA_SRC=`Greek yogurt power bowl|bsR|3|greek yogurt:p:cup:1:0.5:2.5;granola:c:cup:0.25:0:1;blueberries:c:cup:0.5:0:1.5;honey:c:tbsp:1:0:2;almonds:f:oz:0.5:0:1.5
 Protein oats|bPR|8|oats:c:cup:0.5:0.25:1.5;whey:p:scoop:1:0:2;banana:c:each:1:0:2;peanut butter:f:tbsp:1:0:2.5
 Egg white scramble & toast|bR|10|egg white:p:each:4:0:10;egg:f:each:1:0:3;wheat bread:c:slice:2:0:4;spinach:x:cup:1:1:1;salsa:x:tbsp:2:2:2
@@ -5110,8 +5294,8 @@ function myWeek(){
   const sk=streak();if([3,5,7,10,14,21,30,50,75,100,150,200,365].includes(sk))ev.push({id:'s:'+tk,type:'streak',date:tk,t:Date.now(),n:sk});
   if(stats.wchg!=null&&Math.abs(stats.wchg)>=.5)ev.push({id:'wt:'+ws,type:'weight',date:tk,t:T(tk),n:stats.wchg});
   ev.sort((a,b)=>b.t-a.t);return {stats,events:ev.slice(0,20),dp}}
-async function socApi(path,body){let c;try{c=await ensureSync()}catch(e){throw new Error(niceErr(e,'Syncope Friends'))}let r;try{r=await fetch(c.url+'/api/social/'+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined})}catch(e){throw new Error(niceErr(e,'Syncope Friends'))}
-  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Couldn’t reach Syncope Friends.');return j}
+async function socApi(path,body){let c;try{c=await ensureSync()}catch(e){throw new Error(niceErr(e,'Trainer Friends'))}let r;try{r=await fetch(c.url+'/api/social/'+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${c.uid}.${c.token}`,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined})}catch(e){throw new Error(niceErr(e,'Trainer Friends'))}
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Couldn’t reach Trainer Friends.');return j}
 let socT=null;
 function socSchedule(ms=60000){const c=socCfg();if(!c.on)return;clearTimeout(socT);socT=setTimeout(socPush,ms)}
 // Leaderboard pushes: at most every 15 min, and never when nothing changed (keeps the free server tier comfortable).
@@ -5130,7 +5314,7 @@ function ago(t,d){const m=Math.round((Date.now()-t)/60000);if(t&&m<60&&m>=0)retu
 function renderFriends(){
   renderTip('friends');const el=$('frBody'),c=socCfg();
   if(!c.on){const nm=S.profile.name||'';
-    el.innerHTML=`<div class="card fr-hero" style='--bnr:${bnr("all","friends")}'><div class="eyebrow" style="color:var(--good)">Syncope Friends</div><h2>Compete with your friends every week</h2><p>Earn points for logging meals, hitting protein, training and walking. The leaderboard resets every Monday.</p></div>
+    el.innerHTML=`<div class="card fr-hero" style='--bnr:${bnr("all","friends")}'><div class="eyebrow" style="color:var(--good)">Trainer Friends</div><h2>Compete with your friends every week</h2><p>Earn points for logging meals, hitting protein, training and walking. The leaderboard resets every Monday.</p></div>
       <div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="field"><label for="frN">Name your friends see</label><input id="frN" type="text" value="${esc(nm)}" placeholder="e.g. Brian M" autocomplete="name"></div>
       <div class="field"><label for="frU">Username</label><div class="atin"><span>@</span><input id="frU" type="text" value="${esc(nm.toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'').slice(0,20))}" placeholder="brian.m" autocapitalize="off" autocomplete="username" spellcheck="false"></div></div>
       <div class="field"><label for="frP">Phone number <span style="font-weight:500;color:var(--subtle)">so friends can find you</span></label><input id="frP" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 123-4567"></div>
@@ -5138,7 +5322,7 @@ function renderFriends(){
       <div class="field"><label>Your color</label><div class="wn-acts" id="frC">${ACCENTS.map(([v],i)=>`<button type="button" class="chip" data-v="${v}" aria-pressed="${i===0}"><i class="swatch" style="--c:${v};margin:0"></i></button>`).join('')}</div></div></div>
       <div class="glabel">What friends can see</div><div class="glist" id="frShare">${shareRows({nutrition:true,foods:false,recovery:true,streak:true,workouts:true,protein:true,steps:true,meals:true,weight:false})}</div>
       <p class="note" style="padding:0 6px">Your weekly points are always shown so the leaderboard works. Your food log, weight and health data stay on your phone unless you switch them on above.</p>
-      <button class="primary" id="frGo" style="padding:15px">Join Syncope Friends</button><span class="status" id="frErr"></span>`;
+      <button class="primary" id="frGo" style="padding:15px">Join Trainer Friends</button><span class="status" id="frErr"></span><button class="link" type="button" data-ga="recover" style="align-self:center;padding:8px">Already had a username? Recover my account</button>`;
     $('frC').onclick=e=>{const b=e.target.closest('[data-v]');if(b)$('frC').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))};
     $('frGo').onclick=async()=>{const name=$('frN').value.trim();if(!name){$('frN').focus();return}const color=($('frC').querySelector('[aria-pressed="true"]')||{}).dataset?.v;
       const share=Object.fromEntries([...$('frShare').querySelectorAll('[data-sh]')].map(x=>[x.dataset.sh,x.checked]));const username=$('frU').value.trim(),phone=$('frP').value.trim();if(!username){$('frU').focus();return}
@@ -5175,7 +5359,7 @@ function renderFriends(){
     <div class="glabel">Today's points</div><div class="card fr-today">${(()=>{const d=dayPoints(todayKey());return `<ul class="todo">${POINTS.map(([k,v,l])=>`<li><button type="button" class="${d[k]?'done':''}" tabindex="-1"><span class="ck">${d[k]?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span><b>${l}</b></span><span class="gv">+${v}</span></button></li>`).join('')}</ul>`})()}</div>
     <div class="glabel">Activity</div><div class="feed">${feed.length?feed.map(e=>{const n=(e.cheers||[]).length,mineEv=e.who.me,did=cheered.has(e.who.uid+'|'+e.id);return `<div class="fe" data-fp="${e.who.me?'me':esc(e.who.uid)}">${AV(e.who.name,e.who.color,38,e.who.me?myAv():e.who.av)}<div class="fe-t"><p><b>${esc(mineEv?'You':e.who.name.split(' ')[0])}</b> ${evText(e)}</p><span>${ago(e.t,e.date)}${n?` · ${mineEv?'cheered by ':''}${mineEv?esc(e.cheers.slice(0,3).join(', ')):n+' cheer'+(n>1?'s':'')}`:''}</span></div>${mineEv?'':`<button type="button" class="cheer ${did?'on':''}" data-ch="${esc(e.who.uid)}|${esc(e.id)}" ${did?'disabled':''}>🔥${did?'':' Cheer'}</button>`}</div>`}).join(''):'<p class="note" style="padding:6px">Workouts, protein days and streaks from you and your friends show up here.</p>'}</div>
     <details class="steps card" style="padding:14px 18px"><summary>How points work</summary><ul class="ing" style="margin-top:8px">${POINTS.map(([,v,l])=>`<li><span>${l}</span><b>+${v}/day</b></li>`).join('')}</ul><p class="note">Up to ${POINTS.reduce((a,x)=>a+x[1],0)} points a day. Everyone's points are counted the same way from their own plan.</p></details>
-    <button class="link" id="frLeave" style="color:var(--muted);align-self:center;padding:10px">Leave Syncope Friends</button>`;
+    <button class="link" id="frLeave" style="color:var(--muted);align-self:center;padding:10px">Leave Trainer Friends</button>`;
   frTabs(el,feed,reqs);
 }
 /* Friends in tabs: Leaderboard · Activity · Points · Add, so nothing is buried at the bottom */
@@ -5199,8 +5383,8 @@ function shareRows(sh){sh={...sh,templates:sh.templates!==false};return [['templ
   .map(([k,t,c,ic])=>grow({ic,c,t,ctl:`<input type="checkbox" class="sw" data-sh="${k}" ${sh[k]?'checked':''} aria-label="${t}">`})).join('')}
 $('frBody').addEventListener('click',async e=>{
   const m=e.target.closest('[data-fm]');if(m){S.frMetric=m.dataset.fm;renderFriends();return}
-  if(e.target.closest('#frShareBtn')){const c=socCfg(),url=location.origin+location.pathname+'#join='+c.code,text=`Compete with me on Syncope${c.username?` (I'm @${c.username})`:''}. Tap the link to add me:`;
-    try{if(navigator.share){await navigator.share({title:'Join me on Syncope',text,url});return}}catch(err){if(err&&err.name==='AbortError')return}
+  if(e.target.closest('#frShareBtn')){const c=socCfg(),url=location.origin+location.pathname+'#join='+c.code,text=`Compete with me on Trainer${c.username?` (I'm @${c.username})`:''}. Tap the link to add me:`;
+    try{if(navigator.share){await navigator.share({title:'Join me on Trainer',text,url});return}}catch(err){if(err&&err.name==='AbortError')return}
     try{await navigator.clipboard.writeText(text+' '+url);toast('Invite link copied')}catch(err){toast('Your code is '+esc(c.code))}return}
   if(e.target.closest('#resX')){const c=socCfg();c.resultSeen=(c.weekSnap||{}).ws;socSave(c);renderFriends();return}
   if(e.target.closest('#frUp')||e.target.closest('#frUpNo')){const yes=!!e.target.closest('#frUp');const c=socCfg();c.share={...c.share,nutrition:yes,recovery:yes,foods:false};socSave(c);try{await socApi('profile',{name:c.name,color:c.color,share:c.share});await socPush(true);await socBoard()}catch(err){toast(esc(err.message))}renderFriends();if(yes)toast('Friends can now see your calories & recovery');return}
@@ -5215,9 +5399,9 @@ $('frBody').addEventListener('click',async e=>{
     sheet(`<div><div class="eyebrow">Friend</div><h3>${esc(f?f.name:'Friend')}</h3></div><p class="note">Removing them takes you off each other's leaderboards. You can add each other again with your codes.</p><div class="row" style="justify-content:flex-end"><button class="ghost" id="rmX">Cancel</button><button class="danger" id="rmOk">Remove friend</button></div>`,{nofocus:true});
     $('rmX').onclick=closeSheet;$('rmOk').onclick=async()=>{try{await socApi('remove',{uid:rm.dataset.rm});closeSheet();await socBoard();renderFriends()}catch(err){toast(esc(err.message))}};return}
   if(e.target.closest('#frLeave')){const b=$('frLeave');if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to leave and delete your Friends profile';return}
-    try{await socApi('leave',{})}catch(err){}socSave({});renderFriends();toast('You left Syncope Friends')}
+    try{await socApi('leave',{})}catch(err){}socSave({});renderFriends();toast('You left Trainer Friends')}
 });
-function openPrivacy(){const c=socCfg();if(!c.on){toast('Join Syncope Friends first, then choose what to share');setView('friends');return}
+function openPrivacy(){const c=socCfg();if(!c.on){toast('Join Trainer Friends first, then choose what to share');setView('friends');return}
   const n=Object.values({...c.share,templates:(c.share||{}).templates!==false}).filter(Boolean).length;
   sheet(`<div><div class="eyebrow">Privacy</div><h3>What friends see when they tap you</h3><p class="note" style="margin:6px 0 0">Your weekly points always show so the leaderboard works. Everything else is your call, and you can change it anytime.</p></div>
     <div class="glist" id="frShare2">${shareRows(c.share||{})}</div>
@@ -5234,7 +5418,7 @@ async function addFriend(v){if(!v){$('frAdd').focus();return}$('frAddErr').class
     toast(a.already?`You're already friends with ${esc(a.name)}`:a.requested?`Request sent to ${esc(a.name)}`:`You and ${esc(a.name)} are now friends`);await socBoard();renderFriends()}
   catch(err){$('frAddErr').className='status err';$('frAddErr').textContent=err.message}}
 function editSoc(){const c=socCfg();
-  sheet(`<div><div class="eyebrow">Syncope Friends</div><h3>Your profile</h3></div>
+  sheet(`<div><div class="eyebrow">Trainer Friends</div><h3>Your profile</h3></div>
     <div class="field"><label for="esN">Name</label><input id="esN" type="text" value="${esc(c.name||'')}"></div>
     <div class="field"><label for="esU">Username</label><div class="atin"><span>@</span><input id="esU" type="text" value="${esc(c.username||'')}" autocapitalize="off" spellcheck="false"></div></div>
     <div class="field"><label for="esP">Phone number</label><input id="esP" type="tel" inputmode="tel" placeholder="${c.phoneLast4?'Saved: ••'+esc(c.phoneLast4)+' · type a new one to change':'(555) 123-4567'}"></div>
@@ -5472,9 +5656,9 @@ function tplCard(t,who,i){const have=tplHave(t);return `<div class="card ft-card
   <ul class="ing">${t.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.s?esc(e.s):''}</b></li>`).join('')}</ul></div>`}
 function friendTpls(uid){const b=socCfg().board||{},f=(b.friends||[]).find(x=>x.uid===uid);return f&&f.detail&&f.detail.tpls||[]}
 function renderFtpl(){const b=socCfg().board||{},frs=(b.friends||[]).filter(f=>f.detail&&f.detail.tpls&&f.detail.tpls.length);
-  if(!socCfg().on){$('pg-ftpl').innerHTML=emptyState('user','--good','Share templates with friends','Join Syncope Friends and you can browse and copy each other’s workout templates.','Open Friends','friends');return}
+  if(!socCfg().on){$('pg-ftpl').innerHTML=emptyState('user','--good','Share templates with friends','Join Trainer Friends and you can browse and copy each other’s workout templates.','Open Friends','friends');return}
   $('pg-ftpl').innerHTML=frs.length?frs.map(f=>`<div class="glabel ft-who">${AV(f.name,f.color,26,f.av)} ${esc(f.name)}</div>${f.detail.tpls.map((t,i)=>tplCard(t,f.uid,i)).join('')}`).join('')
-    :emptyState('dumbbell','--pro','No shared templates yet','When your friends update Syncope, their workout templates show up here for you to copy.');}
+    :emptyState('dumbbell','--pro','No shared templates yet','When your friends update Trainer, their workout templates show up here for you to copy.');}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ftadd]');if(!b)return;const [uid,i]=b.dataset.ftadd.split('|'),f=((socCfg().board||{}).friends||[]).find(x=>x.uid===uid),t=friendTpls(uid)[+i];if(!t)return;
   importTpl(t,f?f.name:'Friend');b.textContent='✓ Added';b.disabled=true;b.className='ghost ft-add'});
 
@@ -5525,7 +5709,7 @@ function renderProgs(){
     <li><b>Rotate heavy, volume and pump days.</b> Changing the rep zone from session to session (3–5, 8–10, 12–15 reps) beat changing it only every 4 weeks, at the same total work (Simão et al., 2012).</li>
     <li><b>Big lifts first, then isolation.</b> Multi-joint lifts go early while you're fresh, then single-joint work finishes each muscle.</li>
     <li><b>Hard sets, not failure.</b> Stop 1–2 reps before failure on big lifts. Going all the way isn't needed for growth and costs more recovery.</li>
-    <li><b>Progressive overload.</b> When you hit the top of the rep range on every set, Syncope suggests adding weight next time.</li></ul>
+    <li><b>Progressive overload.</b> When you hit the top of the rep range on every set, Trainer suggests adding weight next time.</li></ul>
     <p class="note" style="margin:0">One of the two papers studied adults 50+, so its exact loads are conservative. These programs keep its principles and use the 6–20 rep zones that work across ages. Rest times are set for you: ${restLbl(ZONE.H.r)} heavy, ${restLbl(ZONE.V.r)} volume, ${restLbl(ZONE.M.r)} pump.</p></div>
     ${PROGS.map(p=>{const v=progVolume(p),added=progAdded(p),top=Object.entries(v).sort((a,b)=>b[1]-a[1]);
       return `<div class="card prog"><div class="prog-h"><div class="prog-days"><b>${p.days}</b><span>day${p.days>1?'s':''}/wk</span></div><div style="min-width:0"><h2>${esc(p.name)}</h2><div class="note" style="margin:2px 0 0">${esc(p.level)}</div></div></div>
@@ -5708,7 +5892,7 @@ function openStart(){
 }
 function openWeigh(){
   const k=todayKey(),cur=S.weights[k],lw=latestWeight();
-  sheet(`<div><div class="eyebrow">Morning weigh-in · ${niceDate(k,{weekday:'short',month:'short',day:'numeric'})}</div><h3>What do you weigh?</h3><p class="note">Best first thing in the morning, after the bathroom. Syncope tracks the 7-day average, so daily ups and downs don't matter.</p></div>
+  sheet(`<div><div class="eyebrow">Morning weigh-in · ${niceDate(k,{weekday:'short',month:'short',day:'numeric'})}</div><h3>What do you weigh?</h3><p class="note">Best first thing in the morning, after the bathroom. Trainer tracks the 7-day average, so daily ups and downs don't matter.</p></div>
     <div class="inrow"><div class="inbox"><input id="qwIn" type="number" inputmode="decimal" placeholder="${lw?r1(lw.w):'e.g. 170'}" value="${cur??''}" aria-label="Weight in pounds"></div><button class="go" type="button" id="qwOk">Save</button></div>`);
   const go=()=>{const v=+$('qwIn').value;if(!(v>50&&v<800)){$('qwIn').focus();toast('Enter your weight in pounds');return}S.weights[k]=r1(v);save();closeSheet();renderAll();toast(`Weigh-in saved · ${r1(v)} lb`)};
   $('qwOk').onclick=go;$('qwIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go()}};
@@ -5754,7 +5938,7 @@ function renderTodayRows(){
     +grow({pg:'cook',ic:'cloche',c:'--good',t:'Meal ideas & recipes',s:'Recipes from foods you like, with grocery lists'})
     +grow({pg:'prep',ic:'list',c:'--carb',t:'This week\'s meal prep',s:weekPrep().map(r=>r.name).slice(0,2).join(' · ')})+grow({pg:'checkin',ic:'quill',c:'--over',t:'Daily check-in',s:c?[c.note?esc(c.note.slice(0,40)):'',RATE.filter(([r])=>c[r]).map(([r,l])=>`${l} ${c[r]}/5`).slice(0,2).join(' · ')].filter(Boolean).join(' · ')||'Saved':'Energy, hunger, sleep, notes',v:c?'Done':'',vc:c?'on':''});
 }
-const TIPS={today:['Welcome to Syncope','Type what you ate or drank in plain words, like “2 eggs and toast” or “2 orange crushes”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
+const TIPS={today:['Welcome to Trainer','Type what you ate or drank in plain words, like “2 eggs and toast” or “2 orange crushes”. The big <b>+</b> at the bottom logs anything: food, a photo, your weight or a workout.'],
   train:['Train','Tap a template to start. Tick ✓ after each set and the rest timer starts on its own. WHOOP and Garmin workouts appear here automatically.'],
   week:['Progress','Your week at a glance. Tap any day to open it. Switch to Month at the top.'],month:['Month view','Each square is a day, colored by how close you were to your calories. Tap one to open it.'],
   friends:['Friends','Earn points every day for logging, protein, training and steps. Share your code so friends can add you. You choose what they can see.'],
@@ -5764,11 +5948,11 @@ function renderTip(v){const el=$('tip-'+v);if(!el)return;const P=S.prefs||{};if(
   el.hidden=false;el.innerHTML=`<span class="tic">i</span><div class="tx"><span>${TIPS[v][1]}</span></div><button type="button" class="tipx" data-tipx="${v}" aria-label="Dismiss tip">×</button>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-tipx]');if(!b)return;S.prefs.tipsSeen={...(S.prefs.tipsSeen||{}),[b.dataset.tipx]:true};save();renderTip(b.dataset.tipx)});
 const FAQ=[['How much protein can my body use in one meal?','More than people think. In a 2023 study, 100 g after lifting built more muscle than 25 g, and for over 12 hours, with almost none wasted. Get your daily total, eat at least ~25 g each time, and make the post-workout meal a big one. Details in Profile → Fuel & timing.'],['When should I eat carbs, protein and fat?','Carbs before and after training, protein (~0.3 g per kg, about 20–30 g) after training and every 3–5 hours, and most of your fat in meals away from training. Meal ideas switch to pre- or post-workout picks automatically when you have just trained. Details in Profile → Fuel & timing.'],['How do I log food?','Type it the way you would text a friend: “2 eggs, 1 slice toast, black coffee”. Amounts like 6 oz, 200 g or 1 cup all work. Then tap Add. You can also tap the camera to snap a photo, or the big + at the bottom from anywhere.'],
-  ['Where do my calorie and macro targets come from?','From your body stats and goal. Syncope estimates what you burn, then sets a gradual weekly plan. Protein stays high to protect muscle. You can see every week in Plan.'],
+  ['Where do my calorie and macro targets come from?','From your body stats and goal. Trainer estimates what you burn, then sets a gradual weekly plan. Protein stays high to protect muscle. You can see every week in Plan.'],
   ['What is the + button?','A shortcut for logging anything: food, a photo, a saved meal, your weight, a workout or your daily check-in.'],
   ['How do WHOOP, Oura and Garmin work?','Connect once in Profile → Wearables. After that, sleep, recovery, strain and workouts come in on their own whenever you open the app.'],
-  ['Why did my carbs go up today?','Your watch logged a hard workout, so Syncope added some carbs to refuel. Tap the green “training” pill on Today to see the math, or turn it off in Settings.'],
-  ['WHOOP logged my lift but not the exercises. Why?','WHOOP doesn’t share exercise details with other apps. Tap “Same as last…” on the Train tab and Syncope fills in your sets from last time.'],
+  ['Why did my carbs go up today?','Your watch logged a hard workout, so Trainer added some carbs to refuel. Tap the green “training” pill on Today to see the math, or turn it off in Settings.'],
+  ['WHOOP logged my lift but not the exercises. Why?','WHOOP doesn’t share exercise details with other apps. Tap “Same as last…” on the Train tab and Trainer fills in your sets from last time.'],
   ['How do I add an exercise that isn’t listed?','Search for it in the exercise picker and tap “Create”. Pick the muscle and equipment once and it’s saved for good.'],
   ['Is my data private?','Everything you log stays on this phone. Download a backup now and then in Profile → Backup & export, since deleting the app deletes its data.']];
 function renderHelp(){$('pg-help').innerHTML=`<div class="faq">${FAQ.map(([q,a],i)=>`<details ${i?'':'open'}><summary>${q}</summary><p>${a}</p></details>`).join('')}</div>
@@ -5802,7 +5986,7 @@ function drawOnb(){
   const top=`<div class="onb-top"><div class="brand" style="font-size:16px"><svg class="logo" style="width:28px;height:28px" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="hpgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0b8"/><stop offset="1" stop-color="#17a07a"/></linearGradient><clipPath id="hpcS"><path d="M50 79C34 68 21 57 21 42c0-9 7-16 15.5-16 6 0 10.5 3.2 13.5 8 3-4.8 7.5-8 13.5-8C72 26 79 33 79 42c0 15-13 26-29 37z"/></clipPath></defs><rect width="100" height="100" rx="23" fill="#11151b"/><rect x=".9" y=".9" width="98.2" height="98.2" rx="22.2" fill="none" stroke="#3ed6a0" stroke-opacity=".35" stroke-width="1.8"/><g clip-path="url(#hpcS)"><rect x="18" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="35" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="52" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="69" y="24" width="15" height="58" fill="url(#hpgS)"/></g><path d="M50 79C34 68 21 57 21 42c0-9 7-16 15.5-16 6 0 10.5 3.2 13.5 8 3-4.8 7.5-8 13.5-8C72 26 79 33 79 42c0 15-13 26-29 37z" fill="none" stroke="#bff7e0" stroke-opacity=".55" stroke-width="1.8"/></svg></div><div class="onb-prog">${[1,2,3,4,5,6].map(n=>`<i class="${n<=prog?'on':''}"></i>`).join('')}</div>${st!=='tour'?'<button class="onb-skip" id="obSkip">Skip</button>':''}</div>`;
   let body='',next='Continue',back=ob.i>0&&st!=='tour';
   $('onb').classList.toggle('photo',st==='welcome');if(st==='welcome')$('onb').style.setProperty('--bnr',((S.prefs||{}).photos!==false?`url("https://images.unsplash.com/${PHOTO.lunch}?w=1000&q=70&auto=format&fit=crop") center top/cover no-repeat,`:'')+`${thumbURL('lunch')} right -130px top -60px/400px no-repeat,${thumbURL('snack')} left -70px top 40px/200px no-repeat`);
-  if(st==='welcome'){body=`<div class="hero-logo"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="hpgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0b8"/><stop offset="1" stop-color="#17a07a"/></linearGradient><clipPath id="hpcS"><path d="M50 79C34 68 21 57 21 42c0-9 7-16 15.5-16 6 0 10.5 3.2 13.5 8 3-4.8 7.5-8 13.5-8C72 26 79 33 79 42c0 15-13 26-29 37z"/></clipPath></defs><rect width="100" height="100" rx="23" fill="#11151b"/><rect x=".9" y=".9" width="98.2" height="98.2" rx="22.2" fill="none" stroke="#3ed6a0" stroke-opacity=".35" stroke-width="1.8"/><g clip-path="url(#hpcS)"><rect x="18" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="35" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="52" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="69" y="24" width="15" height="58" fill="url(#hpgS)"/></g><path d="M50 79C34 68 21 57 21 42c0-9 7-16 15.5-16 6 0 10.5 3.2 13.5 8 3-4.8 7.5-8 13.5-8C72 26 79 33 79 42c0 15-13 26-29 37z" fill="none" stroke="#bff7e0" stroke-opacity=".55" stroke-width="1.8"/></svg></div><div class="eyebrow" style="letter-spacing:.2em">syncope</div><h1>Eat with a <em>plan</em>, not a guess.</h1><p class="lede">Syncope turns your body stats and goal into daily calorie and macro targets that adjust every week, then helps you log food, lifts and how you feel.</p><p class="lede" style="font-size:14px">Takes about a minute. Everything stays on this phone.</p><p class="lede" style="font-size:12px;opacity:.75">For ages 13+. General nutrition and fitness information, not medical advice. By continuing you agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Privacy policy</a>.</p>`;next="Let's set you up"}
+  if(st==='welcome'){body=`<div class="hero-logo"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="hpgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0b8"/><stop offset="1" stop-color="#17a07a"/></linearGradient><clipPath id="hpcS"><path d="M50 79C34 68 21 57 21 42c0-9 7-16 15.5-16 6 0 10.5 3.2 13.5 8 3-4.8 7.5-8 13.5-8C72 26 79 33 79 42c0 15-13 26-29 37z"/></clipPath></defs><rect width="100" height="100" rx="23" fill="#11151b"/><rect x=".9" y=".9" width="98.2" height="98.2" rx="22.2" fill="none" stroke="#3ed6a0" stroke-opacity=".35" stroke-width="1.8"/><g clip-path="url(#hpcS)"><rect x="18" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="35" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="52" y="24" width="15" height="58" fill="url(#hpgS)"/><rect x="69" y="24" width="15" height="58" fill="url(#hpgS)"/></g><path d="M50 79C34 68 21 57 21 42c0-9 7-16 15.5-16 6 0 10.5 3.2 13.5 8 3-4.8 7.5-8 13.5-8C72 26 79 33 79 42c0 15-13 26-29 37z" fill="none" stroke="#bff7e0" stroke-opacity=".55" stroke-width="1.8"/></svg></div><div class="eyebrow" style="letter-spacing:.2em">trainer</div><h1>Eat with a <em>plan</em>, not a guess.</h1><p class="lede">Trainer turns your body stats and goal into daily calorie and macro targets that adjust every week, then helps you log food, lifts and how you feel.</p><p class="lede" style="font-size:14px">Takes about a minute. Everything stays on this phone.</p><p class="lede" style="font-size:12px;opacity:.75">For ages 13+. General nutrition and fitness information, not medical advice. By continuing you agree to the <a href="terms.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Privacy policy</a>.</p><p class="lede" style="font-size:14px;margin-top:6px"><button class="link" type="button" data-ga="signin" style="font-size:15px;padding:6px 0">Already have an account? Sign in</button></p>`;next="Let's set you up"}
   if(st==='name'){body=`<h1>What should we call you?</h1><input class="big-in" id="obName" type="text" autocomplete="given-name" placeholder="Your name" value="${esc(d.name)}">`}
   if(st==='body'){body=`<h1>Your body today</h1><p class="lede">This sets your maintenance calories. Body fat % is optional but makes the math sharper.</p>
     <div class="choice" style="grid-template-columns:1fr 1fr">${[['m','Male'],['f','Female']].map(([v,l])=>`<button type="button" data-sex="${v}" aria-pressed="${d.sex===v}"><i></i><div><b>${l}</b></div></button>`).join('')}</div>
@@ -5813,7 +5997,7 @@ function drawOnb(){
   if(st==='activity'){body=`<h1>How active are you?</h1><p class="lede">Count workouts and how much you move at work.</p><div class="choice">${[['1.2','Mostly sitting','Desk job, little exercise'],['1.375','Lightly active','Train 1–3 days a week'],['1.55','Active','Train 3–5 days a week'],['1.725','Very active','Train hard 6–7 days a week'],['1.9','Athlete','Twice-a-day training or a physical job']].map(([v,l,s])=>`<button type="button" data-act="${v}" aria-pressed="${d.act===v}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='goal'){body=`<h1>What's the goal?</h1><div class="choice">${[['cut','Cut','Lose fat and keep muscle','var(--fat)'],['maintain','Maintain','Hold your weight, recomp slowly','var(--good)'],['bulk','Bulk','Build muscle with a small surplus','var(--pro)']].map(([v,l,s,c])=>`<button type="button" data-goal="${v}" aria-pressed="${d.type===v}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>
     ${d.type==='maintain'?'':`<div class="grid2"><div class="field"><label for="obLbs">Pounds to ${d.type==='bulk'?'gain':'lose'}</label><input id="obLbs" type="number" inputmode="decimal" value="${esc(d.lbs)}"></div><div class="field"><label for="obDur">Over</label><div class="dur-row"><input id="obDur" type="number" inputmode="numeric" value="${esc(d.dur)}" aria-label="Duration"><select id="obUnit" aria-label="Unit"><option value="months" ${d.unit==='months'?'selected':''}>months</option><option value="weeks" ${d.unit==='weeks'?'selected':''}>weeks</option></select></div></div></div>`}`}
-  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. Syncope uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${SRC_META[v]?(SRC_LOGO[v]?`<img class="wear-g" src="${SRC_LOGO[v]}" alt="">`:`<svg class="wear-g" viewBox="0 0 24 24" aria-hidden="true" style="color:${SRC_META[v].c}">${SRC_META[v].i}</svg>`):''}${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
+  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. Trainer uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${SRC_META[v]?(SRC_LOGO[v]?`<img class="wear-g" src="${SRC_LOGO[v]}" alt="">`:`<svg class="wear-g" viewBox="0 0 24 24" aria-hidden="true" style="color:${SRC_META[v].c}">${SRC_META[v].i}</svg>`):''}${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='connect'){
     const ws=(d.wear||[]).filter(x=>x!=='none'),srv=!!(SYNC_URL||syncCfg().url),st2=syncCfg().st||{};
     const row=(id,name,c,desc,btn,done)=>`<div class="conn-row"><div class="conn-logo" style="--c:${c}">${name[0]}</div><div class="conn-t"><b>${name}</b><span>${desc}</span></div>${done?'<span class="conn-chip on">Connected</span>':`<button class="pill-btn" id="${id}">${btn}</button>`}</div>`;
@@ -5837,8 +6021,8 @@ function drawOnb(){
   }
   if(st==='tour'){body=`<h1>You're set${d.name?', '+esc(d.name.split(' ')[0]):''}.</h1><p class="lede">Three things to know:</p><div class="tour">
     <div style="--c:var(--kcal)">${IC.today}<div><b>Today: log food fast</b><span>Type “3 eggs, 2 slices toast”, scan a photo, or tap a saved meal. The ring shows what's left.</span></div></div>
-    <div style="--c:var(--pro)">${IC.train}<div><b>Train: log your lifts</b><span>Start a template, enter weight × reps, and Syncope remembers last time and flags new PRs.</span></div></div>
-    <div style="--c:var(--good)">${IC.plan}<div><b>Plan: weekly targets</b><span>Your calories and macros update every week. Log weigh-ins and check-ins to see if you're on track.</span></div></div></div>`;next='Open Syncope'}
+    <div style="--c:var(--pro)">${IC.train}<div><b>Train: log your lifts</b><span>Start a template, enter weight × reps, and Trainer remembers last time and flags new PRs.</span></div></div>
+    <div style="--c:var(--good)">${IC.plan}<div><b>Plan: weekly targets</b><span>Your calories and macros update every week. Log weigh-ins and check-ins to see if you're on track.</span></div></div></div>`;next='Open Trainer'}
   $('onbIn').innerHTML=top+`<div class="step">${body}</div><div class="onb-foot">${back?'<button class="ghost" id="obBack">Back</button>':''}<button class="primary" id="obNext">${next}</button></div>`;
   const sk=$('obSkip');if(sk)sk.onclick=()=>{S.profile.onboarded=true;if(obVal('obName'))S.profile.name=obVal('obName').trim();save();renderProfileBtn();closeOnb();renderAll()};
   if($('obBack'))$('obBack').onclick=()=>{obRead();ob.i--;drawOnb()};
@@ -6323,7 +6507,7 @@ function editTemplate(d){
    countdown shows in the lock screen's Now Playing and the beep still sounds while the phone is locked. */
 let restAC=null,restAudio=null,restWake=null,restBeeped=0,restTail=0;
 const restLockOn=()=>!!(S.prefs&&S.prefs.restLock);
-/* Music-friendly audio: Syncope's audio session stays "ambient" (mixes with Spotify/Apple Music and never pauses it).
+/* Music-friendly audio: Trainer's audio session stays "ambient" (mixes with Spotify/Apple Music and never pauses it).
    For the rest-over sound it switches to "transient", which ducks the music, then switches back so it comes up again. */
 const ASess=()=>navigator.audioSession||null;
 function sessType(t){try{const a=ASess();if(a&&a.type!==t)a.type=t}catch(e){}}
@@ -6402,7 +6586,7 @@ function playRestSound(id,atMs){id=id||restSoundId();if(id==='none'){rsCancel();
 function restBeep(){playRestSound()}
 /* Vibrate at rest end. Android: the Vibration API. iPhone (iOS 18+): Safari has no vibrate(), but toggling a
    hidden "switch" checkbox fires the system haptic tap, so we tap it a few times for a buzz-buzz-buzz. Works with
-   the ringer off; needs "System Haptics" on (Settings → Sounds & Haptics) and Syncope open on screen. */
+   the ringer off; needs "System Haptics" on (Settings → Sounds & Haptics) and Trainer open on screen. */
 let hapEl=null,lastBuzz=0;
 function hapTap(){try{if(!hapEl){hapEl=document.createElement('label');hapEl.setAttribute('aria-hidden','true');hapEl.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
   const i=document.createElement('input');i.type='checkbox';i.setAttribute('switch','');i.tabIndex=-1;hapEl.appendChild(i);document.body.appendChild(hapEl)}hapEl.click()}catch(e){}}
@@ -6424,7 +6608,7 @@ async function restLockStart(){restLockStop();if(!restLockOn()||!S.rest)return;c
   au.onended=()=>{if(restAudio===au){restBeeped=S.rest?S.rest.end:Date.now();restLockStop()}};
   au._t0=Date.now();au.play().catch(()=>{});
   try{if('mediaSession' in navigator){const at=new Date(S.rest.end).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-    navigator.mediaSession.metadata=new MediaMetadata({title:`Rest · next set at ${at}`,artist:(S.active&&S.active.name)||'Syncope',album:'Syncope rest timer',artwork:[{src:'./icon-512.png',sizes:'512x512',type:'image/png'}]});
+    navigator.mediaSession.metadata=new MediaMetadata({title:`Rest · next set at ${at}`,artist:(S.active&&S.active.name)||'Trainer',album:'Trainer rest timer',artwork:[{src:'./icon-512.png',sizes:'512x512',type:'image/png'}]});
     navigator.mediaSession.playbackState='playing';
     ['pause','stop'].forEach(k=>{try{navigator.mediaSession.setActionHandler(k,()=>{S.rest=null;save();renderRest()})}catch(e){}});
     try{navigator.mediaSession.setPositionState({duration:left+rsDur()+0.1,position:0,playbackRate:1})}catch(e){}}}catch(e){}}
@@ -6440,7 +6624,7 @@ addEventListener('pagehide',()=>restLockEnsure(false));
 function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else{rsUnlock();playRestSound(null,S.rest.end)}}
 /* ================= REST-OVER NOTIFICATION: a real banner on the lock screen (and your watch) =================
    The sync server queues one push for the moment your rest ends; skipping or changing the rest replaces it. Free:
-   Cloudflare Queues + Web Push, no keys to manage (the server makes its own). iPhone needs Syncope on the Home Screen. */
+   Cloudflare Queues + Web Push, no keys to manage (the server makes its own). iPhone needs Trainer on the Home Screen. */
 function pushOn(){try{return localStorage.getItem('syncope.push')==='1'}catch(e){return false}}
 let pushReady=false;setTimeout(async()=>{try{const c=syncCfg();if(c.url&&c.uid){await api('/api/vapid');pushReady=true;if(S.rest)renderRest()}}catch(e){}},2500);
 const isStandalone=()=>navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
@@ -6450,9 +6634,9 @@ async function pushSub(){const reg=await navigator.serviceWorker.ready;let sub=a
   if(!sub){const {key}=await api('/api/vapid');sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(key)})}return sub}
 async function enablePush(){
   if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){
-    if(isIOS()&&!isStandalone()){sheet(`<div><div class="eyebrow">Rest-over alerts</div><h3>Add Syncope to your Home Screen first</h3><p class="note">iPhone only sends notifications to apps on the Home Screen. In Safari tap <b>Share</b> → <b>Add to Home Screen</b>, open Syncope from that icon, then tap 🔔 again.</p></div><div class="row" style="justify-content:flex-end"><button class="primary" id="pnOk">Got it</button></div>`);$('pnOk').onclick=closeSheet}
+    if(isIOS()&&!isStandalone()){sheet(`<div><div class="eyebrow">Rest-over alerts</div><h3>Add Trainer to your Home Screen first</h3><p class="note">iPhone only sends notifications to apps on the Home Screen. In Safari tap <b>Share</b> → <b>Add to Home Screen</b>, open Trainer from that icon, then tap 🔔 again.</p></div><div class="row" style="justify-content:flex-end"><button class="primary" id="pnOk">Got it</button></div>`);$('pnOk').onclick=closeSheet}
     else toast('This browser can’t show notifications');return false}
-  const perm=await Notification.requestPermission();if(perm!=='granted'){toast('Notifications are off. Turn them on in Settings → Notifications → Syncope.');return false}
+  const perm=await Notification.requestPermission();if(perm!=='granted'){toast('Notifications are off. Turn them on in Settings → Notifications → Trainer.');return false}
   try{await ensureSync();await pushSub();localStorage.setItem('syncope.push','1');return true}catch(e){toast(esc(e.message||'Couldn’t turn on alerts'));return false}}
 async function restPushSchedule(){if(!pushOn()||!S.rest)return;const end=S.rest.end;
   try{const sub=await pushSub();if(!S.rest||S.rest.end!==end)return;await api('/api/rest',{method:'POST',body:JSON.stringify({at:end,sub:sub.toJSON()})})}catch(e){}}
@@ -6518,7 +6702,7 @@ async function syncHealth(){
   openHealthPaste();
 }
 function openHealthPaste(){
-  sheet(`<div><div class="eyebrow">Health data</div><h3>Paste from your Shortcut</h3><p class="note">Run your “Syncope Sync” shortcut, then paste here. Or type numbers yourself, one per line.</p></div>
+  sheet(`<div><div class="eyebrow">Health data</div><h3>Paste from your Shortcut</h3><p class="note">Run your “Trainer Sync” shortcut, then paste here. Or type numbers yourself, one per line.</p></div>
     <textarea id="hpT" rows="7" placeholder="steps=8432&#10;active=612&#10;rhr=54&#10;hrv=68&#10;sleep=7.4&#10;recovery=72"></textarea>
     <div class="status" id="hpErr"></div>
     <div class="row" style="justify-content:space-between"><button class="link" id="hpHow">How to set up the Shortcut</button><div class="row"><button class="ghost" id="hpCancel">Cancel</button><button class="primary" id="hpOk">Add</button></div></div>`);
@@ -6536,10 +6720,10 @@ function openHealthEdit(){
   $('heOk').onclick=()=>{const n={};H_FIELDS.forEach(([k])=>{const v=$('he_'+k).value;if(v!=='')n[k]=+v});const wo=$('he_wo').value.trim();if(wo)n.workouts=wo;S.health[S.day]={...n,t:Date.now()};if(!Object.keys(n).length)delete S.health[S.day];save();closeSheet();renderAll();toast('Saved')};
 }
 function openHealthGuide(){
-  sheet(`<div><div class="eyebrow">One-time setup · about 5 minutes</div><h3>Connect WHOOP or Garmin</h3><p class="note">Web apps can't read Apple Health directly, but the free Shortcuts app on your iPhone can. Your WHOOP or Garmin app already sends its data to Apple Health; the Shortcut collects it and Syncope pastes it in.</p></div>
+  sheet(`<div><div class="eyebrow">One-time setup · about 5 minutes</div><h3>Connect WHOOP or Garmin</h3><p class="note">Web apps can't read Apple Health directly, but the free Shortcuts app on your iPhone can. Your WHOOP or Garmin app already sends its data to Apple Health; the Shortcut collects it and Trainer pastes it in.</p></div>
     <ol class="steps-guide">
       <li><b>Turn on the Health connection.</b> In the WHOOP app, look in settings under Integrations for Apple Health. In Garmin Connect, look under Settings → Connected Apps → Apple Health. Allow all categories.</li>
-      <li><b>Open Shortcuts → + → name it “Syncope Sync”.</b></li>
+      <li><b>Open Shortcuts → + → name it “Trainer Sync”.</b></li>
       <li><b>Add “Find Health Samples”</b> for each item below, filtered to <i>Start Date is today</i> (sleep: <i>in the last 1 day</i>). For totals add <b>Calculate Statistics → Sum</b>; for single readings sort by Start Date, Latest First, Limit 1.
         <br>Steps (Sum) · Active Energy (Sum) · Resting Heart Rate (latest) · Heart Rate Variability (latest) · Sleep Analysis, value Asleep (Sum of durations, in hours) · Weight (latest)</li>
       <li><b>Add a “Text” action</b> and insert each result after its label:</li>
@@ -6554,7 +6738,7 @@ sleep=[Sleep hours]
 weight=[Weight]</div>
     <ol class="steps-guide" start="5">
       <li><b>Add “Copy to Clipboard”.</b> Run it once and allow Health access.</li>
-      <li><b>Each morning:</b> run the shortcut (or set Automation → Time of Day to run it), open Syncope, tap <b>Sync</b>.</li>
+      <li><b>Each morning:</b> run the shortcut (or set Automation → Time of Day to run it), open Trainer, tap <b>Sync</b>.</li>
     </ol>
     <p class="note">What comes through: WHOOP sends sleep, resting heart rate, active energy and workouts, but not HRV or Recovery. Garmin sends sleep, steps, active energy, workouts and weight, but not HRV or resting HR. Apple Watch sends all of it. Type anything missing, like WHOOP Recovery, with Edit.</p>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="hgOk">Got it</button></div>`);
@@ -6641,7 +6825,7 @@ function setConnStatus(t){const e=$('connSyncing');if(e)e.textContent=t}
 function renderConn(){
   const el=$('connBody');if(!el)return;const c=syncCfg();
   if((!c.url||!c.uid)&&!SYNC_URL){
-    el.innerHTML=`<p class="note">Pull WHOOP recovery, HRV, strain and sleep plus Garmin steps, Body Battery, sleep score and workouts into Syncope automatically. It runs on a free server you own (Cloudflare), about 10 minutes to set up once.</p>
+    el.innerHTML=`<p class="note">Pull WHOOP recovery, HRV, strain and sleep plus Garmin steps, Body Battery, sleep score and workouts into Trainer automatically. It runs on a free server you own (Cloudflare), about 10 minutes to set up once.</p>
       <div class="field"><label for="cnUrl">Your sync server address</label><input id="cnUrl" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="https://macros-sync.yourname.workers.dev" value="${esc(c.url||'')}"></div>
       <div class="row"><button class="primary" id="cnGo">Connect server</button><button class="ghost" id="cnHow">How to set it up</button><span class="status" id="cnErr"></span></div>`;
     $('cnHow').onclick=openSyncGuide;
@@ -6674,7 +6858,7 @@ function openGarminKey(){
 }
 function openSyncGuide(){
   const app=location.origin+location.pathname;
-  sheet(`<div><div class="eyebrow">One-time setup · about 10 minutes · free</div><h3>Your own sync server</h3><p class="note">Syncope lives on your phone, so it needs a tiny server of yours to sign in to WHOOP and Garmin and fetch your data while you sleep. Cloudflare runs it free.</p></div>
+  sheet(`<div><div class="eyebrow">One-time setup · about 10 minutes · free</div><h3>Your own sync server</h3><p class="note">Trainer lives on your phone, so it needs a tiny server of yours to sign in to WHOOP and Garmin and fetch your data while you sleep. Cloudflare runs it free.</p></div>
     <ol class="steps-guide">
       <li><b>Create the worker.</b> Sign up at dash.cloudflare.com → Workers &amp; Pages → Create → Start with Hello World → name it <b>macros-sync</b> → Deploy → Edit code. Replace everything with the code from <span class="num">sync-server/worker.js</span> in your macros GitHub repository, then Deploy.</li>
       <li><b>Add storage.</b> Storage &amp; Databases → KV → Create namespace <b>MACROS_KV</b>. Then your worker → Settings → Bindings → Add → KV namespace, variable name <b>MACROS_KV</b>.</li>
@@ -6683,7 +6867,7 @@ function openSyncGuide(){
       <li><b>Turn on auto-refresh.</b> Worker → Settings → Trigger events → Cron → <span class="num">17 */6 * * *</span> (every 6 hours).</li>
       <li><b>Connect.</b> Paste your worker address above, tap Connect server, then Connect WHOOP and Add key for Garmin.</li>
     </ol>
-    <p class="note">After that, Syncope syncs whenever you open it. Your WHOOP and Garmin sign-ins are stored only on your Cloudflare account.</p>
+    <p class="note">After that, Trainer syncs whenever you open it. Your WHOOP and Garmin sign-ins are stored only on your Cloudflare account.</p>
     <div class="row" style="justify-content:flex-end"><button class="primary" id="sgOk">Got it</button></div>`);
   $('sgOk').onclick=closeSheet;
 }
@@ -6751,7 +6935,7 @@ function renderWatchNow(){
     <h2>${esc(d.name)}</h2>
     <div class="live"><div style="--c:var(--pro)"><b>${d.min??'—'}</b><span>minutes</span></div><div style="--c:var(--good)"><b>${d.strain??'—'}</b><span>strain</span></div><div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div></div>
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
-    <p class="note" style="margin:0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Syncope what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p>
+    <p class="note" style="margin:0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Trainer what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p>
     <div class="wn-acts">${rec.map((w,j)=>`<button class="chip ${j?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button><button class="chip" data-wnotme>Not me</button></div>`;
 }
 $('wNow').addEventListener('click',e=>{const id=$('wNow').dataset.id,d=devList().find(x=>x.id===id);if(!d)return;
@@ -6799,7 +6983,7 @@ const jm=location.hash.match(/^#join=([A-Za-z0-9]{4,10})/);if(jm){try{localStora
 applyPrefs(); setTimeout(warmOffline,3000); setTimeout(()=>{try{maybeTour()}catch(e){}},1200); setTimeout(()=>{if((S.prefs||{}).restSound==='custom')rsLoadCustom()},1500); checkBackup(); setView(jm?'friends':(location.hash.slice(1)||'today')); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
 if(!storageOK){$('saved').textContent='Not saving — storage blocked';$('saved').style.color='var(--over)'}
 if(window.__restoredFrom){save();setTimeout(()=>toast('Your log was recovered from its automatic safety copy'),900)}
-if(loadBlocked){$('backupBanner').hidden=false;$('backupText').textContent='Syncope couldn’t read your saved log, so it paused saving to protect it. Restore from a backup in Profile → Backup & export.'}
+if(loadBlocked){$('backupBanner').hidden=false;$('backupText').textContent='Trainer couldn’t read your saved log, so it paused saving to protect it. Restore from a backup in Profile → Backup & export.'}
 document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&S.view==='today'){e.preventDefault();input.focus()}});
 let lastDay=todayKey();
 setInterval(()=>{const t=todayKey();if(t!==lastDay){if(S.day===lastDay)S.day=t;lastDay=t;S.mealSel=autoMeal();renderAll()}},60000);
