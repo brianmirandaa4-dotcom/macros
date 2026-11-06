@@ -1,0 +1,16 @@
+{
+ "version": "v4.1-seed",
+ "decided_utc": "2026-11-06T00:41:00Z",
+ "promoted_utc": "2026-11-06T00:41:00Z",
+ "through_week": 8,
+ "source": "validated local run of src/models.py, calibrate.py, backtest_priced.py, gamelines.py, features.py --leakcheck, live.py (Nov 5, 2026)",
+ "files": [
+  "backtest_props.parquet",
+  "calibrated_2026.json",
+  "backtest_priced.json",
+  "backtest_summary.json",
+  "backtest_games_summary.json",
+  "leakage_check.json",
+  "live_validation.json"
+ ]
+}

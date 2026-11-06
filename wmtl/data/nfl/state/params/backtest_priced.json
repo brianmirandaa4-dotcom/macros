@@ -1,0 +1,274 @@
+{
+ "pass_yds": {
+  "n_dk": 222,
+  "logloss_model": 0.6971,
+  "logloss_novig_market": 0.6932,
+  "logloss_5050": 0.6931,
+  "hubacek_corr_p_vs_novig": 0.087,
+  "over_rate": 0.518,
+  "bets_edge0": {
+   "n": 125,
+   "win": 0.528,
+   "roi": 0.0029,
+   "units": 0.4,
+   "under_share": 0.464,
+   "over": {
+    "n": 67,
+    "roi": 0.0182
+   },
+   "under": {
+    "n": 58,
+    "roi": -0.0147
+   }
+  },
+  "bets_edge3": {
+   "n": 61,
+   "win": 0.59,
+   "roi": 0.1228,
+   "units": 7.5,
+   "under_share": 0.475,
+   "over": {
+    "n": 32,
+    "roi": 0.0693
+   },
+   "under": {
+    "n": 29,
+    "roi": 0.1819
+   }
+  },
+  "bets_edge5": {
+   "n": 31,
+   "win": 0.677,
+   "roi": 0.2824,
+   "units": 8.8,
+   "under_share": 0.581,
+   "over": {
+    "n": 13,
+    "roi": 0.3142
+   },
+   "under": {
+    "n": 18,
+    "roi": 0.2594
+   }
+  },
+  "bets_edge8": {
+   "n": 19,
+   "win": 0.632,
+   "roi": 0.1985,
+   "units": 3.8,
+   "under_share": 0.684,
+   "over": {
+    "n": 6,
+    "roi": 0.2777
+   },
+   "under": {
+    "n": 13,
+    "roi": 0.162
+   }
+  }
+ },
+ "rec_yds": {
+  "n_dk": 1350,
+  "logloss_model": 0.6926,
+  "logloss_novig_market": 0.6934,
+  "logloss_5050": 0.6931,
+  "hubacek_corr_p_vs_novig": -0.038,
+  "over_rate": 0.498,
+  "bets_edge0": {
+   "n": 404,
+   "win": 0.564,
+   "roi": 0.088,
+   "units": 35.5,
+   "under_share": 0.614,
+   "over": {
+    "n": 156,
+    "roi": 0.1099
+   },
+   "under": {
+    "n": 248,
+    "roi": 0.0742
+   }
+  },
+  "bets_edge3": {
+   "n": 155,
+   "win": 0.529,
+   "roi": 0.0327,
+   "units": 5.1,
+   "under_share": 0.658,
+   "over": {
+    "n": 53,
+    "roi": 0.103
+   },
+   "under": {
+    "n": 102,
+    "roi": -0.0038
+   }
+  },
+  "bets_edge5": {
+   "n": 87,
+   "win": 0.54,
+   "roi": 0.0674,
+   "units": 5.9,
+   "under_share": 0.69,
+   "over": {
+    "n": 27,
+    "roi": 0.1759
+   },
+   "under": {
+    "n": 60,
+    "roi": 0.0185
+   }
+  },
+  "bets_edge8": {
+   "n": 35,
+   "win": 0.4,
+   "roi": -0.1612,
+   "units": -5.6,
+   "under_share": 0.629,
+   "over": {
+    "n": 13,
+    "roi": 0.0989
+   },
+   "under": {
+    "n": 22,
+    "roi": -0.3149
+   }
+  }
+ },
+ "receptions": {
+  "n_dk": 1340,
+  "logloss_model": 0.6858,
+  "logloss_novig_market": 0.6857,
+  "logloss_5050": 0.6931,
+  "hubacek_corr_p_vs_novig": 0.284,
+  "over_rate": 0.496,
+  "bets_edge0": {
+   "n": 1069,
+   "win": 0.464,
+   "roi": -0.0029,
+   "units": -3.1,
+   "under_share": 0.553,
+   "over": {
+    "n": 478,
+    "roi": 0.016
+   },
+   "under": {
+    "n": 591,
+    "roi": -0.0181
+   }
+  },
+  "bets_edge3": {
+   "n": 697,
+   "win": 0.482,
+   "roi": 0.0639,
+   "units": 44.6,
+   "under_share": 0.564,
+   "over": {
+    "n": 304,
+    "roi": 0.124
+   },
+   "under": {
+    "n": 393,
+    "roi": 0.0174
+   }
+  },
+  "bets_edge5": {
+   "n": 466,
+   "win": 0.472,
+   "roi": 0.0658,
+   "units": 30.7,
+   "under_share": 0.56,
+   "over": {
+    "n": 205,
+    "roi": 0.1553
+   },
+   "under": {
+    "n": 261,
+    "roi": -0.0045
+   }
+  },
+  "bets_edge8": {
+   "n": 213,
+   "win": 0.498,
+   "roi": 0.1651,
+   "units": 35.2,
+   "under_share": 0.488,
+   "over": {
+    "n": 109,
+    "roi": 0.3367
+   },
+   "under": {
+    "n": 104,
+    "roi": -0.0147
+   }
+  }
+ },
+ "rush_yds": {
+  "n_dk": 426,
+  "logloss_model": 0.6993,
+  "logloss_novig_market": 0.6936,
+  "logloss_5050": 0.6931,
+  "hubacek_corr_p_vs_novig": 0.071,
+  "over_rate": 0.465,
+  "bets_edge0": {
+   "n": 190,
+   "win": 0.463,
+   "roi": -0.114,
+   "units": -21.7,
+   "under_share": 0.632,
+   "over": {
+    "n": 70,
+    "roi": -0.2266
+   },
+   "under": {
+    "n": 120,
+    "roi": -0.0484
+   }
+  },
+  "bets_edge3": {
+   "n": 103,
+   "win": 0.466,
+   "roi": -0.1071,
+   "units": -11.0,
+   "under_share": 0.631,
+   "over": {
+    "n": 38,
+    "roi": -0.2721
+   },
+   "under": {
+    "n": 65,
+    "roi": -0.0106
+   }
+  },
+  "bets_edge5": {
+   "n": 81,
+   "win": 0.444,
+   "roi": -0.1463,
+   "units": -11.8,
+   "under_share": 0.654,
+   "over": {
+    "n": 28,
+    "roi": -0.349
+   },
+   "under": {
+    "n": 53,
+    "roi": -0.0391
+   }
+  },
+  "bets_edge8": {
+   "n": 51,
+   "win": 0.51,
+   "roi": -0.014,
+   "units": -0.7,
+   "under_share": 0.608,
+   "over": {
+    "n": 20,
+    "roi": -0.278
+   },
+   "under": {
+    "n": 31,
+    "roi": 0.1563
+   }
+  }
+ }
+}
