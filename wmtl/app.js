@@ -102,7 +102,13 @@ function go(tab, opts = {}){ if(!TABS.find(t => t[0] === tab) && !ROUTES.include
   const same = S.tab === tab; S.tab = tab; store.d.ui.tab = tab; store.save(); try{ history.replaceState(null, '', '#' + tab); }catch(e){}
   drawTabs(); render(); if(!same && !opts.keepScroll) window.scrollTo(0, 0); }
 async function setSlate(id, tab){ S.slate = id; S.win = 'all'; S.liveWin = 'all'; S.props.mk = null; store.d.ui.slate = id; store.save(); drawSlateBtn(); try{ await loadSlate(id); }catch(e){ toast('Could not load that slate'); } if(tab) go(tab); else render(); }
-function drawSlateBtn(){ const b = $('#slatebtn'); const s = S.slate && slateInfo(S.slate); $('#top').classList.toggle('has-slate', !!s); if(!s){ b.hidden = true; return; } b.hidden = false; b.style.setProperty('--c', SPORTC[s.sport]); $('i', b).style.background = SPORTHEX[s.sport]; $('span', b).textContent = `${s.sport} · ${s.label}`; }
+function drawSlateBtn(){ const b = $('#slatebtn'); const s = S.slate && slateInfo(S.slate); $('#top').classList.toggle('has-slate', !!s); if(!s){ b.hidden = true; return; } b.hidden = false;
+  const parts = String(s.label || '').split(' · '); const st = slateStatus(s);
+  b.className = 'slatebtn sb2' + (st.k === 'live' ? ' is-live' : '');
+  b.innerHTML = `<span class="sb2-ic" aria-hidden="true">${SB2_ICON[s.sport] || SB2_ICON.NFL}</span><span class="sb2-tx"><b>${esc(parts[0] || s.sport)}</b><small>${st.k === 'live' ? '<i class="sb2-live"></i>Live now' : esc(parts[1] || s.sport)}</small></span><span class="sb2-ch" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg></span>`;
+  b.setAttribute('aria-label', `${s.sport} ${s.label}. Change slate`); }
+const SB2_ICON = {NFL: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="12" rx="9.5" ry="6" transform="rotate(-35 12 12)"/><path d="M9.2 14.8l5.6-5.6M10.6 11.4l2 2M12.4 9.6l2 2"/></svg>', CFB: null};
+SB2_ICON.CFB = SB2_ICON.NFL;
 
 async function render(){ const m = $('#main'); const v = S.tab;
   if(v !== 'lobby' && window.World && World.ready) World.pause(true);
@@ -160,10 +166,18 @@ function noBetReason(F){ if(!F || !F.length) return 'The model did not export it
 function ticket(p, d){ const r = resultOf(d, p); const sp = d.sport.toLowerCase();
   const res = r && r.result ? (r.result === 'won' ? '<span class="pill pill-edge">Won</span>' : r.result === 'lost' ? '<span class="pill pill-loss">Lost</span>' : `<span class="pill pill-fair">${esc(r.result === 'push' ? 'Push' : 'Void')}</span>`) + (isNum(r.actual) ? ` <span>Final <b class="num">${ln(r.actual)}</b></span>` : '') : `<span>25D <b class="num">${sg(p.score25, 1)}</b></span>`;
   return `<button class="betcard tap" data-prop="${esc(p.id)}" style="--c:var(--${sp})">
-  <div class="bc-top"><span style="display:flex;align-items:center;gap:6px;min-width:0;color:var(--${sp})">${Icon.svg(sp, {size: 16})}<span class="t2" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(winWord(p.window))}${p._g ? esc(dayET(p._g.kick_utc).split(',')[0]) + ' ' + kickET(p._g.kick_utc) : esc(p.window || '')}</span></span><span class="pill pill-bet">Bet</span></div>
-  <div class="bc-main">${Charts.ring({p: p.p, be: p.break_even, size: 88, stroke: 9})}<div style="min-width:0"><div class="bc-sel">${esc(selText(p))}</div><div class="bc-who">${esc(p.player)} · ${teamOpp(p)}</div>
-    <div class="bc-px"><span class="num">${od(p.odds)}</span><span><b>${esc(p.book || '')}</b></span><span class="pill pill-edge">Edge ${sg(p.edge_pts)}</span>${isNum(p.units) ? `<span class="t2 b13">${p.units}u</span>` : ''}</div></div></div>
-  <div class="bc-foot"><span>${lossLine(p.p)}</span><span style="display:flex;align-items:center;gap:8px">${res}</span></div><div class="bkrow">${bookBtns(p)}</div></button>`; }
+  <div class="bc-top"><span class="bc-when">${Icon.svg(sp, {size: 15})}<span>${esc(winWord(p.window))}${p._g ? esc(dayET(p._g.kick_utc).split(',')[0]) + ' ' + kickET(p._g.kick_utc) : esc(p.window || '')}</span></span><span class="bc-tier">Model bet</span></div>
+  <div class="bc-head"><div class="bc-pick"><div class="bc-sel">${esc(selText(p))}</div><div class="bc-who"><span class="bc-name">${esc(p.player)}</span><span class="bc-mu">${teamOpp(p)}</span></div></div>
+    <div class="bc-price"><b class="num">${od(p.odds)}</b><span>${esc(p.book || '')}</span></div></div>
+  ${chanceRail(p.p, p.break_even, lossLine(p.p))}
+  <div class="bc-stats"><span class="bc-edge">Edge <b class="num">${sg(p.edge_pts)}</b></span>${isNum(p.units) ? `<span>Stake <b class="num">${p.units}u</b></span>` : ''}<span class="bc-res">${res}</span></div>
+  <div class="bkrow">${bookBtns(p)}</div></button>`; }
+/* bet card signature: the model's chance as a rail, the price's break-even as a tick, the gap between them (the edge) in gold foil */
+function chanceRail(pm, be, note){ if(!isNum(pm)) return ''; const q = v => Math.max(0, Math.min(100, v * 100)).toFixed(1) + '%'; const hb = isNum(be);
+  return `<div class="bc-meter" role="img" aria-label="Model chance ${Math.round(pm * 100)} percent${hb ? `, price needs ${Math.round(be * 1000) / 10} percent` : ''}" style="--p:${q(pm)}${hb ? `;--be:${q(be)}` : ''}">
+    <div class="bc-mtop"><span class="bc-pct num">${pc(pm).replace('%', '')}<i>%</i></span><span class="bc-mlab">model chance</span>${note ? `<span class="bc-loss">${note}</span>` : ''}</div>
+    <div class="bc-rail"><span class="bc-fill"></span>${hb ? '<span class="bc-over"></span><span class="bc-tick"></span>' : ''}</div>
+    ${hb ? `<div class="bc-need"><span>Price needs ${pc(be)}</span></div>` : ''}</div>`; }
 function viewCard(d){ const m = d.meta, info = slateInfo(d.id) || {}; const st = slateStatus(info);
   const inWin = p => S.win === 'all' || p.window === S.win;
   const bets = d.props.filter(p => p.tier === 'bet').sort((a, b) => (b.edge_pts || 0) - (a.edge_pts || 0));
@@ -367,6 +381,7 @@ function watchPlansHTML(d){ if(!LP || !LP.markets) return ''; const ps = d.props
 
 
 /* ---------------- Bet progress: faded bar behind every pick toward its line; green CASHED when it hits, red when an under is blown */
+const CASH_SEEN = new Set(); /* one cash animation per pick per session, not on every re-render */
 function applyProgress(root, d){ if(!root || !Object.keys(LV.games).length) return;
   for(const el of root.querySelectorAll('[data-prop]')){ const p = d.props.find(x => x.id === el.dataset.prop); if(!p || !p.side || p.no_prediction) continue;
     const g = Object.values(LV.games).find(x => x.away === p.team || x.home === p.team); if(!g || g.state === 'pre') continue;
@@ -376,10 +391,11 @@ function applyProgress(root, d){ if(!root || !Object.keys(LV.games).length) retu
     const over = lb.side !== 'under', hit = now > lb.line, done = g.state === 'post';
     const state = over ? (hit ? 'win' : done ? 'loss' : 'run') : (hit ? 'loss' : done ? 'win' : 'run');
     const frac = Math.max(0, Math.min(1, lb.line > 0 ? now / lb.line : (now > 0 ? 1 : 0)));
+    const ck = p.id + (el.classList.contains('betcard') ? '|c' : el.classList.contains('x-bet') ? '|h' : '|o'); if(state === 'win' && !CASH_SEEN.has(ck)){ CASH_SEEN.add(ck); if(!el.classList.contains('pg-win')) el.classList.add('pg-cash'); }
     el.classList.add('pg'); el.classList.toggle('pg-win', state === 'win'); el.classList.toggle('pg-loss', state === 'loss'); el.classList.toggle('pg-under', !over);
     el.style.setProperty('--pg', (state === 'win' ? 100 : frac * 100).toFixed(1) + '%');
     let tag = el.querySelector(':scope > .pgtag'); if(!tag){ tag = document.createElement('span'); tag.className = 'pgtag'; el.appendChild(tag); }
-    tag.textContent = state === 'win' ? `✓ CASHED · ${ln(now)}` : state === 'loss' ? `✕ ${over ? 'Missed' : 'Over the line'} · ${ln(now)}` : `${ln(now)} / ${ln(lb.line)} ${over ? '' : '(under)'}`.trim(); } }
+    tag.textContent = state === 'win' ? `✓ Cashed · ${ln(now)}` : state === 'loss' ? `✕ ${over ? 'Missed' : 'Over the line'} · ${ln(now)}` : `${ln(now)} / ${ln(lb.line)} ${over ? '' : '(under)'}`.trim(); } }
 
 
 /* ---------------- Ticker banner: scores of every game + every model pick that has cashed, scrolling across the top */
@@ -869,14 +885,14 @@ function openLearn(){ const bar = (w, c, l) => `<div class="side"><div class="l"
 /* ================================================================ share image */
 async function shareProp(d, p){ const W = 1080, H = 1350; const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
     const FD = '-apple-system,system-ui,sans-serif', FB = '-apple-system,system-ui,sans-serif', FM = 'ui-monospace,"SF Mono",Menlo,monospace';
-  x.fillStyle = '#0A0810'; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W * .85, 0, 40, W * .85, 0, 1100); g.addColorStop(0, '#2B1466'); g.addColorStop(1, 'rgba(10,8,16,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#000000'; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W * .85, 0, 40, W * .85, 0, 1100); g.addColorStop(0, '#2A2A30'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
   x.fillStyle = SPORTHEX[d.sport]; x.fillRect(80, 96, 14, 14); x.fillStyle = 'rgba(242,239,232,.66)'; x.font = `700 30px ${FB}`; x.fillText(`${d.sport} · ${d.meta.label || ''} · ${p.window || ''}`.toUpperCase(), 108, 110);
   x.fillStyle = '#F2EFE8'; x.font = `700 104px ${FD}`; wrapText(x, p.player.toUpperCase(), 80, 250, W - 160, 108);
   x.fillStyle = 'rgba(242,239,232,.66)'; x.font = `600 36px ${FB}`; x.fillText(`${p.team}${p.opp ? ' vs ' + p.opp : ''} · ${p.market_label}`, 80, 470);
-  x.fillStyle = '#E7C46A'; x.font = `700 84px ${FD}`; x.fillText(selText(p).toUpperCase(), 80, 600);
+  x.fillStyle = '#FFFFFF'; x.font = `700 84px ${FD}`; x.fillText(selText(p).toUpperCase(), 80, 600);
   const kv = [[pc(p.p), 'MODEL CHANCE'], [pc(p.break_even), 'PRICE NEEDS'], [sg(p.edge_pts), 'EDGE']]; kv.forEach(([v, l], i) => { const X = 80 + i * 320; x.fillStyle = '#F2EFE8'; x.font = `600 76px ${FM}`; x.fillText(v, X, 760); x.fillStyle = 'rgba(242,239,232,.54)'; x.font = `700 24px ${FB}`; x.fillText(l, X, 800); });
   x.fillStyle = '#F2EFE8'; x.font = `600 40px ${FM}`; x.fillText(`${od(p.odds)}  ${p.book || ''}`, 80, 900); x.fillStyle = 'rgba(242,239,232,.66)'; x.font = `500 34px ${FB}`; x.fillText(isNum(p.p) ? `Wins about ${Math.round(p.p * 10)} in 10 · loses about ${10 - Math.round(p.p * 10)} in 10` : '', 80, 960); x.fillText(`25D report card ${sg(p.score25, 1)} · ${p.tier === 'bet' ? 'passes both keys' : p.tier === 'lean' ? 'information only, not a bet' : p.tier === 'live' ? 'live watch' : 'not a bet'}`, 80, 1012);
-  x.fillStyle = 'rgba(231,196,106,.35)'; x.fillRect(80, 1130, W - 160, 2); try{ const im = new Image(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(window.TSEAL.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')); await im.decode(); x.drawImage(im, 80, 1168, 60, 60); }catch(e){} x.fillStyle = '#E7C46A'; x.font = `800 50px ${FD}`; x.fillText('tail.', 156, 1214); x.fillStyle = 'rgba(242,239,232,.4)'; x.font = `500 24px ${FB}`; x.fillText('Model output, not a promise. 1-800-GAMBLER', 80, 1256);
+  x.fillStyle = 'rgba(255,255,255,.25)'; x.fillRect(80, 1130, W - 160, 2); try{ const im = new Image(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(window.TSEAL.replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')); await im.decode(); x.drawImage(im, 80, 1168, 60, 60); }catch(e){} x.fillStyle = '#FFFFFF'; x.font = `800 50px ${FD}`; x.fillText('tail.', 156, 1214); x.fillStyle = 'rgba(242,239,232,.4)'; x.font = `500 24px ${FB}`; x.fillText('Model output, not a promise. 1-800-GAMBLER', 80, 1256);
   c.toBlob(async blob => { if(!blob) return toast('Could not make the image'); const file = new File([blob], `wmtl-${p.player.replace(/\W+/g, '-').toLowerCase()}.png`, {type: 'image/png'});
     try{ if(navigator.canShare && navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: 'tail.'}); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
     const url = URL.createObjectURL(blob); pushSheet('Share image', `<div class="body"><img src="${url}" alt="Share card for ${esc(p.player)}" style="width:100%;border-radius:18px"><p class="note">Press and hold the image to save or share it.</p></div>`); }, 'image/png'); }
@@ -907,6 +923,12 @@ async function boot(){ store.load(); drawTabs();
   if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) { navigator.serviceWorker.register('sw.js', {scope: './'}).then(r => { r.update().catch(() => {}); document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') r.update().catch(() => {}); }); }).catch(() => {});
     let reloaded = false; navigator.serviceWorker.addEventListener('controllerchange', () => { if(reloaded) return; reloaded = true; location.reload(); }); } }
 function slatePicker(){ const by = {}; INDEX.slates.forEach(s => (by[s.sport] = by[s.sport] || []).push(s));
-  modal(`<h2>Slates</h2>${SPORTS.filter(sp => by[sp]).map(sp => `<div class="sec"><span class="sp" style="--c:${SPORTHEX[sp]}">${sp}</span><div class="menu">${by[sp].sort((a, b) => a.start_utc < b.start_utc ? 1 : -1).map(s => `<button class="mi" data-pick="${esc(s.id)}" style="grid-template-columns:minmax(0,1fr) auto"><span>${esc(s.label)}<div class="sub">${esc(s.date_label || '')} · ${s.bets} bet${s.bets === 1 ? '' : 's'} · ${esc(slateStatus(s).word)}</div></span><span class="chev">${s.id === S.slate ? '✓' : ICON.chev}</span></button>`).join('')}</div></div>`).join('')}
-    <button class="btn quiet" id="pick-imp">${ICON.import}Import a slate</button>`, (C, close) => { $$('[data-pick]', C).forEach(b => b.onclick = () => { close(); setSlate(b.dataset.pick, S.tab === 'lobby' || S.tab === 'more' ? 'card' : S.tab); }); $('#pick-imp', C).onclick = () => { close(); setTimeout(openImport, 250); }; }); }
+  const mon = d => new Date(d).toLocaleDateString('en-US', {month: 'short', timeZone: 'America/New_York'}), dd = d => new Date(d).toLocaleDateString('en-US', {day: 'numeric', timeZone: 'America/New_York'});
+  const rec = s => { const r = s.results && s.results.bets; if(!r || !(r.w + r.l)) return ''; const u = r.units || 0; return `<span class="sp2-rec ${u >= 0 ? 'up' : 'dn'}">${r.w}\u2013${r.l}${r.p ? '\u2013' + r.p : ''} \u00b7 ${u >= 0 ? '+' : '\u2212'}${Math.abs(u).toFixed(1)}u</span>`; };
+  const row = s => { const st = slateStatus(s), cur = s.id === S.slate, parts = String(s.label || '').split(' \u00b7 ');
+    return `<button class="sp2-row${cur ? ' cur' : ''}${st.k === 'live' ? ' live' : ''}" data-pick="${esc(s.id)}"><span class="sp2-date"><small>${esc(mon(s.start_utc))}</small><b>${esc(dd(s.start_utc))}</b></span>
+      <span class="sp2-mid"><b>${esc(parts[0] || s.label)}${parts[1] ? `<em>${esc(parts[1])}</em>` : ''}</b><span>${s.n_games || 0} game${s.n_games === 1 ? "" : "s"} \u00b7 ${s.bets} bet${s.bets === 1 ? '' : 's'}</span></span>
+      <span class="sp2-end">${st.k === 'live' ? '<span class="sp2-st live"><i></i>Live</span>' : st.k === 'up' ? `<span class="sp2-st">${esc(st.word.replace('Starts in ', 'in '))}</span>` : rec(s) || '<span class="sp2-st">Final</span>'}${cur ? '<span class="sp2-cur" aria-label="Current slate"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>' : ''}</span></button>`; };
+  modal(`<div class="sp2"><h2>Slates</h2><p class="sp2-sub">Pick a slate to see its games, picks and props.</p>${SPORTS.filter(sp => by[sp]).map(sp => `<div class="sp2-sec"><h3>${sp}</h3><div class="sp2-list">${by[sp].sort((a, b) => a.start_utc < b.start_utc ? 1 : -1).map(row).join('')}</div></div>`).join('')}
+    <button class="sp2-imp" id="pick-imp">${ICON.import}Import a slate</button></div>`, (C, close) => { $$('[data-pick]', C).forEach(b => b.onclick = () => { close(); setSlate(b.dataset.pick, S.tab === 'lobby' || S.tab === 'more' ? 'card' : S.tab); }); $('#pick-imp', C).onclick = () => { close(); setTimeout(openImport, 250); }; }); }
 boot();

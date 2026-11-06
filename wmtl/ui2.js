@@ -21,7 +21,7 @@ function mainLine(e){ const o = BOOKS.map(k => (e.books || {})[k]).find(x => x &
 const priceBtn = (lab, b, cls = '') => b ? `<span class="x-odd ${cls}"><small>${esc(lab)}</small><b>${odds(b.v)}</b><i>${esc(b.k)}</i></span>` : `<span class="x-odd x-off"><small>${esc(lab)}</small><b>—</b></span>`;
 
 /* ---------- Home */
-const TSEAL = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#2B1466"/><circle cx="50" cy="50" r="42.2" fill="none" stroke="#E7C46A" stroke-width="3.6"/><g fill="none" stroke="#E7C46A" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"><path d="M46 19 V63 Q46 78 61 78 L69 76"/><path d="M29 44 L72 36.5"/></g></svg>`; window.TSEAL = TSEAL;
+const TSEAL = `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#FFFFFF"/><g fill="none" stroke="#000000" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"><path d="M46 19 V63 Q46 78 61 78 L69 76"/><path d="M29 44 L72 36.5"/></g></svg>`; window.TSEAL = TSEAL;
 const TGUIL = (() => { let s = ''; for(let k = 0; k < 14; k++){ let d = ''; const ph = k * Math.PI / 14; for(let i = 0; i <= 240; i++){ const t = i / 240 * Math.PI * 2; const r = 120 + 18 * Math.sin(7 * t + ph); const x = 300 + r * Math.cos(t) * 1.15, y = 20 + r * Math.sin(t) * .8; d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } s += `<path d="${d}" fill="none" stroke="#E7C46A" stroke-opacity="${(.10 + .06 * (k % 3)).toFixed(2)}" stroke-width=".6"/>`; } for(let k = 0; k < 9; k++){ let d = ''; for(let i = 0; i <= 120; i++){ const x = i / 120 * 340; const y = 170 + k * 6 + 7 * Math.sin(x / 19 + k * .7); d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } s += `<path d="${d}" fill="none" stroke="#9A80FF" stroke-opacity=".14" stroke-width=".6"/>`; } return s; })();
 window.viewHome2 = async function(){ const m = $('#main'); const ds = await weekSlates(); const B = await weekBoard(ds);
   const games = ds.flatMap(d => d.games.map(g => ({g, d}))).sort((a, b) => a.g.kick_utc < b.g.kick_utc ? -1 : 1);
@@ -34,13 +34,23 @@ window.viewHome2 = async function(){ const m = $('#main'); const ds = await week
       <div class="x-team"><b>${esc(g.away.abbr)}</b><span>${st && st.state !== 'pre' ? st.as : isNum(sp) ? fmtSp(-sp) : ''}</span></div>
       <div class="x-team"><b>${esc(g.home.abbr)}</b><span>${st && st.state !== 'pre' ? st.hs : isNum(sp) ? fmtSp(sp) : ''}</span></div>
       <div class="x-gfoot">${isNum(mk.total) ? `O/U ${ln(mk.total)}` : ''}${d.props.filter(p => p.tier === 'bet' && (p.team === g.away.abbr || p.team === g.home.abbr)).length ? ` · <em>${d.props.filter(p => p.tier === 'bet' && (p.team === g.away.abbr || p.team === g.home.abbr)).length} bets</em>` : ''}</div></button>`; };
-  const betCard = ({p, d}) => `<button class="x-bet" data-prop="${esc(p.id)}" data-sl="${esc(d.id)}"><div class="x-btop"><span class="x-tag gold">Bet</span><span>${esc(p.team)} vs ${esc(p.opp)}</span></div>
-      <div class="x-bname">${esc(p.player)}</div><div class="x-bsel">${esc(selText(p))}</div>
-      <div class="x-bfoot"><span class="x-price">${odds(p.odds)} <i>${esc(p.book || '')}</i></span><span class="x-chance">${pc(p.p ?? pSide(p))}</span></div>
-      <div class="x-edge" style="--e:${Math.min(100, Math.max(0, (p.edge_pts || 0) * 5))}%"><span></span></div></button>`;
+  const betCard = ({p, d}) => { const ch = p.p ?? pSide(p); return `<button class="x-bet" data-prop="${esc(p.id)}" data-sl="${esc(d.id)}"><div class="xb-top"><span class="xb-tier">Model bet</span><span class="xb-mu">${esc(p.team)} vs ${esc(p.opp)}</span></div>
+      <div class="xb-head"><div class="xb-sel">${esc(selText(p))}</div><div class="xb-price"><b>${odds(p.odds)}</b><i>${esc(p.book || '')}</i></div></div>
+      <div class="xb-name">${esc(p.player)}</div>
+      ${chanceRail(ch, p.break_even, '')}
+      <div class="xb-foot"><span class="xb-edge">Edge <b>${sg(p.edge_pts)}</b></span>${isNum(p.units) ? `<span>Stake <b>${p.units}u</b></span>` : ''}</div></button>`; };
   const MK = [['Receptions', 'receptions'], ['Receiving yards', 'rec_yds'], ['Rushing yards', 'rush_yds'], ['Passing yards', 'pass_yds'], ['Anytime TD', null]];
   m.innerHTML = `<div class="view x-home">
-    <div class="x-hero t-card"><svg class="t-guil" viewBox="0 0 340 210" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${TGUIL}</svg><i class="t-sheen"></i><div class="t-cardtop">${TSEAL.replace('<svg ','<svg aria-hidden="true" ')}<span>Members\u2019 board</span></div><h1>Week ${esc(wk)}</h1><p>${games.length} games, ${bets.length} model bets${B ? ', ' + B.games.reduce((a, g) => a + g.players.reduce((x, P) => x + P.n, 0), 0).toLocaleString() + ' props priced' : ''}</p><div class="t-cardfoot"><span>NFL 2026</span><b>tail.</b></div></div>
+    <div class="x-hero h-spot">${(() => { const top = bets[0]; const day = new Date().toLocaleDateString('en-US', {weekday: 'long'});
+      if(!top) return `<h1 class="h-title">Week ${esc(wk)}</h1>`;
+      const p = top.p, ch = p.p ?? pSide(p);
+      return `<div class="h-hi"><span>${esc(day)}</span><b>${bets.length} plays the model loves</b></div>
+      <button class="h-card" data-prop="${esc(p.id)}" data-sl="${esc(top.d.id)}"><i class="h-foil"></i>
+        <div class="h-row"><span class="h-badge">Top play</span><span class="h-match">${esc(p.team)} vs ${esc(p.opp)}</span></div>
+        <div class="h-player">${esc(p.player)}</div><div class="h-sel">${esc(selText(p))}</div>
+        <div class="h-row h-nums"><div><small>Model chance</small><b>${pc(ch)}</b></div><div><small>Best price</small><b>${odds(p.odds)}</b><i>${esc(p.book || '')}</i></div><div><small>Edge</small><b>${isNum(p.edge_pts) ? '+' + p.edge_pts.toFixed(1) : '–'}</b></div></div>
+        <span class="h-tail">Tail it</span></button>
+      <div class="h-stats"><div><b>${games.length}</b><span>games</span></div><div><b>${bets.length}</b><span>model bets</span></div><div><b>${B ? B.games.reduce((a, g) => a + g.players.reduce((x, P) => x + P.n, 0), 0).toLocaleString() : '–'}</b><span>props priced</span></div></div>`; })()}</div>
     <div id="x-livehero-slot">${window.liveHeroHTML ? liveHeroHTML() : ''}</div>
     <div class="x-shelf"><div class="x-shead"><h2>Games</h2><button class="x-link" data-go="board">All games</button></div><div class="x-row">${games.map(gameCard).join('')}</div></div>
     ${bets.length ? `<div class="x-shelf"><div class="x-shead"><h2>Model bets</h2><button class="x-link" data-go="card">See all ${bets.length}</button></div><div class="x-row">${bets.slice(0, 10).map(betCard).join('')}</div></div>` : ''}

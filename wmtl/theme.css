@@ -111,3 +111,129 @@ body::before{background:#180C34}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .x-shelf{margin-top:6px}
 .x-tabs{margin-bottom:4px}
+
+/* bet card ================================================================
+   .betcard (Picks tab, game screen Picks) and .x-bet (Home "Model bets").
+   Hierarchy: the pick (selection + price) > player (serif) > the model's chance rail > edge, stake, notes > books.
+   Gold foil top edge is the brand device; green appears only when a pick cashes. Colours come only from tokens. */
+:root{
+  --bc-surface:linear-gradient(180deg,color-mix(in srgb,var(--violet) 30%,var(--s1)) 0%,var(--s1) 46%,var(--s0) 100%);
+  --bc-frame:var(--rule);
+  --bc-gold-dim:color-mix(in srgb,var(--gold) 26%,color-mix(in srgb,var(--t1) 22%,var(--s2)));
+  --bc-gold-ink:color-mix(in srgb,var(--gold) 9%,black);
+  --bc-track:color-mix(in srgb,var(--t1) 9%,transparent);
+  --bc-run:color-mix(in srgb,var(--gold) 10%,transparent);    --bc-run-solid:var(--gold);
+  --bc-under:color-mix(in srgb,var(--live) 12%,transparent);  --bc-under-solid:var(--live);
+  --bc-win-wash:color-mix(in srgb,var(--edge) 22%,transparent);
+  --bc-loss-wash:color-mix(in srgb,var(--loss) 9%,transparent);
+  --bc-fd:#1493FF; --bc-fd-ink:#FFFFFF; --bc-dk:#53D337; --bc-dk-ink:#06210A;   /* book brand colours, so each book is recognisable */
+}
+
+/* ---- the card */
+.betcard{border:0;border-radius:22px;padding:18px 18px 16px;gap:0;background:var(--bc-surface);box-shadow:inset 0 0 0 1px var(--bc-frame),0 18px 36px -24px color-mix(in srgb,var(--violet) 80%,transparent);isolation:isolate}
+.betcard::before{content:"";position:absolute;left:18px;right:18px;top:0;bottom:auto;width:auto;height:1.5px;border-radius:0;background:var(--foil);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+.betcard.tap:active,.betcard.tap.is-pressed{transform:scale(.985);opacity:1;box-shadow:inset 0 0 0 1px var(--rule2)}
+.betcard .bc-top{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:20px;font:600 12.5px/1.2 var(--f-ui);color:var(--t3)}
+.betcard .bc-when{display:flex;align-items:center;gap:6px;min-width:0;color:var(--c,var(--t3))}
+.betcard .bc-when>span{color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.betcard .bc-tier,.x-bet .xb-tier{flex:none;font:500 italic 14px/1 var(--f-disp);color:var(--gold);letter-spacing:.005em}
+
+/* the pick: selection + price on one line, the player under it in the serif */
+.betcard .bc-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:14px;margin-top:12px}
+.betcard .bc-sel{font:700 23px/1.12 var(--f-ui);letter-spacing:-.02em;color:var(--t1);text-wrap:balance}
+.betcard .bc-who{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:6px}
+.betcard .bc-name{font:600 19px/1.15 var(--f-disp);color:var(--t1);letter-spacing:-.005em}
+.betcard .bc-mu{font:600 12.5px/1 var(--f-ui);color:var(--t3)}
+.betcard .bc-price{display:grid;justify-items:end;gap:5px;padding-top:1px}
+.betcard .bc-price b{font:800 23px/1 var(--f-num);letter-spacing:-.02em;color:var(--gold)}
+.betcard .bc-price span{font:600 12px/1 var(--f-ui);color:var(--t2)}
+
+/* signature: the chance rail (shared with Home) */
+.bc-meter{margin-top:16px;padding-top:14px;box-shadow:inset 0 1px 0 var(--rule)}
+.bc-mtop{display:flex;align-items:baseline;gap:7px;min-width:0}
+.bc-pct{font:800 30px/1 var(--f-num);letter-spacing:-.035em;color:var(--gold)}
+.bc-pct i{font-style:normal;font-size:.5em;font-weight:700;margin-left:1px;color:var(--gold-d)}
+.bc-mlab{font:600 12.5px/1 var(--f-ui);color:var(--t2)}
+.bc-loss{margin-left:auto;font:500 12.5px/1 var(--f-ui);color:var(--t3);white-space:nowrap}.bc-loss b{color:var(--t2);font-weight:700}
+.bc-rail{position:relative;height:6px;margin-top:12px;border-radius:3px;background:var(--bc-track)}
+.bc-rail>span{position:absolute;top:0;bottom:0;border-radius:3px}
+.bc-fill{left:0;width:var(--p);background:var(--bc-gold-dim)}
+.bc-over{left:var(--be);width:max(0px,calc(var(--p) - var(--be)));background:var(--foil);border-radius:0 3px 3px 0!important;box-shadow:0 0 12px -2px color-mix(in srgb,var(--gold) 60%,transparent)}
+.bc-tick{left:var(--be);top:-4px!important;bottom:-4px!important;width:2px;margin-left:-1px;background:var(--t1);border-radius:1px!important}
+.bc-need{position:relative;height:13px;margin-top:6px}
+.bc-need span{position:absolute;left:var(--be);transform:translateX(-50%);font:600 11.5px/1 var(--f-ui);color:var(--t3);white-space:nowrap}
+
+/* secondary: edge, stake, report card / result */
+.betcard .bc-stats{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font:600 13px/1.2 var(--f-ui);color:var(--t3)}
+.betcard .bc-stats b{color:var(--t1);font-weight:700}
+.betcard .bc-edge b,.x-bet .xb-edge b{color:var(--gold)}
+.betcard .bc-res{margin-left:auto;display:flex;align-items:center;gap:8px}
+.betcard .bc-res .pill{font-size:12px}
+
+/* books: two full-width 44px buttons in each book's own colour */
+.betcard .bkrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.betcard .bkbtn{justify-content:center;min-height:44px;padding:0 12px;border-radius:13px;font:700 14.5px/1 var(--f-ui);letter-spacing:-.005em;transition:transform var(--d1) var(--ease-out),filter var(--d1)}
+.betcard .bkbtn.fd{background:var(--bc-fd);color:var(--bc-fd-ink)}
+.betcard .bkbtn.dk{background:var(--bc-dk);color:var(--bc-dk-ink)}
+.betcard .bkbtn:active{transform:scale(.96);filter:brightness(1.12)}
+
+/* ---- live progress: a faded bar fills the card toward the line, with a solid hairline under it */
+.betcard.pg{padding-bottom:16px!important;transition:background .6s var(--ease-std),box-shadow var(--d3)!important;
+  background:linear-gradient(var(--bc-run-solid),var(--bc-run-solid)) left bottom/var(--pg) 2px no-repeat,linear-gradient(90deg,var(--bc-run) 0 var(--pg),transparent var(--pg)),var(--bc-surface)!important}
+.betcard.pg.pg-under{background:linear-gradient(var(--bc-under-solid),var(--bc-under-solid)) left bottom/var(--pg) 2px no-repeat,linear-gradient(90deg,var(--bc-under) 0 var(--pg),transparent var(--pg)),var(--bc-surface)!important}
+.betcard.pg .bc-tier{visibility:hidden}
+.betcard .pgtag,.x-bet .pgtag{top:15px;bottom:auto;right:18px;left:auto;padding:5px 9px;border-radius:999px;font:700 12px/1 var(--f-num);letter-spacing:0;background:var(--s3);color:var(--t1);box-shadow:inset 0 0 0 1px var(--rule)}
+/* cashed: green frame, green wash, green tag; the pick is the hero again */
+.betcard.pg.pg-win{opacity:1;background:linear-gradient(180deg,var(--bc-win-wash) 0%,transparent 75%),var(--bc-surface)!important;box-shadow:inset 0 0 0 1.5px var(--edge),0 18px 40px -22px var(--edge)!important}
+.betcard.pg-win::before{background:var(--edge)}
+.betcard.pg-win .pgtag,.x-bet.pg-win .pgtag{background:var(--edge);color:var(--s0);box-shadow:none}
+.betcard.pg-win .bc-price b{color:var(--edge)}
+/* lost: quiet, struck price, red tag */
+.betcard.pg.pg-loss{opacity:.7;background:linear-gradient(180deg,var(--bc-loss-wash) 0%,transparent 70%),var(--bc-surface)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--loss) 40%,transparent)!important}
+.betcard.pg-loss::before{background:var(--loss);opacity:.6}
+.betcard.pg-loss .pgtag,.x-bet.pg-loss .pgtag{background:var(--loss);color:var(--t1);box-shadow:none}
+.betcard.pg-loss .bc-price b,.x-bet.pg-loss .xb-price b{text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--t2)}
+
+/* ---- Home carousel card */
+.x-bet{flex:0 0 244px;border-radius:20px;padding:16px 16px 14px;gap:0;background:var(--bc-surface);box-shadow:inset 0 0 0 1px var(--bc-frame);isolation:isolate;transition:transform var(--d2) var(--ease-out)}
+.x-bet::before{left:16px;right:16px;height:1.5px;-webkit-mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent);mask:linear-gradient(90deg,transparent,#000 18%,#000 82%,transparent)}
+.x-bet:active{transform:scale(.975)}
+.x-bet .xb-top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:18px}
+.x-bet .xb-mu{font:600 12px/1 var(--f-ui);color:var(--t3);white-space:nowrap}
+.x-bet .xb-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start;margin-top:10px}
+.x-bet .xb-sel{font:700 18px/1.15 var(--f-ui);letter-spacing:-.02em;color:var(--t1);text-wrap:balance}
+.x-bet .xb-price{display:grid;justify-items:end;gap:4px}
+.x-bet .xb-price b{font:800 18px/1 var(--f-num);letter-spacing:-.02em;color:var(--gold)}
+.x-bet .xb-price i{font:600 11px/1 var(--f-ui);font-style:normal;color:var(--t3)}
+.x-bet .xb-name{font:600 17px/1.15 var(--f-disp);color:var(--t1);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-bet .bc-meter{margin-top:12px;padding-top:11px}
+.x-bet .bc-pct{font-size:24px}
+.x-bet .bc-rail{margin-top:10px;height:5px}
+.x-bet .bc-need{height:12px}
+.x-bet .bc-need span{font-size:11px}
+.x-bet .xb-foot{display:flex;gap:14px;margin-top:8px;font:600 12.5px/1 var(--f-ui);color:var(--t3)}
+.x-bet .xb-foot b{color:var(--t1);font-weight:700}
+.x-bet .xb-foot .xb-edge b{color:var(--gold)}
+.x-bet.pg{padding-bottom:14px!important;background:linear-gradient(var(--bc-run-solid),var(--bc-run-solid)) left bottom/var(--pg) 2px no-repeat,linear-gradient(90deg,var(--bc-run) 0 var(--pg),transparent var(--pg)),var(--bc-surface)!important}
+.x-bet.pg.pg-under{background:linear-gradient(var(--bc-under-solid),var(--bc-under-solid)) left bottom/var(--pg) 2px no-repeat,linear-gradient(90deg,var(--bc-under) 0 var(--pg),transparent var(--pg)),var(--bc-surface)!important}
+.x-bet.pg .xb-tier{visibility:hidden}
+.x-bet .pgtag{top:12px;right:12px}
+.x-bet.pg .xb-top .xb-mu{margin-right:auto;order:-1}
+.x-bet.pg.pg-win{background:linear-gradient(180deg,var(--bc-win-wash),transparent 75%),var(--bc-surface)!important;box-shadow:inset 0 0 0 1.5px var(--edge)!important}
+.x-bet.pg-win::before{background:var(--edge)}
+.x-bet.pg-win .xb-price b{color:var(--edge)}
+.x-bet.pg.pg-loss{opacity:.7;background:var(--bc-surface)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--loss) 40%,transparent)!important}
+
+/* ---- motion: only in answer to a press or a cash, never ambient */
+@media (prefers-reduced-motion:no-preference){
+  .betcard.pg-cash,.x-bet.pg-cash{animation:bc-cash .7s var(--ease-in) 1}
+  .betcard.pg-cash .pgtag,.x-bet.pg-cash .pgtag{animation:bc-stamp .45s .15s var(--ease-in) both}
+  .betcard.pg-cash::after,.x-bet.pg-cash::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(110deg,transparent 35%,var(--bc-win-wash) 50%,transparent 65%);transform:translateX(-100%);animation:bc-sheen .9s .1s var(--ease-out) 1 both}
+}
+@keyframes bc-cash{0%{transform:scale(1)}30%{transform:scale(1.02)}100%{transform:scale(1)}}
+@keyframes bc-stamp{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes bc-sheen{to{transform:translateX(100%)}}
+@media (prefers-reduced-motion:reduce){.betcard.tap:active,.x-bet:active,.betcard .bkbtn:active{transform:none}}
+/* end bet card */
