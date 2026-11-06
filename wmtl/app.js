@@ -283,9 +283,10 @@ function openSearch(){ pushSheet('Search', `<div class="body"><div class="lt"><h
     const I = await loadPlayerIndex(); const NB = window.NBA ? await NBA.searchIndex() : []; const inp = $('#uq', el), out = $('#ures', el);
     const draw = () => { const q = nkey(inp.value), up = inp.value.trim().toUpperCase(); if(q.length < 2 && up.length < 2){ out.innerHTML = `<p class="sub">${(I.players.length + NB.length).toLocaleString()} players. Start typing.</p>`; return; }
       const r = I.players.filter(p => nkey(p[1]).includes(q) || p[2] === up).sort((a, b) => (b[2] === up) - (a[2] === up)).slice(0, 60);
-      const nf = r.map(p => `<button class="row" data-pid="${esc(p[0])}"><div><div class="nm">${esc(p[1])}${NB.length ? '<span class="sbg nfl">NFL</span>' : ''}</div><div class="mt">${esc(p[2] || 'FA')} · ${esc(p[3] || '')}${p[4] ? ' · #' + esc(p[4]) : ''}${p[5] && p[5] !== 'ACT' ? ' · ' + esc(p[5]) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`).join('');
-      const nb = window.NBA ? NBA.searchHTML(q, up) : {html: '', n: 0}; const nfT = r.some(p => p[2] === up);
-      out.innerHTML = r.length || nb.n ? (nb.team && !nfT ? nb.html + nf : nf + nb.html) : `<p class="sub">No player matches “${esc(inp.value)}”.</p>`;
+      const sc = window.NBA ? NBA.score : null; /* both sports in one list, best match first (team code, then name start, then word start) */
+      const nf = r.map(p => ({s: sc ? sc(p[1], p[2] === up, q) : 0, h: `<button class="row" data-pid="${esc(p[0])}"><div><div class="nm">${esc(p[1])}${NB.length ? '<span class="sbg nfl">NFL</span>' : ''}</div><div class="mt">${esc(p[2] || 'FA')} · ${esc(p[3] || '')}${p[4] ? ' · #' + esc(p[4]) : ''}${p[5] && p[5] !== 'ACT' ? ' · ' + esc(p[5]) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`}));
+      const all = [...nf, ...(window.NBA ? NBA.searchRows(q, up) : [])].map((x, i) => ({...x, i})).sort((a, b) => b.s - a.s || a.i - b.i);
+      out.innerHTML = all.length ? all.map(x => x.h).join('') : `<p class="sub">No player matches “${esc(inp.value)}”.</p>`;
       $$('[data-pid]', out).forEach(b => b.onclick = () => openProfile(b.dataset.pid)); if(window.NBA) NBA.wireSearch(out); };
     inp.oninput = draw; draw(); setTimeout(() => inp.focus(), 350); }); }
 const STATCOLS = [['tgt', 'Tgt'], ['rec', 'Rec'], ['rec_yds', 'RecYd'], ['rec_td', 'RecTD'], ['car', 'Car'], ['rush_yds', 'RuYd'], ['rush_td', 'RuTD'], ['att', 'Att'], ['cmp', 'Cmp'], ['pass_yds', 'PaYd'], ['pass_td', 'PaTD'], ['sacks', 'Sk']];

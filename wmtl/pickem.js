@@ -51,7 +51,7 @@ function dayStats(day){ const card = ST.props.filter(p => p.day === day); let hi
 let TILE = null;
 /* Home can be redrawn by other code; keep the tile present and last, without touching the shared render path */
 (function keep(){ const m = document.querySelector('#main'); if(!m || !window.MutationObserver) return; let q = 0;
-  new MutationObserver(() => { if(q) return; q = requestAnimationFrame(() => { q = 0; if(opt.get() === 'out') return; const v = m.querySelector('.x-home'); if(!v) return;
+  new MutationObserver(() => { if(q) return; q = requestAnimationFrame(() => { q = 0; if(opt.get() === 'out') return; const v = m.querySelector('.x-home') || (typeof S !== 'undefined' && S.tab === 'lobby' && m.querySelector(':scope > .view')); if(!v) return;
     const t = v.querySelector('#pk-tile'); if(!t) home(m); else if(v.lastElementChild !== t) v.appendChild(t); }); }).observe(m, {childList: true, subtree: true}); })();
 async function home(m){ const v = m.querySelector('.x-home') || m.querySelector('.view') || m; const old = v.querySelector('#pk-tile'); if(old) old.remove();
   const st = opt.get(); if(st === 'out') return;
@@ -90,7 +90,7 @@ const introHTML = () => `<div class="pk-head"><h1>Pick'em</h1><p>An optional fre
   <button class="cl-cta pk-cta" id="pk-join">Join Pick'em</button><button class="pk-link" id="pk-later">Not now</button>`;
 const leaveHTML = () => `<div class="pk-leave"><button class="pk-link" id="pk-out">Leave Pick'em</button><p>Hides Pick'em from Home. Your picks stay saved and you can rejoin from Club.</p></div>`;
 function wireLeave(b){ const o = b.querySelector('#pk-out'); if(o) o.onclick = () => { opt.set('out'); popSheet(); EL = null; refreshHome(); toast("Pick'em hidden. Rejoin from Club any time"); }; }
-function refreshHome(){ TILE = null; const m = document.querySelector('#main'); if(window.S && S.tab === 'lobby' && m) home(m); const r = document.querySelector('#pk-club'); if(r){ r.remove(); clubRow(); } }
+function refreshHome(){ TILE = null; const m = document.querySelector('#main'); if(typeof S !== 'undefined' && S.tab === 'lobby' && m) home(m); const r = document.querySelector('#pk-club'); if(r){ r.remove(); clubRow(); } }
 
 function gameHTML(days){
   if(!ST.day) return `<div class="pk-head"><h1>Pick'em</h1><p>No card is posted yet. The next one appears with the next slate.</p></div>${boardHTML()}${leaveHTML()}`;

@@ -71,3 +71,7 @@
 /* ---------------- player card */
 .nb-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.nb-tags:empty{display:none}
 .x-tag.nb-ct{background:var(--s3);color:var(--act);box-shadow:inset 0 0 0 1px var(--hair2)}
+
+/* NBA game Live tab rows have no book buttons under them: leave room for the progress tag */
+.nb-game #x-gb .lv.pg{padding-bottom:50px!important}
+.nb-game .lv{position:relative}

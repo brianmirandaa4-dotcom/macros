@@ -139,7 +139,9 @@ function paint(L, it, anim){ const vp = L.vp, old = vp.querySelector('.tkl-it.cu
 function roll(L, now){ clearTimeout(L.t); if(!L.items.length || !L.el) return; let j = -1; if(L.next){ j = L.items.findIndex(x => x.k === L.next); L.next = null; }
   if(j < 0) j = (L.i + 1) % L.items.length; if(j === L.i && L.vp.querySelector('.tkl-it.cur') && !now){ schedule(L); return; }
   L.i = j; paint(L, L.items[j], true); schedule(L); }
-function setItems(L, list){ if(!mountLanes()) return; const cur = L.items[L.i]; const was = L.init;
+/* team chips render as <span> in the lanes: app.css styles every `.tk i` as a LIVE/FINAL badge */
+const spanChips = h => h.replace(/<i class="tl([^"]*)"([^>]*)>(<img[^>]*>)<\/i>/g, '<span class="tl$1"$2>$3</span>');
+function setItems(L, list){ if(!mountLanes()) return; const cur = L.items[L.i]; const was = L.init; list.forEach(x => { x.html = spanChips(x.html); });
   for(const x of list){ if(x.sig != null){ const o = L.sigs[x.k]; if(o != null && o !== x.sig) x.pulse = true; L.sigs[x.k] = x.sig; } if(was && !L.seen.has(x.k) && (x.kind === 'win' || x.kind === 'bet')) x.flash = x.kind === 'win'; }
   const jump = was ? list.find(x => x.kind === 'bet' && !L.seen.has(x.k)) || list.find(x => x.kind === 'win' && !L.seen.has(x.k)) : null;
   list.forEach(x => L.seen.add(x.k)); L.items = list;
@@ -341,15 +343,15 @@ async function openCard(id, team, market){ await loadIndex(); const ds = await s
     <p class="note">${esc((P && P.source) || 'Stats and bio: the NBA player library.')} Prices: the books listed on the slate. Live: ESPN box score.</p></div>`;
   pushSheet(name, html, el => { $$('[data-cm]', el).forEach(b => b.onclick = () => { sel = props.find(x => x.p.id === b.dataset.cm) || sel; draw(el); }); draw(el); }); }
 async function searchIndex(){ await loadIndex(); return PIX; }
-function searchHTML(q, up){ if(!PIX || !PIX.length) return {html: '', n: 0, team: false}; const T = up.length >= 2 ? nab(up) : '';
+/* relevance shared with app.js openSearch so both sports merge into one list */
+const score = (name, teamHit, q) => { const n = nkey(name); return (teamHit ? 4 : 0) + (q && n.startsWith(q) ? 2 : 0) + (q && n.split(' ').some(w => w.startsWith(q)) ? 1 : 0); };
+function searchRows(q, up){ if(!PIX || !PIX.length) return []; const T = up.length >= 2 ? nab(up) : '';
   const hitT = T && PIX.some(p => p.team === T); const r = PIX.filter(p => (q.length >= 2 && nkey(p.name).includes(q)) || (hitT && p.team === T));
-  const sc = p => (hitT && p.team === T ? 4 : 0) + (nkey(p.name).startsWith(q) ? 2 : 0) + (nkey(p.name).split(' ').some(w => w.startsWith(q)) ? 1 : 0);
-  const top = r.sort((a, b) => sc(b) - sc(a) || a.name.localeCompare(b.name)).slice(0, 40);
-  return {n: top.length, team: !!hitT, html: top.map(p => { const ct = contractOf(p);
-    return `<button class="row" data-nbpid="${esc(p.pid)}"><div><div class="nm">${esc(p.name)}<span class="sbg nba">${GLY.NBA}NBA</span>${ct ? `<span class="sbg ct">${esc(ct)}</span>` : ''}</div><div class="mt">${TLN(p.team, 'xs')}${esc(p.team || 'FA')}${p.pos ? ' · ' + esc(p.pos) : ''}${p.jersey != null && p.jersey !== '' ? ' · #' + esc(p.jersey) : ''}${p.status && !/^(act|active)$/i.test(p.status) && !ct ? ' · ' + esc(p.status) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`; }).join('')}; }
+  return r.map(p => ({p, s: score(p.name, hitT && p.team === T, q)})).sort((a, b) => b.s - a.s || a.p.name.localeCompare(b.p.name)).slice(0, 40).map(({p, s}) => { const ct = contractOf(p);
+    return {s, h: `<button class="row" data-nbpid="${esc(p.pid)}"><div><div class="nm">${esc(p.name)}<span class="sbg nba">${GLY.NBA}NBA</span>${ct ? `<span class="sbg ct">${esc(ct)}</span>` : ''}</div><div class="mt">${TLN(p.team, 'xs')}${esc(p.team || 'FA')}${p.pos ? ' · ' + esc(p.pos) : ''}${p.jersey != null && p.jersey !== '' ? ' · #' + esc(p.jersey) : ''}${p.status && !/^(act|active)$/i.test(p.status) && !ct ? ' · ' + esc(p.status) : ''}</div></div><div class="rt">${ICON.chev}</div></button>`}; }); }
 const wireSearch = out => $$('[data-nbpid]', out).forEach(b => b.onclick = () => openCard(b.dataset.nbpid));
 
-window.NBA = {poll: () => poll(), applyProgress: applyNBA, openCard, openGame: nbaGame, openByTeams, openMarket, searchIndex, searchHTML, wireSearch, slates, nab, MK, live: NLV, _gameTick: null};
+window.NBA = {poll: () => poll(), applyProgress: applyNBA, openCard, openGame: nbaGame, openByTeams, openMarket, searchIndex, searchRows, score, wireSearch, slates, nab, MK, live: NLV, _gameTick: null};
 
 /* ------------------------------------------------------------ start: lanes now, NBA data once the slate list is in */
 mountLanes(); try{ drawTicker(); }catch(e){} TKL.nba();
