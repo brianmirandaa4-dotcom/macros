@@ -1290,6 +1290,53 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .me3-stats b{font:700 20px/1 var(--f-num)}.me3-stats span{font-size:11.5px;color:var(--muted)}
 .me3-app{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:12px 4px;margin-top:6px}
 .me3-app button{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font:inherit;font-size:11.5px;cursor:pointer}.me3-app svg{width:20px;height:20px;color:var(--fg);stroke-width:1.7}
+
+/* foods, redesigned */
+.fd-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:4px}.fd-head h1{font:800 clamp(28px,5vw,36px)/1.05 var(--f-display);margin:2px 0 0;letter-spacing:-.01em}.fd-head .sub{color:var(--muted);font-size:13px;font-weight:600}
+.fd-new{padding:9px 14px;border-radius:12px;font-size:14px;white-space:nowrap}
+.fd-sbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:5;margin:-4px -4px 0;padding:4px;background:linear-gradient(var(--bg) 70%,transparent)}
+.fd-search{display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border-radius:16px;background:var(--surface);border:1px solid rgba(255,255,255,.09);box-shadow:0 10px 26px rgba(0,0,0,.28);cursor:text}
+.fd-search:focus-within{border-color:color-mix(in srgb,var(--kcal) 60%,transparent)}
+.fd-search svg{width:20px;height:20px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;flex:none}
+.fd-search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--fg);font-size:17px;padding:0}
+.fd-search input::-webkit-search-cancel-button{display:none}
+.fd-clr{width:26px;height:26px;border-radius:50%;border:0;background:var(--surface-2);color:var(--muted);font-size:12px;display:grid;place-items:center;flex:none}
+#fdBody{display:flex;flex-direction:column;gap:14px}
+.fd-cols{display:flex;flex-direction:column;gap:14px}
+@media (min-width:900px){.fd-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:start}}
+.fd-card{background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,0) 45%),var(--surface);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 34px rgba(0,0,0,.24);display:flex;flex-direction:column;gap:8px;min-width:0}
+.fd-tabs{max-width:none}
+.fd-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:2px 4px}.fd-h b{font:700 17px/1.2 var(--f-display)}.fd-h span{font-size:12.5px;color:var(--muted);text-align:right}
+.fd-list{display:flex;flex-direction:column}
+.fd-row{display:grid;grid-template-columns:minmax(0,1fr) auto 36px;align-items:center;gap:10px;padding:10px 4px 10px 6px;border-top:1px solid var(--line);cursor:pointer;border-radius:10px;transition:background .15s}
+.fd-row:first-child{border-top:0}.fd-row:hover,.fd-row:focus-visible{background:var(--surface-2);outline:0}
+.fd-t{display:flex;flex-direction:column;gap:3px;min-width:0}.fd-t b{font-size:15px;font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-t>span{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.3}
+.fd-m{display:inline-flex;gap:6px}.fd-m i{font-style:normal;font:600 12px/1 var(--f-num);color:var(--c)}
+.fd-k{text-align:right;font:600 16px/1 var(--f-num);white-space:nowrap}.fd-k small{display:block;font:500 10.5px/1.3 var(--f-body);color:var(--muted)}
+.fd-add{width:34px;height:34px;border-radius:50%;border:1px solid color-mix(in srgb,var(--kcal) 45%,transparent);background:color-mix(in srgb,var(--kcal) 12%,transparent);display:grid;place-items:center;padding:0;transition:transform .12s}
+.fd-add:active{transform:scale(.88)}.fd-add svg{width:16px;height:16px;fill:none;stroke:var(--kcal);stroke-width:2.4;stroke-linecap:round}
+.fd-star{font-style:normal;color:var(--carb);margin-right:5px;font-size:13px}
+.fd-flag{font-style:normal;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:color-mix(in srgb,var(--carb) 22%,transparent);color:var(--carb);font-size:11px;font-weight:800;margin-left:6px;vertical-align:1px}
+.fd-empty{margin:0;padding:14px 6px;color:var(--muted);font-size:14px;text-align:center}
+.fd-more{background:none;border:0;color:var(--kcal);font-weight:600;font-size:14px;padding:8px;align-self:center}
+.fd-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.fd-cat{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px 10px;border-radius:16px;background:var(--surface-2);border:1px solid transparent;color:var(--fg);font:inherit;cursor:pointer;min-width:0;transition:border-color .15s,background .15s}
+.fd-cat.on{border-color:color-mix(in srgb,var(--kcal) 55%,transparent);background:color-mix(in srgb,var(--kcal) 9%,var(--surface-2))}
+.fd-ci{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.04)}.fd-ci svg{width:20px;height:20px;fill:none;stroke:var(--fg);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.fd-cat.on .fd-ci svg{stroke:var(--kcal)}
+.fd-cat b{font-size:12px;font-weight:600;line-height:1.2;text-align:center}.fd-cat>span{font-size:11px;color:var(--muted)}
+@media (max-width:360px){.fd-cat b{font-size:11px}}
+.fd-panel{display:flex;flex-direction:column;gap:6px;padding-top:4px;animation:fdin .22s var(--ease-out)}
+@keyframes fdin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.fd-subs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}.fd-subs::-webkit-scrollbar{display:none}.fd-subs .chip{flex:none}
+.fd-online{display:grid;grid-template-columns:32px minmax(0,1fr) 14px;align-items:center;gap:12px;width:100%;padding:12px;border-radius:14px;background:var(--surface-2);border:0;color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.fd-online>span:first-child{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--kcal) 14%,transparent);color:var(--kcal)}.fd-online svg{width:16px;height:16px}
+.fd-online b{display:block;font-size:14.5px}.fd-online em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.fd-sh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.fd-fav{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--carb);font-size:19px;flex:none}
+.fd-qs{display:flex;gap:6px;flex-wrap:wrap}
+.fd-warn{margin:0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--carb) 10%,transparent);border:1px solid color-mix(in srgb,var(--carb) 30%,transparent);color:#f3dca0;font-size:13px;line-height:1.4}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -1433,24 +1480,9 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
   <!-- FOODS -->
   <section class="view" id="v-foods" aria-label="Foods" hidden>
     <div class="tip" id="tip-foods" hidden></div>
-    <div class="pnav"><div class="title"><div class="sub">Food library</div><h1>Foods</h1></div><button class="primary" id="newFood">+ New food</button></div>
-    <div class="card" style="display:flex;flex-direction:column;gap:14px">
-      <input class="search" id="fSearch" type="search" placeholder="Search foods" aria-label="Search foods">
-      <div class="cats" id="fCats"></div>
-      <p class="note">Tap a food to log it. Foods you save yourself are matched first when you type them on the Today page.</p>
-    </div>
-    <div class="card">
-      <div class="card-h"><div><div class="eyebrow">My meals</div><h2>Meals you eat often, one tap to log</h2></div></div>
-      <ul class="flist" id="myMeals"></ul>
-    </div>
-    <div class="card" id="myFoodsCard">
-      <div class="card-h"><div><div class="eyebrow">My foods</div><h2>Saved from labels and your own recipes</h2></div></div>
-      <ul class="flist" id="myFoods"></ul>
-    </div>
-    <div class="card">
-      <div class="card-h"><div><div class="eyebrow">Built-in</div><h2 id="dbCount">Common foods</h2></div></div>
-      <ul class="flist" id="dbFoods"></ul>
-    </div>
+    <div class="fd-head"><div><div class="sub">Food library</div><h1>Foods</h1></div><button class="ghost fd-new" id="newFood" type="button">+ New food</button></div>
+    <div class="fd-sbar"><label class="fd-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="fSearch" type="search" placeholder="Search foods, drinks, meals" aria-label="Search foods" autocomplete="off" enterkeyhint="search"><button type="button" class="fd-clr" id="fClear" aria-label="Clear search" hidden>✕</button></label></div>
+    <div id="fdBody"></div>
   </section>
 
   <!-- FRIENDS -->
@@ -3089,7 +3121,10 @@ function openLogFood(fd){
   let meal=S.mealSel; const u=fd.def;
   const units=Object.keys(fd.units);if(!fd.noG&&!units.includes('g'))units.push('g');if(!fd.noG&&!units.includes('oz'))units.push('oz');
   let curU=u;
-  sheet(`<div><div class="eyebrow">${esc(fd.custom?'My food':fd.cat)} · per ${esc(servLabel(fd))}</div><h3>${esc(cap(fd.name))}</h3></div>
+  const fl=foodCheck(fd),fv=()=>(S.favFoods||[]).includes(fd.id);
+  sheet(`<div class="fd-sh"><div><div class="eyebrow">${esc(fd.custom?'My food':fd.cat)} · per ${esc(servLabel(fd))}</div><h3>${esc(fd.custom?fd.name:cap(fd.name))}</h3></div><button type="button" class="fd-fav" id="lFav" aria-pressed="${fv()}" aria-label="Favorite">${fv()?'★':'☆'}</button></div>
+    ${fl?`<p class="fd-warn">⚠ ${esc(fl)}</p>`:''}
+    <div class="fd-qs" id="lQs">${[.5,1,1.5,2].map(v=>`<button type="button" class="chip" data-q="${v}" aria-pressed="${v===1}">${v===.5?'½':v} ${esc(UNIT_LABEL(u,v,fd))}</button>`).join('')}</div>
     <div class="grid2"><div class="field"><label for="lQ">Amount</label><div class="stepper"><button type="button" id="lMinus" aria-label="Less">−</button><input id="lQ" type="number" inputmode="decimal" value="1" style="flex:1"><button type="button" id="lPlus" aria-label="More">+</button></div></div>
     <div class="field"><label for="lU">Unit</label><select id="lU">${units.map(x=>`<option value="${x}" ${x===u?'selected':''}>${esc(UNIT_LABEL(x,2,fd))}</option>`).join('')}</select></div></div>
     <div id="lLive"></div>
@@ -3103,6 +3138,8 @@ function openLogFood(fd){
   $('lMinus').onclick=()=>{q.value=Math.max(0,r1((+q.value||0)-step()));upd()};
   $('lPlus').onclick=()=>{q.value=r1((+q.value||0)+step());upd()};
   q.oninput=upd;upd();
+  $('lQs').onclick=ev=>{const b=ev.target.closest('[data-q]');if(!b)return;sel.value=u;curU=u;q.value=b.dataset.q;$('lQs').querySelectorAll('[data-q]').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));upd()};
+  $('lFav').onclick=()=>{const L=S.favFoods||(S.favFoods=[]),i=L.indexOf(fd.id);if(i>=0)L.splice(i,1);else L.unshift(fd.id);save();$('lFav').textContent=fv()?'★':'☆';$('lFav').setAttribute('aria-pressed',String(fv()));toast(fv()?'Added to Favorites':'Removed from Favorites');if(S.view==='foods')renderFoods()};
   wireChips('lMeal',m=>meal=m);
   $('lCancel').onclick=closeSheet;
   if(fd.custom)$('lEdit').onclick=()=>openManual('',false,fd.id);
@@ -3268,24 +3305,88 @@ $('mNext').onclick=()=>{const [y,m]=S.monthRef.split('-').map(Number),d=new Date
 /* ---------- FOODS ---------- */
 function fItem(fd){const k=servKcal(fd),sg=fd.units[fd.def],sc=sg/100;
   return `<li><button class="fitem" data-food="${esc(fd.id)}"><span class="n">${esc(cap(fd.name))}</span><span class="kc">${fmt(k)}</span><span class="s">${esc(servLabel(fd))}</span><span class="mc"><span style="--c:var(--pro)">${r0(fd.p*sc)}P</span><span style="--c:var(--carb)">${r0(fd.c*sc)}C</span><span style="--c:var(--fat)">${r0(fd.f*sc)}F</span></span></button></li>`}
-function renderFoods(){renderTip('foods');
-  const q=$('fSearch').value.trim().toLowerCase();
-  const hit=fd=>!q||fd.aliases.some(a=>a.includes(q));
-  $('fCats').innerHTML=['All',...CATS].map(c=>`<button class="chip" data-cat="${esc(c)}" aria-pressed="${S.fCat===c}">${esc(c)}</button>`).join('');
-  const ms=S.meals.map((m,i)=>[m,i]).filter(([m])=>!q||m.name.toLowerCase().includes(q)||m.items.some(x=>x.n.toLowerCase().includes(q)));
-  $('myMeals').innerHTML=ms.length?ms.map(([m,i])=>{const t=sumEntries(m.items);return `<li><button class="fitem" data-meal-i="${i}"><span class="n">★ ${esc(m.name)}</span><span class="kc">${fmt(t.k)}</span><span class="s">${esc(m.items.map(x=>x.n).join(', '))}</span><span class="mc"><span style="--c:var(--pro)">${r0(t.p)}P</span><span style="--c:var(--carb)">${r0(t.c)}C</span><span style="--c:var(--fat)">${r0(t.f)}F</span></span></button></li>`}).join(''):`<li class="note" style="grid-column:1/-1">${q?'No saved meals match.':'Log a meal on Today, then tap “Save as a meal” under it. Saved meals appear as ★ chips above the food box, and typing the meal name logs the whole thing.'}</li>`;
-  const mine=FOODS.filter(f=>f.custom&&hit(f));
-  $('myFoods').innerHTML=mine.length?mine.map(fItem).join(''):`<li class="note" style="grid-column:1/-1">${q?'No saved foods match.':'Nothing saved yet. Use “+ New food” for anything with a nutrition label, or your own recipes.'}</li>`;
-  const b=BUILTIN.filter(f=>hit(f)&&(q||S.fCat==='All'||f.cat===S.fCat));
-  setTimeout(()=>{const fb=$('fAllBtn');if(fb)fb.onclick=()=>{S.fAll=true;renderFoods()}},0);
-  $('dbCount').textContent=q?`${b.length} match${b.length===1?'':'es'}`:S.fCat==='All'?`${BUILTIN.length} common foods`:S.fCat;
-  const cap=!q&&!S.fAll&&b.length>24;
-  const olBtn=q.length>=2?`<li style="grid-column:1/-1;list-style:none"><button class="ghost ol-more" type="button" data-olq="${esc(q)}">Search 6,500+ foods for “${esc(q)}”</button></li>`:'';
-  $('dbFoods').innerHTML=(b.length?(cap?b.slice(0,24):b).map(fItem).join('')+(cap?`<li style="grid-column:1/-1;list-style:none"><button class="ghost" type="button" id="fAllBtn" style="width:100%">Show all ${b.length} foods</button></li>`:''):'<li class="note" style="grid-column:1/-1">Not in the built-in list yet.</li>')+olBtn;
-}
-$('fSearch').addEventListener('input',renderFoods);
-$('fCats').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(b){S.fCat=b.dataset.cat;renderFoods()}});
-$('v-foods').addEventListener('click',e=>{const ol=e.target.closest('[data-olq]');if(ol)return openOnline(ol.dataset.olq,{mode:'save'});const mb=e.target.closest('[data-meal-i]');if(mb)return openMeal(+mb.dataset.mealI);const b=e.target.closest('[data-food]');if(b){const fd=FOODS.find(f=>f.id===b.dataset.food);if(fd)openLogFood(fd)}});
+const FD_GROUPS=[
+  {id:'protein',n:'Protein',ic:'<path d="M15.5 4.5a4.5 4.5 0 0 1 0 9c-1 0-2-.3-2.8-.9L8 17.3a2 2 0 1 1-3.3-.8 2 2 0 1 1 .8-3.3l4.7-4.7A4.5 4.5 0 0 1 15.5 4.5z"/>',cats:['Protein','Meat & seafood']},
+  {id:'carbs',n:'Grains & carbs',ic:'<path d="M12 21V9"/><path d="M12 9c0-3 2-5 4-6 0 3-2 5-4 6zM12 9c0-3-2-5-4-6 0 3 2 5 4 6zM12 14c0-3 2-5 4-6 0 3-2 5-4 6zM12 14c0-3-2-5-4-6 0 3 2 5 4 6z"/>',cats:['Grains','Grains & pasta','Starches & veg']},
+  {id:'produce',n:'Fruit & veg',ic:'<path d="M12 7c-4-2-8 1-7 6 .7 4 3.5 8 7 7 3.5 1 6.3-3 7-7 1-5-3-8-7-6z"/><path d="M12 7c0-2 1-4 3-4"/>',cats:['Fruit','More fruit','Vegetables & sides']},
+  {id:'dairy',n:'Dairy & eggs',ic:'<path d="M8 3h8M9 3v3l-2 4v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V10l-2-4V3"/><path d="M7 13h10"/>',cats:['Dairy','More dairy','Breakfast']},
+  {id:'meals',n:'Meals & takeout',ic:'<path d="M4 13h16a8 8 0 0 1-16 0zM3 13h18M9 5c0 2 1 2 1 4M13 5c0 2 1 2 1 4"/>',cats:['Meals','Takeout & dishes','Fast food']},
+  {id:'snacks',n:'Snacks & sweets',ic:'<circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10" r="1"/><circle cx="14.5" cy="9" r="1"/><circle cx="13" cy="14.5" r="1"/><circle cx="8.5" cy="14" r=".6"/>',cats:['Snacks & sweets','More snacks','Bakery & desserts','Beans & nuts','Beans, nuts & seeds','Sauces & spreads','More sauces']},
+  {id:'drinks',n:'Drinks',ic:'<path d="M6 4h12l-1.5 15a2 2 0 0 1-2 1.8h-5a2 2 0 0 1-2-1.8z"/><path d="M6.5 9h11"/>',cats:['Drinks','More drinks']},
+  {id:'alcohol',n:'Beer, wine & spirits',ic:'<path d="M8 3h8l-.5 6a3.5 3.5 0 0 1-7 0z"/><path d="M12 12.5V20M8.5 20.5h7"/>',cats:['Beer','Hard seltzer & malt drinks','Wine','Spirits','Cocktails','More cocktails & shots']}];
+const FD_SUB={'Starches & veg':'Starches','More fruit':'Fruit','More dairy':'Dairy','More snacks':'Snacks','Beans, nuts & seeds':'Nuts & seeds','More sauces':'Sauces','More drinks':'Drinks','More cocktails & shots':'Shots','Hard seltzer & malt drinks':'Seltzers'};
+const fdGroupOf=cat=>FD_GROUPS.find(g=>g.cats.includes(cat));
+const FD_ALC=/\b(beer|ale|lager|ipa|stout|wine|vodka|whiskey|whisky|tequila|rum|gin|bourbon|liquor|seltzer|cocktail|margarita|shot|sake|cider|spirit|mimosa|sangria|liqueur|champagne|prosecco)\b/i;
+function foodCheck(fd){if(!fd||fd.k==null)return '';const p=+fd.p||0,c=+fd.c||0,f=+fd.f||0,k=+fd.k||0;
+  if(!fd.noG&&p+c+f>100.5)return 'Protein, carbs and fat add up to more than the food’s weight. Check the label.';
+  const g=fdGroupOf(fd.cat);if((g&&g.id==='alcohol')||FD_ALC.test(fd.name||'')||FD_ALC.test((fd.aliases||[]).join(' ')))return '';
+  const calc=4*p+4*c+9*f;if(Math.abs(k-calc)>Math.max(25,.2*Math.max(k,calc)))return `Calories (${fmt(r0(k))}) and macros (${fmt(r0(calc))} kcal) per 100 g don’t match. Fiber or sugar alcohols can explain it, but check the label.`;
+  return ''}
+let fdTab=null,fdOpen=null,fdSub=null,fdMore=false;
+const fdFavs=()=>S.favFoods||(S.favFoods=[]);
+function fdRecent(){const out=[],seen=new Set();Object.keys(S.days).sort().reverse().slice(0,30).forEach(k=>(S.days[k]||[]).slice().reverse().forEach(e=>{const key=(e.n+'|'+e.a).toLowerCase();if(!seen.has(key)&&out.length<15){seen.add(key);out.push(e)}}));return out}
+const fdMac=(p,c,f)=>`<span class="fd-m"><i style="--c:var(--pro)">${r0(p)}P</i><i style="--c:var(--carb)">${r0(c)}C</i><i style="--c:var(--fat)">${r0(f)}F</i></span>`;
+const FD_PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>';
+function fdFoodRow(fd){const sc=fd.units[fd.def]/100,fl=foodCheck(fd),fav=fdFavs().includes(fd.id);
+  return `<div class="fd-row" data-food="${esc(fd.id)}" role="button" tabindex="0"><span class="fd-t"><b>${fav?'<em class="fd-star" aria-label="Favorite">★</em>':''}${esc(fd.custom?fd.name:cap(fd.name))}${fl?`<em class="fd-flag" title="${esc(fl)}" aria-label="Check this entry">!</em>`:''}</b><span>${esc(servLabel(fd))} · ${fdMac(fd.p*sc,fd.c*sc,fd.f*sc)}</span></span><span class="fd-k num">${fmt(r0(servKcal(fd)))}<small>kcal</small></span><button type="button" class="fd-add" data-qadd="${esc(fd.id)}" aria-label="Log 1 serving of ${esc(fd.name)}">${FD_PLUS}</button></div>`}
+function fdEntryRow(e,i,kind){return `<div class="fd-row" data-fe="${kind}:${i}" role="button" tabindex="0"><span class="fd-t"><b>${esc(e.n)}</b><span>${esc(e.a||'')} · ${fdMac(e.p,e.c,e.f)}</span></span><span class="fd-k num">${fmt(r0(e.k))}<small>kcal</small></span><button type="button" class="fd-add" data-fe-add="${kind}:${i}" aria-label="Log ${esc(e.n)} again">${FD_PLUS}</button></div>`}
+function fdMealRow(m,i){const t=sumEntries(m.items);return `<div class="fd-row" data-meal-i="${i}" role="button" tabindex="0"><span class="fd-t"><b><em class="fd-star">★</em>${esc(m.name)}</b><span>${m.items.length} item${m.items.length===1?'':'s'} · ${fdMac(t.p,t.c,t.f)}</span></span><span class="fd-k num">${fmt(r0(t.k))}<small>kcal</small></span><button type="button" class="fd-add" data-meal-add="${i}" aria-label="Log ${esc(m.name)}">${FD_PLUS}</button></div>`}
+function fdEmpty(t){return `<p class="fd-empty">${t}</p>`}
+function fdLists(){const rec=fdRecent(),fr=quickItems().top,favF=FOODS.filter(f=>fdFavs().includes(f.id)||f.custom);
+  const tabs=[['recent','Recent',rec.length],['fav','Favorites',S.meals.length+favF.length],['freq','Frequent',fr.length]];
+  if(!fdTab)fdTab=rec.length?'recent':(S.meals.length+favF.length)?'fav':'freq';
+  let body='';const cap=fdMore?15:5;
+  if(fdTab==='recent')body=rec.length?rec.slice(0,cap).map((e,i)=>fdEntryRow(e,i,'r')).join(''):fdEmpty('Foods you log show up here for one-tap logging.');
+  if(fdTab==='freq')body=fr.length?fr.slice(0,cap).map((e,i)=>fdEntryRow(e,i,'q')).join(''):fdEmpty('Log a few days and your usual foods appear here.');
+  if(fdTab==='fav'){const rows=[...S.meals.map((m,i)=>fdMealRow(m,i)),...favF.map(fdFoodRow)];body=rows.length?rows.slice(0,fdMore?40:5).join(''):fdEmpty('Tap ☆ on any food, or save a meal from Today, to keep it here.');}
+  const total=fdTab==='recent'?rec.length:fdTab==='freq'?fr.length:S.meals.length+favF.length;
+  return `<section class="fd-card"><div class="seg2 fd-tabs" role="tablist">${tabs.map(([k,l])=>`<button type="button" role="tab" data-ftab="${k}" aria-pressed="${fdTab===k}">${l}</button>`).join('')}</div>
+    <div class="fd-list">${body}</div>${total>5?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show less':`Show all ${Math.min(total,fdTab==='fav'?40:15)}`}</button>`:''}</section>`}
+function fdBrowse(){
+  const grid=FD_GROUPS.map(g=>{const n=BUILTIN.filter(f=>g.cats.includes(f.cat)).length;return `<button type="button" class="fd-cat${fdOpen===g.id?' on':''}" data-fgrp="${g.id}" aria-expanded="${fdOpen===g.id}"><span class="fd-ci"><svg viewBox="0 0 24 24" aria-hidden="true">${g.ic}</svg></span><b>${g.n}</b><span class="num">${n}</span></button>`}).join('');
+  let panel='';const g=FD_GROUPS.find(x=>x.id===fdOpen);
+  if(g){const subs=g.cats.filter(c=>BUILTIN.some(f=>f.cat===c)),lab=c=>FD_SUB[c]||c,uniq=[...new Map(subs.map(c=>[lab(c),c])).keys()];
+    const list=BUILTIN.filter(f=>g.cats.includes(f.cat)&&(!fdSub||lab(f.cat)===fdSub)),cap=fdMore?list.length:12;
+    panel=`<div class="fd-panel"><div class="fd-subs">${['All',...uniq].map(u=>`<button type="button" class="chip" data-fsub="${esc(u)}" aria-pressed="${(fdSub||'All')===u}">${esc(u)}</button>`).join('')}</div>
+      <div class="fd-list">${list.slice(0,cap).map(fdFoodRow).join('')}</div>${list.length>12?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show less':`Show all ${list.length}`}</button>`:''}</div>`}
+  return `<section class="fd-card"><div class="fd-h"><b>Browse</b><span>${fmt(BUILTIN.length)} foods · 6,500+ more in search</span></div><div class="fd-cats">${grid}</div>${panel}</section>`}
+function fdSearch(q){const ql=q.toLowerCase(),words=ql.split(/\s+/).filter(Boolean);
+  const score=f=>{const al=f.aliases;if(al.some(a=>a===ql))return 0;if(al.some(a=>a.startsWith(ql)))return 1;if(al.some(a=>a.includes(ql)))return 2;if(words.every(w=>al.some(a=>a.includes(w))))return 3;return 9};
+  const foods=FOODS.map(f=>[f,score(f)]).filter(x=>x[1]<9).sort((a,b)=>(b[0].custom?1:0)-(a[0].custom?1:0)||a[1]-b[1]||a[0].name.length-b[0].name.length).map(x=>x[0]);
+  const meals=S.meals.map((m,i)=>[m,i]).filter(([m])=>m.name.toLowerCase().includes(ql)||m.items.some(x=>x.n.toLowerCase().includes(ql)));
+  const cap=fdMore?60:12;
+  return `<section class="fd-card"><div class="fd-h"><b>${foods.length+meals.length?`${foods.length+meals.length} result${foods.length+meals.length===1?'':'s'}`:'No matches in your library'}</b><span>for “${esc(q)}”</span></div>
+    <div class="fd-list">${meals.map(([m,i])=>fdMealRow(m,i)).join('')}${foods.slice(0,cap).map(fdFoodRow).join('')}</div>
+    ${foods.length>12?`<button type="button" class="fd-more" data-fmore>${fdMore?'Show fewer':`Show all ${Math.min(foods.length,60)}`}</button>`:''}
+    ${q.length>=2?`<button type="button" class="fd-online" data-olq="${esc(q)}"><span>${GI.book}</span><span><b>Search 6,500+ foods and every brand</b><em>USDA and Open Food Facts for “${esc(q)}”</em></span>${CHEV}</button>`:''}</section>`}
+function renderFoods(){renderTip('foods');const q=$('fSearch').value.trim();$('fClear').hidden=!q;
+  $('fdBody').innerHTML=q?fdSearch(q):`<div class="fd-cols">${fdLists()}${fdBrowse()}</div>`}
+$('fSearch').addEventListener('input',()=>{fdMore=false;renderFoods()});
+$('fClear').onclick=()=>{$('fSearch').value='';fdMore=false;renderFoods();$('fSearch').focus()};
+function fdQuickFood(fd){const e=entryFor(fd,1,fd.def,fd.name);addEntries([e],S.day,S.mealSel)}
+$('v-foods').addEventListener('click',e=>{const t=e.target;
+  const tb=t.closest('[data-ftab]');if(tb){fdTab=tb.dataset.ftab;fdMore=false;return renderFoods()}
+  if(t.closest('[data-fmore]')){fdMore=!fdMore;return renderFoods()}
+  const gp=t.closest('[data-fgrp]');if(gp){fdOpen=fdOpen===gp.dataset.fgrp?null:gp.dataset.fgrp;fdSub=null;fdMore=false;renderFoods();if(fdOpen)setTimeout(()=>{const pn=document.querySelector('.fd-panel');if(pn)pn.scrollIntoView({block:'nearest',behavior:'smooth'})},30);return}
+  const sb=t.closest('[data-fsub]');if(sb){fdSub=sb.dataset.fsub==='All'?null:sb.dataset.fsub;fdMore=false;return renderFoods()}
+  const ol=t.closest('[data-olq]');if(ol)return openOnline(ol.dataset.olq,{mode:'save'});
+  const qa=t.closest('[data-qadd]');if(qa){const fd=FOODS.find(f=>f.id===qa.dataset.qadd);if(fd)fdQuickFood(fd);return}
+  const fa=t.closest('[data-fe-add]');if(fa){const [k,i]=fa.dataset.feAdd.split(':'),src=k==='r'?fdRecent():quickItems().top,en=src[+i];if(en){const {id,t:_t,meal,...x}=en;addEntries([{...x,id:uid(),t:Date.now(),src:x.src==='guess'?'db':x.src}],S.day,S.mealSel)}return}
+  const ma=t.closest('[data-meal-add]');if(ma){const ml=S.meals[+ma.dataset.mealAdd];if(ml)addEntries(mealEntries(ml,1),S.day,S.mealSel);return}
+  const mb=t.closest('[data-meal-i]');if(mb)return openMeal(+mb.dataset.mealI);
+  const fe=t.closest('[data-fe]');if(fe){const [k,i]=fe.dataset.fe.split(':'),src=k==='r'?fdRecent():quickItems().top,en=src[+i];if(en)openLogEntry(en);return}
+  const b=t.closest('[data-food]');if(b){const fd=FOODS.find(f=>f.id===b.dataset.food);if(fd)openLogFood(fd)}});
+$('v-foods').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.fd-row')){e.preventDefault();e.target.click()}});
+function openLogEntry(en){let q=1,meal=S.mealSel;const {id,t:_t,meal:_m,...x}=en;
+  const mkE=()=>({...x,id:uid(),t:Date.now(),src:x.src==='guess'?'db':x.src,a:q===1?x.a:`${r1(q)} × ${x.a}`,g:r1((x.g||0)*q),k:r0(x.k*q),p:r1(x.p*q),c:r1(x.c*q),f:r1(x.f*q)});
+  sheet(`<div><div class="eyebrow">Log again · ${esc(x.a||'')}</div><h3>${esc(x.n)}</h3></div>
+    <div class="fd-qs">${[.5,1,1.5,2].map(v=>`<button type="button" class="chip" data-q="${v}" aria-pressed="${v===1}">${v===.5?'½':v}×</button>`).join('')}</div>
+    <div id="leLive"></div>
+    <div class="field"><label>Meal · ${esc(niceDate(S.day,{weekday:'short',month:'short',day:'numeric'}))}</label>${mealChips('leMeal',meal)}</div>
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="leCancel">Cancel</button><button class="primary" id="leOk">Log it</button></div>`);
+  const upd=()=>{const e=mkE();$('leLive').innerHTML=liveHTML(e.k,e.p,e.c,e.f)};upd();
+  $('sheetRoot').querySelector('.fd-qs').onclick=ev=>{const b=ev.target.closest('[data-q]');if(!b)return;q=+b.dataset.q;$('sheetRoot').querySelectorAll('.fd-qs [data-q]').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));upd()};
+  wireChips('leMeal',m=>meal=m);$('leCancel').onclick=closeSheet;$('leOk').onclick=()=>{const e=mkE();closeSheet();addEntries([e],S.day,meal)}}
 $('newFood').onclick=()=>openManual('',true);
 
 /* ---------- PLAN ---------- */
