@@ -17,7 +17,7 @@ const COL = {ATL: '#E03A3E', BOS: '#2E9E5B', BKN: '#A5A8AC', CHA: '#1D8CAB', CHI
   OKC: '#1D8FD6', ORL: '#1C7FD0', PHI: '#1D6FC4', PHX: '#E56020', POR: '#E03A3E', SAC: '#6F45B8', SAS: '#A7ADB3', TOR: '#CE1141', UTA: '#7B5CC9', WAS: '#E31837'};
 const logoURL = a => `https://a.espncdn.com/combiner/i?img=/i/teamlogos/nba/500/${SLUG[a] || a.toLowerCase()}.png&w=96&h=96`;
 const TLN = (a, cls = '') => { const t = nab(a); return COL[t] ? `<i class="tl ${cls}" style="--tc:${COL[t]}" aria-hidden="true"><img src="${logoURL(t)}" alt="" decoding="async" onerror="this.parentNode.classList.add('nologo')"></i>` : ''; };
-window.TLN = TLN;
+window.TLN = TLN; window.TCOLN = a => COL[nab(a)];
 window.TLS = (sp, a, cls) => sp === 'NBA' ? TLN(a, cls) : (window.TL ? TL(a, cls) : '');
 
 /* ------------------------------------------------------------ markets + stat keys */
@@ -428,7 +428,10 @@ async function playersNBA(){ const m = $('#main'); await Promise.all([loadIndex(
     ${plSeg('NBA')}
     <div class="fld search"><label for="pq2" class="sr">Search NBA players</label>${Icon.svg('search', {size: 18})}<input id="pq2" type="search" autocomplete="off" placeholder="Search any NBA player or team" value="${esc(PL.q)}"></div><div id="pres" class="nb-pres"></div>
     ${games.length ? `<div class="x-shelf"><div class="x-shead"><h2>Playing tonight</h2></div><div class="nb-games">${games.map(g => { const A = nab(g.away.abbr), H = nab(g.home.abbr); return `<button class="nb-gchip" data-nbgm="${esc(A)}|${esc(H)}"><span>${tlN(A, 'xs')}${esc(A)}</span><i>@</i><span>${tlN(H, 'xs')}${esc(H)}</span><small>${esc(kickET(g.kick_utc).replace(' ET', ''))}</small></button>`; }).join('')}</div></div>` : ''}
-    <div class="x-shelf"><div class="x-shead"><h2>Teams</h2></div><div class="x-teams nb-teams">${teams.map(t => `<button class="x-chip" data-nbteam="${esc(t)}" aria-pressed="${PL.team === t}">${tlN(t, 'xs')}<span>${esc(t)}</span></button>`).join('')}</div></div>
+    <div class="x-shelf"><div class="x-shead"><h2>Teams</h2></div>${(() => { const EAST = new Set('ATL BKN BOS CHA CHI CLE DET IND MIA MIL NYK ORL PHI TOR WAS'.split(' '));
+      const tile = t => { const T = TEAMS && TEAMS[t] || {}; return `<button class="tg-t" data-nbteam="${esc(t)}" aria-pressed="${PL.team === t}" style="--tc:${COL[nab(t)] || '#8A8F98'}" aria-label="${esc(T.name || t)}">${tlN(t, 'tg')}<b>${esc(t)}</b><small>${esc(T.short || '')}</small></button>`; };
+      const grp = (h, L) => L.length ? `<div class="tg-grp"><h3 class="tg-h">${h}</h3><div class="tg-row c3">${L.map(tile).join('')}</div></div>` : '';
+      return `<div class="tg">${grp('Eastern Conference', teams.filter(t => EAST.has(t)))}${grp('Western Conference', teams.filter(t => !EAST.has(t)))}</div>`; })()}</div>
     <div class="x-shelf"><button class="x-link" data-more>Settings, how the model works, results</button></div></div>`;
   const out = $('#pres', m), inp = $('#pq2', m);
   const mark = () => $$('[data-nbteam]', m).forEach(b => b.setAttribute('aria-pressed', b.dataset.nbteam === PL.team));
