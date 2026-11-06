@@ -407,6 +407,7 @@ async function tickerLoop(){ clearTimeout(tickerLoop._t); if(document.visibility
   try{ const nfl = INDEX.slates.filter(s => s.sport === 'NFL').sort((a, b) => a.start_utc < b.start_utc ? 1 : -1); const wk = nfl[0] && nfl[0].week;
     for(const s of nfl.filter(s => s.week === wk)) await loadSlate(s.id).catch(() => {});
     const d = SLATE[S.slate] || SLATE[nfl[0] && nfl[0].id]; if(d && (!LV.at || Date.now() - LV.at > 8000)) await livePoll(d); }catch(e){}
+  if(window.WX && (!tickerLoop._wx || Date.now() - tickerLoop._wx > 5 * 60e3)){ tickerLoop._wx = Date.now(); WX.refreshTicker(Object.values(SLATE).filter(d => d && d.sport === 'NFL').flatMap(d => d.games.map(g => ({g, d})))).then(drawTicker).catch(() => {}); }
   drawTicker(); if(window.onLiveTick) onLiveTick(); const live = Object.values(LV.games).some(g => g.state === 'in'); tickerLoop._t = setTimeout(tickerLoop, (live ? 15 : 60) * 1000); }
 function drawTicker(){ const el = $('#tktrack'); if(!el) return; const items = [];
   const G = Object.values(LV.games).sort((a, b) => (a.state === 'in' ? 0 : a.state === 'post' ? 1 : 2) - (b.state === 'in' ? 0 : b.state === 'post' ? 1 : 2));
@@ -414,6 +415,7 @@ function drawTicker(){ const el = $('#tktrack'); if(!el) return; const items = [
   const seen = new Set(); let w = 0, l = 0;
   for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; for(const p of d.props){ if(p.no_prediction || !(p.tier === 'bet' || (pSide(p) || 0) >= .55)) continue; const st = pickState(p); if(!st) continue; const k = p.player + p.market;
     if(seen.has(k)) continue; seen.add(k); if(st.win){ w++; items.push(`<span class="tk tk-win" data-tkp="${esc(p.id)}">✓ ${esc(p.player)} ${esc(selText(p))} · ${ln(st.now)}${p.tier === 'bet' ? ' · BET' : ''}</span>`); } else if(st.loss) l++; } }
+  if(window.WX) items.push(...WX.ticker());
   if(w + l) items.unshift(`<span class="tk tk-sum"><i>MODEL PICKS</i> ${w} cashed · ${l} missed</span>`);
   if(!items.length){ const next = Object.values(LV.games).filter(g => g.state === 'pre').length; items.push(`<span class="tk">No NFL game live${next ? ` · ${next} game${next > 1 ? 's' : ''} still to play this week` : ''} · picks light up here as they cash</span>`); }
   const html = items.join('<span class="tk-dot">•</span>'); if(el.dataset.h === html) return; el.dataset.h = html;

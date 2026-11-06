@@ -1,0 +1,34 @@
+/* tail. weather — tokens only, so it follows whichever colour scheme is active */
+.wx-slot{float:right;margin-left:6px}
+.wx-c{display:inline-flex;align-items:center;gap:2px;font:600 12px/1 var(--f-num);color:var(--t2);white-space:nowrap}
+.wx-c.al{color:var(--live)}
+.x-bt .wx-slot{float:right}
+.wx-card{border-radius:20px;padding:16px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair2);display:grid;gap:10px;margin-bottom:12px}
+.wx-card.soft{background:transparent}
+.wx-card b{font:700 17px/1.2 var(--f-disp)}.wx-card p{margin:0;color:var(--t2);font-size:14.5px;line-height:1.45}
+.wx-big{font-size:36px;line-height:1}
+.wx-top{display:flex;gap:14px;align-items:center}.wx-top>div:last-child{display:grid;gap:4px}.wx-top span{font:500 13px/1.3 var(--f-ui);color:var(--t3)}
+.wx-say{font:600 15px/1.4 var(--f-ui)!important;color:var(--t1)!important}
+.wx-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.wx-stats div{border-radius:12px;padding:10px 8px;background:var(--s2);display:grid;gap:5px}
+.wx-stats small{font:600 11px/1.1 var(--f-ui);color:var(--t3)}.wx-stats b{font:800 18px/1 var(--f-num)}.wx-stats i{font:600 11px/1 var(--f-ui);font-style:normal;color:var(--t3)}
+.wx-ch{width:100%;height:auto;display:block;margin-top:4px}
+.wx-ch .e{font-size:17px;text-anchor:middle}
+.wx-ch .t{font:700 11px var(--f-num);fill:var(--t1);text-anchor:middle}
+.wx-ch .lab{font:600 10.5px var(--f-ui);fill:var(--t3)}
+.wx-ch .pb{fill:#7FA6D9;opacity:.75}.wx-ch .pb.sn{fill:#DDE6F2}
+.wx-ch .v{font:700 9.5px var(--f-num);fill:var(--t2);text-anchor:middle}
+.wx-ch .base{stroke:var(--hair2);stroke-width:1}
+.wx-ch .wl{fill:none;stroke:var(--t1);stroke-width:2;stroke-linejoin:round}
+.wx-ch .gl{fill:none;stroke:var(--t3);stroke-width:1.5;stroke-dasharray:3 3}
+.wx-ch .wd{fill:var(--s0);stroke:var(--t1);stroke-width:1.5}
+.wx-ch .hr{font:600 10px var(--f-ui);fill:var(--t3);text-anchor:middle}
+.wx-ch .kick{stroke:var(--t1);stroke-width:1;stroke-dasharray:2 3;opacity:.6}.wx-ch .kl{font:700 10px var(--f-ui);fill:var(--t1);text-anchor:middle}
+.wx-ch .now{stroke:var(--loss);stroke-width:1.5}.wx-ch .nl{font:800 10px var(--f-ui);fill:var(--loss);text-anchor:middle}
+.wx-src{font:500 11.5px/1.3 var(--f-ui)!important;color:var(--t3)!important}
+.wx-alert{border-radius:16px;padding:12px 14px;margin-bottom:10px;background:var(--live-wash);box-shadow:inset 0 0 0 1px var(--live);display:grid;gap:4px}
+.wx-alert b{font:800 15px/1.2 var(--f-disp);color:var(--live)}.wx-alert span{font:500 13px/1.35 var(--f-ui);color:var(--t1)}
+.wx-note{margin:-4px 0 10px;font:500 13px/1.4 var(--f-ui);color:var(--t3)}
+.wx-li{align-items:flex-start!important;justify-content:flex-start!important}
+.wx-e{font-size:19px;line-height:1;flex:none;min-width:48px;white-space:nowrap}
+.tk-wx{color:var(--t1)}
