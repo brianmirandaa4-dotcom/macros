@@ -974,6 +974,7 @@ header.top .wrap{gap:8px}
 .gym-tl li:not(:last-child)::after{content:"";position:absolute;left:14px;top:38px;bottom:-4px;width:2px;background:var(--line)}
 .gt-ic{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-size:14px;z-index:1}
 .gym-tl li>div{flex:1;min-width:0}.gym-tl b{font-size:14.5px}.gym-tl time{font:600 12.5px var(--f-num);color:var(--muted);white-space:nowrap}
+.gym-tl li>div>.row{flex-wrap:nowrap;align-items:flex-start}.gym-tl li>div>.row b{flex:1;min-width:0}
 .gym-tl p{margin:2px 0 0;font-size:13px;color:var(--muted);line-height:1.4}
 .gym-tl li.now .gt-ic{background:var(--fat);color:#0B0C10;box-shadow:0 0 0 4px color-mix(in srgb,var(--fat) 25%,transparent)}
 .gym-tl li.now b{color:var(--fat)}
@@ -4033,11 +4034,23 @@ function gymSteps(k=todayKey()){const g=gymGet(k);if(!g)return null;const kg=kgN
   const pre=[O(5*kg),O(7*kg)],top=[O(3*kg),O(5*kg)],dur=(+g.min||60)>=45?[4,8]:null,H=3600e3;
   const preGot=ozIn(t0-6*H,t0-H),topGot=ozIn(t0-2.5*H,t0);
   const steps=[
-    {t:t0-4*H,ic:'💧',h:`Pre-load ${pre[0]}–${pre[1]} oz`,b:'About 4 hours before, so your body is topped up and you’ve peed out the extra by go time.',done:preGot>=pre[0],got:preGot},
-    {t:t0-2*H,ic:'🧂',h:`Top up ${top[0]}–${top[1]} oz`,b:'If you haven’t peed much or it’s dark. A salty snack or electrolytes helps you hold onto it.',done:topGot>=top[0]&&preGot>=pre[0]},
-    {t:t0,ic:'🏋️',h:`Go: ${(GYM_KINDS.find(x=>x[0]===g.t)||[,'Training'])[1].toLowerCase()} · ${g.min} min`,b:dur?`Sip ${dur[0]}–${dur[1]} oz every 15–20 min. Lose no more than 2% of body weight (${r1(kg/.4536*.02)} lb).`:'Sip to thirst.',done:now>=t0+(+g.min||60)*60e3},
-    {t:t0+(+g.min||60)*60e3,ic:'🔁',h:'Recover 20–24 oz per lb lost',b:'Over the next couple of hours, with a salty meal or electrolytes.',done:false}];
-  const nxt=steps.findIndex(x=>!x.done&&now<x.t+(x===steps[0]?3*H:x===steps[1]?2*H:x===steps[2]?(+g.min||60)*60e3:4*H));
+    {w:3*H,t:t0-4*H,ic:'💧',h:`Pre-load ${pre[0]}–${pre[1]} oz`,b:'About 4 hours before, so your body is topped up and you’ve peed out the extra by go time.',done:preGot>=pre[0],got:preGot},
+    {w:2*H,t:t0-2*H,ic:'🧂',h:`Top up ${top[0]}–${top[1]} oz`,b:'If you haven’t peed much or it’s dark. A salty snack or electrolytes helps you hold onto it.',done:topGot>=top[0]&&preGot>=pre[0]},
+    {w:(+g.min||60)*60e3,t:t0,ic:'🏋️',h:`Go: ${(GYM_KINDS.find(x=>x[0]===g.t)||[,'Training'])[1].toLowerCase()} · ${g.min} min`,b:dur?`Sip ${dur[0]}–${dur[1]} oz every 15–20 min. Lose no more than 2% of body weight (${r1(kg/.4536*.02)} lb).`:'Sip to thirst.',done:now>=t0+(+g.min||60)*60e3},
+    {w:4*H,t:t0+(+g.min||60)*60e3,ic:'🔁',h:'Recover 20–24 oz per lb lost',b:'Over the next couple of hours, with a salty meal or electrolytes.',done:false}];
+  /* Food around training (ISSN nutrient timing position stand, Kerksick et al. 2017; ACSM/AND/DC 2016):
+     2–3 h before: a real meal, carb-forward, moderate protein, lower fat & fiber so it's digested by go time.
+     30–60 min before: only if that meal was 3+ h ago, a small fast-carb snack.
+     Within ~2 h after: 20–40 g protein (~0.4 g/kg) plus carbs to refill glycogen. */
+  const ents=(S.days[k]||[]),sumIn=(a,b)=>ents.filter(e=>e.t>=a&&e.t<b).reduce((o,e)=>({c:o.c+(+e.c||0),p:o.p+(+e.p||0)}),{c:0,p:0}),end=t0+(+g.min||60)*60e3;
+  const preC=Math.round(kg*1/5)*5,preP=Math.round(kg*.4/5)*5,snC=Math.round(kg*.3/5)*5,postP=Math.min(40,Math.max(20,Math.round(kg*.4/5)*5)),postC=Math.round(kg*.8/5)*5;
+  const preGotF=sumIn(t0-4*H,t0-1.25*H),snackGot=sumIn(t0-1.25*H,t0),postGot=sumIn(end,end+3*H);
+  const ideasPre=g.t==='lift'?'chicken & rice bowl, turkey sandwich + fruit, or oats with whey and a banana':'pasta with lean meat, a bagel with eggs, or rice, chicken and fruit';
+  steps.push({w:1.5*H,t:t0-3*H,ic:'🍚',food:1,h:`Pre-workout meal: ~${preC} g carbs, ~${preP} g protein`,b:`Carb-forward, easy on fat and fiber so it’s digested by ${hhmm(t0)}. Try a ${ideasPre}.`,done:preGotF.c>=preC*.6});
+  steps.push({w:45*60e3,t:t0-45*60e3,ic:'🍌',food:1,h:`Optional: ~${snC} g quick carbs`,b:'Only if your last meal was 3+ hours ago: a banana, rice cakes with honey, or applesauce.',done:snackGot.c>=snC*.6||preGotF.c>=preC*.6});
+  steps.push({w:3*H,t:end+5*60e3,ic:'🥩',food:1,h:`Recovery meal: ${postP} g protein + ~${postC} g carbs`,b:'Within about 2 hours. Protein rebuilds muscle and carbs refill what you burned. Greek yogurt + granola, a burrito bowl, or a shake + bagel all work.',done:postGot.p>=postP*.8});
+  steps.sort((a,b)=>a.t-b.t);
+  const nxt=steps.findIndex(x=>!x.done&&now<x.t+x.w);
   return {g,t0,steps,next:nxt<0?null:steps[nxt],ni:nxt,pre,top}}
 function untilTxt(ms){const d=ms-Date.now(),a=Math.abs(d),h=Math.floor(a/3600e3),m=Math.round(a%3600e3/60e3);const t=h?`${h}h ${m}m`:`${m} min`;return d>=0?`in ${t}`:`${t} ago`}
 function gymCardHTML(k=todayKey(),compact){const G=gymSteps(k);
@@ -4045,8 +4058,8 @@ function gymCardHTML(k=todayKey(),compact){const G=gymSteps(k);
   const now=Date.now(),{g,t0,steps,ni}=G;
   return `<div class="card gym-card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Training ${t0>now?untilTxt(t0):t0+(+g.min||60)*60e3>now?'now':'done'}</div><h2 style="margin:2px 0 0">${hhmm(t0)} · ${(GYM_KINDS.find(x=>x[0]===g.t)||[,'Training'])[1]}</h2></div><button class="link" type="button" data-gymplan>Edit</button></div>
     <ol class="gym-tl">${steps.map((x,i)=>`<li class="${x.done?'done':i===ni?'now':x.t<now?'past':''}"><span class="gt-ic">${x.done?'✓':x.ic}</span><div><div class="row" style="justify-content:space-between;gap:8px"><b>${x.h}</b><time>${hhmm(x.t)}</time></div>${compact&&i!==ni?'':`<p>${x.b}${x.got!=null&&!x.done&&x.got>0?` You’ve had ${fmt(x.got)} oz in that window.`:''}</p>`}</div></li>`).join('')}</ol>
-    ${ni>=0&&ni<2?`<div class="row" style="gap:8px"><button class="primary" type="button" data-gymdrink="${ni===0?G.pre[0]:G.top[0]}">+${ni===0?G.pre[0]:G.top[0]} oz now</button><button class="ghost" type="button" data-gymdrink="8">+8 oz</button></div>`:''}
-    <p class="note" style="margin:0;font-size:12px">From ACSM (2007, 2016) and NATA (2017) hydration guidance.</p></div>`}
+    ${ni>=0&&steps[ni].food?`<div class="row" style="gap:8px"><button class="primary" type="button" data-gymfood>Log it</button><button class="ghost" type="button" data-pg="ideas">Meal ideas that fit</button></div>`:ni>=0&&/^(Pre-load|Top up)/.test(steps[ni].h)?`<div class="row" style="gap:8px"><button class="primary" type="button" data-gymdrink="${steps[ni].h.startsWith('Pre')?G.pre[0]:G.top[0]}">+${steps[ni].h.startsWith('Pre')?G.pre[0]:G.top[0]} oz now</button><button class="ghost" type="button" data-gymdrink="8">+8 oz</button></div>`:''}
+    <p class="note" style="margin:0;font-size:12px">From ACSM (2007, 2016), NATA (2017) and ISSN nutrient-timing (2017) guidance.</p></div>`}
 function openGymPlan(k=todayKey()){const g=gymGet(k)||{},nowH=new Date(),def=g.at||`${String(Math.min(22,nowH.getHours()+2)).padStart(2,'0')}:00`;let t=g.t||'lift',mn=+g.min||60;
   sheet(`<div><div class="eyebrow">Plan today’s session</div><h3>When are you training?</h3><p class="note" style="margin:4px 0 0">Syncope adds it to your water target and tells you when to drink so you show up hydrated.</p></div>
     <div class="field"><label for="gyAt">Time</label><input id="gyAt" type="time" value="${def}" style="font-size:20px;padding:12px 14px"></div>
@@ -4058,6 +4071,7 @@ function openGymPlan(k=todayKey()){const g=gymGet(k)||{},nowH=new Date(),def=g.a
   if($('gyDel'))$('gyDel').onclick=()=>{gymSet(k,null);closeSheet();renderAll();toast('Session removed')};
   $('gyOk').onclick=()=>{const at=$('gyAt').value;if(!at){$('gyAt').focus();return}gymSet(k,{at,t,min:mn});closeSheet();renderAll();const G=gymSteps(k);toast(G&&G.next?`Set. Next: ${esc(G.next.h)} by ${hhmm(G.next.t)}`:'Session planned')}}
 document.addEventListener('click',e=>{if(e.target.closest('[data-gymplan]')){e.preventDefault();openGymPlan()}
+  if(e.target.closest('[data-gymfood]')){setView('today');setTimeout(()=>{const f=$('foodIn');if(f){f.scrollIntoView({block:'center'});f.focus()}},150);return}
   const d=e.target.closest('[data-gymdrink]');if(d){hydAdd(+d.dataset.gymdrink,'water',0,todayKey());renderAll();toast(`+${d.dataset.gymdrink} oz water`)}});
 setInterval(()=>{if(document.visibilityState==='visible'&&gymGet()){if(S.view==='train'||S.view==='today')renderAll()}},60000);
 function hydTypes(k){const d=hydS().day[k]||{};if(Array.isArray(d.types))return {types:d.types.filter(t=>HYD_TYPES.some(x=>x[0]===t&&t!=='rest')),auto:false};
@@ -4365,7 +4379,7 @@ function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayK
   let tr;
   if(S.active&&k===tk)tr={v:'Live',s:esc(S.active.name),fr:.5,go:'train',hot:1};
   else if(done.length||dv.length){const n=done.length+dv.length,m=done.reduce((a,w)=>a+Math.round(((w.end||0)-(w.start||0))/60000),0)+dv.reduce((a,d)=>a+(d.min||0),0);tr={v:'Done',s:`${n>1?n+' sessions':esc((done[0]||dv[0]).name)}${m>0?` · ${m} min`:''}${!done.length?' · '+esc(dv[0].src):''}`,fr:1,go:!done.length&&dv.length===1?'dev:'+dv[0].id:'train'}}
-  else if(k===tk&&gymGet(k)){const G=gymSteps(k);tr={v:hhmm(G.t0),s:G.next&&G.ni<2?`${G.next.h.replace(/^(Pre-load|Top up) /,'Drink ')} by ${hhmm(G.next.t)}`:esc((GYM_KINDS.find(x=>x[0]===G.g.t)||[,'Training'])[1]),fr:0,go:'train'}}
+  else if(k===tk&&gymGet(k)){const G=gymSteps(k);tr={v:hhmm(G.t0),s:G.next&&G.next.t<G.t0?`${G.next.food?G.next.h.replace(/:.*$/,''):G.next.h.replace(/^(Pre-load|Top up) /,'Drink ')} · ${hhmm(G.next.t)}`:esc((GYM_KINDS.find(x=>x[0]===G.g.t)||[,'Training'])[1]),fr:0,go:'train'}}
   else if(nx&&S.templates[nx.i])tr={v:'Start',s:esc(S.templates[nx.i].name),fr:0,go:'start'};
   else tr={v:k===tk?'Start':'Rest',s:k===tk?'Tap to log a workout':'No training logged',fr:0,go:k===tk?'start':'train'};
   const rec=h.recovery,sl=h.sleep;
@@ -5097,12 +5111,14 @@ function myDetail(){
   for(let i=6;i>=0;i--){const d=addDays(tk,-i),t=dayTotals(d),g=goalsFor(d),h=hv(d);
     daily.push({d,k:r0(t.k),p:r0(t.p),c:r0(t.c),f:r0(t.f),gk:goalKcal(g),gp:r0(g.p),gc:r0(g.c),gf:r0(g.f),n:t.n,steps:h.steps??null,sleep:h.sleep??null,rec:h.recovery??null,hrv:h.hrv??null,rhr:h.rhr??null,strain:h.strain??null,w:S.weights[d]??null,...(()=>{const hd=hydDay(d),hp=hydPlan(d);return {ho:hd.oz?r0(hd.oz):(d===tk?0:null),ht:r0(hp.oz.total),na:hd.na?r0(hd.na):null}})()})}
   const foods=(S.days[tk]||[]).slice(0,40).map(e=>({n:e.n,a:e.a,m:e.meal||'snack',k:r0(e.k),p:r0(e.p),c:r0(e.c),f:r0(e.f)}));
+  const A=S.active&&S.active.date===tk?S.active:null,st0=A?new Date(A.start):null;
+  const live=A?[{name:A.name,d:tk,min:Math.round((Date.now()-A.start)/60000),sets:A.ex.reduce((a,y)=>a+(y.sets||[]).filter(z=>z.done).length,0),vol:null,prs:0,kcal:st0.getHours()*60+st0.getMinutes(),strain:null,src:'live',ex:[]}]:[];
   const wks=trainFeed().filter(x=>x.date>=addDays(tk,-6)).slice(0,10).map(x=>{const w=x.log,d=x.dev;
     return {name:w?w.name:d.name,d:x.date,min:w?Math.round((w.end-w.start)/60000):d.min,sets:w?w.ex.reduce((a,y)=>a+y.sets.length,0):null,vol:w?r0(w.ex.reduce((a,y)=>a+y.sets.reduce((b,z)=>b+setVol(z),0),0)):null,prs:w?(w.prs||[]).length:0,kcal:d?d.kcal:null,strain:d?d.strain:null,src:d?d.src:'',
       ex:w?w.ex.map(y=>{const b=y.sets.reduce((a,z)=>e1rm(z.w,z.r)>e1rm(a.w,a.r)?z:a,y.sets[0]);return {n:y.n,sets:y.sets.length,top:b?`${b.w}×${b.r}`:''}}):[]}});
   const pl=S.plan?`${S.plan.type==='cut'?'Cutting':S.plan.type==='bulk'?'Bulking':'Maintaining'}`:'';
   const tpls=S.templates.map(t=>({name:t.name,ex:t.ex.map(n=>{const l=lastFor(n);return {n,m:musOf(n),eq:eqOf(n),s:l&&l.length?`${l.length}×${l[0].r}`:''}})}));
-  return {daily,foods,wks,tpls,plan:pl}}
+  return {daily,foods,wks:[...live,...wks].slice(0,10),tpls,plan:pl}}
 let fpUid=null;
 function openFriend(uid){fpUid=uid;openPage('friend')}
 function ringMini(v,goal,col,size=128,stroke=12){const R=(size-stroke)/2,C=2*Math.PI*R,f=goal?Math.min(1,v/goal):0;
@@ -5135,13 +5151,15 @@ function renderFriendPage(){
       ${isMe?'<button class="plan-pill" data-privacy>Share my calories</button>':''}</div>`}
   {const tiles=[],hx=today.ht!=null?today:null;
     tiles.push(hx?{id:'water',c:'var(--fat)',lab:'Water',v:`${fmt(hx.ho||0)}<small>/${fmt(hx.ht)} oz</small>`,s:(hx.ho||0)>=hx.ht?'Goal hit 🎉':`${fmt(hx.ht-(hx.ho||0))} oz to go`,fr:(hx.ho||0)/hx.ht}:{id:'water',c:'var(--fat)',lab:'Water',v:'—',s:'Not logged yet',fr:0});
-    const tw=(D.wks||[]).filter(w=>w.d===tk);
+    const lv=(D.wks||[]).find(w=>w.src==='live'&&w.d===tk),lvMin=lv?(()=>{const n=new Date(),m=n.getHours()*60+n.getMinutes()-(+lv.kcal||0);return m>=0?m:null})():null;
+    const tw=(D.wks||[]).filter(w=>w.d===tk&&w.src!=='live');
+    if(onW&&lv&&(lvMin==null||lvMin<180))tiles.push({id:'train',c:'var(--pro)',lab:'Training',v:'🔴 Live',s:`${esc(lv.name)}${lvMin!=null?` · ${lvMin} min`:''}${lv.sets?` · ${lv.sets} sets`:''}`,fr:.5,hot:1});else
     tiles.push(!onW?{id:'train',c:'var(--pro)',lab:'Training',v:'🔒',s:'Private',fr:0}:tw.length?{id:'train',c:'var(--pro)',lab:'Training',v:'Done',s:`${esc(tw[0].name)}${tw[0].min?` · ${tw[0].min} min`:''}`,fr:1}:{id:'train',c:'var(--pro)',lab:'Training',v:'Not yet',s:'No workout today',fr:0});
     const r=days.slice().reverse().find(x=>x.rec!=null||x.sleep!=null)||{};
     tiles.push(!onR?{id:'rec',c:'var(--good)',lab:'Recovery',v:'🔒',s:'Private',fr:0}:{id:'rec',c:'var(--good)',lab:'Recovery',v:r.rec!=null?`${r.rec}<small>%</small>`:'—',s:r.sleep!=null?`${r.sleep}h sleep${r.hrv!=null?` · HRV ${r.hrv}`:''}`:'No wearable data',fr:r.rec!=null?r.rec/100:0});
     tiles.push(!onS?{id:'steps',c:'var(--carb)',lab:'Steps',v:'🔒',s:'Private',fr:0}:{id:'steps',c:'var(--carb)',lab:'Steps',v:today.steps!=null?fmt(today.steps):'—',s:today.steps!=null?(today.steps>=10000?'Goal hit 🎉':`${fmt(10000-today.steps)} to 10k`):'No steps yet',fr:today.steps!=null?today.steps/10000:0});
     if(!onR)priv.push('recovery & sleep');if(!onS)priv.push('steps');if(!onW)priv.push('workouts');
-    html+=`<div class="qgrid fp-q">${tiles.map(t=>`<div class="qt" style="--c:${t.c}">${qRing(t.fr,t.c)}<div class="qt-t"><span>${t.lab}</span><b class="num">${t.v}</b><em>${t.s}</em></div></div>`).join('')}</div>`}
+    html+=`<div class="qgrid fp-q">${tiles.map(t=>`<div class="qt${t.hot?' hot':''}" style="--c:${t.c}">${qRing(t.fr,t.c)}<div class="qt-t"><span>${t.lab}</span><b class="num">${t.v}</b><em>${t.s}</em></div></div>`).join('')}</div>`}
   if(!isMe&&!sh.foods)priv.push('food log');
   if(D.foods&&D.foods.length){const by={};D.foods.forEach(x=>(by[x.m]=by[x.m]||[]).push(x));
     html+=`<div class="glabel">What ${isMe?'you':esc(F.name.split(' ')[0])} ate today</div><div class="card fp-foods">${MEALS.filter(([m])=>by[m]).map(([m,l])=>`<div class="fp-meal"><div class="row" style="justify-content:space-between"><b>${l}</b><span class="num">${fmt(by[m].reduce((a,x)=>a+x.k,0))} kcal</span></div>${by[m].map(x=>`<div class="fp-f"><span>${esc(x.n)} <i>${esc(x.a)}</i></span><span class="num">${fmt(x.k)} · <em style="color:var(--pro)">${x.p}P</em> <em style="color:var(--carb)">${x.c}C</em> <em style="color:var(--fat)">${x.f}F</em></span></div>`).join('')}</div>`).join('')}</div>`}
@@ -5154,7 +5172,8 @@ function renderFriendPage(){
   if(sh.nutrition||sh.steps||sh.recovery||isMe){const mx=Math.max(1,...days.map(x=>Math.max(x.k||0,x.gk||0)));
     html+=`<div class="glabel">Last 7 days</div><div class="card"><div class="fp-bars">${days.map(x=>`<div class="fb" title="${x.d}"><div class="fb-c"><i class="g" style="bottom:${(x.gk||0)/mx*100}%"></i><u style="height:${(x.k||0)/mx*100}%;background:${x.k>x.gk*1.1?'var(--over)':x.k>=x.gk*.9?'var(--good)':'var(--kcal)'}"></u></div><span>${DOW[parseKey(x.d).getDay()][0]}</span></div>`).join('')}</div>
       <table class="dtable fp-t"><thead><tr><th>Day</th>${sh.nutrition||isMe?'<th>kcal</th><th style="color:var(--pro)">P</th>':''}${sh.steps||isMe?'<th>Steps</th>':''}${sh.recovery||isMe?'<th style="color:var(--good)">Rec</th><th>Sleep</th>':''}</tr></thead><tbody>${days.slice().reverse().map(x=>`<tr><td>${niceDate(x.d,{weekday:'short',day:'numeric'})}</td>${sh.nutrition||isMe?`<td>${x.k!=null&&x.n?fmt(x.k):'—'}</td><td>${x.p!=null&&x.n?x.p:'—'}</td>`:''}${sh.steps||isMe?`<td>${x.steps!=null?fmt(x.steps):'—'}</td>`:''}${sh.recovery||isMe?`<td>${x.rec!=null?x.rec+'%':'—'}</td><td>${x.sleep!=null?x.sleep+'h':'—'}</td>`:''}</tr>`).join('')}</tbody></table></div>`}
-  if(D.wks&&D.wks.length)html+=`<div class="glabel">Workouts this week</div><div class="fp-wks">${D.wks.map(w=>`<details class="card fp-w"><summary><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(w.name)}${w.prs?` <span class="pr">${w.prs} PR</span>`:''}</b><span>${niceDate(w.d,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.strain!=null?` · strain ${w.strain}`:''}</span></span><span class="gv">${w.vol?fmt(w.vol)+' lb':w.kcal?fmt(w.kcal)+' kcal':''}</span></summary>${w.ex&&w.ex.length?`<ul class="ing">${w.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.sets} sets · top ${esc(e.top)}</b></li>`).join('')}</ul>`:'<p class="note">Watch session, no lifts logged.</p>'}</details>`).join('')}</div>`;
+  const WK=(D.wks||[]).filter(w=>w.src!=='live');
+  if(WK.length)html+=`<div class="glabel">Workouts this week</div><div class="fp-wks">${WK.map(w=>`<details class="card fp-w"><summary><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(w.name)}${w.prs?` <span class="pr">${w.prs} PR</span>`:''}</b><span>${niceDate(w.d,{weekday:'short',month:'short',day:'numeric'})}${w.min?` · ${w.min} min`:''}${w.sets?` · ${w.sets} sets`:''}${w.strain!=null?` · strain ${w.strain}`:''}</span></span><span class="gv">${w.vol?fmt(w.vol)+' lb':w.kcal?fmt(w.kcal)+' kcal':''}</span></summary>${w.ex&&w.ex.length?`<ul class="ing">${w.ex.map(e=>`<li><span>${esc(e.n)}</span><b>${e.sets} sets · top ${esc(e.top)}</b></li>`).join('')}</ul>`:'<p class="note">Watch session, no lifts logged.</p>'}</details>`).join('')}</div>`;
 
   if(!isMe&&D.tpls&&D.tpls.length)html+=`<div class="glabel">${esc(F.name.split(' ')[0])}'s workout templates</div>${D.tpls.map((t,i)=>tplCard(t,F.uid,i)).join('')}`;
   if(priv.length)html+=`<div class="fp-priv">${GI.shield}<span>${isMe?'Hidden from friends':fn+' keeps private'}: ${priv.join(', ')}${isMe?' · <button class="link" data-privacy>Change</button>':''}</span></div>`;
@@ -5877,6 +5896,7 @@ $('trSync').onclick=()=>syncDevices(true);
 
 function startWorkout(name,exNames,prefill,dev){
   if(S.active){toast('Finish or discard your current workout first');setView('train');return}
+  setTimeout(()=>{try{socPush(true)}catch(e){}},1500);
   const T=tplFor(name,exNames),sc=T?{tid:T.id,name}:null;
   S.active={id:'w'+uid(),...(T?{tid:T.id}:{}),name,date:dev?dev.date:todayKey(),start:Date.now(),...(T&&T.rest?{restSec:T.rest,zone:T.zone}:{}),...(dev?{devId:dev.id,wStart:dev.start?Date.parse(dev.start):null,wEnd:dev.start&&dev.min?Date.parse(dev.start)+dev.min*60000:null}:{}),
     ex:exNames.map((n,i)=>{const last=lastFor(n,null,sc),k=prefill&&prefill[n]||last,tg=T&&T.tg&&T.tg[i];
@@ -5956,7 +5976,7 @@ $('trainActive').addEventListener('click',e=>{const a=S.active;if(!a)return;cons
   if(b.dataset.exswap!=null){const i=+b.dataset.exswap;return openExPicker({multi:false,eyebrow:'Swap '+a.ex[i].n,title:'Swap for…',onDone:([n])=>{if(!n)return;a.ex[i].n=n;save();renderActive()}})}
   if(b.id==='wkFinish')return finishWorkout();
   if(b.id==='wkTpl'){const n=a.name.trim()||'Workout',ex=a.ex.map(x=>x.n),src=noteHome(a),nt={};ex.forEach(x=>{const v=exNote(src,x);if(v)nt[noteKey(x)]=v});const i=S.templates.findIndex(t=>t.name.toLowerCase()===n.toLowerCase());if(i>=0){S.templates[i].ex=ex;S.templates[i].notes={...(S.templates[i].notes||{}),...nt}}else S.templates.push({id:'t'+uid(),name:n,ex,notes:nt});save();toast(`Saved template “${esc(n)}”`);return}
-  if(b.id==='wkDiscard'){if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to discard';b.classList.add('armed');return}if(a.orig){S.workouts.push(a.orig);S.workouts.sort((x,y)=>y.end-x.end)}S.active=null;S.rest=null;save();renderTrain();renderRest();toast(a.orig?'Changes discarded':'Workout discarded');return}
+  if(b.id==='wkDiscard'){if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Tap again to discard';b.classList.add('armed');return}if(a.orig){S.workouts.push(a.orig);S.workouts.sort((x,y)=>y.end-x.end)}S.active=null;S.rest=null;save();setTimeout(()=>{try{socPush(true)}catch(e){}},800);renderTrain();renderRest();toast(a.orig?'Changes discarded':'Workout discarded');return}
 });
 /* ---- exercise picker: 400+ lifts, search, filters, favorites, your own ---- */
 const SYN=[[/\bdb\b/g,'dumbbell'],[/\bbb\b/g,'barbell'],[/\bkb\b/g,'kettlebell'],[/\bohp\b/g,'overhead press'],[/\brdl\b/g,'romanian deadlift'],[/\bsldl\b/g,'stiff-leg deadlift'],[/\bhs\b/g,'hammer strength'],
@@ -6035,7 +6055,7 @@ function finishWorkout(){
   const end=a.wEnd||Date.now(),cmin=ex.reduce((t,x)=>t+(x.cardio?x.cardio.min:0),0),st=Math.min(a.wStart||a.start,end-cmin*60000),prs=[];
   ex.forEach(x=>{const top=Math.max(...x.sets.map(s=>e1rm(s.w,s.r)));const prev=bestBefore(x.n,end);if(top>0&&prev>0&&top>prev+0.01)prs.push({n:x.n,e:r1(top),prev:r1(prev)})});
   const wk={id:a.id,...(a.tid?{tid:a.tid}:{}),name:a.name.trim()||'Workout',date:a.date,start:st,end,ex,prs,...(a.devId?{devId:a.devId}:{})};
-  S.workouts.unshift(wk);S.workouts.sort((x,y)=>y.end-x.end);S.active=null;if(S.rest)restPushCancel();S.rest=null;save();renderTrain();renderRest();
+  S.workouts.unshift(wk);S.workouts.sort((x,y)=>y.end-x.end);S.active=null;if(S.rest)restPushCancel();S.rest=null;save();setTimeout(()=>{try{socPush(true)}catch(e){}},800);renderTrain();renderRest();
   const vol=ex.reduce((b,x)=>b+x.sets.reduce((c,s)=>c+setVol(s),0),0),sets=ex.reduce((b,x)=>b+x.sets.length,0),cds=ex.filter(x=>x.cardio),ct=cds.reduce((t,x)=>({min:t.min+x.cardio.min,mi:t.mi+x.cardio.mi,kcal:t.kcal+x.cardio.kcal}),{min:0,mi:0,kcal:0});
   sheet(`<div class="done-hd"><span class="done-badge">${prs.length?'🏆':'✓'}</span><div><div class="eyebrow">Workout complete</div><h3>${prs.length?`${prs.length} new personal record${prs.length>1?'s':''}`:`${esc(wk.name)} done`}</h3></div></div>
     <div class="live"><div style="--c:var(--pro)"><b>${fmtDur(end-st)}</b><span>time</span></div>${sets||!cds.length?`<div style="--c:var(--kcal)"><b>${sets}</b><span>sets</span></div><div style="--c:var(--fat)"><b>${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div>`:`<div style="--c:var(--kcal)"><b>${ct.mi?r1(ct.mi):'—'}</b><span>miles</span></div><div style="--c:var(--fat)"><b>${r0(ct.min)}</b><span>cardio min</span></div>`}<div style="--c:var(--carb)"><b>${cds.length?fmt(ct.kcal):prs.length}</b><span>${cds.length?'cardio kcal':'new PRs'}</span></div></div>
@@ -6279,6 +6299,7 @@ function restArm(){if(!S.rest)return;if(restLockOn())rsCancel();else{rsUnlock();
    The sync server queues one push for the moment your rest ends; skipping or changing the rest replaces it. Free:
    Cloudflare Queues + Web Push, no keys to manage (the server makes its own). iPhone needs Syncope on the Home Screen. */
 function pushOn(){try{return localStorage.getItem('syncope.push')==='1'}catch(e){return false}}
+let pushReady=false;setTimeout(async()=>{try{const c=syncCfg();if(c.url&&c.uid){await api('/api/vapid');pushReady=true;if(S.rest)renderRest()}}catch(e){}},2500);
 const isStandalone=()=>navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
 const isIOS=()=>/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 function u8(b){const s=atob(b.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-b.length%4)%4));return Uint8Array.from(s,c=>c.charCodeAt(0))}
@@ -6311,7 +6332,7 @@ function renderRest(){
     const au=restAudio,playing=au&&!au.paused&&!au.ended;restBuzz();
     if(playing){const ms=Math.round(rsDur()*1000)+400;restTail=Date.now()+ms;setTimeout(()=>{if(restAudio===au)restLockStop()},ms)}else{if(late<4000&&Math.abs(restBeeped-end)>1500)restBeep();restLockStop()}
     toast('Rest is over. Next set!');return}
-  el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button><button data-notify aria-pressed="${pushOn()}" aria-label="Notify me when rest ends" title="Notify me when rest ends" class="rest-lk">${pushOn()?'🔔':'🔕'}</button><button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
+  el.innerHTML=`<span class="eyebrow" style="font-size:10px">Rest</span><b>${clock(left)}</b><button data-adj="-15" aria-label="15 seconds less">−15</button><button data-adj="15" aria-label="15 seconds more">+15</button>${pushReady?`<button data-notify aria-pressed="${pushOn()}" aria-label="Notify me when rest ends" title="Notify me when rest ends" class="rest-lk">${pushOn()?'🔔':'🔕'}</button>`:''}<button data-lock aria-pressed="${restLockOn()}" aria-label="Show timer on lock screen" title="Show on lock screen" class="rest-lk">${restLockOn()?'🔒':'🔓'}</button><button aria-label="Skip rest">Skip</button>`;
 }
 setInterval(()=>{if(S.active&&!S.active.wStart){const t=$('wkTime');if(t)t.textContent=clock(Date.now()-S.active.start)}if(S.rest)renderRest()},1000);
 
