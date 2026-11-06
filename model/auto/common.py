@@ -111,9 +111,17 @@ def write_json(path, obj, compact=False):
     os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path) or '.', suffix='.tmp')
     with os.fdopen(fd, 'w') as f:
-        if compact: json.dump(obj, f, separators=(',', ':'), ensure_ascii=False, default=_default)
-        else: json.dump(obj, f, indent=1, ensure_ascii=False, default=_default)
+        obj = _clean(obj)                                                  # NaN / inf are not JSON: write null
+        if compact: json.dump(obj, f, separators=(',', ':'), ensure_ascii=False, default=_default, allow_nan=False)
+        else: json.dump(obj, f, indent=1, ensure_ascii=False, default=_default, allow_nan=False)
     os.replace(tmp, path)
+
+
+def _clean(o):
+    if isinstance(o, float) and (o != o or o in (float('inf'), float('-inf'))): return None
+    if isinstance(o, dict): return {k: _clean(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)): return [_clean(v) for v in o]
+    return o
 
 
 def _default(o):

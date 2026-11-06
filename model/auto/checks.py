@@ -42,7 +42,7 @@ def check(slate, model_run, prev=None, frozen_gids=()):
         rec = [p for p in ps if p['market'] == 'receptions']
         if rec:
             tot = sum(p['tg_sh'] * p['share_scale'] for p in rec)
-            if tot > 1.0 + 1e-6: F.append(f'I2 {gid} {team}: target shares sum to {tot:.3f} > 1')
+            if tot > 1.0 + 0.0005 * sum(p['tg_sh'] for p in rec) + 1e-9: F.append(f'I2 {gid} {team}: target shares sum to {tot:.4f} > 1')   # share_scale is stored to 3 decimals
         qb = [p for p in ps if p['market'] == 'pass_yds']
         ry = sum(p['mean'] for p in ps if p['market'] == 'rec_yds')     # means already include share_scale (slate.py scales the draws)
         # slate.py tests pre-copula sample means; the stored means come from the copula draws, so allow 2 points of slack

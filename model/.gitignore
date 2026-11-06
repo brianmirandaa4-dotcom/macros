@@ -1,0 +1,5 @@
+# runtime folders of the headless refresh (rebuilt every run; raw nflverse history lives in actions/cache)
+nfl/raw/
+nfl/work/
+nfl/tmp/
+__pycache__/

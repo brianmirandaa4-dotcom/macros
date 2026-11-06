@@ -1,0 +1,11 @@
+# Exact versions the model was built and validated with (Python 3.13). Binary wheels only (pip --only-binary=:all:).
+pandas==3.0.5
+numpy==2.5.3
+scipy==1.18.1
+scikit-learn==1.9.1
+lightgbm==4.7.0
+pyarrow==26.0.1
+joblib==1.6.0
+threadpoolctl==3.7.0
+python-dateutil==2.9.0.post0
+tzdata==2026.6

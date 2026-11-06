@@ -65,12 +65,16 @@ def main():
         entry['errors'].append(f'{type(e).__name__}: {str(e)[:1500]}'); traceback.print_exc(); rc = 1
     entry['duration_s'] = round(time.time() - budget.t0)
     summary(entry)
-    if a.stamp:
+    if a.stamp and a.mode != 'dry-run':
         st = read_json(a.stamp, {}) or {}
         if rc == 0: st['last_refresh_utc'] = entry['ts']
         if a.mode == 'refit':
             st['last_refit_attempt_utc'] = entry['ts']
-            if entry.get('refit', {}).get('decision') in ('promoted', 'kept'): st['last_refit_utc'] = entry['ts']
+            dec = (entry.get('refit') or {}).get('decision')
+            if dec == 'failed': st['refit_failures'] = [t for t in st.get('refit_failures', []) if t >= st.get('last_refit_utc', '')] + [entry['ts']]
+            # promoted / kept are decisions; a crash retries hourly, and after 3 crashes the week counts as decided (live parameters kept)
+            if dec in ('promoted', 'kept') or (dec == 'failed' and len(st.get('refit_failures', [])) >= 3):
+                st['last_refit_utc'] = entry['ts']; st['refit_failures'] = []
         if entry['published']: st['last_commit_utc'] = entry['ts']
         write_json(a.stamp, st)
     out = os.environ.get('GITHUB_OUTPUT')
@@ -150,13 +154,16 @@ def refresh(a, budget, now, entry, stage):
     else:
         run_slates(a, budget, now, entry, stage, W, sch)
     # ---- 7 other outputs
-    if comp['ok']: other_outputs(a, budget, entry, stage, W, man, espn_dir, an_dir)
+    other_outputs(a, budget, entry, stage, W, man, espn_dir, an_dir, stats_ok=comp['ok'])
     write_json(os.path.join(stage, STATE_REL, 'inputs_snapshot.json'), snap, compact=True)
     return finish(a, entry, stage, W)
 
 
 def run_slates(a, budget, now, entry, stage, W, sch):
-    sh([sys.executable, f'{SRC}/slate.py', str(SEASON), str(W)], budget, f'slate.py {SEASON} {W}', cap=1500)
+    try:
+        sh([sys.executable, f'{SRC}/slate.py', str(SEASON), str(W)], budget, f'slate.py {SEASON} {W}', cap=1500)
+    except RuntimeError as e:
+        entry['kept'].append('slates: slate.py failed, every slate keeps its last good version'); entry['errors'].append(str(e)[:1500]); return
     run = read_json(f'{WORK}/slate_{SEASON}_{W:02d}.json')
     entry['sources']['invariants_log'] = (run.get('log') or [])[:30]
     parts = sorted({'thu' if g['weekday'] in ('Wed', 'Thu', 'Fri') else 'sun' for g in sch['games'] if not g['started']})
@@ -184,7 +191,7 @@ def run_slates(a, budget, now, entry, stage, W, sch):
         write_json(ip, idx)
 
 
-def other_outputs(a, budget, entry, stage, W, man, espn_dir, an_dir):
+def other_outputs(a, budget, entry, stage, W, man, espn_dir, an_dir, stats_ok=True):
     env = dict(WMTL_DATA=stage)
     allp = sorted(glob.glob(f'{an_dir}/an_nfl_wk{W:02d}_allprops_*.json'))
     st = (read_json(f'{an_dir}/an_status.json', {}) or {}).get('allprops', '')
@@ -208,7 +215,8 @@ def other_outputs(a, budget, entry, stage, W, man, espn_dir, an_dir):
     else: entry['kept'].append('injuries.json: kept last good (ESPN injuries pull failed)')
     changed = man.get('changed') or []
     missing = not os.path.exists(os.path.join(stage, 'nflp', 'index.json')) or not os.path.exists(os.path.join(stage, 'nfl', f'defense_{SEASON}.json'))
-    if changed or missing or a.offline:
+    if not stats_ok: entry['kept'].append('players / defense exports: nflverse play-by-play incomplete')
+    elif changed or missing or a.offline:
         for s, cap in (('players_export.py', 600), ('defense_export.py', 300)):
             try: sh([sys.executable, f'{SRC}/{s}'], budget, s, env=env, cap=cap)
             except RuntimeError as e: entry['kept'].append(f'{s}: {str(e)[:200]}')

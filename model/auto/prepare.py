@@ -175,17 +175,18 @@ def injuries(week, espn_dir, sched):
     R = pd.read_parquet(f'{RAW}/roster_{SEASON}.parquet', columns=['gsis_id', 'espn_id', 'full_name', 'team', 'position', 'week'])
     R = R[R.espn_id.notna() & R.gsis_id.notna()].sort_values('week').groupby('espn_id').last(); R.index = R.index.astype(str).str.replace(r'\.0$', '', regex=True)
     esp = {}
-    inj = read_json(os.path.join(espn_dir, 'injuries.json'))
+    overlay = os.environ.get('TAIL_INJURY_OVERLAY', '1') != '0'          # 0 = official report only (reproduces the manual v4.1 runs)
+    inj = read_json(os.path.join(espn_dir, 'injuries.json')) if overlay else None
     for r in ((inj or {}).get('nfl') or {}).get('rows', []):
         s = ESPN_STATUS.get(r[4])
         if r[0] and s: esp[str(r[0])] = (s, f'ESPN injuries: {r[4]}')
-    summ = read_json(os.path.join(espn_dir, 'summaries.json'))
+    summ = read_json(os.path.join(espn_dir, 'summaries.json')) if overlay else None
     for g in ((summ or {}).get('games') or {}).values():
         for aid, name, team, status in g.get('statuses', []):
             s = ESPN_STATUS.get(status)
             if aid and s and SEVERITY[s] >= SEVERITY.get((esp.get(str(aid)) or (None,))[0], 0): esp[str(aid)] = (s, f'ESPN game page: {status}')
     cur = I[(I.season == SEASON) & (I.week == week)]
-    off = {r.pid: r.report_status for r in cur.itertuples()}
+    off = {r.pid: (None if pd.isna(r.report_status) else r.report_status) for r in cur.itertuples()}
     changes, add = [], []
     for aid, (s, why) in esp.items():
         if aid not in R.index: continue
@@ -199,7 +200,7 @@ def injuries(week, espn_dir, sched):
         A = pd.DataFrame(add)
         I = pd.concat([I[~((I.season == SEASON) & (I.week == week) & I.pid.isin(set(A.pid)))], A[list(I.columns)]], ignore_index=True)
         I.to_parquet(f'{WORK}/injuries.parquet')
-    final = {r.pid: r.report_status for r in I[(I.season == SEASON) & (I.week == week)].itertuples() if r.team in teams}
+    final = {r.pid: r.report_status for r in I[(I.season == SEASON) & (I.week == week)].itertuples() if r.team in teams and isinstance(r.report_status, str)}
     names = dict(zip(R.gsis_id, R.full_name))
     return dict(espn_rows=len(esp), raised=changes, status={pid: [s, names.get(pid)] for pid, s in final.items()})
 
