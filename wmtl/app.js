@@ -360,10 +360,15 @@ function liveNowHTML(d, only){ const tms = new Set(d.games.flatMap(g => [g.away.
 /* ---------------- In-game model (data/nfl/live_params.json, fit 2018-24, calibrated 2025, validated on 2026) and checkpoint plans */
 let LP = null; async function loadLiveParams(){ if(!LP){ try{ LP = await getJSON('data/nfl/live_params.json'); }catch(e){ LP = {markets: {}}; } } return LP; }
 const LMK = m => m === 'qb_rush' ? 'rush_yds' : m;
-const BKT = d => d <= -14 ? 'down14' : d <= -7 ? 'down7' : d < 7 ? 'close' : d < 14 ? 'up7' : 'up14';
+/* score buckets come from live_params.json (v2: 11 states in 7s to +/-35); v1 files fall back to the 5-bucket rule */
+const BKT1 = [[-999, -14, 'down14'], [-13, -7, 'down7'], [-6, 6, 'close'], [7, 13, 'up7'], [14, 999, 'up14']];
+const BKT = d => { const e = ((LP && LP.buckets) || BKT1).find(([lo, hi]) => d >= lo && d <= hi); return e ? e[2] : 'close'; };
 function liveQ(p, soFar, f, diff){ const M = LP && LP.markets[LMK(p.market)]; if(!M || !M.validated || !isNum(p.projection)) return null;
   const pre = p.projection, r = 1 - f, pace = soFar / Math.max(f, .1), b = BKT(diff), B = M.beta; const ind = k => b === k ? 1 : 0;
-  const x = [pre * r, pace * r, r, r * ind('down14'), r * ind('down7'), r * ind('up7'), r * ind('up14'), pre * r * ind('down14'), pre * r * ind('down7'), pre * r * ind('up7'), pre * r * ind('up14')];
+  /* x order = LP.feature_order: [pre*r, pace*r, r] then each bucket term x each non-close bucket (v2 adds r2 = r*r and pre*r2 = margin x time-left) */
+  const tv = {r, 'pre*r': pre * r, r2: r * r, 'pre*r2': pre * r * r}, bn = (LP.buckets || BKT1).map(e => e[2]).filter(k => k !== 'close');
+  const x = [pre * r, pace * r, r]; for(const t of (LP.version >= 2 ? LP.bucket_terms : ['r', 'pre*r'])) for(const k of bn) x.push(tv[t] * ind(k));
+  if(x.length !== B.length) return null;
   const rem = Math.max(.05, x.reduce((a, v, i) => a + v * B[i], 0)); const T = (1 - f) * 3600;
   const g = String(LP.snapshots_seconds_remaining.reduce((a, s) => Math.abs(s - T) < Math.abs(a - T) ? s : a)); const zq = M.zq[g];
   return {q: zq.map(z => soFar + Math.max(0, rem + z * Math.sqrt(Math.max(rem, .25)))), k: M.k}; }
@@ -372,18 +377,24 @@ function qOver(Q, line){ const L = LP.quantile_levels; const q = Q.q.slice(); fo
   const p = Math.min(.99, Math.max(.01, 1 - F)); const lgt = Math.log(p / (1 - p)); return 1 / (1 + Math.exp(-Q.k * lgt)); }
 const qMed = Q => Q.q[Math.floor(Q.q.length / 2)];
 function checkpointHTML(p){ if(!LP || !LP.markets[LMK(p.market)] || !isNum(p.projection) || !isNum(p.line)) return '';
-  const CK = [[2700, 'End Q1'], [1800, 'Half'], [900, 'End Q3']], SS = [[-14, 'Down 14'], [-7, 'Down 7'], [0, 'Close'], [7, 'Up 7'], [14, 'Up 14']];
-  const rows = CK.map(([T, l]) => { const f = 1 - T / 3600; const onPace = p.projection * f;
-    const cells = SS.map(([dd]) => { const Q = liveQ(p, onPace, f, dd); return Q ? ln(Math.round(qMed(Q) * 10) / 10) : '—'; });
+  const M = LP.markets[LMK(p.market)], CK = [[2700, 'End Q1'], [1800, 'Half'], [900, 'End Q3']];
+  const SS = [[-35, 'Down 35+'], [-28, 'Down 28'], [-21, 'Down 21'], [-14, 'Down 14'], [-7, 'Down 7'], [0, 'Close'], [7, 'Up 7'], [14, 'Up 14'], [21, 'Up 21'], [28, 'Up 28'], [35, 'Up 35+']];
+  const gl = Object.values(LV.games || {}).find(g => g.state === 'in' && (g.home === p.team || g.away === p.team)), curB = gl ? BKT(p.team === gl.home ? gl.hs - gl.as : gl.as - gl.hs) : null;
+  const curT = gl ? CK.reduce((a, c) => Math.abs((1 - gl.f) * 3600 - c[0]) < Math.abs((1 - gl.f) * 3600 - a[0]) ? c : a)[0] : null;
+  let nSame = 0, nSparse = 0;
+  const rows = CK.map(([T, l]) => { const f = 1 - T / 3600; const onPace = p.projection * f; const sp = (M.sparse || {})[T] || [], ind_ = (M.indistinct || {})[T] || [];
+    const cells = SS.map(([dd]) => { const cur = curB && BKT(dd) === curB ? ' cur' : ''; if(sp.includes(dd)){ nSparse++; return `<td class="num na${cur}">—<sup>‡</sup></td>`; }
+      const Q = liveQ(p, onPace, f, dd); if(!Q) return `<td class="num${cur}">—</td>`; const same = dd !== 0 && (ind_.includes(dd) || BKT(dd) === BKT(dd - 7 * Math.sign(dd))); if(same) nSame++;
+      return `<td class="num${cur}">${ln(Math.round(qMed(Q) * 10) / 10)}${same ? '<sup>*</sup>' : ''}</td>`; });
     let need = null; for(let s_ = 0; s_ <= Math.max(3, p.line * 1.5); s_ += (p.market === 'receptions' ? 1 : Math.max(1, Math.round(p.line / 30)))){ const Q = liveQ(p, s_, f, 0); if(Q && qOver(Q, p.line) >= .55){ need = s_; break; } }
-    return `<tr><td>${l}</td><td class="num">${ln(Math.round(onPace * 10) / 10)}</td>${cells.map(c => `<td class="num">${c}</td>`).join('')}<td class="num">${need == null ? '—' : ln(need) + '+'}</td></tr>`; }).join('');
-  return `<section class="sec"><div class="hd"><h2>Checkpoints</h2><span class="sub">in-game model</span></div><div class="tbl"><table><thead><tr><th></th><th>On pace</th>${SS.map(x => `<th>${x[1]}</th>`).join('')}<th>Over needs</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="note">Projected final ${esc(STATWORD[p.market] || p.market_label)} if he is exactly on pregame pace at each checkpoint, by score (his team's view). “Over needs” is the stat he needs by then, in a close game, for the in-game model to give the over ${ln(p.line)} at least 55%.</p></section>`; }
+    return `<tr${T === curT ? ' class="cur"' : ''}><th scope="row">${l}</th><td class="num">${ln(Math.round(onPace * 10) / 10)}</td>${cells.join('')}<td class="num">${need == null ? '—' : ln(need) + '+'}</td></tr>`; }).join('');
+  return `<section class="sec"><div class="hd"><h2>Checkpoints</h2><span class="sub">in-game model${gl ? ' · now highlighted' : ''}</span></div><div class="tbl cpk" tabindex="0" role="region" aria-label="Checkpoint projections by score"><table><thead><tr><th scope="col"></th><th scope="col">On pace</th>${SS.map(x => `<th scope="col"${curB && BKT(x[0]) === curB ? ' class="cur"' : ''}>${x[1]}</th>`).join('')}<th scope="col">Over needs</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="note">Projected final ${esc(STATWORD[p.market] || p.market_label)} if he is exactly on pregame pace at each checkpoint, by score (his team's view; columns are 7-point states, “Close” is within 6). Late blowouts cut the projection more because starters sit. “Over needs” is the stat he needs by then, in a close game, for the in-game model to give the over ${ln(p.line)} at least 55%.${nSame ? ' <sup>*</sup> Not distinguishable from the next state toward Close (game bootstrap).' : ''}${nSparse ? ' <sup>‡</sup> Too few past games in this state at this point (under 30), so no number.' : ''} Swipe for more scores.</p></section>`; }
 
 
 function watchPlansHTML(d){ if(!LP || !LP.markets) return ''; const ps = d.props.filter(p => !p.no_prediction && isNum(p.line) && isNum(p.projection) && LP.markets[LMK(p.market)] && (p.tier === 'bet' || p.tier === 'lean' || (pSide(p) || 0) >= .58)).sort((a, b) => (b.tier === 'bet') - (a.tier === 'bet') || (pSide(b) || 0) - (pSide(a) || 0)).slice(0, 12);
   if(!ps.length) return ''; return `<div class="list">${ps.map(p => { const f = .5, onP = p.projection * f; const Q0 = liveQ(p, onP, f, 0); let need = null; for(let s_ = 0; s_ <= Math.max(3, p.line * 1.5); s_ += (p.market === 'receptions' ? 1 : Math.max(1, Math.round(p.line / 30)))){ const Q = liveQ(p, s_, f, 0); if(Q && qOver(Q, p.line) >= .55){ need = s_; break; } }
-    return `<button class="row" data-prop="${esc(p.id)}"><div><div class="nm">${esc(p.player)} · ${esc(selText(p))}</div><div class="mt">${teamOpp(p)} · proj ${ln(p.projection)} · at half on pace ${ln(Math.round(onP * 10) / 10)}${need != null ? ` · over live at ${ln(need)}+ by half` : ''}</div></div><div class="rt">${p.tier === 'bet' ? '<span class="pill pill-bet">Bet</span>' : `<span class="sub">${pc(pSide(p))}</span>`}</div></button>`; }).join('')}</div><p class="note">Tap a player for the full checkpoint table (end Q1, half, end Q3 × down 14 to up 14).</p>`; }
+    return `<button class="row" data-prop="${esc(p.id)}"><div><div class="nm">${esc(p.player)} · ${esc(selText(p))}</div><div class="mt">${teamOpp(p)} · proj ${ln(p.projection)} · at half on pace ${ln(Math.round(onP * 10) / 10)}${need != null ? ` · over live at ${ln(need)}+ by half` : ''}</div></div><div class="rt">${p.tier === 'bet' ? '<span class="pill pill-bet">Bet</span>' : `<span class="sub">${pc(pSide(p))}</span>`}</div></button>`; }).join('')}</div><p class="note">Tap a player for the full checkpoint table (end Q1, half, end Q3 × down 35 to up 35).</p>`; }
 
 
 /* ---------------- Bet progress: faded bar behind every pick toward its line; green CASHED when it hits, red when an under is blown */

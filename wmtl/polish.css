@@ -58,3 +58,32 @@
 /* no phantom gaps from empty slots */
 #wx-watch:empty,#x-livehero-slot:empty,[id$="-slot"]:empty{display:none}
 .x-home{gap:24px!important}
+
+/* checkpoints */
+/* 11 score states + On pace + Over needs: horizontal scroll, sticky checkpoint column, live state highlighted */
+.sec .tbl.cpk{background:var(--s1);border-radius:var(--r16);overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:16px}
+.sec .tbl.cpk::-webkit-scrollbar{display:none}
+.sec .tbl.cpk:focus-visible{outline:2px solid var(--act);outline-offset:2px}
+.sec .tbl.cpk table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0}
+.sec .tbl.cpk th,.sec .tbl.cpk td{padding:10px 8px;min-width:48px;text-align:right;white-space:nowrap}
+.sec .tbl.cpk thead th{font:600 var(--fs-11)/1.1 var(--f-ui);letter-spacing:var(--track-label);color:var(--t3);background:var(--s1)}
+.sec .tbl.cpk tr>:first-child{position:sticky;left:0;z-index:2;min-width:0;text-align:left;white-space:nowrap;padding-left:var(--sp4);padding-right:10px;background:var(--s1);box-shadow:inset -1px 0 0 var(--hair2),inset 0 .5px 0 var(--hair)}
+.sec .tbl.cpk thead tr>:first-child{z-index:3;box-shadow:inset -1px 0 0 var(--hair2)}
+.sec .tbl.cpk tbody th{font:600 var(--fs-13)/1.2 var(--f-ui);color:var(--t2);letter-spacing:0;text-transform:none}
+.sec .tbl.cpk td:nth-child(2),.sec .tbl.cpk thead th:nth-child(2){color:var(--t2)}
+.sec .tbl.cpk td:last-child,.sec .tbl.cpk thead th:last-child{box-shadow:inset 1px 0 0 var(--hair2),inset 0 .5px 0 var(--hair);color:var(--t1)}
+.sec .tbl.cpk td.na{color:var(--t3)}
+.sec .tbl.cpk sup{font:600 9px/0 var(--f-ui);color:var(--t3);margin-left:1px;vertical-align:super}
+.sec .tbl.cpk .cur{background:var(--live-wash);color:var(--t1)}
+.sec .tbl.cpk thead th.cur{color:var(--live)}
+.sec .tbl.cpk tr.cur>th{color:var(--live)}
+.sec .tbl.cpk tr.cur td.cur{font-weight:800;color:var(--live);box-shadow:inset 0 0 0 1.5px var(--live);border-radius:8px}
+
+/* player card: chart labels never sit on the line; model box on one clean grid */
+.x-chart .v,.x-chart .lt{paint-order:stroke;stroke:var(--s1);stroke-width:5px;stroke-linejoin:round}
+.x-hit .x-chart .v{font-weight:800}
+.x-take:not(.off){grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px 10px!important;padding:14px 16px!important}
+.x-take:not(.off)>div{min-width:0}
+.x-take:not(.off) b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.x-take .x-go{grid-column:1/-1;display:flex;align-items:center;justify-content:center;min-height:40px;margin-top:2px;border-radius:12px;box-shadow:inset 0 0 0 1px var(--hair2);font:700 14px/1 var(--f-ui)!important;color:var(--t1)!important}
+.x-take .x-go::after{content:" ›";margin-left:4px;color:var(--t3)}
