@@ -920,6 +920,8 @@ header.top .wrap{gap:8px}
 .dz-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;flex-wrap:wrap}.dz-h b{white-space:nowrap}.dz-h span{color:var(--muted);font-size:12px}
 .live.l3{grid-template-columns:repeat(3,minmax(0,1fr))}.dz{display:flex;flex-direction:column;gap:8px}.dz-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px}.dz-bar i{display:block;min-width:3px}.dz-k{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--muted)}.dz-k span{display:inline-flex;align-items:center;gap:5px}.dz-k u{width:8px;height:8px;border-radius:50%;display:inline-block}
 .safe-pill{border-color:color-mix(in srgb,var(--good) 45%,transparent);color:var(--good)}
+.fp-heroC .hm-g{white-space:nowrap;font-size:12px}
+.fp-locked .hv-big b{font-size:44px;opacity:.85}.fp-locked .hv-sub{font-family:var(--f-body)}
 .fp-hyd{display:flex;flex-direction:column;gap:10px}.fp-hyd .fp-m span svg{width:15px;height:15px;vertical-align:-2px;color:var(--fat)}.fp-hb{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.fp-hb div{display:flex;flex-direction:column;align-items:center;gap:4px}.fp-hb i{display:block;width:100%;max-width:26px;height:46px;border-radius:7px;background:var(--surface-2);position:relative;overflow:hidden}.fp-hb u{position:absolute;left:0;right:0;bottom:0;border-radius:7px}.fp-hb span{font-size:11px;color:var(--muted)}
 .fp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fp-tiles .tile{padding:12px}.fp-tiles .v{font-size:20px}
 .fp-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:120px;margin-bottom:14px}
@@ -2430,7 +2432,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.44';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.45';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4825,7 +4827,11 @@ function renderFriendPage(){
       <div class="gauge ${ov?'over':''}">${gaugeSVG(t,gk)}<div class="c"><b class="num">${pc}</b><span>%</span></div></div></div>
       <div class="hv-mac">${mac('Protein',t.p,today.gp,'--pro','p')}${mac('Carbs',t.c,today.gc,'--carb','c')}${mac('Fat',t.f,today.gf,'--fat','f')}</div></div>`
       :`<div class="card fp-empty"><b>${fn==='You'?'You haven’t':fn+' hasn’t'} logged anything yet today</b><span>Their numbers show up here as soon as they do.</span></div>`}
-  else priv.push('calories & macros');
+  else{priv.push('calories & macros');
+    html+=`<div class="card hero v2 fp-heroC fp-locked"><div class="hv-top"><div class="hv-l"><div class="eyebrow">Left today</div><div class="hv-big"><b class="num">🔒</b></div><div class="hv-sub">${fn} keeps calories private</div></div>
+      <div class="gauge">${gaugeSVG({k:0,p:0,c:0,f:0},1)}<div class="c"><b class="num">—</b></div></div></div>
+      <div class="hv-mac">${['Protein','Carbs','Fat'].map((l,i)=>`<div class="hm" style="--c:var(${['--pro','--carb','--fat'][i]})"><div class="hm-n">${l}</div><div class="hm-v num"><b>—</b></div><div class="bar"><i style="width:0"></i></div><div class="hm-g">Private</div></div>`).join('')}</div>
+      ${isMe?'<button class="plan-pill" data-privacy>Share my calories</button>':''}</div>`}
   {const tiles=[],hx=today.ht!=null?today:null;
     tiles.push(hx?{id:'water',c:'var(--fat)',lab:'Water',v:`${fmt(hx.ho||0)}<small>/${fmt(hx.ht)} oz</small>`,s:(hx.ho||0)>=hx.ht?'Goal hit 🎉':`${fmt(hx.ht-(hx.ho||0))} oz to go`,fr:(hx.ho||0)/hx.ht}:{id:'water',c:'var(--fat)',lab:'Water',v:'—',s:'Not logged yet',fr:0});
     const tw=(D.wks||[]).filter(w=>w.d===tk);
