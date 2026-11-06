@@ -291,7 +291,7 @@ async function syncWhoop(user, env, days) {
     const sc = w.score || {};
     return { src: 'WHOOP', id: 'whoop-' + w.id, date: localDate(w.start, w.timezone_offset), name: w.sport_name ? titleCase(w.sport_name) : 'Workout',
       start: w.start, min: w.end ? Math.round((Date.parse(w.end) - Date.parse(w.start)) / 60000) : null,
-      kcal: sc.kilojoule != null ? Math.round(sc.kilojoule / 4.184) : null, strain: sc.strain != null ? r1(sc.strain) : null, avgHr: sc.average_heart_rate || null, maxHr: sc.max_heart_rate || null, zones: sc.zone_durations ? ['zero', 'one', 'two', 'three', 'four', 'five'].map(z => Math.round((sc.zone_durations['zone_' + z + '_milli'] || 0) / 60000)) : null, mi: sc.distance_meter ? r1(sc.distance_meter / 1609.34) : null };
+      kcal: sc.kilojoule != null ? Math.round(sc.kilojoule / 4.184) : null, strain: sc.strain != null ? r1(sc.strain) : null, avgHr: sc.average_heart_rate || null, maxHr: sc.max_heart_rate || null, zones: sc.zone_durations ? ['zero', 'one', 'two', 'three', 'four', 'five'].map(z => Math.round((sc.zone_durations['zone_' + z + '_milli'] || 0) / 60000)) : null, mi: sc.distance_meter ? r1(sc.distance_meter / 1609.34) : null, elev: sc.altitude_gain_meter ? Math.round(sc.altitude_gain_meter * 3.281) : null };
   }).filter(w => w.date);
   return { days: clean(byDay), workouts };
 }
@@ -377,7 +377,7 @@ async function syncOura(user, env, days) {
   for (const x of spo) if (x.day && x.spo2_percentage?.average != null) d(x.day).spo2 = r1(x.spo2_percentage.average);
   const workouts = wko.map(w => ({ src: 'Oura', id: 'oura-' + w.id, date: w.day || (w.start_datetime || '').slice(0, 10), name: w.activity ? titleCase(w.activity) : 'Workout',
     start: w.start_datetime, min: w.end_datetime && w.start_datetime ? Math.round((Date.parse(w.end_datetime) - Date.parse(w.start_datetime)) / 60000) : null,
-    kcal: w.calories != null ? Math.round(w.calories) : null, intensity: w.intensity || null })).filter(w => w.date);
+    kcal: w.calories != null ? Math.round(w.calories) : null, intensity: w.intensity || null, mi: w.distance ? r1(w.distance / 1609.34) : null })).filter(w => w.date);
   return { days: clean(byDay), workouts, errors: errs };
 }
 const titleCase = (s) => String(s).replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -453,7 +453,7 @@ async function syncGarmin(user, env, days) {
   const workouts = list.map(a => ({ src: 'Garmin', id: 'garmin-' + a.activityId, date: String(a.startTimeLocal || a.startTimeGMT || '').slice(0, 10),
     name: a.activityName || titleCase(a.activityType && a.activityType.typeKey || 'Activity'), type: a.activityType && a.activityType.typeKey || null,
     start: a.startTimeLocal || null, min: a.duration ? Math.round(a.duration / 60) : null, kcal: a.calories ? Math.round(a.calories) : null,
-    avgHr: a.averageHR || null, maxHr: a.maxHR || null, sets: a.totalSets || a.activeSets || null, reps: a.totalReps || null, zones: a.hrTimeInZone_1 != null ? [0, 1, 2, 3, 4, 5].map(i => i ? Math.round((a['hrTimeInZone_' + i] || 0) / 60) : 0) : null, mi: a.distance ? r1(a.distance / 1609.34) : null })).filter(w => /^\d{4}-\d{2}-\d{2}$/.test(w.date));
+    avgHr: a.averageHR || null, maxHr: a.maxHR || null, sets: a.totalSets || a.activeSets || null, reps: a.totalReps || null, zones: a.hrTimeInZone_1 != null ? [0, 1, 2, 3, 4, 5].map(i => i ? Math.round((a['hrTimeInZone_' + i] || 0) / 60) : 0) : null, mi: a.distance ? r1(a.distance / 1609.34) : null, elev: a.elevationGain ? Math.round(a.elevationGain * 3.281) : null, te: a.aerobicTrainingEffect ? r1(a.aerobicTrainingEffect) : null, steps: a.steps || null })).filter(w => /^\d{4}-\d{2}-\d{2}$/.test(w.date));
   const errors = Object.entries({ summaries: sum, sleep: slp, hrv, bodyBattery: bb, activities: acts, weight: wt, steps: st1 }).filter(([, v]) => v && v.__error).map(([k, v]) => k + ': ' + v.__error);
   return { days: clean(byDay), workouts, errors };
 }

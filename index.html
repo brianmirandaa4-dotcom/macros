@@ -864,7 +864,15 @@ details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:c
 .fp-foods{display:flex;flex-direction:column;gap:14px}.fp-meal b{font-family:var(--f-display)}
 .fp-f{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--line)}.fp-f:last-child{border-bottom:0}
 .fp-f i{color:var(--muted);font-style:normal;font-size:12px}.fp-f em{font-style:normal;font-size:12px}
+.srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
+.wear-g{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;margin-right:6px}
+.srcrow{display:inline-flex;flex-wrap:wrap;gap:6px}
+.wn-src .srcb{margin-left:4px}
+.dz-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;flex-wrap:wrap}.dz-h b{white-space:nowrap}.dz-h span{color:var(--muted);font-size:12px}
 .live.l3{grid-template-columns:repeat(3,minmax(0,1fr))}.dz{display:flex;flex-direction:column;gap:8px}.dz-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;gap:2px}.dz-bar i{display:block;min-width:3px}.dz-k{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--muted)}.dz-k span{display:inline-flex;align-items:center;gap:5px}.dz-k u{width:8px;height:8px;border-radius:50%;display:inline-block}
+.safe-pill{border-color:color-mix(in srgb,var(--good) 45%,transparent);color:var(--good)}
 .fp-hyd{display:flex;flex-direction:column;gap:10px}.fp-hyd .fp-m span svg{width:15px;height:15px;vertical-align:-2px;color:var(--fat)}.fp-hb{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.fp-hb div{display:flex;flex-direction:column;align-items:center;gap:4px}.fp-hb i{display:block;width:100%;max-width:26px;height:46px;border-radius:7px;background:var(--surface-2);position:relative;overflow:hidden}.fp-hb u{position:absolute;left:0;right:0;bottom:0;border-radius:7px}.fp-hb span{font-size:11px;color:var(--muted)}
 .fp-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.fp-tiles .tile{padding:12px}.fp-tiles .v{font-size:20px}
 .fp-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:120px;margin-bottom:14px}
@@ -2372,7 +2380,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.37';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.38';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2592,7 +2600,7 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
       <div class="gauge ${over?'over':''}">${gaugeSVG(t,gk)}<div class="c"><b class="num" data-cu="pct" data-v="${pct}">${pct}</b><span>%</span></div></div></div>
     <div class="hv-mac">${mac('p','Protein',t.p,g.p,'--pro')}${mac('c','Carbs',t.c,g.c,'--carb')}${mac('f','Fat',t.f,g.f,'--fat')}</div>
     <div class="hv-pills">${!t.k?`<span class="note" style="margin:0">Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate or drank below.</span>`:''}
-    ${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · training</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of}`}</button>`:g.starter?`<button class="plan-pill" data-goto="plan">Starter targets · build your plan</button>`:''}</div>`;
+    ${g.safe?`<button class="plan-pill safe-pill" data-safe>Raised to ${fmt(g.safe.to)} kcal · safe minimum</button>`:''}${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · training</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of}`}</button>`:g.starter?`<button class="plan-pill" data-goto="plan">Starter targets · build your plan</button>`:''}</div>`;
   animateHero(k);
   $('mealPick').innerHTML=MEALS.map(([m,l])=>`<button type="button" class="chip" data-meal="${m}" aria-pressed="${S.mealSel===m}">${l}</button>`).join('');
   const list=S.days[k]||[], prev=S.days[addDays(k,-1)]||[];
@@ -3005,16 +3013,19 @@ function buildPlan(p){
   const sign=p.type==='cut'?-1:p.type==='bulk'?1:0, lbs=sign?Math.abs(p.lbs):0, male=p.sex==='m';
   const breaks=sign<0&&p.breaks==='on'&&N>=10, isBreak=i=>breaks&&(i+1)%9===0&&i<N-1;
   let nDiet=0;for(let i=0;i<N;i++)if(!isBreak(i))nDiet++;
-  const avgDaily=sign*lbs*3500/(nDiet*7), floor=male?1500:1200, kg=x=>x*.4536;
+  const avgDaily=sign*lbs*3500/(nDiet*7), kg=x=>x*.4536, teen=p.age&&p.age<18;
   let w=p.wt, lbm=p.bf>0?kg(p.wt)*(1-p.bf/100):null, fatLb=p.bf>0?p.wt*p.bf/100:null;
   const weeks=[];let capped=false,lowCarb=false,carbHold=null,dIdx=0;
   for(let i=0;i<N;i++){
     const brk=isBreak(i), tdee=bmrAt(p,w,lbm)*+p.act;
     const r=(p.style==='gradual'&&nDiet>1)?0.5+dIdx/(nDiet-1):1;
     let adj=brk?0:avgDaily*r;
-    if(sign<0&&adj<-Math.min(1000,tdee*.3)){adj=-Math.min(1000,tdee*.3);capped=true}
+    // cut limits: ≤25% below maintenance, ≤1% of body weight a week, never under resting burn or the 1,200/1,500 floor, no deficit under 18
+    const maxDef=teen?0:Math.min(1000,tdee*.25,w*.01*3500/7);
+    if(sign<0&&adj<-maxDef){adj=-maxDef;capped=true}
     if(sign>0&&adj>Math.min(750,tdee*.25)){adj=Math.min(750,tdee*.25);capped=true}
-    let kcal=tdee+adj;if(kcal<floor){kcal=floor;adj=kcal-tdee;capped=true}
+    const floor=Math.max(male?1500:1200,bmrAt(p,w,lbm));
+    let kcal=tdee+adj;if(sign<0&&kcal<floor){kcal=Math.min(tdee,floor);adj=kcal-tdee;capped=true}
     kcal=Math.round(kcal/10)*10;
     const t=N>1?i/(N-1):0, dfrac=Math.min(1,Math.abs(adj)/(.3*tdee));
     let pro;
@@ -3061,8 +3072,29 @@ function planInfo(k){
   const T=pl.T||pl.weeks.length, i=Math.floor((parseKey(k)-parseKey(pl.start))/(7*864e5));
   return {i,done:i>=T,rec:i>=pl.N&&i<T,wk:pl.weeks[Math.min(i,T-1)]};
 }
-function goalsFor(k){const g=goalsBase(k),f=trainFuel(k);return f?{...g,c:g.c+f.c,fuel:f}:g}
-function goalsBase(k){
+function goalsFor(k){const g=goalsBaseRaw(k),f=trainFuel(k);return applySafe(f?{...g,c:g.c+f.c,fuel:f}:g,k)}
+/* ---- safety net: nobody is told to eat too little ----
+   Evidence: deficits above ~25% of maintenance or ~1% of body weight a week cost lean mass (Helms 2014; Garthe 2011;
+   Murphy & Koehler 2022). Energy availability under 30 kcal per kg of fat-free mass disrupts hormones, bone and
+   periods, especially in women (Loucks 2011; IOC REDs consensus 2023). Intake below resting metabolic rate or
+   1,200 kcal (women) / 1,500 kcal (men) is below what clinical guidelines use without medical supervision (NIH/NHLBI).
+   Under 18: no deficit at all (AAP). */
+function safeFloor(k){const c=S.calc||{};if(!c.age||!c.ht)return null;
+  const lw=latestWeight(),wt=(lw&&lw.w)||c.wt;if(!wt)return null;
+  const male=c.sex==='m',kgW=wt*.4536,cm=c.ht*2.54,lbm=c.bf>0&&c.bf<70?kgW*(1-c.bf/100):null;
+  const bmr=bmrAt({...c},wt,lbm),tdee=bmr*(+c.act||1.375);
+  const ffm=lbm||(male?.407*kgW+.267*cm-19.2:.252*kgW+.473*cm-48.3); // Boer fat-free mass when no body fat %
+  const ex=((S.dev&&S.dev.workouts)||[]).filter(w=>w.date===k&&w.kcal>0).reduce((a,w)=>a+Math.max(0,w.kcal-kgW*(w.min||0)/60),0);
+  const parts=[['basic',male?1500:1200],['rest',bmr],['deficit',tdee*.75],['energy',30*ffm+ex]];
+  if(c.age<18)parts.push(['teen',tdee]);
+  const [why,kc]=parts.reduce((a,b)=>b[1]>a[1]?b:a);
+  return {k:Math.round(kc/10)*10,why,bmr:Math.round(bmr),tdee:Math.round(tdee/10)*10}}
+const SAFE_WHY={basic:'the 1,200 kcal (women) / 1,500 kcal (men) minimum health guidelines use without a doctor',rest:'your resting burn, what your body uses just to keep you alive',deficit:'the safe limit of 25% under your maintenance, the most that protects muscle',energy:'what your body needs on training days to keep hormones, bones and periods healthy',teen:'your maintenance, and under 18 Syncope never sets a deficit'};
+function applySafe(g,k){const f=safeFloor(k);if(!f)return g;const kc=g.p*4+g.c*4+g.f*9;if(kc>=f.k-5)return g;
+  const add=f.k-kc,fAdd=Math.min(add*.3,Math.max(0,f.k*.25/9-g.f)*9);
+  return {...g,c:r0(g.c+(add-fAdd)/4),f:r0(g.f+fAdd/9),safe:{from:r0(kc),to:f.k,why:f.why,tdee:f.tdee}}}
+function goalsBase(k){return applySafe(goalsBaseRaw(k),k)}
+function goalsBaseRaw(k){
   const pi=planInfo(k);
   if(pi){if(pi.done)return {...S.plan.after,plan:true,after:true};
     return {p:pi.wk.p,c:pi.wk.c,f:pi.wk.f,plan:true,week:pi.i+1,of:S.plan.N,ph:pi.wk.ph,rec:pi.rec,rw:pi.i-S.plan.N+1,rf:pi.wk.rf}}
@@ -3085,12 +3117,17 @@ function trainFuel(k){
 function openFuel(){
   const g=goalsFor(S.day),f=g.fuel;if(!f)return;
   sheet(`<div><div class="eyebrow">Fuel for training</div><h3>+${f.c} g carbs today</h3></div>
-    <ul class="ml-items">${f.ws.map(w=>`<li><span>${esc(w.name)} <span class="dim">· ${esc(w.src)}${w.min?` · ${w.min} min`:''}</span></span><span class="num">${fmt(w.kcal)} kcal</span></li>`).join('')}</ul>
+    <ul class="ml-items">${f.ws.map(w=>`<li><span>${esc(w.name)} ${srcBadge(w.src)}<span class="dim">${w.min?` · ${w.min} min`:''}</span></span><span class="num">${fmt(w.kcal)} kcal</span></li>`).join('')}</ul>
     <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Syncope adds back ${f.pct}% of the rest as carbs, which refill the glycogen your training used. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="fuSet">Change in Settings</button><button class="primary" id="fuOk">Got it</button></div>`);
   $('fuOk').onclick=closeSheet;$('fuSet').onclick=()=>{closeSheet();openPage('prefs')};
 }
-document.addEventListener('click',e=>{if(e.target.closest('[data-fuel]'))openFuel()});
+document.addEventListener('click',e=>{if(e.target.closest('[data-fuel]'))openFuel();if(e.target.closest('[data-safe]'))openSafe()});
+function openSafe(){const g=goalsFor(S.day),s=g.safe;if(!s)return;
+  sheet(`<div><div class="eyebrow">Eating enough</div><h3>${fmt(s.to)} kcal is your floor</h3></div>
+    <p class="note">Your plan asked for ${fmt(s.from)} kcal, which is below ${SAFE_WHY[s.why]||'a safe minimum'}. Syncope raised it to <b>${fmt(s.to)} kcal</b> (your maintenance is about ${fmt(s.tdee)}). You'll still lose fat, just with your muscle, energy and health protected.</p>
+    <p class="note" style="margin:0">Syncope never sets a target below your resting burn, more than 25% under maintenance, more than 1% of body weight a week, or under 1,200 kcal (women) / 1,500 (men). Talk to a doctor or dietitian before eating less than this.</p>
+    <div class="row" style="justify-content:flex-end"><button class="primary" id="sfOk">Got it</button></div>`);$('sfOk').onclick=closeSheet}
 function rangeGoal(keys){const gs=keys.map(goalsFor),n=gs.length||1;return {p:gs.reduce((a,g)=>a+g.p,0)/n,c:gs.reduce((a,g)=>a+g.c,0)/n,f:gs.reduce((a,g)=>a+g.f,0)/n}}
 function wAvg(k){const v=[...Array(7)].map((_,j)=>S.weights[addDays(k,-j)]).filter(x=>x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null}
 function latestWeight(){const ks=Object.keys(S.weights).sort();return ks.length?{k:ks[ks.length-1],w:S.weights[ks[ks.length-1]]}:null}
@@ -3142,7 +3179,7 @@ function renderPlan(){renderTip('plan');
     $('pWeeks').innerHTML=weeksTable(pl);
     $('pStartBtn').disabled=false;
     if(pl.lowCarb&&!warn&&!pl.capped)$('pWarn').innerHTML=`<div class="banner"><span>Late in this plan carbs fall below 2 g per kg of body weight, the low end for people who lift. Training may feel flat then; a longer timeline keeps more carbs.</span></div>`;
-    if(pl.capped&&!warn)$('pWarn').innerHTML=`<div class="banner"><span>Some weeks hit a safety limit (largest deficit 1,000 kcal or 30% of maintenance, never below ${p.sex==='m'?'1,500':'1,200'} kcal), so the projection ends at ${r1(pl.endW)} lb instead of ${r1(pl.targetW)} lb. A longer timeline reaches the full goal.</span></div>`;
+    if(pl.capped&&!warn)$('pWarn').innerHTML=`<div class="banner"><span>Some weeks hit a safety limit (at most 25% below maintenance and 1% of body weight a week, never below your resting burn or ${p.sex==='m'?'1,500':'1,200'} kcal), so the projection ends at ${r1(pl.endW)} lb instead of ${r1(pl.targetW)} lb. A longer timeline reaches the full goal.</span></div>`;
   }
   $('pStartBtn').textContent=S.plan?'Replace current plan with this one':'Start this plan';
   $('pStop').hidden=!S.plan;
@@ -5142,7 +5179,7 @@ function drawOnb(){
   if(st==='activity'){body=`<h1>How active are you?</h1><p class="lede">Count workouts and how much you move at work.</p><div class="choice">${[['1.2','Mostly sitting','Desk job, little exercise'],['1.375','Lightly active','Train 1–3 days a week'],['1.55','Active','Train 3–5 days a week'],['1.725','Very active','Train hard 6–7 days a week'],['1.9','Athlete','Twice-a-day training or a physical job']].map(([v,l,s])=>`<button type="button" data-act="${v}" aria-pressed="${d.act===v}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='goal'){body=`<h1>What's the goal?</h1><div class="choice">${[['cut','Cut','Lose fat and keep muscle','var(--fat)'],['maintain','Maintain','Hold your weight, recomp slowly','var(--good)'],['bulk','Bulk','Build muscle with a small surplus','var(--pro)']].map(([v,l,s,c])=>`<button type="button" data-goal="${v}" aria-pressed="${d.type===v}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>
     ${d.type==='maintain'?'':`<div class="grid2"><div class="field"><label for="obLbs">Pounds to ${d.type==='bulk'?'gain':'lose'}</label><input id="obLbs" type="number" inputmode="decimal" value="${esc(d.lbs)}"></div><div class="field"><label for="obDur">Over</label><div class="dur-row"><input id="obDur" type="number" inputmode="numeric" value="${esc(d.dur)}" aria-label="Duration"><select id="obUnit" aria-label="Unit"><option value="months" ${d.unit==='months'?'selected':''}>months</option><option value="weeks" ${d.unit==='weeks'?'selected':''}>weeks</option></select></div></div></div>`}`}
-  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. Syncope uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
+  if(st==='wear'){d.wear=d.wear||[];body=`<h1>What do you wear?</h1><p class="lede">Pick all that apply. Syncope uses it to bring in your sleep, recovery and workouts.</p><div class="choice">${WEAR.map(([v,l,s,c])=>`<button type="button" data-wear="${v}" aria-pressed="${d.wear.includes(v)}" style="--c:${c}"><i></i><div><b>${SRC_META[v]?`<svg class="wear-g" viewBox="0 0 24 24" aria-hidden="true" style="color:${SRC_META[v].c}">${SRC_META[v].i}</svg>`:''}${l}</b><span>${s}</span></div></button>`).join('')}</div>`}
   if(st==='connect'){
     const ws=(d.wear||[]).filter(x=>x!=='none'),srv=!!(SYNC_URL||syncCfg().url),st2=syncCfg().st||{};
     const row=(id,name,c,desc,btn,done)=>`<div class="conn-row"><div class="conn-logo" style="--c:${c}">${name[0]}</div><div class="conn-t"><b>${name}</b><span>${desc}</span></div>${done?'<span class="conn-chip on">Connected</span>':`<button class="pill-btn" id="${id}">${btn}</button>`}</div>`;
@@ -5335,7 +5372,7 @@ function renderTrain(){
   $('hist').innerHTML=feed.length?feed.slice(0,15).map(x=>{
     if(x.log){const w=x.log,d=x.dev,v=w.ex.reduce((b,y)=>b+y.sets.reduce((c,s2)=>c+setVol(s2),0),0);
       return `<li><button data-wk="${x.i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}${d?`<span class="wb">${esc(d.src)}</span>`:''}</b><span class="r">${v||!w.ex.some(y=>y.cardio)?fmt(v)+' lb':fmt(w.ex.reduce((b,y)=>b+(y.cardio?+y.cardio.kcal||0:0),0))+' kcal'}<br><span class="dim">${d&&d.strain!=null?`strain ${d.strain}`:fmtDur(w.end-w.start)}</span></span><span class="s">${dfmt(w.date)} · ${w.ex.length} exercises · ${w.ex.some(y=>y.cardio)?`${w.ex.reduce((a2,y)=>a2+(y.cardio?+y.cardio.min||0:0),0)} min cardio${w.ex.some(y=>y.sets.length)?' · ':''}`:''}${(n=>n?n+' sets':'')(w.ex.reduce((a2,y)=>a2+y.sets.length,0))}${d&&d.kcal?` · ${fmt(d.kcal)} kcal`:''}</span></button></li>`}
-    const d=x.dev;return `<li><button data-devwk="${esc(d.id)}"><b>${esc(d.name)}<span class="wb">${esc(d.src)}</span></b><span class="r">${d.kcal!=null?fmt(d.kcal)+' kcal':''}${d.strain!=null?`<br><span class="dim">strain ${d.strain}</span>`:''}</span><span class="s">${dfmt(d.date)}${d.min?` · ${d.min} min`:''}${d.avgHr?` · ${d.avgHr} bpm avg`:''}</span></button></li>`}).join('')
+    const d=x.dev;return `<li><button data-devwk="${esc(d.id)}"><b>${esc(d.name)}${srcBadge(d.src)}</b><span class="r">${d.kcal!=null?fmt(d.kcal)+' kcal':''}${d.strain!=null?`<br><span class="dim">strain ${d.strain}</span>`:''}</span><span class="s">${dfmt(d.date)}${d.min?` · ${d.min} min`:''}${d.avgHr?` · ${d.avgHr} bpm avg`:''}</span></button></li>`}).join('')
     :`<li>${emptyState('dumbbell','--pro','No workouts yet','Start one from a template above. WHOOP and Garmin sessions show up here on their own.','Start a workout','startNow')}</li>`;
   const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
   $('trRows').innerHTML=grow({pg:'tlog',ic:'cal',c:'--fat',t:'Training calendar',s:'Every workout by day, week and month',v:`${fWk.length} this wk`})+grow({pg:'lifts',ic:'chart',c:'--carb',t:'Lift progress',s:'Which lifts are going up, and how fast',v:lifts?`${lifts} lifts`:''})
@@ -5801,7 +5838,7 @@ function renderHealth(){
   $('hGrid').hidden=!shown.length;
   $('hGrid').innerHTML=shown.map(([k,l,u,col])=>`<div class="hm" style="--c:${col}"><small>${k==='recovery'&&h.ouraReady?'Readiness':k==='recovery'&&h.garminBB?'Body Battery':l}</small><b>${k==='steps'||k==='active'?fmt(h[k]):h[k]}${u&&!(k==='recovery'&&h.garminBB)?`<span> ${u}</span>`:''}</b></div>`).join('');
   $('hSync').textContent=conn?'Sync now':'Sync';
-  $('hSrc').textContent=h.src.length?h.src.join(' + '):(conn?'WHOOP · Oura · Garmin':'WHOOP, Oura, Garmin or Apple Watch');
+  $('hSrc').innerHTML=h.src.length?`<span class="srcrow">${h.src.map(x=>srcBadge(x,1)).join('')}</span>`:(conn?'WHOOP · Oura · Garmin':'WHOOP, Oura, Garmin or Apple Watch');
   const x=h.extra||{},bits=[];
   if(x.deep!=null)bits.push(`Deep ${x.deep}h · REM ${x.rem}h`);if(x.eff!=null)bits.push(`Efficiency ${x.eff}%`);if(x.resp!=null)bits.push(`Resp. rate ${x.resp}`);if(x.stress!=null)bits.push(`Stress ${x.stress}`);if(x.hrvStatus)bits.push(`HRV ${String(x.hrvStatus).toLowerCase()}`);
   $('hNote').innerHTML=shown.length?[bits.join(' · '),h.workouts?`<b>Workouts:</b> ${esc(h.workouts)}`:'',conn&&c.last?`Synced ${new Date(c.last).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`:''].filter(Boolean).join('<br>')
@@ -5980,16 +6017,29 @@ function openSyncGuide(){
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices(false)});
 setInterval(()=>{if(document.visibilityState==='visible')syncDevices(false)},15*60000);
 /* ---- watch workouts in Train ---- */
+/* Source badges: each device gets its own color and a simple glyph (band, watch face, ring, heart) next to its name. */
+const SRC_META={whoop:{n:'WHOOP',c:'#E9E9EF',i:'<rect x="7" y="2" width="10" height="20" rx="3"/><path d="M7 9h10M7 15h10"/>'},
+  garmin:{n:'Garmin',c:'#5AA9FF',i:'<circle cx="12" cy="12" r="6.5"/><path d="M9 3h6M9 21h6M12 9v3l2 1.5"/>'},
+  oura:{n:'Oura',c:'#C9B8FF',i:'<circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="4.5"/>'},
+  apple:{n:'Apple Health',c:'#FF6B81',i:'<path d="M12 20s-7-4.3-7-9.4A4.1 4.1 0 0 1 12 8a4.1 4.1 0 0 1 7 2.6C19 15.7 12 20 12 20Z"/>'}};
+function srcKey(src){const s=String(src||'').toLowerCase();return s.includes('whoop')?'whoop':s.includes('garmin')?'garmin':s.includes('oura')?'oura':/apple|health|watch/.test(s)?'apple':null}
+function srcBadge(src,big){const k=srcKey(src),m=k&&SRC_META[k];if(!m)return `<span class="srcb">${esc(src||'')}</span>`;
+  return `<span class="srcb${big?' big':''}" style="--b:${m.c}"><svg viewBox="0 0 24 24" aria-hidden="true">${m.i}</svg>${m.n}</span>`}
 function devList(){return (S.dev&&S.dev.workouts)||[]}
 /* Watch sessions that are lifting get the "log your sets" prompts; everything else (golf, basketball, a run, tennis…)
    is shown as its own result: time, strain, calories, heart rate, zones and distance. */
 function isLiftDev(d){const t=String((d.type||'')+' '+(d.name||'')).toLowerCase();return /strength|weight|lift|functional|power|crossfit|hiit|bodybuild|gym|^\s*(workout|activity|other)\s*$/.test(t)||!t.trim()}
 const ZC=['var(--muted)','#6FA8FF','#4FD1C5','#F6C453','#FF9F43','#FF5C6C'];
 function devResults(d){const hm=m=>m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} min`;
-  const z=Array.isArray(d.zones)?d.zones:null,zt=z?z.reduce((a,b)=>a+(+b||0),0):0;
-  const n=3+(d.strain!=null)+(!!d.maxHr)+(!!d.mi);
-  return `<div class="live${n>4?' l3':''}"><div style="--c:var(--pro)"><b style="white-space:nowrap">${d.min!=null?hm(d.min):'—'}</b><span>time</span></div>${d.strain!=null?`<div style="--c:var(--good)"><b>${d.strain}</b><span>strain</span></div>`:''}<div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div>${d.maxHr?`<div style="--c:var(--kcal)"><b>${d.maxHr}</b><span>max bpm</span></div>`:''}${d.mi?`<div style="--c:var(--carb)"><b>${d.mi}</b><span>miles</span></div>`:''}</div>
-  ${zt?`<div class="dz"><div class="dz-bar">${z.map((m,i)=>m?`<i style="flex:${m};background:${ZC[i]}"></i>`:'').join('')}</div><div class="dz-k">${z.map((m,i)=>m?`<span><u style="background:${ZC[i]}"></u>${i?'Zone '+i:'Rest'} ${m}m</span>`:'').join('')}</div></div>`:''}`}
+  const z=Array.isArray(d.zones)?d.zones:null,zt=z?z.reduce((a,b)=>a+(+b||0),0):0,t=String((d.type||'')+' '+d.name).toLowerCase();
+  const tiles=[[d.min!=null?hm(d.min):'—','time','--pro',1],[d.strain,'strain','--good'],[d.kcal!=null?fmt(d.kcal):'—','kcal','--over',1],[d.avgHr,'avg bpm','--fat'],[d.maxHr,'max bpm','--kcal'],
+    [d.mi,'miles','--carb'],[d.mi&&d.min&&/run|walk|hike|jog/.test(t)?(()=>{const p=d.min/d.mi;return `${Math.floor(p)}:${String(Math.round(p%1*60)).padStart(2,'0')}`})():null,'min / mi','--pro'],
+    [d.mi&&d.min&&/cycl|bike|ride/.test(t)?r1(d.mi/(d.min/60)):null,'mph','--pro'],[d.elev!=null?fmt(d.elev):null,'ft climbed','--good'],[d.steps?fmt(d.steps):null,'steps','--carb'],
+    [d.sets,'sets','--pro'],[d.reps,'reps','--carb'],[d.te!=null?d.te:null,'aerobic effect','--good'],[d.intensity?String(d.intensity).replace(/^./,c=>c.toUpperCase()):null,'intensity','--kcal'],
+    [d.kcal&&d.min>=10?fmt(Math.round(d.kcal/d.min*60)):null,'kcal / hour','--over']].filter(x=>x[3]||(x[0]!=null&&x[0]!==''));
+  const hi=zt?z.slice(2).reduce((a,b)=>a+(+b||0),0):0,peak=zt?z.reduce((m,v,i)=>v?i:m,0):0;
+  return `<div class="live${tiles.length>4?' l3':''}">${tiles.map(([v,l,c])=>`<div style="--c:var(${c})"><b style="white-space:nowrap">${v??'—'}</b><span>${l}</span></div>`).join('')}</div>
+  ${zt?`<div class="dz"><div class="dz-h"><b>Heart-rate zones</b><span>${Math.round(hi/zt*100)}% in zone 2 or higher · peak zone ${peak}</span></div><div class="dz-bar">${z.map((m,i)=>m?`<i style="flex:${m};background:${ZC[i]}"></i>`:'').join('')}</div><div class="dz-k">${z.map((m,i)=>m?`<span><u style="background:${ZC[i]}"></u>${i?'Zone '+i:'Rest'} ${m}m</span>`:'').join('')}</div></div>`:''}`}
 function autoLink(){
   let ch=false;const used=new Set(S.workouts.map(w=>w.devId).filter(Boolean));
   S.workouts.forEach(w=>{if(w.devId)return;const d=devList().find(x=>!used.has(x.id)&&x.date===w.date&&x.start&&Math.abs(Date.parse(x.start)-w.start)<90*60000);if(d){w.devId=d.id;used.add(d.id);ch=true}});
@@ -6015,12 +6065,12 @@ function renderWatchNow(){
   if(!d){el.hidden=true;el.innerHTML='';return}
   const rec=recentLogged(2),f=trainFuel(d.date);
   el.hidden=false;el.dataset.id=d.id;
-  if(!isLiftDev(d)){el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${esc(d.src)}</span><span>${esc(whenStr(d))}</span></div>
+  if(!isLiftDev(d)){el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${srcBadge(d.src,1)}</span><span>${esc(whenStr(d))}</span></div>
     <h2>${esc(d.name)}</h2>${devResults(d)}
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
     <p class="note" style="margin:0">Counted in ${d.date===todayKey()?"today's":'that day’s'} calories burned and water target. It stays in your training history below.</p>
     <div class="wn-acts"><button class="chip main" data-wskip>Got it</button><button class="chip" data-wpick>I lifted too</button></div>`;return}
-  el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${esc(d.src)}</span><span>${esc(whenStr(d))}</span></div>
+  el.innerHTML=`<div class="wn-top"><span class="wn-src">New from ${srcBadge(d.src,1)}</span><span>${esc(whenStr(d))}</span></div>
     <h2>${esc(d.name)}</h2>
     <div class="live"><div style="--c:var(--pro)"><b>${d.min??'—'}</b><span>minutes</span></div><div style="--c:var(--good)"><b>${d.strain??'—'}</b><span>strain</span></div><div style="--c:var(--over)"><b>${d.kcal!=null?fmt(d.kcal):'—'}</b><span>kcal</span></div><div style="--c:var(--fat)"><b>${d.avgHr||'—'}</b><span>avg bpm</span></div></div>
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
@@ -6042,7 +6092,7 @@ function pickLiftFor(d){
     const t=e.target.closest('[data-pt]');if(t){const i=+t.dataset.pt,tp=i>=0?S.templates[i]:{name:d.name,ex:[]};closeSheet();startWorkout(tp.name,tp.ex,null,d);if(i<0)setTimeout(()=>openExPicker({eyebrow:d.name,onDone:addExercises}),120)}});
 }
 function openDevWorkout(id){const w=devList().find(x=>x.id===id);if(!w)return;
-  sheet(`<div><div class="eyebrow">${esc(w.src)} · ${esc(whenStr(w))}</div><h3>${esc(w.name)}</h3></div>
+  sheet(`<div><div class="row" style="justify-content:space-between;align-items:center">${srcBadge(w.src,1)}<span class="eyebrow" style="margin:0">${esc(whenStr(w))}</span></div><h3 style="margin-top:8px">${esc(w.name)}</h3></div>
     ${devResults(w)}
     ${isLiftDev(w)?`<p class="note">Your watch recorded time, heart rate and calories. Add the lifts to track sets, weights and strength progress for this session.</p>
     <div class="row" style="justify-content:flex-end"><button class="ghost" id="dwClose">Close</button><button class="primary" id="dwLog">Add the lifts</button></div>`:`<p class="note">Recorded by ${esc(w.src)}. Its calories count toward that day’s burn and its time toward that day’s water target.</p>
