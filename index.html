@@ -937,6 +937,19 @@ header.top .wrap{gap:8px}
 .scan-list .mc[data-open]{cursor:pointer;border-radius:8px;padding:2px 4px;margin:-2px -4px;background:rgba(255,255,255,.03)}
 .scan-list li.sc-ed{display:block;background:color-mix(in srgb,var(--kcal) 8%,var(--surface-2));margin-top:-4px}
 .scan-list li.sc-ed .grid4{gap:8px}
+/* tile grids: any row list marked .tgrid becomes big tap targets, three across */
+.glist.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;background:none;border:0;box-shadow:none;border-radius:0;overflow:visible}
+.glist.tgrid:empty{display:none}
+.glist.tgrid .gr{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-height:0;padding:12px;border:1px solid rgba(255,255,255,.07)!important;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0) 50%),var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 20px rgba(0,0,0,.22);transition:transform .15s var(--ease-out)}
+.glist.tgrid .gr:active{transform:scale(.96)}
+.glist.tgrid .gi{width:36px;height:36px;border-radius:12px}
+.glist.tgrid .gt{width:100%}.glist.tgrid .gt b{font:700 14px/1.2 var(--f-display);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.glist.tgrid .gt span{display:none}
+.glist.tgrid .gv{font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.glist.tgrid .gv:empty{display:none}
+.glist.tgrid .chev{display:none}
+.glist.tgrid .gr.static{grid-column:1/-1}
+.hist-all{width:100%;padding:12px;border:0;background:none;color:var(--kcal);font:700 14px var(--f-body);cursor:pointer}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
@@ -1215,11 +1228,11 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
       <div class="recent" id="recent"></div>
     </div>
 
+    <div class="glist tgrid" id="todayRows"></div>
     <div class="tip" id="tip-today" hidden></div>
     <div class="card idea-card" id="ideasCard" hidden></div>
     <div class="meals" id="meals"></div>
 
-    <div class="glist" id="todayRows"></div>
   </section>
 
   <!-- TRAIN -->
@@ -1229,6 +1242,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
       <div style="display:flex;flex-direction:column;gap:18px">
         <div class="tip" id="tip-train" hidden></div>
         <div class="tiles" id="trTiles"></div>
+        <div class="glist tgrid" id="trRows"></div>
         <div class="card wnow" id="wNow" hidden></div>
         <div class="card">
           <div class="card-h"><div><div class="eyebrow">Start a workout</div><h2>Pick a template or start empty</h2></div><div class="row" style="gap:6px"><button class="pill-btn" id="tplOrder" type="button">Order &amp; days</button><button class="pill-btn" data-pg="progs" type="button">Programs</button></div></div>
@@ -1238,7 +1252,6 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
           <div class="card-h"><div><div class="eyebrow">History · your lifts and watch sessions</div><h2>Recent workouts</h2></div></div>
           <ul class="hist" id="hist"></ul>
         </div>
-        <div class="glist" id="trRows"></div>
       </div>
     </div>
     <div id="trainActive" hidden style="display:flex;flex-direction:column;gap:14px"></div>
@@ -1336,7 +1349,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
     <div class="pnav"><div class="title"><div class="sub">Cut · Maintain · Bulk</div><h1>Your plan</h1></div></div>
     <div class="tip" id="tip-plan" hidden></div>
     <div class="card plan-live" id="planLive" hidden></div>
-    <div class="glist" id="planRows"></div>
+    <div class="glist tgrid" id="planRows"></div>
     <div id="planBuilder" style="display:flex;flex-direction:column;gap:18px">
       <div class="card" style="display:flex;flex-direction:column;gap:16px">
         <div><div class="eyebrow">Build a plan</div><h2>What do you want to do?</h2></div>
@@ -2465,7 +2478,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.48';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.49';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4264,18 +4277,22 @@ $('findBtn').onclick=openFind;
 
 /* ================= TOUR: six quick stops, replay from the ? anytime ================= */
 const TOUR=[
-  ['#hero','Your day, front and center','Calories left and the ring fill up as you log. Protein, carbs and fat sit right under it.'],
-  ['#quick','Everything else, one tap away','Tap +12 to add a glass of water. Tap Training to start today’s workout, or to fix a session your watch logged by mistake. Recovery and steps come from your watch.'],
-  ['.composer','Log anything in plain words','Type “2 eggs and a coffee”, or tap the camera to scan your plate or a label.'],
-  ['#tabsBottom','Move around','Train: workouts and templates. Progress: your trends, plus Friends, where you tap anyone to see their day. Plan: your goal and targets. The big + logs food, water, weight or a workout from anywhere.'],
-  ['#profBtn','You and your settings','Your profile, devices, rest sounds and privacy all live here.'],
-  ['#findBtn','Can’t find something?','Search jumps straight to any screen. Try “water”, “report” or “rest sound”.'],
-  ['#helpBtn','That’s it','Replay this tour anytime from the ? up here. Now go log your first meal.']];
+  ['today','#hero','Today: your numbers','Calories left, the ring and protein, carbs and fat. It fills as you log.'],
+  ['today','#quick','One-tap tiles','+12 adds a glass of water. Training starts today’s workout. Recovery and steps come from your watch.'],
+  ['today','.composer','Log in plain words','Type “2 eggs and a coffee”. ▥ scans a barcode, the camera scans your plate or a label. Tap anything you logged to fix it.'],
+  ['today','#todayRows','Your shortcuts','Water, meal ideas, meal prep and your daily check-in, right here.'],
+  ['train','#tplGrid','Train','Tap a template to start. Tick ✓ after each set and the rest timer runs. Hold ⋮⋮ to reorder exercises.'],
+  ['train','#trRows','See your gains','Training calendar, lift progress, sets per muscle and ready-made programs.'],
+  ['week','#wTiles','Progress','Your week and month at a glance. Friends lives here too: tap anyone to see their day.'],
+  ['plan','#planRows','Plan','Pick cut, maintain or bulk. Syncope sets safe targets and adjusts them as you weigh in.'],
+  ['today','#profBtn','You','Streak, rank, wearables, privacy and settings.'],
+  ['today','#findBtn','Find anything','Type “water”, “report” or “rest sound” and jump straight there.'],
+  ['today','#helpBtn','You’re set','Replay this anytime from the ?. Now log your first meal.']];
 let tourI=-1;
 function startTour(){closeSheet&&closeSheet();if(typeof pgStack!=='undefined'&&pgStack.length)closePages();if(S.view!=='today')setView('today');tourI=0;setTimeout(tourStep,180)}
-function tourEnd(){tourI=-1;const o=$('tourO');if(o)o.remove();try{localStorage.setItem('syncope.tour','1')}catch(e){}}
+function tourEnd(){tourI=-1;const o=$('tourO');if(o)o.remove();try{localStorage.setItem('syncope.tour2','1')}catch(e){}if(S.view!=='today')setView('today')}
 function tourStep(){let o=$('tourO');if(tourI<0||tourI>=TOUR.length)return tourEnd();
-  const [sel,h,b]=TOUR[tourI];let el=document.querySelector(sel);
+  const [vw,sel,h,b]=TOUR[tourI];if(S.view!==vw){setView(vw);return setTimeout(tourStep,260)}let el=document.querySelector(sel);
   if(!el||!el.getBoundingClientRect().height){tourI++;return tourStep()}
   if(!o){o=document.createElement('div');o.id='tourO';o.className='sytour';o.innerHTML='<div class="tour-hole"></div><div class="tour-card" role="dialog" aria-live="polite"></div>';document.body.appendChild(o);
     o.addEventListener('click',e=>{if(e.target.closest('[data-tn]')){tourI++;tourStep()}else if(e.target.closest('[data-tx]'))tourEnd()})}
@@ -4288,7 +4305,7 @@ function tourStep(){let o=$('tourO');if(tourI<0||tourI>=TOUR.length)return tourE
     card.style.top=(below+cardH<innerHeight-10?below:Math.max(12,r.top-pad-16-cardH))+'px'})}
 $('helpBtn').onclick=startTour;
 addEventListener('resize',()=>{if(tourI>=0)tourStep()});
-function maybeTour(){let seen=null;try{seen=localStorage.getItem('syncope.tour')}catch(e){}if(seen||!S.profile||!S.profile.onboarded||!$('onb').hidden||(typeof pgStack!=='undefined'&&pgStack.length)||S.view!=='today'||document.querySelector('#sheetRoot .sheet'))return;
+function maybeTour(){let seen=null;try{seen=localStorage.getItem('syncope.tour2')}catch(e){}if(seen||!S.profile||!S.profile.onboarded||!$('onb').hidden||(typeof pgStack!=='undefined'&&pgStack.length)||S.view!=='today'||document.querySelector('#sheetRoot .sheet'))return;
   setTimeout(()=>{if(S.view==='today'&&$('onb').hidden&&!(typeof pgStack!=='undefined'&&pgStack.length))startTour()},900)}
 /* ================= MEAL IDEAS: meals sized to close your remaining macros ================= */
 // name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Syncope adjusts the amount, x = fixed)
@@ -5656,10 +5673,11 @@ function renderTrain(){
   $('exNote').innerHTML=cur?'':emptyState('chart','--carb','Your strength curve starts here','Finish a workout with weights and reps and your estimated 1-rep max for each lift is charted.','Start a workout','startNow');if(false)$('exNote').textContent=cur?'':'Finish a workout with weight and reps to see your strength trend. Estimated 1-rep max uses the Epley formula: weight × (1 + reps ÷ 30).';
   // history
   const dfmt=k=>niceDate(k,{weekday:'short',month:'short',day:'numeric'});
-  $('hist').innerHTML=feed.length?feed.slice(0,15).map(x=>{
+  $('hist').innerHTML=feed.length?feed.slice(0,5).map(x=>{
     if(x.log){const w=x.log,d=x.dev,v=w.ex.reduce((b,y)=>b+y.sets.reduce((c,s2)=>c+setVol(s2),0),0);
       return `<li><button data-wk="${x.i}"><b>${esc(w.name)}${(w.prs||[]).length?`<span class="pr">${w.prs.length} PR</span>`:''}${d?srcBadge(d.src):''}</b><span class="r">${v||!w.ex.some(y=>y.cardio)?fmt(v)+' lb':fmt(w.ex.reduce((b,y)=>b+(y.cardio?+y.cardio.kcal||0:0),0))+' kcal'}<br><span class="dim">${d&&d.strain!=null?`strain ${d.strain}`:fmtDur(w.end-w.start)}</span></span><span class="s">${dfmt(w.date)} · ${w.ex.length} exercises · ${w.ex.some(y=>y.cardio)?`${w.ex.reduce((a2,y)=>a2+(y.cardio?+y.cardio.min||0:0),0)} min cardio${w.ex.some(y=>y.sets.length)?' · ':''}`:''}${(n=>n?n+' sets':'')(w.ex.reduce((a2,y)=>a2+y.sets.length,0))}${d&&d.kcal?` · ${fmt(d.kcal)} kcal`:''}</span></button></li>`}
     const d=x.dev;return `<li><button data-devwk="${esc(d.id)}"><b>${esc(d.name)}${srcBadge(d.src)}</b><span class="r">${d.kcal!=null?fmt(d.kcal)+' kcal':''}${d.strain!=null?`<br><span class="dim">strain ${d.strain}</span>`:''}</span><span class="s">${dfmt(d.date)}${d.min?` · ${d.min} min`:''}${d.avgHr?` · ${d.avgHr} bpm avg`:''}</span></button></li>`}).join('')
+    +(feed.length>5?`<li><button class="hist-all" data-pg="tlog">See all ${feed.length} workouts →</button></li>`:'')
     :`<li>${emptyState('dumbbell','--pro','No workouts yet','Start one from a template above. WHOOP and Garmin sessions show up here on their own.','Start a workout','startNow')}</li>`;
   const lifts=new Set(S.workouts.flatMap(w=>w.ex.map(y=>y.n))).size;
   $('trRows').innerHTML=grow({pg:'tlog',ic:'cal',c:'--fat',t:'Training calendar',s:'Every workout by day, week and month',v:`${fWk.length} this wk`})+grow({pg:'lifts',ic:'chart',c:'--carb',t:'Lift progress',s:'Which lifts are going up, and how fast',v:lifts?`${lifts} lifts`:''})
