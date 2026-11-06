@@ -1,7 +1,7 @@
 /* tail. NBA — the basketball side, built to the NFL side's standard and fed only by data the app is given:
    slates in data/nba/<date>.json (wmtl.slate.v2), the player library in data/nbap, teams in data/nba/teams.json,
    and ESPN's public NBA scoreboard + box scores for live scores. Nothing here estimates a number; anything missing reads "Not available"
-   or is left out. Also owns the two-lane header ticker (NFL + NBA) that app.js drawTicker hands its items to.
+   or is left out. Also owns the one-banner header ticker (NFL | NBA switch, Auto by default) that app.js drawTicker hands its items to.
    Loaded after every other script; it wraps, never replaces, the NFL screens (Home, Live Now, game screen, search). */
 (function(){
 'use strict';
@@ -120,18 +120,31 @@ const LANE = {NFL: {sp: 'NFL', dir: 'up', items: [], i: 0, paused: false, t: nul
 const HOLD = 3200, HOLD_BET = 5200;
 function mountLanes(){ const tk = $('#ticker'), tr = $('#tktrack'); if(!tk || !tr) return false; if(tr.dataset.lanes) return true;
   tk.classList.add('tkl2'); tr.dataset.lanes = '1'; tr.removeAttribute('style');
-  tr.innerHTML = ['NFL', 'NBA'].map(sp => `<div class="tkl" data-lane="${sp}" data-dir="${LANE[sp].dir}"><button type="button" class="tkl-b" aria-pressed="false" aria-label="${sp} lane. Tap to pause">${GLY[sp]}<span>${sp}</span><i class="tkl-pz" aria-hidden="true"></i></button><div class="tkl-vp"></div><button type="button" class="tkl-n" aria-label="Next ${sp} item"><span></span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${sp === 'NFL' ? 'M7 14l5-5 5 5' : 'M7 10l5 5 5-5'}"/></svg></button></div>`).join('');
+  tr.innerHTML = ['NFL', 'NBA'].map(sp => `<div class="tkl" data-lane="${sp}" data-dir="${LANE[sp].dir}"><span class="tkl-seg" role="group" aria-label="Banner sport">${['NFL', 'NBA'].map(x => `<button type="button" class="tkl-sw" data-sw="${x}" aria-pressed="false">${GLY[x]}<span>${x}</span></button>`).join('')}<i class="tkl-auto" aria-hidden="true">AUTO</i></span><div class="tkl-vp"></div><button type="button" class="tkl-n" aria-label="Next ${sp} item"><span></span><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${sp === 'NFL' ? 'M7 14l5-5 5 5' : 'M7 10l5 5 5-5'}"/></svg></button></div>`).join('');
   for(const sp of ['NFL', 'NBA']){ const L = LANE[sp]; L.el = tr.querySelector(`[data-lane="${sp}"]`); L.vp = $('.tkl-vp', L.el); L.cnt = $('.tkl-n span', L.el);
-    const b = $('.tkl-b', L.el); b.onclick = e => { e.stopPropagation(); L.paused = !L.paused; L.el.classList.toggle('paused', L.paused); b.setAttribute('aria-pressed', L.paused); b.setAttribute('aria-label', `${sp} lane. ${L.paused ? 'Paused. Tap to resume' : 'Tap to pause'}`); if(L.paused) clearTimeout(L.t); else schedule(L); };
+    $$('.tkl-sw', L.el).forEach(b => b.onclick = e => { e.stopPropagation(); const want = b.dataset.sw;
+      if(want === SHOW.on && SHOW.mode !== 'auto'){ SHOW.mode = 'auto'; save(); show(autoPick()); toast('Banner: Auto. Shows the sport that is live or up next'); }
+      else { SHOW.mode = want; save(); show(want); toast(`Banner: ${want}. Tap ${want} again for Auto`); } });
     $('.tkl-n', L.el).onclick = e => { e.stopPropagation(); roll(L, true); };
     L.vp.onclick = e => { const t = e.target.closest('[data-tkp],[data-tkg],[data-nbg]'); if(t && openTarget(t)) return; roll(L, true); }; }
-  return true; }
+  show(SHOW.mode === 'auto' ? autoPick() : SHOW.mode); return true; }
+/* one banner: the user picks NFL or NBA with one tap; until then (and after tapping the active sport again) Auto shows what matters now */
+const SHOW = {mode: (() => { try{ const v = localStorage.getItem('tail.banner'); return v === 'NFL' || v === 'NBA' ? v : 'auto'; }catch(e){ return 'auto'; } })(), on: null};
+function save(){ try{ localStorage.setItem('tail.banner', SHOW.mode); }catch(e){} }
+function nextNFL(){ const now = Date.now(); let t = Infinity; for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; for(const g of d.games || []){ const k = Date.parse(g.kick_utc); if(k > now - 4 * 3600e3 && k < t) t = k; } } return t; }
+function nextNBA(){ const now = Date.now(); let t = Infinity; for(const g of Object.values(NLV.games)){ if(g.state !== 'pre') continue; const k = Date.parse(g.kick); if(k > now - 3600e3 && k < t) t = k; } return t; }
+function autoPick(){ const has = (sp, k) => LANE[sp].items.some(x => x.kind === k);
+  for(const k of ['bet', 'live']) for(const sp of ['NFL', 'NBA']) if(has(sp, k)) return sp;
+  const a = nextNFL(), b = nextNBA(); if(a === Infinity && b === Infinity) return SHOW.on || 'NFL'; return b < a ? 'NBA' : 'NFL'; }
+function show(sp){ const tr = $('#tktrack'); if(!tr || !sp) return; const ch = SHOW.on !== sp; SHOW.on = sp; tr.dataset.show = sp; tr.dataset.mode = SHOW.mode;
+  tr.querySelectorAll('.tkl-sw').forEach(b => { const on = b.dataset.sw === sp; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  for(const x of ['NFL', 'NBA']){ const L = LANE[x]; if(x === sp){ if(ch && L.items.length){ L.i = Math.min(L.i, L.items.length - 1); paint(L, L.items[L.i], false); } schedule(L); } else clearTimeout(L.t); } }
 function openTarget(t){
   if(t.dataset.tkp){ const d = Object.values(SLATE).find(x => x && x.props.some(p => p.id === t.dataset.tkp)); if(d){ openProp(d, t.dataset.tkp); return true; } return false; }
   if(t.dataset.tkg){ const [a, h] = t.dataset.tkg.split('|'); for(const d of Object.values(SLATE)){ if(!d || d.sport !== 'NFL') continue; const g = d.games.find(x => x.away.abbr === a && x.home.abbr === h); if(g){ openGame(d.id, g.id); return true; } } toast(`${a} @ ${h} is not on a modeled slate`); return true; }
   if(t.dataset.nbg){ const [a, h] = t.dataset.nbg.split('|'); openByTeams(a, h); return true; } return false; }
-function schedule(L){ clearTimeout(L.t); if(!L.el || L.paused || L.items.length < 2 || document.visibilityState !== 'visible') return; const it = L.items[L.i];
-  L.t = setTimeout(() => roll(L), (it && it.kind === 'bet' ? HOLD_BET : HOLD) + (L.sp === 'NBA' && !L.offset ? (L.offset = 1, HOLD / 2) : 0)); }
+function schedule(L){ clearTimeout(L.t); if(!L.el || L.paused || (SHOW.on && SHOW.on !== L.sp) || L.items.length < 2 || document.visibilityState !== 'visible') return; const it = L.items[L.i];
+  L.t = setTimeout(() => roll(L), (it && it.kind === 'bet' ? HOLD_BET : HOLD) ); }
 function count(L){ if(!L.cnt) return; const n = L.items.length; L.cnt.textContent = n > 1 ? `${L.i + 1}/${n}` : ''; L.el.classList.toggle('single', n < 2); }
 function paint(L, it, anim){ const vp = L.vp, old = vp.querySelector('.tkl-it.cur'); const n = document.createElement('div'); n.className = 'tkl-it k-' + it.kind; n.dataset.k = it.k; n.innerHTML = it.html;
   if(it.flash){ n.classList.add('flash'); it.flash = false; } if(it.pulse){ n.classList.add('pulse'); it.pulse = false; }
@@ -176,8 +189,8 @@ function itemsNBA(){ const out = [], G = Object.values(NLV.games); const ord = s
   if(!out.length) out.push({k: 'i:none', kind: 'info', html: `<span class="tk">${NLV.at ? 'No NBA game on today' : NLV.err ? 'NBA scores not available right now' : 'Checking NBA scores…'}</span>`});
   return out; }
 const TKL = window.TKL = {
-  nfl(items){ if(!mountLanes()) return; const list = (items || []).map(parse).filter(Boolean); setItems(LANE.NFL, [...betNowNFL(), ...list]); },
-  nba(){ if(!mountLanes()) return; setItems(LANE.NBA, itemsNBA()); }, lanes: LANE};
+  nfl(items){ if(!mountLanes()) return; const list = (items || []).map(parse).filter(Boolean); setItems(LANE.NFL, [...betNowNFL(), ...list]); if(SHOW.mode === 'auto') show(autoPick()); },
+  nba(){ if(!mountLanes()) return; setItems(LANE.NBA, itemsNBA()); if(SHOW.mode === 'auto') show(autoPick()); }, lanes: LANE, show: s => { SHOW.mode = s === 'auto' ? 'auto' : s; save(); show(s === 'auto' ? autoPick() : s); }};
 
 /* ------------------------------------------------------------ shared pieces (same markup and classes as the NFL screens) */
 function best(p, side){ const offs = (p.offers || []).filter(o => isNum(o[side])); const at = offs.filter(o => o.line === p.line); let b = null;

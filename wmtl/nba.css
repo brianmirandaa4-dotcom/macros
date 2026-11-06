@@ -75,3 +75,16 @@
 /* NBA game Live tab rows have no book buttons under them: leave room for the progress tag */
 .nb-game #x-gb .lv.pg{padding-bottom:50px!important}
 .nb-game .lv{position:relative}
+/* one banner: NFL | NBA switch (Auto until the user picks) */
+#tktrack[data-show=NFL] .tkl[data-lane=NBA],#tktrack[data-show=NBA] .tkl[data-lane=NFL]{display:none}
+.tkl+.tkl{box-shadow:none}
+.tkl-seg{flex:none;position:relative;display:inline-flex;gap:2px;padding:2px;border-radius:8px;background:var(--s1);box-shadow:inset 0 0 0 1px var(--hair2)}
+.tkl-sw{display:inline-flex;align-items:center;gap:3px;height:18px;padding:0 6px;border:0;border-radius:6px;background:transparent;color:var(--t3);font:800 9.5px/1 var(--f-ui);letter-spacing:.06em;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .18s,color .18s}
+.tkl-sw svg{flex:none;width:11px;height:11px;opacity:.7}
+.tkl-sw.on{background:var(--s3);color:var(--t1);box-shadow:inset 0 0 0 1px var(--hair2)}.tkl-sw.on svg{color:var(--act);opacity:1}
+.tkl-sw:active{transform:scale(.94)}
+.tkl-auto{position:absolute;right:-3px;top:-5px;font:800 6.5px/1 var(--f-ui);font-style:normal;letter-spacing:.08em;padding:2px 3px;border-radius:3px;background:var(--act);color:var(--s0);display:none;pointer-events:none}
+#tktrack[data-mode=auto] .tkl-auto{display:block}
+@media (max-width:360px){.tkl-sw span{display:none}.tkl-sw{padding:0 5px}}
+.tkl-auto{position:static;align-self:center;height:auto;padding:3px 4px;margin-left:1px;border-radius:4px;font-size:7.5px;background:color-mix(in srgb,var(--act) 18%,transparent);color:var(--act)}
+#tktrack[data-mode=auto] .tkl-auto{display:inline-block}
