@@ -864,6 +864,43 @@ details.steps ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:c
 .fp-foods{display:flex;flex-direction:column;gap:14px}.fp-meal b{font-family:var(--f-display)}
 .fp-f{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--line)}.fp-f:last-child{border-bottom:0}
 .fp-f i{color:var(--muted);font-style:normal;font-size:12px}.fp-f em{font-style:normal;font-size:12px}
+/* top bar icons */
+.hbtn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--muted);display:grid;place-items:center;flex:none;padding:0;cursor:pointer}
+.hbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hbtn:active{transform:scale(.94)}
+header.top .wrap{gap:8px}
+/* compact Today banner so the numbers sit up top */
+.pnav.banner.compact{min-height:0!important;padding-top:12px!important;padding-bottom:12px!important;align-items:center}
+.pnav.banner.compact h1{font-size:24px}
+@media (max-width:780px){.pnav.banner.compact.flush{min-height:0;padding-top:10px;padding-bottom:12px}}
+/* quick tiles */
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:900px){.qgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.qt{position:relative;display:flex;align-items:center;gap:10px;padding:12px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0) 50%),var(--surface);border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 24px rgba(0,0,0,.25);cursor:pointer;min-width:0;transition:transform .15s var(--ease-out)}
+.qt:active{transform:scale(.97)}
+.qt.hot{border-color:color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 40%,transparent),0 10px 24px rgba(0,0,0,.25)}
+.qt .qr{width:44px;height:44px;flex:none}
+.qt-t{display:flex;flex-direction:column;min-width:0;flex:1}
+.qt-t span{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--c)}
+.qt-t b{font:700 20px/1.15 var(--f-num);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qt-t b small{font-size:12px;color:var(--muted);font-weight:600;margin-left:1px}
+.qt-t em{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-add{position:absolute;top:8px;right:8px;border:0;border-radius:999px;background:color-mix(in srgb,var(--fat) 22%,transparent);color:var(--fat);font:800 12px/1 var(--f-body);padding:7px 9px;cursor:pointer}
+.q-add:active{transform:scale(.92)}
+/* find */
+.find{display:flex;flex-direction:column;gap:12px}
+.find-in{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:14px;padding:0 12px;border:1px solid rgba(255,255,255,.08)}
+.find-in svg{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;flex:none}
+.find-in input{flex:1;background:none;border:0;color:var(--text);font-size:16px;padding:13px 0;outline:none;min-width:0}
+.find-l{max-height:52vh;overflow:auto}
+/* tour */
+.sytour{position:fixed;inset:0;z-index:9999}
+.sytour .tour-card .row{display:flex;width:100%}
+.tour-hole{position:fixed;border-radius:22px;box-shadow:0 0 0 9999px rgba(5,6,9,.78);transition:all .35s cubic-bezier(.2,.8,.2,1);pointer-events:none;outline:2px solid color-mix(in srgb,var(--kcal) 70%,transparent)}
+.tour-card{display:block;position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;background:var(--surface);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.6);transition:top .35s cubic-bezier(.2,.8,.2,1)}
+.tour-card h3{margin:4px 0 6px;font:800 19px/1.2 var(--f-display)}
+.tour-card p{margin:0 0 14px;color:var(--muted);font-size:14.5px;line-height:1.45}
+.tour-n{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--kcal)}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
@@ -1091,6 +1128,8 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
   <div class="brand"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#1E3A3B"/><circle cx="50" cy="50" r="29.6" fill="none" stroke="#C9F26B" stroke-width="4.6"/><path d="M50 16.5V25.5M50 74.5V83.5M16.5 50H29M71 50H83.5" stroke="#C9F26B" stroke-width="4.6" stroke-linecap="round"/><path d="M30 50H40L43.5 41L47.5 59.5L50 50" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 50L52.5 41L56.5 58.5L59 50H70" fill="none" stroke="#A0A8AA" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="4.4" fill="#C9F26B"/></svg><span>syncope</span></div>
   <nav class="tabs" aria-label="Views" id="tabsTop"></nav>
   <div class="saved" id="saved">Saved on this device</div>
+  <button class="hbtn" id="findBtn" aria-label="Search Syncope" title="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
+  <button class="hbtn" id="helpBtn" aria-label="Show me around" title="Show me around"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.1-2.4 3.6M12 17.2v.1"/></svg></button>
   <button class="avatar" id="profBtn" aria-label="Profile"><span>ME</span></button>
 </div></header>
 
@@ -1108,6 +1147,7 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
     </div>
 
     <div class="card hero v2" id="hero"></div>
+    <div class="qgrid" id="quick" aria-label="Quick look"></div>
     <div class="card prep-card" id="prepCard" hidden></div>
     <div class="card coach" id="coach" hidden></div>
 
@@ -2380,7 +2420,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.38';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.39';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2584,7 +2624,7 @@ function gaugeSVG(t,goal){
   let ticks='';for(let i=0;i<20;i++){const a=i/20*2*Math.PI-Math.PI/2,a1=104,a2=i%5===0?110:107;ticks+=`<line x1="${100+a1*Math.cos(a)}" y1="${100+a1*Math.sin(a)}" x2="${100+a2*Math.cos(a)}" y2="${100+a2*Math.sin(a)}" stroke="var(--faint)" stroke-width="${i%5===0?1.6:1}"/>`}
   return `<svg viewBox="-14 -14 228 228" role="img" aria-label="${fmt(t.k)} of ${fmt(goal)} calories"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${arcs}${over}${ticks}</svg>`;
 }
-function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack.length-1]:null;if(pgOpen==='checkin')renderCheckin();if(pgOpen==='health')renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();
+function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack.length-1]:null;if(pgOpen==='checkin')renderCheckin();if(pgOpen==='health')renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();renderQuick();
   const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk;
   $('dTitle').textContent=niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   const diff=Math.round((parseKey(k)-parseKey(tk))/864e5);
@@ -4026,7 +4066,101 @@ function mealOfNow(){const h=new Date().getHours();return h<11?'breakfast':h<16?
 function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySelector('.pnav');if(!pn)return;
   const kind=S.view==='today'?mealOfNow():S.view==='week'||S.view==='month'?'all':S.view==='friends'?'all':S.view;
   pn.classList.add('banner');pn.classList.toggle('flush',pn===sec.firstElementChild||(pn.previousElementSibling&&pn.previousElementSibling.classList.contains('tip')&&pn.previousElementSibling===sec.firstElementChild));
-  pn.style.setProperty('--bnr',bnr(kind,S.view))}
+  pn.style.setProperty('--bnr',bnr(kind,S.view));pn.classList.toggle('compact',S.view==='today')}
+/* ================= QUICK TILES: the things you check all day, one tap away on Today ================= */
+function qRing(fr,col){const R=17,C=2*Math.PI*R,f=Math.max(0,Math.min(1,fr||0));return `<svg class="qr" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="22" cy="22" r="${R}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" transform="rotate(-90 22 22)" style="transition:stroke-dasharray .6s var(--ease-out)"/></svg>`}
+function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayKey();
+  const hd=hydDay(k),hp=hydPlan(k),wo=r0(hd.oz),wt=hp.oz.total;
+  const h=hv(k),stepGoal=+((S.prefs||{}).stepGoal)||10000;
+  const done=(S.workouts||[]).filter(w=>w.date===k),dv=devList().filter(d=>d.date===k&&!done.some(w=>w.devId===d.id)),nx=k===tk?tplNext():null;
+  let tr;
+  if(S.active&&k===tk)tr={v:'Live',s:esc(S.active.name),fr:.5,go:'train',hot:1};
+  else if(done.length||dv.length){const n=done.length+dv.length,m=done.reduce((a,w)=>a+Math.round(((w.end||0)-(w.start||0))/60000),0)+dv.reduce((a,d)=>a+(d.min||0),0);tr={v:'Done',s:`${n>1?n+' sessions':esc((done[0]||dv[0]).name)}${m>0?` · ${m} min`:''}`,fr:1,go:'train'}}
+  else if(nx&&S.templates[nx.i])tr={v:'Start',s:esc(S.templates[nx.i].name),fr:0,go:'start'};
+  else tr={v:k===tk?'Start':'Rest',s:k===tk?'Tap to log a workout':'No training logged',fr:0,go:k===tk?'start':'train'};
+  const rec=h.recovery,sl=h.sleep;
+  const tiles=[
+    {id:'water',c:'var(--fat)',ic:GI.drop||'',lab:'Water',v:`${fmt(wo)}<small>/${fmt(wt)} oz</small>`,s:wo>=wt?'Goal hit 🎉':`${fmt(Math.max(0,wt-wo))} oz to go`,fr:wt?wo/wt:0,act:`<button class="q-add" data-qwater aria-label="Add 12 oz of water">+12</button>`},
+    {id:'train',c:'var(--pro)',lab:'Training',v:tr.v,s:tr.s,fr:tr.fr,hot:tr.hot},
+    {id:'rec',c:'var(--good)',lab:h.recovery!=null&&h.ouraReady?'Readiness':h.garminBB?'Body Battery':'Recovery',v:rec!=null?`${rec}<small>%</small>`:'—',s:sl!=null?`${sl}h sleep${h.hrv!=null?` · HRV ${h.hrv}`:''}`:'Connect a wearable',fr:rec!=null?rec/100:0},
+    {id:'steps',c:'var(--carb)',lab:'Steps',v:h.steps!=null?fmt(h.steps):'—',s:h.steps!=null?(h.steps>=stepGoal?'Goal hit 🎉':`${fmt(stepGoal-h.steps)} to ${fmt(stepGoal/1000)}k`):'Syncs from your watch',fr:h.steps!=null?h.steps/stepGoal:0}];
+  el.innerHTML=tiles.map(t=>`<div class="qt${t.hot?' hot':''}" role="button" tabindex="0" data-q="${t.id}" style="--c:${t.c}">${qRing(t.fr,t.c)}<div class="qt-t"><span>${t.lab}</span><b class="num">${t.v}</b><em>${t.s}</em></div>${t.act||''}</div>`).join('');
+  el.dataset.go=tr.go}
+$('quick').addEventListener('click',e=>{
+  if(e.target.closest('[data-qwater]')){e.stopPropagation();hydAdd(12,'water',0,S.day);const b=e.target.closest('[data-qwater]');renderQuick();toast('+12 oz water',()=>{const L=hydS().log[S.day]||[];L.pop();save();renderQuick();renderTodayRows()});return}
+  const t=e.target.closest('[data-q]');if(!t)return;const q=t.dataset.q;
+  if(q==='water')openPage('hyd');else if(q==='train'){if($('quick').dataset.go==='start'&&!S.active){setView('train');openStart()}else setView('train')}
+  else if(q==='rec')openPage('health');else if(q==='steps')openPage('health')});
+$('quick').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-q]')){e.preventDefault();e.target.click()}});
+
+/* ================= FIND ANYTHING: type a word, jump straight there ================= */
+const FIND=[
+  ['Log food or a drink','eat drink meal food log add calories',()=>{setView('today');setTimeout(()=>$('foodIn').focus(),80)}],
+  ['Scan a meal photo','camera photo scan picture ai',()=>{setView('today');$('photoBtn').click()}],
+  ['Scan a nutrition label','label barcode macros package manual',()=>{setView('today');$('manualBtn').click()}],
+  ['Water & hydration','water hydration drink electrolytes sodium bottle oz',()=>openPage('hyd')],
+  ['Start a workout','lift gym workout train start session template',()=>{setView('train');openStart()}],
+  ['Training & templates','train templates history lifts workouts',()=>setView('train')],
+  ['Exercise library','lifts exercises library movements',()=>openPage('lifts')],
+  ['Strength progress','strength pr 1rm progress lifts e1rm',()=>openPage('strength')],
+  ['Muscles trained','muscles volume sets body map',()=>openPage('muscle')],
+  ['Progress & weight trend','progress weight trend chart week month',()=>setView('progress')],
+  ['Log my weight','weigh scale weight body',()=>openPage('weigh')],
+  ['Monthly report','report month summary vitamins micronutrients review',()=>openPage('report')],
+  ['Recovery & sleep','recovery sleep hrv rhr whoop oura garmin readiness strain',()=>openPage('health')],
+  ['Daily check-in','check in mood energy soreness',()=>openPage('checkin')],
+  ['Friends & leaderboard','friends leaderboard social points invite',()=>setView('friends')],
+  ['My plan (cut, maintain, bulk)','plan cut bulk maintain goal diet phase',()=>setView('plan')],
+  ['Calorie & macro targets','targets macros protein carbs fat calories goal',()=>openPage('targets')],
+  ['Meal ideas','ideas meals recipes suggestions what to eat',()=>openPage('ideas')],
+  ['Meal prep','prep sunday batch cook',()=>openPage('prep')],
+  ['Food library','foods library saved custom',()=>setView('foods')],
+  ['Training fuel','fuel carbs training add back',()=>openPage('fuel')],
+  ['Connect WHOOP, Garmin, Oura, Apple','connect wearable whoop garmin oura apple watch health devices',()=>openPage('conn')],
+  ['Photo scanning','scan claude ai key photo',()=>openPage('scan')],
+  ['Settings, rest timer & sounds','settings preferences rest timer sound beep units',()=>openPage('prefs')],
+  ['Body stats','body fat height measurements',()=>openPage('body')],
+  ['Backup & data','backup export import restore data',()=>openPage('data')],
+  ['Profile & account','profile account name avatar',()=>openPage('me')],
+  ['Help & FAQ','help faq questions how',()=>openPage('help')],
+  ['Show me around (tour)','tour tutorial guide walkthrough intro',()=>startTour()]];
+function openFind(){
+  sheet(`<div class="find"><div class="find-in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="findIn" type="search" placeholder="Search: water, report, rest sound…" autocomplete="off" enterkeyhint="go" aria-label="Search Syncope"></div><div class="glist find-l" id="findL"></div></div>`);
+  const draw=()=>{const q=$('findIn').value.trim().toLowerCase(),ws=q.split(/\s+/).filter(Boolean);
+    const hits=FIND.map((f,i)=>{const hay=(f[0]+' '+f[1]).toLowerCase();let sc=0;for(const w of ws){if(f[0].toLowerCase().startsWith(w))sc+=5;else if(hay.includes(' '+w)||hay.startsWith(w))sc+=3;else if(hay.includes(w))sc+=1;else return null}return {i,sc}}).filter(Boolean).sort((a,b)=>b.sc-a.sc).slice(0,ws.length?8:9);
+    $('findL').innerHTML=hits.length?hits.map(h=>`<button class="gr" data-fi="${h.i}"><span class="gt"><b>${FIND[h.i][0]}</b></span>${CHEV}</button>`).join(''):`<p class="note" style="padding:14px">Nothing for “${esc(q)}”. Try water, lift, weight or report.</p>`};
+  draw();$('findIn').oninput=draw;$('findIn').onkeydown=e=>{if(e.key==='Enter'){const b=$('findL').querySelector('[data-fi]');if(b)b.click()}};
+  $('findL').onclick=e=>{const b=e.target.closest('[data-fi]');if(!b)return;closeSheet();setTimeout(FIND[+b.dataset.fi][2],140)};
+  setTimeout(()=>$('findIn').focus(),60)}
+$('findBtn').onclick=openFind;
+
+/* ================= TOUR: six quick stops, replay from the ? anytime ================= */
+const TOUR=[
+  ['#hero','Your day, front and center','Calories left and the ring fill up as you log. Protein, carbs and fat sit right under it.'],
+  ['#quick','Everything else, one tap away','Water (tap +12 to add a glass), training, recovery and steps. Tap any tile to open it.'],
+  ['.composer','Log anything in plain words','Type “2 eggs and a coffee”, or tap the camera to scan your plate or a label.'],
+  ['#tabsBottom','Move around','Train for workouts, Progress for trends and friends, Plan for your goals. The big + logs food, water, weight or a workout from anywhere.'],
+  ['#findBtn','Can’t find something?','Search jumps straight to any screen. Try “water”, “report” or “rest sound”.'],
+  ['#helpBtn','That’s it','Replay this tour anytime from the ? up here. Now go log your first meal.']];
+let tourI=-1;
+function startTour(){closeSheet&&closeSheet();if(S.view!=='today')setView('today');tourI=0;setTimeout(tourStep,180)}
+function tourEnd(){tourI=-1;const o=$('tourO');if(o)o.remove();try{localStorage.setItem('syncope.tour','1')}catch(e){}}
+function tourStep(){let o=$('tourO');if(tourI<0||tourI>=TOUR.length)return tourEnd();
+  const [sel,h,b]=TOUR[tourI];let el=document.querySelector(sel);
+  if(!el||!el.getBoundingClientRect().height){tourI++;return tourStep()}
+  if(!o){o=document.createElement('div');o.id='tourO';o.className='sytour';o.innerHTML='<div class="tour-hole"></div><div class="tour-card" role="dialog" aria-live="polite"></div>';document.body.appendChild(o);
+    o.addEventListener('click',e=>{if(e.target.closest('[data-tn]')){tourI++;tourStep()}else if(e.target.closest('[data-tx]'))tourEnd()})}
+  const fixed=getComputedStyle(el).position==='fixed'||el.closest('header');
+  if(!fixed){const r=el.getBoundingClientRect(),want=Math.max(70,(innerHeight-r.height)/2-60);window.scrollTo({top:Math.max(0,scrollY+r.top-want),behavior:'instant'})}
+  requestAnimationFrame(()=>{const r=el.getBoundingClientRect(),pad=8,hole=o.querySelector('.tour-hole'),card=o.querySelector('.tour-card');
+    Object.assign(hole.style,{left:r.left-pad+'px',top:r.top-pad+'px',width:r.width+pad*2+'px',height:Math.min(r.height+pad*2,innerHeight*.62)+'px'});
+    card.innerHTML=`<div class="tour-n">${tourI+1} of ${TOUR.length}</div><h3>${h}</h3><p>${b}</p><div class="row" style="justify-content:space-between"><button class="ghost" data-tx>${tourI===TOUR.length-1?'Close':'Skip'}</button><button class="primary" data-tn>${tourI===TOUR.length-1?'Let’s go':'Next'}</button></div>`;
+    const below=r.top+Math.min(r.height,innerHeight*.62)+pad+16,cardH=card.offsetHeight||180;
+    card.style.top=(below+cardH<innerHeight-10?below:Math.max(12,r.top-pad-16-cardH))+'px'})}
+$('helpBtn').onclick=startTour;
+addEventListener('resize',()=>{if(tourI>=0)tourStep()});
+function maybeTour(){let seen=null;try{seen=localStorage.getItem('syncope.tour')}catch(e){}if(seen||!S.profile||!S.profile.onboarded||!$('onb').hidden)return;
+  setTimeout(()=>{if(S.view==='today'&&$('onb').hidden)startTour()},900)}
 /* ================= MEAL IDEAS: meals sized to close your remaining macros ================= */
 // name | slots (b l d s) | minutes | ingredients "food:role:unit:default:min:max"  (role p/c/f = Syncope adjusts the amount, x = fixed)
 const IDEA_SRC=`Greek yogurt power bowl|bsR|3|greek yogurt:p:cup:1:0.5:2.5;granola:c:cup:0.25:0:1;blueberries:c:cup:0.5:0:1.5;honey:c:tbsp:1:0:2;almonds:f:oz:0.5:0:1.5
@@ -5161,7 +5295,7 @@ function openOnb(){
   ob={i:0,d:{wear:(S.profile.wear||[]).slice(),name:S.profile.name||'',sex:c.sex||'m',age:c.age||'',ft:c.ht?Math.floor(c.ht/12):'',inch:c.ht?r1(c.ht%12):'',wt:c.wt||'',bf:c.bf||'',act:c.act||'1.55',type:S.pType||'cut',lbs:c.lbs||10,dur:c.dur||4,unit:c.unit||'months'}};
   $('onb').hidden=false;document.documentElement.style.overflow='hidden';drawOnb();
 }
-function closeOnb(){$('onb').hidden=true;document.documentElement.style.overflow='';ob=null}
+function closeOnb(){$('onb').hidden=true;document.documentElement.style.overflow='';ob=null;setTimeout(maybeTour,400)}
 function obVal(id){const e=$(id);return e?e.value:''}
 function drawOnb(){
   const st=OB_STEPS[ob.i],d=ob.d,prog=Math.min(6,Math.max(0,ob.i));
@@ -6118,7 +6252,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.add
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 const jm=location.hash.match(/^#join=([A-Za-z0-9]{4,10})/);if(jm){try{localStorage.setItem('syncope.join',jm[1].toUpperCase())}catch(e){}try{history.replaceState(null,'','#friends')}catch(e){}}
-applyPrefs(); setTimeout(warmOffline,3000); setTimeout(()=>{if((S.prefs||{}).restSound==='custom')rsLoadCustom()},1500); checkBackup(); setView(jm?'friends':(location.hash.slice(1)||'today')); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
+applyPrefs(); setTimeout(warmOffline,3000); setTimeout(()=>{try{maybeTour()}catch(e){}},1200); setTimeout(()=>{if((S.prefs||{}).restSound==='custom')rsLoadCustom()},1500); checkBackup(); setView(jm?'friends':(location.hash.slice(1)||'today')); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
 if(!storageOK){$('saved').textContent='Not saving — storage blocked';$('saved').style.color='var(--over)'}
 if(window.__restoredFrom){save();setTimeout(()=>toast('Your log was recovered from its automatic safety copy'),900)}
 if(loadBlocked){$('backupBanner').hidden=false;$('backupText').textContent='Syncope couldn’t read your saved log, so it paused saving to protect it. Restore from a backup in Profile → Backup & export.'}
