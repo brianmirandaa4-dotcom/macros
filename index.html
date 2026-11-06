@@ -1236,33 +1236,39 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .page-body{padding-top:6px;gap:14px}.page-big{margin:0 4px -2px}
 .fact{padding:10px 11px}.fact span{display:block;line-height:1.25;margin-top:3px}
 
-/* membership */
+/* membership: calm, health-app style */
 .mbr{display:flex;flex-direction:column;gap:14px}
-.mb-hero h2{margin:4px 0 4px;font:800 26px/1.1 var(--f-display);letter-spacing:-.015em}.mb-hero p{margin:0;color:var(--muted);font-size:14.5px}
-.mb-bill{max-width:none}.mb-bill em{font-style:normal;font-size:11px;color:var(--j-emerald);margin-left:2px}
-.mb-list{display:flex;flex-direction:column;gap:12px}
-.mb-card{position:relative;border-radius:22px;padding:16px 16px 14px;background:radial-gradient(120% 80% at 100% 0%,color-mix(in srgb,var(--tj) 13%,transparent),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0) 45%),var(--surface);border:1px solid color-mix(in srgb,var(--tj) 30%,rgba(255,255,255,.06));box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 34px rgba(0,0,0,.28);overflow:hidden}
-.mb-elite{border-color:color-mix(in srgb,var(--j-gold) 55%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--j-gold) 18%,transparent),0 18px 44px rgba(0,0,0,.35),0 0 40px color-mix(in srgb,var(--j-gold) 10%,transparent)}
-.mb-elite::after{content:"";position:absolute;inset:-40% -60%;background:linear-gradient(105deg,transparent 42%,rgba(255,236,190,.07) 50%,transparent 58%);animation:mbsheen 6s ease-in-out infinite;pointer-events:none}
-@keyframes mbsheen{0%,55%{transform:translateX(-40%)}100%{transform:translateX(40%)}}
-@media (prefers-reduced-motion:reduce){.mb-elite::after{animation:none;display:none}}
-.mb-h{display:flex;align-items:center;gap:12px}.mb-h .gi{width:40px;height:40px;flex:none}.mb-h .gi svg{width:20px;height:20px}
-.mb-n{display:flex;flex-direction:column;min-width:0;flex:1}.mb-n b{font:800 20px/1.1 var(--f-display);color:var(--tj)}.mb-n span{font-size:13px;color:var(--muted)}
-.mb-tag{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tj);border:1px solid color-mix(in srgb,var(--tj) 45%,transparent);border-radius:99px;padding:3px 9px;white-space:nowrap}
-.mb-p{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 6px;margin:12px 0 10px}.mb-p b{font:700 30px/1 var(--f-num)}.mb-p small{color:var(--muted);font-size:13px}.mb-p span{flex-basis:100%;font-size:12.5px;color:var(--muted)}
-.mb-f{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}.mb-f li{position:relative;padding-left:22px;font-size:14px;line-height:1.35}
-.mb-f li::before{content:"";position:absolute;left:2px;top:4px;width:12px;height:7px;border-left:2px solid var(--tj);border-bottom:2px solid var(--tj);transform:rotate(-45deg)}
-.mb-f li:has(>b)::before{display:none}.mb-f li:has(>b){padding-left:0;color:var(--muted);font-size:13px}.mb-f li>b{color:var(--fg)}
-.mb-cta{width:100%;justify-content:center}
-.mb-pro .mb-cta{background:var(--j-sapphire);color:#07101f}.mb-elite .mb-cta{background:linear-gradient(135deg,#f5dc9e,#c79a4a);color:#1a1205}
-.mb-cmp{padding:6px 14px 10px}.mb-row{display:grid;grid-template-columns:minmax(0,1fr) 46px 52px 62px;align-items:center;gap:6px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
-.mb-row>*:not(:first-child){text-align:center;font-style:normal}.mb-hd{border-top:0;font-size:13px}.mb-g{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:12px 0 2px}
-.mb-y{color:var(--j-emerald);font-weight:800}.mb-x{color:var(--faint)}.mb-t{font-size:11.5px;font-weight:700;color:var(--j-gold)}
+.mb-intro{margin:0 2px;color:var(--muted);font-size:14.5px;line-height:1.45}
+.mb-seg{max-width:none}
+.mb-plan{display:flex;flex-direction:column;gap:14px}
+.mb-ph{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.mb-ph h3{margin:0;font:700 22px/1.15 var(--f-display);display:flex;align-items:center;gap:8px;flex-wrap:wrap}.mb-ph p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.mb-big{font:600 28px/1 var(--f-num)}
+.mb-cur{font:600 11px/1 var(--f-body);color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent);border-radius:99px;padding:5px 8px}
+.mb-opts{display:flex;flex-direction:column;gap:8px}
+.mb-opt{display:grid;grid-template-columns:22px minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid transparent;color:var(--fg);text-align:left;font:inherit;cursor:pointer}
+.mb-opt[aria-checked=true]{border-color:var(--kcal);background:color-mix(in srgb,var(--kcal) 8%,var(--surface-2))}
+.mb-rd{width:20px;height:20px;border-radius:50%;border:2px solid var(--faint)}.mb-opt[aria-checked=true] .mb-rd{border:6px solid var(--kcal)}
+.mb-ol{display:flex;flex-direction:column;min-width:0}.mb-ol b{font-size:15px}.mb-ol span{font-size:12.5px;color:var(--muted)}
+.mb-op{font:600 15px/1 var(--f-num)}
+.mb-inc{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.mb-fl{display:flex;flex-direction:column}
+.mb-fr{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14.5px}.mb-fr:first-child{border-top:0}
+.mb-fi{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--fg);flex:none}.mb-fi svg{width:16px;height:16px;stroke-width:1.8}
+.mb-cta{width:100%;padding:15px;font-size:16px;border-radius:14px}
+.mb-fine{margin:-4px 0 0;text-align:center;font-size:12px;color:var(--muted)}
+.mb-cmp{padding:4px 14px 10px}
+.mb-row{display:grid;grid-template-columns:minmax(0,1fr) 44px 50px 60px;align-items:center;gap:6px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+.mb-row>*:not(:first-child){text-align:center;font-style:normal;display:flex;justify-content:center}
+.mb-hd{border-top:0;font-size:13px;color:var(--muted)}.mb-hd b{color:var(--fg)}
+.mb-g{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 0 2px}
+.mb-y{color:var(--good)}.mb-y svg{width:16px;height:16px}
+.mb-x::before{content:"";display:block;width:10px;height:2px;border-radius:2px;background:var(--line)}
+.mb-t{font-size:12px;font-weight:600;color:var(--fg)}
 .mb-foot{font-size:12.5px;margin:0 2px}
-.mb-band{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:18px;text-align:left;color:var(--fg);cursor:pointer;background:radial-gradient(120% 120% at 0% 0%,rgba(227,194,122,.14),transparent 55%),var(--surface);border:1px solid rgba(227,194,122,.35);font:inherit}
-.mb-crest{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--j-gold);border:1px solid rgba(227,194,122,.45);background:radial-gradient(circle at 50% 30%,rgba(227,194,122,.2),rgba(227,194,122,.04) 75%);flex:none}.mb-crest svg{width:18px;height:18px}
-.mb-bt{display:flex;flex-direction:column;min-width:0;flex:1}.mb-bt b{font:700 15px/1.2 var(--f-display)}.mb-bt b em{font-style:normal;color:var(--j-gold);font-weight:600}.mb-bt>span{font-size:12.5px;color:var(--muted)}
-.mb-go{font-size:13px;font-weight:700;color:var(--j-gold);white-space:nowrap}
+.mb-band{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;text-align:left;color:var(--fg);cursor:pointer;background:var(--surface);border:1px solid rgba(255,255,255,.07);font:inherit}
+.mb-crest{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--fg);flex:none}.mb-crest svg{width:17px;height:17px}
+.mb-bt{display:flex;flex-direction:column;min-width:0;flex:1}.mb-bt b{font:600 15px/1.2 var(--f-display)}.mb-bt>span{font-size:12.5px;color:var(--muted)}
+.mb-go{color:var(--muted);display:flex}.mb-go svg{width:16px;height:16px}
 .status:empty{display:none}
 .empty-meal:not(:has(.repeat)){display:none}.empty-meal>span{display:none}
 </style>
@@ -2572,7 +2578,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.63';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.64';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3896,40 +3902,38 @@ function openAvatarPicker(){const P=S.profile||{};
   $('avOk').onclick=closeSheet}
 
 /* ================= MEMBERSHIP (display only, no payments yet) ================= */
-const MB_ICON={free:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l8-8"/></svg>',
-  pro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>',
-  elite:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8l4.5 4 4-7 4 7 4.5-4-2 11h-13z"/><path d="M6 21h12"/></svg>'};
 const MB_PRICE={pro:{wk:2.99,mo:8.99,yr:49.99},elite:{wk:4.99,mo:17.99,yr:99.99}};
 const MB_TIERS=[
-  {id:'free',name:'Free',j:'emerald',line:'Everything you need to track every day.',feat:['Calorie & macro tracking','Log in plain words + barcode scanner','6,500 foods offline + every brand','Workouts, templates & rest timer','Water tracking & Apple Health','Friends, streaks & weekly points','Safe calorie floor, always on']},
-  {id:'pro',name:'Pro',j:'sapphire',tag:'Most popular',line:'Your plan adapts to you.',feat:['Photo & label scanning (20 a day)','Adaptive plan that adjusts weekly','Meals that fit, recipes & meal prep','WHOOP, Oura & Garmin sync','Recovery-based calorie & carb targets','Gym-time hydration & fuel countdown','Programs, micronutrients & monthly report']},
-  {id:'elite',name:'Elite',j:'gold',tag:'Everything',line:'The full performance lab.',feat:['Unlimited photo & label scanning','Session deep-dives: zones, strain, pace','Strength curves & sets per muscle','Lock-screen rest alerts','Live workout status for friends','Daily readiness score (coming soon)','Exclusive themes & early access']}];
+  {id:'free',name:'Free',line:'Track food, water and workouts every day.',feat:[['plus','Calorie & macro tracking'],['list','Plain-words logging & barcode scanner'],['book','6,500 foods offline, every brand'],['dumbbell','Workouts, templates & rest timer'],['drop','Water tracking'],['heart','Apple Health'],['user','Friends, streaks & points'],['shield','Safe calorie floor, always on']]},
+  {id:'pro',name:'Pro',line:'Your plan adapts to your body and training.',feat:[['camera','Photo & label scanning, 20 a day'],['plan','Adaptive plan that adjusts weekly'],['cloche','Meals that fit, recipes & meal prep'],['watch','WHOOP, Oura & Garmin sync'],['moon','Recovery-based calorie & carb targets'],['timer','Gym-time hydration & fuel countdown'],['chart','Programs, micronutrients & monthly report']]},
+  {id:'elite',name:'Elite',line:'Every insight, for serious training.',feat:[['camera','Unlimited photo & label scanning'],['fire','Session deep-dives: zones, strain, pace'],['bars','Strength curves & sets per muscle'],['bell','Lock-screen rest alerts'],['user','Live workout status for friends'],['target','Daily readiness score (coming soon)'],['palette','Exclusive themes & early access']]}];
 const MB_ROWS=[['Tracking',[['Calories, macros & water',1,1,1],['Barcode scanner & brand search',1,1,1],['Photo & label scanning',0,'20/day','Unlimited'],['Micronutrients & monthly report',0,1,1]]],
   ['Plan',[['Starter targets & safe calorie floor',1,1,1],['Adaptive weekly plan',0,1,1],['Meals that fit, recipes & meal prep',0,1,1],['Gym-time hydration & fuel',0,1,1]]],
   ['Wearables',[['Apple Health',1,1,1],['WHOOP, Oura & Garmin sync',0,1,1],['Recovery-based targets',0,1,1],['Session deep-dives',0,0,1],['Daily readiness score',0,0,'Soon']]],
   ['Training',[['Workout logging & rest timer',1,1,1],['Science-based programs',0,1,1],['Strength curves & sets per muscle',0,0,1],['Lock-screen rest alerts',0,0,1]]],
   ['Social',[['Friends, streaks & points',1,1,1],['Live workout status',0,0,1],['Exclusive themes & early access',0,0,1]]]];
-let mbBill='yr';
-function mbPrice(id){if(id==='free')return {big:'$0',sub:'Free forever'};const P=MB_PRICE[id];
-  if(mbBill==='yr')return {big:'$'+P.yr.toFixed(2),per:'/ year',sub:`$${(P.yr/12).toFixed(2)} a month, billed yearly`};
-  if(mbBill==='mo')return {big:'$'+P.mo.toFixed(2),per:'/ month',sub:`$${(P.mo*12).toFixed(0)} a year if paid monthly`};
-  return {big:'$'+P.wk.toFixed(2),per:'/ week',sub:'Try it a week at a time'}}
-function renderMember(){const el=$('pg-member');if(!el)return;const save=Math.round((1-MB_PRICE.pro.yr/(MB_PRICE.pro.mo*12))*100);
-  const tick=v=>v===1?'<i class="mb-y" aria-label="Included">✓</i>':v===0?'<i class="mb-x" aria-label="Not included">–</i>':`<i class="mb-t">${v}</i>`;
+let mbBill='yr',mbTier='pro';
+function renderMember(){const el=$('pg-member');if(!el)return;const T=MB_TIERS.find(t=>t.id===mbTier),P=MB_PRICE[mbTier];
+  const save=Math.round((1-MB_PRICE.pro.yr/(MB_PRICE.pro.mo*12))*100);
+  const tick=v=>v===1?'<i class="mb-y" aria-label="Included">'+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>':v===0?'<i class="mb-x" aria-label="Not included"></i>':`<i class="mb-t">${v}</i>`;
+  const opts=P?[['yr','Annual',`$${P.yr.toFixed(2)}/yr`,`$${(P.yr/12).toFixed(2)}/mo · Save ${save}%`],['mo','Monthly',`$${P.mo.toFixed(2)}/mo`,'Billed monthly'],['wk','Weekly',`$${P.wk.toFixed(2)}/wk`,'Billed weekly']]:[];
   el.innerHTML=`<div class="mbr">
-    <div class="mb-hero"><h2>Level up your health</h2><p>Track for free. Go Pro to have your plan adapt to you. Go Elite for the full performance lab.</p></div>
-    <div class="seg2 mb-bill" role="group" aria-label="Billing period">${[['wk','Weekly'],['mo','Monthly'],['yr','Annual']].map(([k,l])=>`<button type="button" data-mbb="${k}" aria-pressed="${mbBill===k}">${l}${k==='yr'?` <em>−${save}%</em>`:''}</button>`).join('')}</div>
-    <div class="mb-list">${MB_TIERS.map(t=>{const pr=mbPrice(t.id),cur=t.id==='free';return `<section class="mb-card mb-${t.id}" style="--tj:var(--j-${t.j})">
-      <div class="mb-h"><span class="gi" data-j="${t.j}">${MB_ICON[t.id]}</span><div class="mb-n"><b>${t.name}</b><span>${t.line}</span></div>${t.tag?`<em class="mb-tag">${t.tag}</em>`:''}</div>
-      <div class="mb-p"><b class="num">${pr.big}</b>${pr.per?`<small>${pr.per}</small>`:''}<span>${pr.sub}</span></div>
-      <ul class="mb-f">${t.feat.map((f,i)=>`<li>${i===0&&t.id!=='free'?`<b>Everything in ${t.id==='pro'?'Free':'Pro'}</b>, plus:</li><li>`:''}${f}</li>`).join('')}</ul>
-      <button type="button" class="${cur?'ghost':'primary'} mb-cta" data-mbgo="${t.id}" ${cur?'disabled':''}>${cur?'Your current plan':`Go ${t.name}`}</button></section>`}).join('')}</div>
-    <div class="glabel">Compare every feature</div>
-    <div class="card mb-cmp"><div class="mb-row mb-hd"><span></span><b>Free</b><b style="color:var(--j-sapphire)">Pro</b><b style="color:var(--j-gold)">Elite</b></div>
+    <p class="mb-intro">Tracking is free. Pro and Elite add a plan that adapts to your recovery and training.</p>
+    <div class="seg2 mb-seg" role="tablist" aria-label="Plan">${MB_TIERS.map(t=>`<button type="button" role="tab" data-mbt="${t.id}" aria-pressed="${t.id===mbTier}">${t.name}</button>`).join('')}</div>
+    <div class="card mb-plan">
+      <div class="mb-ph"><div><h3>${T.name}${T.id==='free'?' <span class="mb-cur">Current plan</span>':''}</h3><p>${T.line}</p></div>${T.id==='free'?'<b class="num mb-big">$0</b>':''}</div>
+      ${P?`<div class="mb-opts" role="radiogroup" aria-label="Billing">${opts.map(([k,l,pr,sub])=>`<button type="button" role="radio" class="mb-opt" data-mbb="${k}" aria-checked="${mbBill===k}"><span class="mb-rd"></span><span class="mb-ol"><b>${l}</b><span>${sub}</span></span><b class="num mb-op">${pr}</b></button>`).join('')}</div>`:''}
+      <div class="mb-inc">${T.id==='free'?'Included':`Everything in ${T.id==='pro'?'Free':'Pro'}, plus`}</div>
+      <div class="mb-fl">${T.feat.map(([ic,f])=>`<div class="mb-fr"><span class="mb-fi">${GI[ic]||''}</span><span>${f}</span></div>`).join('')}</div>
+      ${T.id==='free'?'':`<button type="button" class="primary mb-cta" data-mbgo="${T.id}">Continue with ${T.name}</button><p class="mb-fine">Payments aren't live yet. Everything is unlocked free during the beta.</p>`}
+    </div>
+    <div class="glabel">Compare plans</div>
+    <div class="card mb-cmp"><div class="mb-row mb-hd"><span></span><b>Free</b><b>Pro</b><b>Elite</b></div>
       ${MB_ROWS.map(([g,rows])=>`<div class="mb-g">${g}</div>${rows.map(r=>`<div class="mb-row"><span>${r[0]}</span>${tick(r[1])}${tick(r[2])}${tick(r[3])}</div>`).join('')}`).join('')}</div>
-    <p class="note mb-foot">Payments aren't live yet. During the beta every Pro and Elite feature stays unlocked for free. Prices in USD. Cancel anytime once billing starts. Safety features, like the calorie floor, are free on every plan.</p></div>`;
-  el.onclick=e=>{const b=e.target.closest('[data-mbb]');if(b){mbBill=b.dataset.mbb;renderMember();return}
-    const g=e.target.closest('[data-mbgo]');if(g&&!g.disabled){toast(`${g.dataset.mbgo==='pro'?'Pro':'Elite'} is coming soon. Everything's unlocked free during the beta.`)}}}
+    <p class="note mb-foot">Prices in USD. Cancel anytime once billing starts. Safety features, like the calorie floor, are on every plan.</p></div>`;
+  el.onclick=e=>{const t=e.target.closest('[data-mbt]');if(t){mbTier=t.dataset.mbt;renderMember();return}
+    const b=e.target.closest('[data-mbb]');if(b){mbBill=b.dataset.mbb;renderMember();return}
+    const g=e.target.closest('[data-mbgo]');if(g)toast(`${g.dataset.mbgo==='pro'?'Pro':'Elite'} is coming soon. Everything's unlocked free during the beta.`)}}
 /* ================= PAGES (profile, settings, details) ================= */
 const sv=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const GI={bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>'),drop:sv('<path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/>'),run:sv('<circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 12l3-4 4 1 2 4 3 1"/>'),user:sv('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),body:sv('<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 9.5a5 5 0 0 1 7 0L12 13z"/>'),
@@ -3946,7 +3950,7 @@ const GI={bell:sv('<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 
   leaf:sv('<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l8-8"/>'),moon:sv('<path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5z"/>'),
   laurel:sv('<path d="M12 20V9"/><path d="M8 19c-3-2-4-6-3-10M16 19c3-2 4-6 3-10"/><path d="M5.5 12.5c1.5 0 2.5 1 2.5 2.5M5 9c1.5 0 2.5 1 2.5 2.5M18.5 12.5c-1.5 0-2.5 1-2.5 2.5M19 9c-1.5 0-2.5 1-2.5 2.5"/><circle cx="12" cy="6" r="2"/>'),
   crown:sv('<path d="M3.5 8l4.5 4 4-7 4 7 4.5-4-2 11h-13z"/><path d="M6 21h12"/>'),quill:sv('<path d="M20 4C11 5 7 10 5 20"/><path d="M20 4c-1 6-5 9-10 10M9 9h5"/>'),cloche:sv('<path d="M4 17h16M3 20h18M5 17a7 7 0 0 1 14 0M12 8V6M10.5 6h3"/>')};
-const JEWEL={crown:'gold',drop:'sapphire',timer:'sapphire',cal:'sapphire',watch:'teal',moon:'amethyst',leaf:'emerald',bars:'emerald',chart:'teal',plan:'teal',refresh:'teal',laurel:'gold',user:'gold',target:'gold',dumbbell:'gold',cloche:'copper',fire:'copper',download:'copper',list:'copper',quill:'rose',heart:'rose',bell:'rose',palette:'amethyst',camera:'amethyst',book:'amethyst',scale:'sage',body:'sage',sliders:'sage',shield:'emerald',link:'teal',info:'sapphire',copy:'sage',plus:'gold'};
+const JEWEL={drop:'sapphire',timer:'sapphire',cal:'sapphire',watch:'teal',moon:'amethyst',leaf:'emerald',bars:'emerald',chart:'teal',plan:'teal',refresh:'teal',laurel:'gold',user:'gold',target:'gold',dumbbell:'gold',cloche:'copper',fire:'copper',download:'copper',list:'copper',quill:'rose',heart:'rose',bell:'rose',palette:'amethyst',camera:'amethyst',book:'amethyst',scale:'sage',body:'sage',sliders:'sage',shield:'emerald',link:'teal',info:'sapphire',copy:'sage',plus:'gold'};
 const CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>';
 function grow(o){const attr=o.pg?`data-pg="${o.pg}"`:o.ga?`data-ga="${o.ga}"`:o.act?`data-ga="${o.act}"`:'';
   const inner=`<span class="gi" data-j="${JEWEL[o.ic]||''}" style="--c:var(${o.c||'--muted'})">${GI[o.ic]||''}</span><span class="gt"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span><span class="gv ${o.vc||''}">${o.v??''}</span>${o.ctl?'':CHEV}`;
@@ -3991,7 +3995,7 @@ function renderMe(){
     <div class="me2-top"><button class="avatar" type="button" data-ga="avatar" aria-label="Change profile picture"><span class="${avatarCls().trim()}">${avatarInner()}</span><i class="av-ed">✎</i></button>
       <div class="me2-id"><h2>${esc(S.profile.name||'Your profile')}</h2><p>${planLabel()} · ${fmt(goalKcal(g))} kcal today</p>
       ${conn.length?`<div class="srcrow">${conn.map(x=>srcBadge(x)).join('')}</div>`:`<button class="link" data-pg="conn" style="padding:4px 0">+ Connect your watch</button>`}</div></div>
-    <button class="mb-band" type="button" data-pg="member"><span class="mb-crest">${MB_ICON.elite}</span><span class="mb-bt"><b>Free plan <em>· Beta</em></b><span>Pro and Elite are unlocked free during the beta</span></span><span class="mb-go">See plans</span></button>
+    <button class="mb-band" type="button" data-pg="member"><span class="mb-crest">${GI.crown}</span><span class="mb-bt"><b>Membership: Free</b><span>Pro and Elite features are free during the beta</span></span><span class="mb-go">${CHEV}</span></button>
     <div class="qgrid me2-q">
       <div class="qt" style="--c:var(--carb)" role="button" tabindex="0" data-ga="friends">${qRing(Math.min(1,sk/30),'var(--carb)')}<div class="qt-t"><span>Streak</span><b class="num">${sk}<small> day${sk===1?'':'s'}</small></b><em>${sk>=30?'Legend status 🔥':`${30-sk} more to hit 30`}</em></div></div>
       <div class="qt" style="--c:var(--good)" role="button" tabindex="0" data-ga="friends">${qRing(sc.on&&frs.length?(frs.length+1-rank+1)/(frs.length+1):0,'var(--good)')}<div class="qt-t"><span>This week</span><b class="num">${sc.on?`#${rank}`:'—'}<small>${sc.on?` of ${frs.length+1}`:''}</small></b><em>${sc.on?`${fmt(me)} pts`:'Join Friends'}</em></div></div>
@@ -5734,7 +5738,7 @@ function renderPlanRows(){
     +grow({ga:'report',ic:'chart',c:'--good',t:'Monthly reports',s:'Wins, fixes, vitamins & minerals, sleep and training by month'})
     +grow({pg:'targets',ic:'target',c:'--pro',t:'Daily targets',s:S.plan?'Set by your plan':'Set grams yourself',v:S.plan?'Auto':fmt(goalKcal(S.goals))+' kcal'})
     +grow({pg:'method',ic:'book',c:'--good',t:'The science',s:'Why your macros change'})
-    +grow({pg:'member',ic:'crown',c:'--carb',t:'Membership',s:'Free, Pro and Elite',v:'Free · Beta'})
+    +grow({pg:'member',ic:'crown',c:'--muted',t:'Membership',s:'Free, Pro and Elite',v:'Free'})
     +(S.plan?grow({ga:'builder',ic:'refresh',c:'--kcal',t:S.showBuilder?'Hide plan builder':'Change or rebuild plan',s:'Switch goal, pace or start date'}):'');
   $('planBuilder').hidden=!!S.plan&&!S.showBuilder;
 }
