@@ -2641,7 +2641,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.67';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.68';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3576,7 +3576,7 @@ function renderPlan(){renderTip('plan');
   // preview
   draft=profReady(p)?buildPlan(p):null;
   const pl=draft;
-  if(!pl){$('pHead').textContent='Fill in your body stats to see the plan';$('pTiles').innerHTML='';$('pChart').innerHTML='';$('pWeeks').innerHTML='';$('pStartBtn').disabled=true}
+  if(!pl){const miss=[!p.age&&'age',!p.ht&&'height',!p.wt&&'weight'].filter(Boolean);$('pHead').textContent=`Add your ${miss.join(', ').replace(/, ([^,]*)$/,' and $1')} to build this plan`;$('pTiles').innerHTML=`<button type="button" class="ac-band warn" data-pg="body" style="grid-column:1/-1"><span class="mb-crest">${GI.body}</span><span class="mb-bt"><b>Body stats needed</b><span>Your plan is built from your sex, age, height and weight. Tap to add them.</span></span><span class="mb-go">${CHEV}</span></button>`;$('pChart').innerHTML='';$('pWeeks').innerHTML='';$('pStartBtn').disabled=false;$('pStartBtn').dataset.need='1'}
   else{
     const first=pl.weeks[0],last=pl.weeks.slice(0,pl.N).filter(w=>w.ph!=='Diet break').pop()||pl.weeks[pl.N-1],endDate=addDays(pl.start,pl.N*7-1);
     $('pHead').textContent=pl.type==='maintain'?`Hold ${fmt(first.k)} kcal a day for ${pl.N} weeks`:`${pl.type==='cut'?'Lose':'Gain'} ${r1(Math.abs(pl.endW-pl.startW))} lb by ${niceDate(endDate,{month:'long',day:'numeric',year:'numeric'})}`;
@@ -3588,11 +3588,11 @@ function renderPlan(){renderTip('plan');
     $('pSplit').innerHTML=splitChart(pl);
     $('pChart').innerHTML=planChart(pl,S.plan&&S.plan.start===pl.start?S.weights:S.weights);
     $('pWeeks').innerHTML=weeksTable(pl);
-    $('pStartBtn').disabled=false;
+    $('pStartBtn').disabled=false;delete $('pStartBtn').dataset.need;
     if(pl.lowCarb&&!warn&&!pl.capped)$('pWarn').innerHTML=`<div class="banner"><span>Late in this plan carbs fall below 2 g per kg of body weight, the low end for people who lift. Training may feel flat then; a longer timeline keeps more carbs.</span></div>`;
     if(pl.capped&&!warn)$('pWarn').innerHTML=`<div class="banner"><span>Some weeks hit a safety limit (at most 25% below maintenance and 1% of body weight a week, never below your resting burn or ${p.sex==='m'?'1,500':'1,200'} kcal), so the projection ends at ${r1(pl.endW)} lb instead of ${r1(pl.targetW)} lb. A longer timeline reaches the full goal.</span></div>`;
   }
-  $('pStartBtn').textContent=S.plan?'Replace current plan with this one':'Start this plan';
+  $('pStartBtn').textContent=$('pStartBtn').dataset.need?'Add body stats to start':S.plan?'Replace current plan with this one':'Start this plan';
   $('pStop').hidden=!S.plan;
   renderPlanLive();renderWeights();renderManual();renderAiSettings();renderDataNote();renderConn();renderPlanRows();
 }
@@ -3756,7 +3756,7 @@ $('wIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$
 function saveProfileFields(){const p=profIn();S.calc={sex:p.sex,age:p.age,ht:p.ht,wt:p.wt,bf:p.bf,act:p.act,lbs:+$('pLbs').value,dur:+$('pDur').value,unit:p.unit,style:p.style,pro:p.pro,breaks:p.breaks,type:S.pType};save()}
 ['pSex','pAge','pFt','pIn','pWt','pBf','pAct','pLbs','pDur','pUnit','pStyle','pPro','pBrk','pStart'].forEach(id=>{$(id).addEventListener('input',()=>renderPlan());$(id).addEventListener('change',saveProfileFields)});
 $('pType').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;S.pType=b.dataset.t;S.calc={...S.calc,type:S.pType};save();renderPlan()};
-$('pStartBtn').onclick=()=>{if(!draft)return;saveProfileFields();S.plan=draft;if(!S.weights[draft.start]&&draft.start<=todayKey())S.weights[draft.start]=draft.startW;save();renderAll();window.scrollTo({top:0,behavior:'smooth'});toast(`Plan started: ${fmt(draft.weeks[0].k)} kcal a day this week`)};
+$('pStartBtn').onclick=()=>{if(!draft){openPage('body');toast('Add your age, height and weight, then come back to start your plan');return}saveProfileFields();S.plan=draft;if(!S.weights[draft.start]&&draft.start<=todayKey())S.weights[draft.start]=draft.startW;save();renderAll();window.scrollTo({top:0,behavior:'smooth'});toast(`Plan started: ${fmt(draft.weeks[0].k)} kcal a day this week`)};
 let stopArmed=null;
 $('pStop').onclick=()=>{const b=$('pStop');if(!stopArmed){b.textContent='Tap again to end the plan';b.classList.add('danger');stopArmed=setTimeout(()=>{b.textContent='End current plan';b.classList.remove('danger');stopArmed=null},4000);return}clearTimeout(stopArmed);stopArmed=null;S.plan=null;b.textContent='End current plan';b.classList.remove('danger');save();renderAll();toast('Plan ended. Manual targets are back in use.')};
 
@@ -4119,6 +4119,8 @@ function restoreFromSoc(soc){if(!soc)return 0;const D=soc.detail||{},n0=Object.k
   const have=new Set(S.templates.map(t=>t.name.toLowerCase()));(D.tpls||[]).forEach(t=>{if(!have.has(t.name.toLowerCase())){S.templates.push({id:'t'+uid(),name:t.name,ex:t.ex.map(e=>e.n)});n++}});S.tplSeeded=true;
   const wid=new Set((S.workouts||[]).map(w=>w.name+'|'+w.date));(D.wks||[]).forEach(w=>{if(!w.d||w.src==='live'||(w.src&&w.src!=='')||!(w.ex||[]).length||wid.has(w.name+'|'+w.d))return;const st=new Date(w.d+'T12:00:00').getTime();
     S.workouts=S.workouts||[];S.workouts.push({id:'w'+uid(),name:w.name,date:w.d,start:st,end:st+(w.min||45)*60000,restored:true,prs:[],ex:w.ex.map(e=>{const m=String(e.top||'').match(/([\d.]+)\D+(\d+)/);return {n:e.n,sets:Array.from({length:Math.max(1,e.sets||1)},()=>({w:m?+m[1]:0,r:m?+m[2]:0,done:true}))}})});n++});
+  {const ws=Object.keys(S.weights).sort();if(ws.length&&!(S.calc&&S.calc.wt))S.calc={...(S.calc||{}),wt:S.weights[ws[ws.length-1]]};
+   const pt=/bulk/i.test(D.plan||'')?'bulk':/cut/i.test(D.plan||'')?'cut':/maint/i.test(D.plan||'')?'maintain':null;if(pt&&!S.plan){S.pType=pt;S.calc={...(S.calc||{}),type:pt}};renderPlan.filled=false}
   if(soc.name&&!S.profile.name)S.profile.name=soc.name;if(soc.av&&!S.profile.avatar&&!S.profile.photo)S.profile.avatar=soc.av;S.profile.onboarded=true;
   const sc=socCfg();socSave({...sc,on:true,code:soc.code,name:soc.name,color:soc.color,share:soc.share,username:soc.username,phoneLast4:soc.phLast4||null});
   save();return n}
