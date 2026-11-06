@@ -959,6 +959,12 @@ header.top .wrap{gap:8px}
 .sugg .sg-h{font:800 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 12px 4px}
 .sugg .sg-wait{font-weight:600;letter-spacing:0;text-transform:none}
 .prog-top{display:flex;flex-direction:column;gap:14px}.prog-top .qt{cursor:pointer}
+.fr-tabs{position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:4;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:16px;background:rgba(20,22,29,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.07)}
+.fr-tabs button{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:12px;background:none;color:var(--muted);font:700 12px var(--f-body);padding:8px 2px}
+.fr-tabs .fti{font-size:17px;line-height:1}
+.fr-tabs button[aria-selected="true"]{background:var(--surface-2);color:var(--fg);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.fr-tabs i{position:absolute;top:4px;right:calc(50% - 22px);min-width:17px;height:17px;border-radius:9px;background:var(--over);color:#fff;font:800 10.5px/17px var(--f-body);font-style:normal;padding:0 4px}
+.fr-pane{display:flex;flex-direction:column;gap:16px}.fr-pane[hidden]{display:none}
 .srcb{display:inline-flex;align-items:center;gap:4px;font:800 10.5px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--b,var(--muted));background:color-mix(in srgb,var(--b,var(--muted)) 13%,transparent);border:1px solid color-mix(in srgb,var(--b,var(--muted)) 40%,transparent);border-radius:999px;padding:3px 7px 3px 5px;margin-left:6px;vertical-align:2px;white-space:nowrap}
 .srcb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .srcb.big{font-size:11.5px;padding:5px 9px 5px 7px;margin-left:0}.srcb.big svg{width:14px;height:14px}
@@ -2489,7 +2495,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.52';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.53';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4940,7 +4946,25 @@ function renderFriends(){
     <div class="glabel">Activity</div><div class="feed">${feed.length?feed.map(e=>{const n=(e.cheers||[]).length,mineEv=e.who.me,did=cheered.has(e.who.uid+'|'+e.id);return `<div class="fe" data-fp="${e.who.me?'me':esc(e.who.uid)}">${AV(e.who.name,e.who.color,38,e.who.me?myAv():e.who.av)}<div class="fe-t"><p><b>${esc(mineEv?'You':e.who.name.split(' ')[0])}</b> ${evText(e)}</p><span>${ago(e.t,e.date)}${n?` · ${mineEv?'cheered by ':''}${mineEv?esc(e.cheers.slice(0,3).join(', ')):n+' cheer'+(n>1?'s':'')}`:''}</span></div>${mineEv?'':`<button type="button" class="cheer ${did?'on':''}" data-ch="${esc(e.who.uid)}|${esc(e.id)}" ${did?'disabled':''}>🔥${did?'':' Cheer'}</button>`}</div>`}).join(''):'<p class="note" style="padding:6px">Workouts, protein days and streaks from you and your friends show up here.</p>'}</div>
     <details class="steps card" style="padding:14px 18px"><summary>How points work</summary><ul class="ing" style="margin-top:8px">${POINTS.map(([,v,l])=>`<li><span>${l}</span><b>+${v}/day</b></li>`).join('')}</ul><p class="note">Up to ${POINTS.reduce((a,x)=>a+x[1],0)} points a day. Everyone's points are counted the same way from their own plan.</p></details>
     <button class="link" id="frLeave" style="color:var(--muted);align-self:center;padding:10px">Leave Syncope Friends</button>`;
+  frTabs(el,feed,reqs);
 }
+/* Friends in tabs: Leaderboard · Activity · Points · Add, so nothing is buried at the bottom */
+function frTabs(el,feed,reqs){const kids=[...el.children],grp={lead:[],act:[],pts:[],add:[]};let g='lead';
+  kids.forEach(k=>{const t=k.classList.contains('glabel')?k.textContent.trim().toLowerCase():'';
+    if(t==='activity'){g='act';k.remove();return}if(t==="today's points"){g='pts';k.remove();return}
+    if(k.classList.contains('fr-inv')){grp.add.push(k);return}
+    if(k.matches('details.steps')||k.id==='frLeave'){grp.pts.push(k);return}
+    grp[g].push(k)});
+  const since=Date.now()-864e5,fresh=(feed||[]).filter(e=>!e.who.me&&e.t>since).length;
+  const tab=S.frTab&&grp[S.frTab]?S.frTab:'lead';
+  const tabs=[['lead','🏆','Board',reqs&&reqs.length?reqs.length:0],['act','🔥','Activity',fresh],['pts','⭐','Points',0],['add','➕','Add',0]];
+  const bar=document.createElement('div');bar.className='fr-tabs';bar.setAttribute('role','tablist');
+  bar.innerHTML=tabs.map(([k,ic,l,n])=>`<button type="button" role="tab" data-frt="${k}" aria-selected="${k===tab}"><span class="fti">${ic}</span>${l}${n?`<i>${n}</i>`:''}</button>`).join('');
+  el.prepend(bar);
+  Object.entries(grp).forEach(([k,list])=>{const pane=document.createElement('div');pane.className='fr-pane';pane.dataset.pane=k;pane.hidden=k!==tab;list.forEach(x=>pane.appendChild(x));
+    if(k==='act'&&!list.length)pane.innerHTML='<p class="note" style="text-align:center;padding:20px">No activity yet. Log a meal or a workout to get things going.</p>';el.appendChild(pane)});
+  bar.onclick=e=>{const b=e.target.closest('[data-frt]');if(!b)return;S.frTab=b.dataset.frt;bar.querySelectorAll('[data-frt]').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+    el.querySelectorAll('.fr-pane').forEach(p=>p.hidden=p.dataset.pane!==S.frTab)}}
 function shareRows(sh){sh={...sh,templates:sh.templates!==false};return [['templates','Workout templates','--pro','dumbbell'],['nutrition','Calories & macros','--kcal','target'],['foods','Food log (what you ate)','--carb','list'],['recovery','Recovery & sleep','--good','heart'],['streak','Logging streak','--carb','fire'],['workouts','Workouts & PRs','--pro','dumbbell'],['protein','Protein days','--pro','target'],['steps','Steps','--fat','watch'],['meals','Days on target','--good','list'],['weight','Weekly weight change','--kcal','scale']]
   .map(([k,t,c,ic])=>grow({ic,c,t,ctl:`<input type="checkbox" class="sw" data-sh="${k}" ${sh[k]?'checked':''} aria-label="${t}">`})).join('')}
 $('frBody').addEventListener('click',async e=>{
