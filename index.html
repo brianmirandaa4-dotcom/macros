@@ -2423,7 +2423,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.40';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.41';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -2596,7 +2596,7 @@ function setView(v){
   $('tabsTop').innerHTML=tabsHTML(); $('tabsBottom').innerHTML=tabsHTML(TABS_M);
   if(location.hash.slice(1)!==v){try{history.replaceState(null,'','#'+v)}catch(e){}}
   renderView(); decorate(); window.scrollTo({top:0});
-  if(v==='train'||v==='today')setTimeout(()=>syncDevices(false),300);
+  if(v==='train'||v==='today')setTimeout(()=>syncDevices('fresh'),300);
 }
 document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t){if(t.dataset.v==='add')openAdd();else setView(t.dataset.v)};const g=e.target.closest('[data-goto]');if(g)setView(g.dataset.goto)});
 window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);const jm=h.match(/^join=([A-Za-z0-9]{4,10})/);if(jm){try{localStorage.setItem('syncope.join',jm[1].toUpperCase())}catch(e){}setView('friends');if(socCfg().on){const pj=jm[1];localStorage.removeItem('syncope.join');socApi('add',{q:pj}).then(a=>{toast(`You and ${esc(a.name)} are now friends`);socBoard().then(()=>S.view==='friends'&&renderFriends())}).catch(e=>toast(esc(e.message)))}return}if(h&&h!==S.view)setView(h)});
@@ -6072,22 +6072,29 @@ async function api(path,opt={}){
   return j;
 }
 let syncing=false;
+/* force=true: you tapped Sync (toast). force='fresh': opening/returning to the app, at most every 2 minutes, skips the
+   server's 20-minute cache so edits and deletions in WHOOP/Oura/Garmin show up right away. Both stay inside free limits. */
 async function syncDevices(force){
   const c=syncCfg();if(!c.url||!c.uid||syncing)return;
-  if(!force&&((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<15*60000)))return;
+  if(force==='fresh'){if((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<2*60000))return}
+  else if(!force&&((S.prefs&&S.prefs.autoSync===false)||(c.last&&Date.now()-c.last<15*60000)))return;
   syncing=true;setConnStatus('Syncing…');document.documentElement.classList.add('syncing');if(S.view==='today')renderTodayRows();
   try{
-    const d=await api(`/api/sync?days=${c.last?14:45}${force?'&force=1':''}`);
-    mergeDevice(d);c.last=Date.now();c.err=(d.errors||[]).join(' · ');c.st={...(c.st||{}),whoop:!!d.whoop,garmin:!!d.garmin,oura:!!d.oura};syncSave(c);
-    setConnStatus('');if(force)toast('Synced your devices');
-  }catch(e){c.err=e.message;syncSave(c);setConnStatus('');if(force)toast(esc(e.message))}
+    const days=c.last?14:45,d=await api(`/api/sync?days=${days}${force?'&force=1':''}`);
+    mergeDevice(d,days);c.last=Date.now();c.err=(d.errors||[]).join(' · ');c.st={...(c.st||{}),whoop:!!d.whoop,garmin:!!d.garmin,oura:!!d.oura};syncSave(c);
+    setConnStatus('');if(force===true)toast('Synced your devices');
+  }catch(e){c.err=e.message;syncSave(c);setConnStatus('');if(force===true)toast(esc(e.message))}
   syncing=false;document.documentElement.classList.remove('syncing');renderAll();
 }
-function mergeDevice(d){
+function mergeDevice(d,days=14){
   S.dev=S.dev||{days:{},workouts:[]};
   const put=(src,days)=>Object.entries(days||{}).forEach(([k,v])=>{S.dev.days[k]=S.dev.days[k]||{};S.dev.days[k][src]={...(S.dev.days[k][src]||{}),...v};if(src==='g'&&v.weightLb&&!S.weights[k])S.weights[k]=v.weightLb});
   if(d.whoop)put('w',d.whoop.days);if(d.oura)put('o',d.oura.days);if(d.garmin)put('g',d.garmin.days);
   const ws=[...(d.whoop?d.whoop.workouts:[]),...(d.oura?d.oura.workouts:[]),...(d.garmin?d.garmin.workouts:[])];
+  // drop sessions you deleted in WHOOP / Oura / Garmin: anything from a source that answered, inside the window it sent, that's no longer there
+  const from=addDays(todayKey(),-(days-2)),fresh=new Set(ws.map(w=>w.id)),answered=['whoop','oura','garmin'].filter(x=>d[x]&&Array.isArray(d[x].workouts));
+  const gone=S.dev.workouts.filter(w=>answered.some(x=>String(w.id).startsWith(x+'-'))&&w.date>=from&&!fresh.has(w.id));
+  if(gone.length){const g=new Set(gone.map(w=>w.id));S.dev.workouts=S.dev.workouts.filter(w=>!g.has(w.id));S.dev.skip=(S.dev.skip||[]).filter(id=>!g.has(id));S.workouts.forEach(w=>{if(w.devId&&g.has(w.devId))delete w.devId})}
   const map=new Map(S.dev.workouts.map(w=>[w.id,w]));ws.forEach(w=>map.set(w.id,w));
   S.dev.workouts=[...map.values()].sort((a,b)=>String(b.start||b.date).localeCompare(String(a.start||a.date))).slice(0,200);
   save();
@@ -6151,7 +6158,7 @@ function openSyncGuide(){
     <div class="row" style="justify-content:flex-end"><button class="primary" id="sgOk">Got it</button></div>`);
   $('sgOk').onclick=closeSheet;
 }
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices(false)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncDevices('fresh')});
 setInterval(()=>{if(document.visibilityState==='visible')syncDevices(false)},15*60000);
 /* ---- watch workouts in Train ---- */
 /* Source badges: each device gets its own color and a simple glyph (band, watch face, ring, heart) next to its name. */
