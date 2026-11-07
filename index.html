@@ -1990,6 +1990,7 @@ html:has(#pgBody>#pg-coach) .tabbar{display:none!important}
 .day-total .dt-t{display:flex;flex-direction:column;gap:2px}.day-total .dt-t b{font:650 16px/1.3 var(--f-body)}
 .day-total .dt-t i{font-style:normal;font-size:13px}.day-total .dt-k{font-size:22px}.day-total .dt-k small{font-size:12px;color:var(--muted);font-family:var(--f-body)}
 .day-total .dt-n{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.day-total .dt-a{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:4px}.day-total .dt-a button{min-height:42px}
 /* calmer accents: purple only for the main action and selection */
 .statstrip b.c-p{color:var(--fg)!important}
 </style>
@@ -3290,7 +3291,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}}};
 let storageOK=true;
-const APP_VER='syncope-2.77';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.78';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3600,8 +3601,9 @@ function renderToday(){const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack
     ${g.safe?`<button class="plan-pill safe-pill" data-safe>Raised to ${fmt(g.safe.to)} kcal · safe minimum</button>`:''}${S.day===todayKey()?`<button class="plan-pill" data-dayplan>🏋️ ${(()=>{const t=((hydS().day[todayKey()]||{}).types);return t?(t.length?hydLabel(t):'Rest day'):'Today\'s training?'})()}</button>`:''}${g.carry?`<button class="plan-pill fuel-pill" data-dayplan>Held at ${fmt(goalKcal(g))} · bulk never drops</button>`:''}${g.fuel?`<button class="plan-pill fuel-pill" data-fuel>+${g.fuel.c} g carbs · ${g.fuel.planned?'planned training':'training'}</button>`:''}${g.plan?`<button class="plan-pill" data-goto="plan">${S.plan.type==='cut'?'Cut':S.plan.type==='bulk'?'Bulk':'Maintain'} · ${g.after?'maintenance':g.rec?`recovery wk ${g.rw}`:`wk ${g.week}/${g.of}`}</button>`:g.starter?`<button class="plan-pill" data-goto="plan">${g.body?'Maintenance for your body · build a plan':'Starter targets · build your plan'}</button>`:''}</div>`;
   animateHero(k);dlToday();
   $('mealPick').innerHTML=MEALS.map(([m,l])=>`<button type="button" class="chip" data-meal="${m}" aria-pressed="${S.mealSel===m}">${l}</button>`).join('');
+  rebalDT(k);
   const isDT=e=>e.src==='restored'&&/^Day total/.test(e.n||''),all=S.days[k]||[],dts=all.filter(isDT),list=all.filter(e=>!isDT(e)), prev=(S.days[addDays(k,-1)]||[]).filter(e=>!isDT(e));
-  const dtHTML=dts.map(e=>`<div class="card day-total"><button class="dt-b" data-edit="${e.id}"><div class="dt-t"><b>Day total</b><span class="num"><i style="color:var(--pro)">${r0(e.p)}P</i> <i style="color:var(--carb)">${r0(e.c)}C</i> <i style="color:var(--fat)">${r0(e.f)}F</i></span></div><b class="num dt-k">${fmt(e.k)}<small> kcal</small></b></button><p class="dt-n">Restored from your account summary. The meal-by-meal list for this day was only on the old copy of the app, so just the total came back. Every day since you made an account is backed up meal by meal.</p></div>`).join('');
+  const dtHTML=dts.filter(e=>e.k>0).map(e=>{const part=e.orig&&e.orig.k>e.k;return `<div class="card day-total"><button class="dt-b" data-edit="${e.id}"><div class="dt-t"><b>${part?'Not rebuilt yet':'Day total'}</b><span class="num"><i style="color:var(--pro)">${r0(e.p)}P</i> <i style="color:var(--carb)">${r0(e.c)}C</i> <i style="color:var(--fat)">${r0(e.f)}F</i></span></div><b class="num dt-k">${fmt(e.k)}<small> kcal</small></b></button><p class="dt-n">${part?`Of your ${fmt(e.orig.k)} kcal day total. Keep adding meals and this shrinks to zero.`:'Only the total for this day was saved before accounts existed. Rebuild the meals from your camera roll: each photo you add is logged to this day and comes off this total.'}</p><div class="dt-a"><button class="primary" type="button" data-dtphoto>Rebuild from meal photos</button><button class="ghost" type="button" data-dttype>Type a meal</button></div></div>`}).join('');
   const emp=MEALS.filter(([m])=>!list.some(e=>(e.meal||'snack')===m));
   const empHTML=emp.length?`<div class="card meal-empty"><div class="me-h">Add to</div><div class="me-row">${emp.map(([m,l])=>{const pe=prev.filter(e=>(e.meal||'snack')===m);return `<button type="button" class="me-c" data-addto="${m}"><span class="ic thumb" style='background-image:${thumbURL(m)}'></span><b>${l}</b><i>+</i></button>${pe.length?`<button type="button" class="me-rep" data-repeat="${m}">Repeat yesterday's ${l.toLowerCase()} · ${fmt(sumEntries(pe).k)}</button>`:''}`}).join('')}</div></div>`:'';
   if(!window._mealOpen)window._mealOpen={};
@@ -3630,13 +3632,19 @@ $('meals').addEventListener('click',e=>{const gb=e.target.closest('[data-grade]'
   const r=e.target.closest('[data-repeat]');if(r){const m=r.dataset.repeat;const src=(S.days[addDays(S.day,-1)]||[]).filter(x=>(x.meal||'snack')===m);addEntries(src.map(x=>({...x,id:uid(),t:Date.now()})),S.day,m)}
 });
 
+/* A restored "Day total" only covers what hasn't been rebuilt: real meals logged to that day come off it, so the day still adds up. */
+function rebalDT(k){const L=S.days[k]||[],dt=L.find(e=>e.src==='restored'&&/^Day total/.test(e.n||''));if(!dt)return;
+  if(!dt.orig)dt.orig={k:dt.k,p:dt.p,c:dt.c,f:dt.f};const sm=sumEntries(L.filter(e=>e!==dt));['k','p','c','f'].forEach(x=>dt[x]=Math.max(0,Math.round(dt.orig[x]-(sm[x]||0))))}
+function dtPickMeal(then){sheet(`<div><div class="eyebrow">Rebuild this day</div><h3>Which meal is it?</h3></div><div class="wn-acts" id="dtM">${MEALS.map(([m,l])=>`<button type="button" class="chip" data-v="${m}">${l}</button>`).join('')}</div><button class="ghost" id="dtX" style="width:100%">Cancel</button>`);
+  $('dtX').onclick=closeSheet;$('dtM').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;S.mealSel=b.dataset.v;closeSheet();then()}}
+$('meals').addEventListener('click',e=>{if(e.target.closest('[data-dtphoto]'))dtPickMeal(()=>$('photoIn').click());else if(e.target.closest('[data-dttype]'))dtPickMeal(()=>{renderToday();setTimeout(()=>{$('foodIn').scrollIntoView({block:'center'});$('foodIn').focus()},150)})});
 function addEntries(entries,k=S.day,meal=S.mealSel){
   if(!entries.length)return;const _before=dayTotals(k);setTimeout(()=>checkRewards(k,_before),0);
   if(meal!=='drinks'&&entries.every(e=>isBooze(e.n))){meal='drinks';setTimeout(()=>toast('Added to Drinks 🍺'),400)}
   entries.forEach(e=>e.meal=meal);try{window._mealOpen=window._mealOpen||{};window._mealOpen[k+meal]=true}catch(_){}
   const ids=entries.map(e=>e.id),kc=entries.reduce((a,e)=>a+e.k,0);
   S.just={k,ids};
-  S.days[k]=[...(S.days[k]||[]),...entries]; save(); renderAll();
+  S.days[k]=[...(S.days[k]||[]),...entries]; rebalDT(k); save(); renderAll();
   if(S.view==='today'&&k===S.day){
     try{if(matchMedia('(pointer:coarse)').matches&&document.activeElement&&document.activeElement.id==='foodIn')document.activeElement.blur()}catch(e){}
     setTimeout(()=>{const j=$('justAdded');if(j&&!j.hidden)j.scrollIntoView({behavior:'smooth',block:'nearest'})},80);
