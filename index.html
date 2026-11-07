@@ -2558,6 +2558,23 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 .composer #addForm .cam,.composer #addForm .go{min-height:46px}
 /* scrolling rows fade at the edge while there's more to see, instead of a hard cut */
 .hs-more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent)}
+
+/* coach engine */
+.rd-dot{display:inline-flex}.rd-dot::before{content:'';width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 22%,transparent)}
+.rd-list{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:10px}
+.rd-list li{position:relative;padding-left:18px;line-height:1.4;color:var(--fg)}
+.rd-list li::before{content:'';position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.rd-list li b{display:block;font-weight:700}.rd-list li span{display:block;color:var(--muted);margin-top:2px}
+.rd-btns{gap:10px;flex-wrap:wrap;margin:4px 0 12px}.rd-btns button{flex:1 1 150px}
+.lp-why{margin:14px 0 6px;padding-top:14px;border-top:1px solid var(--hair)}.lp-why .glabel{margin:0 0 12px}
+
+#readyToday.card{padding:0!important;overflow:hidden}
+#readyToday .trp-row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:14px 16px;background:none;border:0;color:var(--fg);text-align:left;cursor:pointer;font:inherit}
+#readyToday .trp-ic{width:22px;flex:none;justify-content:center}
+#readyToday .trp-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#readyToday .trp-tx b{font:700 15px var(--f-body)}
+#readyToday .trp-tx em{font-style:normal;font-size:13px;color:var(--muted);line-height:1.35}
+#readyToday .trp-row>svg{width:16px;height:16px;color:var(--subtle);flex:none}
 </style>
 </head>
 <body>
@@ -2590,6 +2607,7 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
     <div class="card hero v2" id="hero"></div>
     <div class="pg-tip" id="planTip" hidden></div>
     <div class="qgrid" id="quick" aria-label="Quick look"></div>
+    <div class="card trp rd-today" id="readyToday" hidden></div>
     <div class="upnext" id="upNext" hidden aria-live="polite"></div>
     <div id="acNudge"></div>
     <div class="card prep-card" id="prepCard" hidden></div>
@@ -3906,7 +3924,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.93';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.94';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4421,7 +4439,7 @@ function sheet(html,o={}){{const sr=$('sheetRoot'),cur=sr.firstElementChild,key=
   cuDress($('sheetRoot').querySelector('.sheet'));
   const f=$('sheetRoot').querySelector('input:not([type=checkbox])');if(f&&!o.nofocus)setTimeout(()=>f.focus(),60)}
 /* CULTURE: every plain sheet opens the same way: round icon tile, title, one-line subtitle (markup, ids and handlers untouched) */
-const CU_IC=[[/friend|picture|who's|profile/,'user'],[/add a food|saved food|breakfast|lunch|dinner|snack|my meal|log again/,'cloche'],[/weigh(?!tlift)|weight(?!lift)|sweat/,'scale'],[/drink|hydration|bottle|water/,'drop'],[/barcode|package|photo|scan|label|\bplate\b/,'camera'],[/alert|notif|home screen/,'bell'],[/grade/,'laurel'],[/fuel|carbs/,'fire'],[/enough|floor/,'shield'],
+const CU_IC=[[/today’s call|go lighter|green light|hold back|as planned/,'heart'],[/friend|picture|who's|profile/,'user'],[/add a food|saved food|breakfast|lunch|dinner|snack|my meal|log again/,'cloche'],[/weigh(?!tlift)|weight(?!lift)|sweat/,'scale'],[/drink|hydration|bottle|water/,'drop'],[/barcode|package|photo|scan|label|\bplate\b/,'camera'],[/alert|notif|home screen/,'bell'],[/grade/,'laurel'],[/fuel|carbs/,'fire'],[/enough|floor/,'shield'],
   [/calendar|coming up|schedule|when are you/,'cal'],[/workout|training|template|exercise|lift|session|train/,'dumbbell'],[/backup|restore|csv|export/,'download'],[/privacy|remove|leave|turn off/,'shield'],
   [/team|coach|player|roster|code/,'laurel'],[/friend|profile|picture|who's/,'user'],[/sign in|account|password|recover\b/,'user'],[/garmin|whoop|health|watch|wearable|sync|recovery|shortcut|server|api key/,'heart'],
   [/meal|food|log|eat|favourite|avoid|like|day/,'cloche']];
@@ -6974,6 +6992,68 @@ document.addEventListener('contextmenu',e=>{const el=e.target.closest(HOLD_SEL);
   hook();setTimeout(hook,1500)})();
 
 
+/* ================= THE COACH ENGINE: wearable data + training + food, worked out on the phone =================
+   Hard rule: wearable data (WHOOP, Oura, Garmin, Apple Health) is never sent to AI. Everything here runs locally. */
+function hvBase(key,k,n){n=n||28;const v=[];for(let i=1;i<=n;i++){const x=hv(addDays(k,-i))[key];if(x!=null&&x!==''&&!isNaN(+x))v.push(+x)}if(v.length<5)return null;const m=v.reduce((a,b)=>a+b,0)/v.length;return {m,n:v.length}}
+function readiness(k){k=k||todayKey();let h;try{h=hv(k)}catch(e){return null}const R=[];let sc=0,have=0;
+  const rec=h.recovery!=null&&h.recovery!==''?+h.recovery:null;
+  if(rec!=null&&!isNaN(rec)){have++;const lab=h.ouraReady?'Readiness':h.garminBB?'Body Battery':'Recovery';
+    if(rec<34){sc-=2;R.push({w:3,t:`${lab} ${r0(rec)}%`})}else if(rec<55){sc-=.75;R.push({w:1.5,t:`${lab} ${r0(rec)}%`})}else if(rec>=67){sc+=1;R.push({w:1,g:1,t:`${lab} ${r0(rec)}%`})}}
+  const sl=h.sleep!=null&&h.sleep!==''?+h.sleep:null;
+  if(sl!=null&&sl>0){have++;const t=`${r1(sl)} h sleep`;if(sl<5.5){sc-=1.5;R.push({w:2.5,t})}else if(sl<6.5){sc-=.75;R.push({w:1.5,t})}else if(sl>=7.5){sc+=.5;R.push({w:.5,g:1,t})}}
+  if(h.hrv!=null&&h.hrv!==''){const b=hvBase('hrv',k);if(b){have++;const d=(+h.hrv-b.m)/b.m*100;if(d<=-15){sc-=1;R.push({w:2,t:`HRV ${r0(-d)}% below your normal`})}else if(d>=10){sc+=.5;R.push({w:.5,g:1,t:`HRV ${r0(d)}% above your normal`})}}}
+  if(h.rhr!=null&&h.rhr!==''){const b=hvBase('rhr',k);if(b){have++;const d=+h.rhr-b.m;if(d>=5){sc-=1;R.push({w:2,t:`Resting heart rate ${r0(d)} bpm above normal`})}}}
+  if(!have)return null;
+  let run=0;for(let i=1;i<=7;i++){const d=addDays(k,-i);let hard=false;try{hard=(+hv(d).strain||0)>=14}catch(e){}if(S.workouts.some(w=>w.date===d)||hard)run++;else break}
+  if(run>=4){sc-=.75;R.push({w:1.5,t:`${run} training days in a row`})}
+  try{const ys=hv(addDays(k,-1)).strain;if(ys!=null&&+ys>=17){sc-=.5;R.push({w:1,t:`Hard day yesterday (strain ${r1(+ys)})`})}}catch(e){}
+  try{const yk=addDays(k,-1),yt=dayTotals(yk),yg=goalsFor(yk);if(yt&&yt.k>200&&yg){const kt=goalKcal(yg);if(kt&&yt.k<kt*.75){sc-=.5;R.push({w:1,t:`Ate ${fmt(r0(yt.k))} of ${fmt(r0(kt))} kcal yesterday`})}if(yg.p&&yt.p<yg.p*.7){sc-=.25;R.push({w:.8,t:`Protein ${r0(yt.p)} of ${r0(yg.p)} g yesterday`})}}}catch(e){}
+  const lvl=sc<=-2?'low':sc<=-.75?'mod':sc>=1?'high':'ok';R.sort((a,b)=>b.w-a.w);
+  return {lvl,sc,why:R.filter(x=>lvl==='high'?x.g:!x.g).slice(0,3).map(x=>x.t),src:h.src||[]}}
+const RD={low:{t:'Go lighter today',c:'--over',plan:['Do one less set on each lift','Stop 2–3 reps before failure, no max attempts','Or swap it for an easy 20–30 minute walk or bike'],eat:'Get your protein in, don’t skip carbs around training, and get to bed early tonight.'},
+  mod:{t:'Train, but hold back a little',c:'--fat',plan:['Do your planned session','Skip any extra top sets','Stop a rep short on the last set of each lift']},
+  ok:{t:'Train as planned',c:'--good',plan:['Your body looks ready for a normal session']},
+  high:{t:'Green light: push today',c:'--good',plan:['Good day to try a top set or add 5 lb on your main lift','Add a rep wherever the weight felt easy last time']}};
+function readyRowHTML(i){const r=readiness();if(!r)return '';const L=RD[r.lvl];
+  return `<button type="button" class="trp-row rd-row" data-ready="${i==null?-1:i}"><span class="trp-ic rd-dot" style="--c:var(${L.c})" aria-hidden="true"></span><span class="trp-tx"><b>${L.t}</b><em>${esc(r.why.join(' · ')||'From your watch data')}</em></span>${CHEV}</button>`}
+function startLighter(i){const before=S.active&&S.active.id;startTpl(i);const A=S.active;if(!A||A.id===before)return;
+  A.ex.forEach(x=>{if(!isCardio(x.n)&&x.sets.length>=3)x.sets.pop()});A.lite=1;save();renderAll();toast('Lighter version: one less set per lift. Stop 2–3 reps short.')}
+function openReady(i){const r=readiness();if(!r)return;const L=RD[r.lvl],tp=i>=0?S.templates[i]:null;
+  sheet(`<div><div class="eyebrow">Today’s call</div><h3>${L.t}</h3></div>
+    ${r.why.length?`<div class="glabel">Why</div><ul class="rd-list">${r.why.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    <div class="glabel">What to do</div><ul class="rd-list">${L.plan.map(t=>`<li>${esc(t)}</li>`).join('')}${L.eat?`<li>${esc(L.eat)}</li>`:''}</ul>
+    ${tp&&!S.active?`<div class="row rd-btns">${r.lvl==='low'||r.lvl==='mod'?`<button class="primary" type="button" data-rdlite="${i}">Start lighter</button><button class="ghost" type="button" data-rdgo="${i}">Start as planned</button>`:`<button class="primary" type="button" data-rdgo="${i}">Start ${esc(tp.name)}</button>`}</div>`:''}
+    <p class="note">Worked out on your phone from ${esc(r.src.filter(x=>x!=='manual').join(', ')||'your health data')}, your training and your food. Your watch data never leaves your phone.</p>`);
+  const R=$('sheetRoot');R.querySelectorAll('[data-rdlite]').forEach(b=>b.onclick=()=>{closeSheet();startLighter(+b.dataset.rdlite)});R.querySelectorAll('[data-rdgo]').forEach(b=>b.onclick=()=>{closeSheet();startTpl(+b.dataset.rdgo)})}
+/* Stalled lifts: compare the last 4 weeks with the 4 before, then look at food, sleep, recovery and training for the cause */
+function stallInfo(n){const tk=todayKey(),a=liftSessions(n,addDays(tk,-27),tk),b=liftSessions(n,addDays(tk,-55),addDays(tk,-28));
+  if(a.length<3)return null;const bw=a[0].bw,v=x=>bw?x.reps:x.best,bestA=Math.max(...a.map(v)),bestB=b.length?Math.max(...b.map(v)):null;
+  const stalled=bestB!=null?bestA<=bestB*1.01:(a.length>=4&&Math.max(...a.slice(1).map(v))<=v(a[0])*1.01);if(!stalled)return null;
+  const F=[],days=Array.from({length:28},(_,i)=>addDays(tk,-i-1)),prev=Array.from({length:28},(_,i)=>addDays(tk,-i-29));
+  const avg=(ks,f)=>{const x=ks.map(k=>{try{return f(k)}catch(e){return null}}).filter(y=>y!=null&&!isNaN(y));return x.length>=5?x.reduce((s,y)=>s+y,0)/x.length:null};
+  const num=y=>y==null||y===''?null:+y,logged=days.filter(k=>(S.days[k]||[]).length),kind=S.plan&&S.plan.type;
+  if(logged.length>=7){const r=avg(logged,k=>{const t=goalKcal(goalsFor(k));return t?dayTotals(k).k/t:null});
+    if(r!=null&&r<.92)F.push(kind==='cut'?{w:1,t:`You’re eating ${r0((1-r)*100)}% under target on a cut, so holding strength is a win right now.`,fix:'Keep protein high. Expect strength to hold, not climb, until the cut ends.'}:{w:3,t:`You’re eating ${r0((1-r)*100)}% under your calorie target on average.`,fix:'Hit your calorie target at least 6 days a week, with a meal or snack around training.'});
+    const pr=avg(logged,k=>{const g=goalsFor(k);return g.p?dayTotals(k).p/g.p:null});if(pr!=null&&pr<.85)F.push({w:2.5,t:`Protein averages ${r0(pr*100)}% of your target.`,fix:'Reach your protein target daily, spread over 3–4 meals.'})}
+  else F.push({w:.5,t:`Food is logged on only ${logged.length} of the last 28 days, so eating can’t be ruled out.`,fix:'Log meals for two weeks to see whether food is the bottleneck.'});
+  const sl=avg(days,k=>num(hv(k).sleep)),slp=avg(prev,k=>num(hv(k).sleep));
+  if(sl!=null&&(sl<7||(slp!=null&&slp-sl>=.5)))F.push({w:sl<6.5?3:2,t:`Sleep averages ${r1(sl)} h${slp!=null&&slp-sl>=.5?`, down from ${r1(slp)} h`:''}.`,fix:'Aim for 7.5–9 hours. Strength gains slow a lot under 7.'});
+  const rc=avg(days,k=>num(hv(k).recovery)),rcp=avg(prev,k=>num(hv(k).recovery));
+  if(rc!=null&&(rc<50||(rcp!=null&&rcp-rc>=10)))F.push({w:2,t:`Recovery averages ${r0(rc)}%${rcp!=null&&rcp-rc>=10?`, down from ${r0(rcp)}%`:''}.`,fix:'Take a lighter week (about half your sets), then build back up.'});
+  if(a.length<4)F.push({w:1.5,t:`You trained it ${a.length} times in 4 weeks.`,fix:'Train this lift, or its muscle group, at least twice a week.'});
+  const mus=musOf(n),cnt=ks=>S.workouts.filter(w=>ks.includes(w.date)).reduce((t,w)=>t+w.ex.filter(x=>musOf(x.n)===mus).reduce((u,x)=>u+x.sets.filter(z=>(+z.r||0)>0).length,0),0),sA=cnt(days)/4,sB=cnt(prev)/4;
+  if(mus!=='Other'&&mus!=='Cardio'){if(sA>22)F.push({w:2,t:`About ${r0(sA)} ${mus.toLowerCase()} sets a week, likely more than you can recover from.`,fix:'Trim to about 12–18 sets a week for a few weeks.'});else if(sB&&sA<sB*.7)F.push({w:1.5,t:`${mus} sets dropped from ${r0(sB)} to ${r0(sA)} a week.`,fix:'Bring weekly sets back up gradually.'});else if(sA<8)F.push({w:1,t:`Only about ${r0(sA)} ${mus.toLowerCase()} sets a week.`,fix:'Work up to about 10–16 sets a week for this muscle.'})}
+  const T3=a.slice(-3);if(!bw&&T3.length===3&&T3.every(x=>+x.top.w===+T3[0].top.w&&+x.top.r===+T3[0].top.r))F.push({w:2,t:`Same top set (${T3[0].top.w} × ${T3[0].top.r}) three sessions in a row.`,fix:'Add a rep each session, and add 5 lb once you reach the top of your rep range.'});
+  F.sort((x,y)=>y.w-x.w);return {n,sessions:a.length,bw,F:F.slice(0,3)}}
+function stalledLifts(){const tk=todayKey(),names=[...new Set(S.workouts.filter(w=>w.date>=addDays(tk,-27)).flatMap(w=>w.ex.filter(x=>!isCardio(x.n)).map(x=>x.n)))];return names.map(stallInfo).filter(Boolean)}
+function stallHTML(n){const st=stallInfo(n);if(!st||!st.F.length)return '';
+  return `<div class="lp-why"><div class="glabel">Why it may be stuck</div><ul class="rd-list">${st.F.map(f=>`<li><b>${esc(f.t)}</b><span>${esc(f.fix)}</span></li>`).join('')}</ul><p class="note">Based on your last 4 weeks of training, food, sleep and recovery. Worked out on your phone.</p></div>`}
+function stallRowHTML(){let L=[];try{L=stalledLifts()}catch(e){}if(!L.length)return '';const top=L[0];
+  return `<button type="button" class="trp-row" data-stall="${esc(top.n)}"><span class="trp-ic" aria-hidden="true">🏋️</span><span class="trp-tx"><b>${esc(top.n)} has stalled${L.length>1?` (+${L.length-1} more)`:''}</b><em>${esc(top.F[0]?top.F[0].t:'See what might be holding it back')}</em></span>${CHEV}</button>`}
+document.addEventListener('click',e=>{const r=e.target.closest('[data-ready]');if(r){openReady(+r.dataset.ready);return}
+  const st=e.target.closest('[data-stall]');if(st){S.lpLift=st.dataset.stall;S.lpPeriod='4w';openPage('lifts')}});
+
+
 /* ================= FIND ANYTHING: type a word, jump straight there ================= */
 const FIND=[
   ['Membership: Free, Pro & Elite','membership subscription pro elite upgrade plan premium price billing',()=>openPage('member')],
@@ -7300,7 +7380,8 @@ function mealNudgeText(){try{const p=nextMealPick(todayKey())[0];return p?p.text
 window.mealNudgeText=mealNudgeText;
 window.coStarts=()=>coStarts();window.coachContext=()=>coachContext();window.__un={openPage:id=>openPage(id),openChat:q=>openChat(q)};
 var unOpen=false;
-function renderUpNext(){const el=$('upNext');if(!el)return;const k=todayKey();
+function renderUpNext(){try{const rt=$('readyToday');if(rt){const r=S.day===todayKey()&&!S.active?readiness():null,nx=r?tplNext():null,show=!!r&&(r.lvl==='low'||r.lvl==='high');rt.hidden=!show;rt.innerHTML=show?readyRowHTML(nx?nx.i:-1):''}}catch(e){}
+  const el=$('upNext');if(!el)return;const k=todayKey();
   if(S.day!==k||(typeof coachOn==='function'&&coachOn()&&ctView()==='team')){el.hidden=true;el.innerHTML='';return}
   let P=[];try{P=nextMealPick(k)}catch(e){P=[]}if(!P.length){el.hidden=true;el.innerHTML='';return}
   const a=P[0];el.hidden=false;
@@ -8603,6 +8684,7 @@ function renderLifts(){
       ${bw?'':`<div class="seg2" role="group" style="max-width:none"><button type="button" data-lmet="best" aria-pressed="${m==='best'}">Est. 1-rep max</button><button type="button" data-lmet="top" aria-pressed="${m==='top'}">Top set weight</button></div>`}
       <div class="chart lp-chart">${liftChart(ss,m)}</div>
       ${tr?`<div class="lp-facts"><div><b class="${tr.status}">${tr.pct>=0?'+':''}${r1(tr.pct)}%</b><span>change</span></div><div><b>${tr.delta>=0?'+':''}${r1(tr.delta)}${bw?'':' lb'}</b><span>${bw?'reps':'est. max'}</span></div><div><b>${tr.perWk>=0?'+':''}${r1(tr.perWk)}${bw?'':' lb'}</b><span>per week</span></div></div>`:''}
+      ${(()=>{try{return tr&&tr.status!=='up'?stallHTML(r.n):''}catch(e){return ''}})()}
       <ul class="ing">${ss.slice().reverse().map((x,i,arr)=>{const nx=arr[i+1],up=nx?(bw?x.reps-nx.reps:x.best-nx.best):0;return `<li><span>${niceDate(x.d,{weekday:'short',month:'short',day:'numeric'})}</span><b>${x.top.w?`${x.top.w} × ${x.top.r}`:`${x.reps} reps`} <span class="dim">· ${x.sets} sets</span> ${nx?`<i class="dl ${up>0.4?'up':up<-0.4?'down':'flat'}">${up>0.4?'▲':up<-0.4?'▼':'＝'}</i>`:''}</b></li>`}).join('')}</ul>
       <p class="note" style="margin:0">${first.top.w?`${niceDate(first.d,{month:'short',day:'numeric'})}: ${first.top.w}×${first.top.r} → ${niceDate(last.d,{month:'short',day:'numeric'})}: ${last.top.w}×${last.top.r}. `:''}Est. 1-rep max uses weight × (1 + reps ÷ 30), so more reps at the same weight counts as progress.</p></div>`}
   h+=`<div class="glabel">${rows.length} lift${rows.length>1?'s':''} · tap one for its curve</div><div class="glist lp-list">${rows.map(r=>{const t=r.tr,st=t?t.status:'new',f=r.ss[0],l=r.ss[r.ss.length-1];
@@ -9200,6 +9282,7 @@ function trPrimeHTML(nx){const tp=nx?S.templates[nx.i]:null,k=todayKey(),G=gymSt
   if(!G)row=`<button type="button" class="trp-row" data-gymplan><span class="trp-ic">🕒</span><span class="trp-tx"><b>When are you training today?</b><em>Set a time to plan water &amp; food</em></span>${CHEV}</button>`;
   else{const {g,t0,steps,ni}=G,now=Date.now(),st=t0>now?untilTxt(t0):t0+(+g.min||60)*60e3>now?'now':'done',nxs=ni>=0?steps[ni]:null;
     row=`<details class="trp-gym"><summary class="trp-row"><span class="trp-ic">🕒</span><span class="trp-tx"><b>${hhmm(t0)} · ${(GYM_KINDS.find(x=>x[0]===g.t)||[,'Training'])[1]} <small>${st}</small></b>${nxs?`<em>Next: ${esc(nxs.h)} · ${hhmm(nxs.t)}</em>`:''}</span><button class="link" type="button" data-gymplan>Edit</button></summary>${gymCardHTML(k,false)}</details>`}
+  try{row=readyRowHTML(tp?nx.i:-1)+row+stallRowHTML()}catch(e){}
   {const U=gymUpcoming(6).filter(u=>u.k>todayKey());row+=`<button type="button" class="trp-row trp-sched" data-gymsched><span class="trp-ic">📅</span><span class="trp-tx"><b>${U.length?`Next: ${niceDate(U[0].k,{weekday:'short',month:'short',day:'numeric'})} · ${hhmm(atMs(U[0].k,U[0].at))}`:'Schedule a future session'}</b><em>${U.length>1?`${U.length} sessions coming up`:'Plan any day ahead'}</em></span>${CHEV}</button>`}
   return `<div class="card trp"><div class="trp-main"><div class="trp-t"><span class="trp-e">${tp?(nx.done?'Done today ✓':nx.why==='today'?'Today':'Up next'):'Train'}</span><h2>${tp?esc(tp.name):'Start a workout'}</h2><p>${tp?`${tp.ex.length} exercises · ${esc(tp.ex.slice(0,2).join(', '))}${tp.ex.length>2?` +${tp.ex.length-2} more`:''}`:'Pick a template or start empty'}</p></div><button class="primary trp-go" type="button" data-start="${tp?nx.i:-1}">Start</button></div>${row}</div>`}
 function startTpl(i){const t=i>=0?S.templates[i]:{name:i===-2?'Cardio':'Workout',ex:[]};if(!t)return;startWorkout(t.name,t.ex);if(i<0&&S.active&&!S.active.ex.length)setTimeout(()=>openExPicker({eyebrow:i===-2?'Cardio':'New workout',title:i===-2?'What cardio did you do?':undefined,mus:i===-2?'Cardio':undefined,onDone:addExercises}),120)}
