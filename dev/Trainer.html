@@ -2141,21 +2141,40 @@ html.coachm #v-today>*:not(#coachHome):not(#ctSwitch){display:none!important}
     .chp,.cts{max-width:760px}
 }
 /* DS3 — eating rules & food traditions */
-.dr-sheet .dr-sh{display:flex;flex-direction:column;gap:20px;min-width:0}
-.dr-sheet .dr-hd h3{margin:0 0 4px}
-.dr-sheet .dr-hd .note{margin:0}
-.dr-sheet .dr-h{margin:0 0 10px;font:600 13px/1.3 var(--f-body);color:var(--muted);letter-spacing:0;text-transform:none}
-.dr-sheet .dr-chips{display:flex;flex-wrap:wrap;gap:8px}
-.dr-sheet .dr-c{min-height:40px;height:auto;padding:8px 14px;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:none;text-align:left;line-height:1.25;display:inline-flex;flex-direction:column;align-items:flex-start;justify-content:center;max-width:100%;color:var(--fg);font-size:13.5px}
-.dr-sheet .dr-c small{font-size:12px;font-weight:500;color:var(--muted);margin-top:1px}
-.dr-sheet .dr-c[aria-pressed="true"] small{color:inherit;opacity:.72}
-.dr-sheet .dr-fast{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);cursor:pointer;margin:0}
-.dr-sheet .dr-fast>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.dr-sheet .dr-fast b{font:600 15px/1.3 var(--f-body)}
-.dr-sheet .dr-fast small{font-size:13px;color:var(--muted);line-height:1.4}
-.dr-sheet .dr-fast input{width:22px;height:22px;accent-color:var(--kcal);flex:none;margin:0}
-.dr-sheet .dr-act{display:flex;justify-content:flex-end;gap:8px}
-.dr-sheet .dr-act button{min-height:44px}
+.dr-sheet{padding-top:14px}
+.dr-sheet .dr-sh{display:flex;flex-direction:column;gap:22px;min-width:0}
+.dr-sheet .dr-hd{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:0 0 2px}
+.dr-sheet .dr-ic{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--s2));font-size:26px}
+.dr-sheet .dr-ic svg{width:28px;height:28px}
+.dr-sheet .dr-hd h3{margin:4px 0 0}
+.dr-sheet .dr-hd .note{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
+.dr-sheet #dtR{display:flex;flex-direction:column;gap:22px}
+.dr-sheet .dr-h{margin:0 4px 8px;font:600 13px/1.3 var(--f-body);color:var(--muted);letter-spacing:0;text-transform:none}
+.dr-sheet .dr-l{background:var(--s2);border-radius:16px;overflow:hidden}
+.dr-sheet .dr-r{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:9px 14px;margin:0;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:var(--fg)!important;text-align:left;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dr-sheet .dr-r+.dr-r{box-shadow:inset 0 1px 0 var(--hair)!important}
+.dr-sheet .dr-r:active{background:color-mix(in srgb,var(--fg) 4%,transparent)!important}
+.dr-sheet .dr-e{flex:none;width:28px;text-align:center;font-size:19px;line-height:1}
+.dr-sheet .dr-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dr-sheet .dr-t b{font:500 15px/1.25 var(--f-body)}
+.dr-sheet .dr-t small{font-size:12.5px;line-height:1.3;color:var(--muted)}
+.dr-sheet .dr-ck{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;box-shadow:inset 0 0 0 1.75px color-mix(in srgb,var(--fg) 26%,transparent);color:transparent;transition:background .15s,box-shadow .15s}
+.dr-sheet .dr-ck svg{width:14px;height:14px}
+.dr-sheet [aria-pressed="true"] .dr-ck{background:var(--good);box-shadow:none;color:#0B0C10}
+.dr-sheet .dr-fr .sw{flex:none}.dr-sheet .dr-fr .sw:not(:checked){background:color-mix(in srgb,var(--fg) 16%,transparent);border-color:transparent}
+.dr-sheet .dr-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dr-sheet .dr-tile{position:relative;display:flex;align-items:center;gap:10px;min-height:52px;height:auto;padding:8px 12px;margin:0;background:var(--s2)!important;border:0!important;border-radius:14px!important;box-shadow:none!important;color:var(--fg)!important;text-align:left;font:500 14px/1.25 var(--f-body);cursor:pointer;white-space:normal;transition:background .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.dr-sheet .dr-te{flex:none;font-size:20px;line-height:1}
+.dr-sheet .dr-tl{min-width:0;hyphens:none;overflow-wrap:normal;word-break:normal}
+.dr-sheet .dr-tile .dr-ck{position:absolute;right:6px;top:6px;width:18px;height:18px;box-shadow:none;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s}
+.dr-sheet .dr-tile .dr-ck svg{width:11px;height:11px}
+.dr-sheet .dr-tile[aria-pressed="true"] .dr-ck{opacity:1;transform:none}
+.dr-sheet .dr-tile[aria-pressed="true"]{background:color-mix(in srgb,var(--good) 14%,var(--s2))!important;box-shadow:inset 0 0 0 1.5px var(--good)!important}
+.dr-sheet .dr-bar{position:sticky;bottom:calc(-22px - env(safe-area-inset-bottom,0px));z-index:3;display:flex;align-items:center;gap:12px;margin:-6px -20px calc(-22px - env(safe-area-inset-bottom,0px));padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);box-shadow:0 -1px 0 var(--hair)}
+.dr-sheet .dr-sum{flex:1;min-width:0;font:500 13px/1.3 var(--f-body);color:var(--muted)}
+.dr-sheet .dr-act{display:flex;gap:8px;flex:none}
+.dr-sheet .dr-act button{min-height:44px;padding-inline:18px}
+.dr-sheet .dr-act .primary{min-width:96px}
 .dr-note{margin:0;font-size:13px;line-height:1.4;color:var(--muted);padding-left:10px;border-left:2px solid var(--hair)}
 .fd-t .dr-rn{display:block;font-style:normal;font-size:12px;line-height:1.3;color:var(--muted);margin-top:2px}
 .fd-t .dr-rn.no{color:color-mix(in srgb,var(--carb) 80%,var(--muted))}
@@ -2173,9 +2192,63 @@ html.edge-swipe #pageRoot{overflow:hidden}
 .sheet.sh-back-in{animation:shBackIn .24s cubic-bezier(.2,.8,.2,1)}
 @keyframes shBackIn{from{transform:translate3d(-24%,0,0);opacity:.6}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.sheet.sh-back-in{animation:none}}
-.fd-diet{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 14px;margin:-4px 0 2px;border:0;border-radius:16px;background:var(--s1);color:var(--fg);text-align:left;cursor:pointer;font:inherit}
-.fd-diet .fdd-ic{font-size:20px}.fd-diet .fdd-t{flex:1;min-width:0;display:flex;flex-direction:column}.fd-diet .fdd-t b{font-size:14.5px}.fd-diet .fdd-t em{font-style:normal;font-size:12.5px;color:var(--muted)}
-.fd-diet .fdd-e{font:600 13px var(--f-body);color:var(--kcal)}
+.fd-diet{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 12px 8px 10px;margin:-4px 0 2px;border:0;border-radius:16px;background:var(--s1);color:var(--fg);text-align:left;cursor:pointer;font:inherit}
+.fd-diet .fdd-ic{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--s2));font-size:18px}.fd-diet .fdd-ic svg{width:20px;height:20px}
+.fd-diet .fdd-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.fd-diet .fdd-t b{font:600 14.5px/1.25 var(--f-body)}.fd-diet .fdd-t em{font-style:normal;font-size:12.5px;line-height:1.3;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fd-diet .fdd-e{flex:none;font:600 13px var(--f-body);color:var(--muted)}.fd-diet .fdd-e.set{color:var(--good)}
+.fd-diet .fdd-chev{flex:none;width:14px;height:14px;color:var(--muted);opacity:.7}
+/* CULTURE — shared (sheet header, grouped fields, switches, segmented choices, pinned action) */
+#sheetRoot .cu-h{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:12px;row-gap:1px;align-items:center}
+#sheetRoot .cu-h>*{grid-column:1/-1;margin:0}
+#sheetRoot .cu-h>.cu-ic{grid-column:1;grid-row:1/span 2;width:44px;height:44px;align-self:center;margin:0}
+#sheetRoot .cu-h>.cu-ic svg{width:21px;height:21px}
+#sheetRoot .cu-h>h3,#sheetRoot .cu-h>.ed-name{grid-column:2;grid-row:1;align-self:end;margin:0!important;font:700 19px/1.22 var(--f-display);letter-spacing:-.01em}
+#sheetRoot .cu-h>.ed-name{padding:2px 0 3px}
+#sheetRoot .cu-h>.cu-s{grid-column:2;grid-row:2;align-self:start;margin:0!important;font:500 13px/1.35 var(--f-body)!important;letter-spacing:0!important;text-transform:none!important;color:var(--muted)!important}
+#sheetRoot .cu-h:not(:has(>.cu-s))>h3{grid-row:1/span 2;align-self:center}
+#sheetRoot .cu-h>p.note:not(.cu-s),#sheetRoot .cu-h>.note:not(.cu-s){margin-top:12px!important;font-size:13.5px!important;line-height:1.45;color:var(--muted)}
+#sheetRoot .cu-h>.row{margin-top:10px}
+/* fields: one rounded --s2 fill everywhere */
+#sheetRoot .sheet:not(:has(>.dr-sh)) :is(.field input,.field select,textarea,select,input[type=text],input[type=number],input[type=search],input[type=email],input[type=password],input[type=tel],input[type=url],input[type=date],input[type=time],input:not([type])):not(.ed-name):not(.find *){background:var(--s2);border:1px solid transparent;border-radius:14px;box-shadow:none}
+#sheetRoot .sheet:not(:has(>.dr-sh)) :is(.field input,.field select,textarea,select,input[type=text],input[type=number],input[type=search],input[type=email],input[type=password],input[type=tel],input[type=url],input[type=date],input[type=time],input:not([type])):not(.ed-name):not(.find *):focus{border-color:color-mix(in srgb,var(--kcal) 55%,transparent);outline:none}
+#sheetRoot .sheet .mfield input{border-left:3px solid var(--c)!important}
+#sheetRoot .sheet .field>label{font-size:12.5px;font-weight:600;color:var(--muted);padding-left:2px}
+#sheetRoot .sheet .stepper button{background:var(--s2);border:0;border-radius:14px}
+/* every on/off is an iOS switch, in its own grouped row */
+#sheetRoot .sheet:not(:has(>.dr-sh)) label.check{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--s2);border-radius:14px;padding:11px 12px 11px 14px;font-size:14.5px;line-height:1.35;min-height:52px;cursor:pointer}
+#sheetRoot .sheet:not(:has(>.dr-sh)) label.check>input[type=checkbox]:not(.sw),#sheetRoot .sheet:not(:has(>.dr-sh)) label.check>input.sw{order:2;margin:0}
+#sheetRoot .sheet:not(:has(>.dr-sh)) input[type=checkbox]:not(.sw){appearance:none;-webkit-appearance:none;flex:none;width:50px;height:30px;border-radius:999px;background:rgba(255,255,255,.12);border:0;position:relative;cursor:pointer;margin:0;transition:background .2s;accent-color:auto}
+#sheetRoot .sheet:not(:has(>.dr-sh)) input[type=checkbox]:not(.sw)::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+#sheetRoot .sheet:not(:has(>.dr-sh)) input[type=checkbox]:not(.sw):checked{background:var(--good)}
+#sheetRoot .sheet:not(:has(>.dr-sh)) input[type=checkbox]:not(.sw):checked::after{transform:translateX(20px)}
+.sw{background:rgba(255,255,255,.12)!important;border:0!important}.sw::after{top:3px!important;left:3px!important}.sw:checked{background:var(--good)!important}
+/* buttons: one primary, quiet filled secondaries, no outlines */
+#sheetRoot .sheet:not(:has(>.dr-sh)) :is(.ghost,.danger):not(.chip){background:var(--s2);border:1px solid transparent;border-radius:14px;min-height:46px}
+#sheetRoot .sheet:not(:has(>.dr-sh)) .danger:not(.armed){color:var(--over);background:color-mix(in srgb,var(--over) 11%,var(--s2))}
+#sheetRoot .sheet:not(:has(>.dr-sh)) .primary{border-radius:14px;min-height:46px}
+#sheetRoot .sheet:not(:has(>.dr-sh)) .chip{background:var(--s2);border-color:transparent}
+#sheetRoot .sheet:not(:has(>.dr-sh)) .chip[aria-pressed="true"]{background:color-mix(in srgb,var(--good) 20%,var(--s2));color:var(--good);border-color:transparent}
+/* meal choice: one segmented track, green = selected */
+#sheetRoot .sheet .meals-pick{background:var(--s2);border-radius:14px;padding:3px;gap:2px!important;flex-wrap:nowrap}
+#sheetRoot .sheet .meals-pick .chip{flex:1 1 0;min-width:0;background:none;border:0;border-radius:11px;padding:8px 2px;min-height:38px;font-size:13px;color:var(--muted)}
+#sheetRoot .sheet .meals-pick .chip[aria-pressed="true"]{background:color-mix(in srgb,var(--good) 20%,var(--s1));color:var(--good)}
+/* choice chips become an even grid of tiles; long preset lists become one grouped list */
+#sheetRoot .sheet .wn-acts:not(:has(>[data-na])){display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+#sheetRoot .sheet .wn-acts>.chip{border-radius:12px;min-height:42px;justify-content:center;text-align:center;padding:8px 6px;color:var(--fg)}
+#sheetRoot .sheet .wn-acts>.chip[aria-pressed="true"]{color:var(--good)}
+#sheetRoot .sheet .wn-acts:has(>[data-na]){display:flex;flex-direction:column;gap:0;background:var(--s2);border-radius:14px;overflow:hidden}
+#sheetRoot .sheet .wn-acts>[data-na]{background:none;border-radius:0;min-height:46px;text-align:left;padding:10px 14px;font-weight:500;color:var(--fg)}
+#sheetRoot .sheet .wn-acts>[data-na]+[data-na]{border-top:1px solid var(--hair)}
+#sheetRoot .dp-o{background:var(--s2)}#sheetRoot .dp-o[aria-pressed=true]{border-color:color-mix(in srgb,var(--good) 60%,transparent);background:color-mix(in srgb,var(--good) 12%,var(--s2))}
+#sheetRoot .dp-o b.gi{width:38px;height:38px;font-size:0}#sheetRoot .dp-o b.gi svg{width:19px;height:19px}
+#sheetRoot .cu-chip{display:inline-flex;align-items:center;gap:7px}#sheetRoot .cu-chip svg{width:16px;height:16px;flex:none}
+/* the main action stays in reach at the bottom of long sheets */
+#sheetRoot .sheet:not(.tall)>.row:last-child:has(.primary){position:sticky;bottom:calc(-22px - env(safe-area-inset-bottom,0px));margin:0 -20px calc(-22px - env(safe-area-inset-bottom,0px));padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,color-mix(in srgb,var(--surface) 0%,transparent),var(--surface) 14px);z-index:3}
+/* sheets never slide under the status bar; Back stays pinned and readable while scrolling */
+.sheet{max-height:calc(var(--vvh,100vh) - env(safe-area-inset-top,0px) - 20px)!important}
+.sheet .sh-back{position:sticky;top:-22px;z-index:5;align-self:stretch;justify-content:flex-start;margin:-14px -20px 0!important;padding:12px 16px 10px!important;min-height:48px;background:var(--surface);color:var(--fg)!important;font:600 16px var(--f-body)!important;gap:4px!important}
+.sheet .sh-back svg{width:20px;height:20px;color:var(--kcal)}
+.sheet .sh-back:active{opacity:.6}
 /* calmer accents: purple only for the main action and selection */
 .statstrip b.c-p{color:var(--fg)!important}
 </style>
@@ -3506,7 +3579,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.83';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.84';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -3995,7 +4068,20 @@ function sheet(html,o={}){{const sr=$('sheetRoot'),cur=sr.firstElementChild,key=
     if(cur&&o.stack!==false&&(cur.dataset.key||'')!==key){sheetStack.push(cur);if(sheetStack.length>8)sheetStack.shift();cur.remove()}o._key=key}
   $('sheetRoot').innerHTML=`<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true"><div class="grab" aria-hidden="true"></div><button type="button" class="sh-back" id="shBack" aria-label="Back"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Back</button>${html}</div></div>`;$('shBack').onclick=()=>sheetBack();$('sheetRoot').firstElementChild.dataset.key=o._key||'';document.documentElement.classList.add('locked');
   $('scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeSheet()});
+  cuDress($('sheetRoot').querySelector('.sheet'));
   const f=$('sheetRoot').querySelector('input:not([type=checkbox])');if(f&&!o.nofocus)setTimeout(()=>f.focus(),60)}
+/* CULTURE: every plain sheet opens the same way: round icon tile, title, one-line subtitle (markup, ids and handlers untouched) */
+const CU_IC=[[/add a food|saved food|breakfast|lunch|dinner|snack|my meal|log again/,'cloche'],[/weigh|weight|sweat/,'scale'],[/drink|hydration|bottle|water/,'drop'],[/barcode|package|photo|scan|label|plate/,'camera'],[/alert|notif|home screen/,'bell'],[/grade/,'laurel'],[/fuel|carbs/,'fire'],[/enough|floor/,'shield'],
+  [/calendar|coming up|schedule|when are you/,'cal'],[/workout|training|template|exercise|lift|session|train/,'dumbbell'],[/backup|restore|csv|export/,'download'],[/privacy|remove|leave|turn off/,'shield'],
+  [/team|coach|player|roster|code/,'laurel'],[/friend|profile|picture|who's/,'user'],[/sign in|account|password|recover/,'user'],[/garmin|whoop|health|watch|wearable|sync|recovery|shortcut|server|api key/,'heart'],
+  [/meal|food|log|eat|favourite|avoid|like|day/,'cloche']];
+function cuDress(sh){try{if(!sh)return;const h=[...sh.children].find(c=>!c.matches('.grab,.sh-back'));if(!h||h.tagName!=='DIV'||h.classList.contains('cu-h'))return;
+  if(h.className&&!/^(acs-h|ch-st0)$/.test(h.className.trim()))return;
+  const t=h.querySelector(':scope>h3,:scope>.ed-name');if(!t)return;const ey=h.querySelector(':scope>.eyebrow');let sub=ey;
+  if(!sub){const n=h.querySelector(':scope>p.note');if(n&&n.textContent.trim().length<=80)sub=n}
+  const txt=((ey?ey.textContent:'')+' '+(t.textContent||t.value||'')).toLowerCase(),m=CU_IC.find(r=>r[0].test(txt))||[0,'info'];
+  h.classList.add('cu-h');if(sub)sub.classList.add('cu-s');
+  h.insertAdjacentHTML('afterbegin',`<span class="gi cu-ic" data-j="${JEWEL[m[1]]||''}" aria-hidden="true">${GI[m[1]]||''}</span>`)}catch(e){}}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')sheetBack()});
 function liveHTML(k,p,c,f){return `<div class="live"><div style="--c:var(--kcal)"><b>${fmt(k)}</b><span>kcal</span></div><div style="--c:var(--pro)"><b>${r0(p)}</b><span>protein g</span></div><div style="--c:var(--carb)"><b>${r0(c)}</b><span>carbs g</span></div><div style="--c:var(--fat)"><b>${r0(f)}</b><span>fat g</span></div></div>`}
 function mealChips(id,cur){return `<div class="meals-pick" id="${id}">${MEALS.map(([m,l])=>`<button type="button" class="chip" data-m="${m}" aria-pressed="${cur===m}">${l}</button>`).join('')}</div>`}
@@ -4013,7 +4099,7 @@ function openEdit(id){
       <div class="field mfield" style="--c:var(--carb)"><label for="eC">Carbs g</label><input id="eC" type="number" inputmode="decimal"></div>
       <div class="field mfield" style="--c:var(--fat)"><label for="eF">Fat g</label><input id="eF" type="number" inputmode="decimal"></div>
     </div>
-    <div class="ed-fix"><button type="button" class="chip" id="eLbl">📷 Scan the label</button><button type="button" class="chip" id="eBar">▥ Scan barcode</button></div>
+    <div class="ed-fix"><button type="button" class="chip cu-chip" id="eLbl">${GI.camera}Scan the label</button><button type="button" class="chip cu-chip" id="eBar">${GI.list}Scan barcode</button></div>
     <div class="status" id="eSt"></div>
     <label class="check"><input type="checkbox" id="eMine"> Save to My foods so it’s right next time</label>
     <div class="field"><label>Meal</label>${mealChips('eMeal',meal)}</div>
@@ -4585,7 +4671,8 @@ function openFuel(){
   const g=goalsFor(S.day),f=g.fuel;if(!f)return;
   sheet(`<div><div class="eyebrow">Fuel for training</div><h3>+${f.c} g carbs today</h3></div>
     <ul class="ml-items">${f.ws.map(w=>`<li><span>${esc(w.name)} ${srcBadge(w.src)}<span class="dim">${w.min?` · ${w.min} min`:''}</span></span><span class="num">${fmt(w.kcal)} kcal</span></li>`).join('')}</ul>
-    <p class="note">Your watch measured about <b>${fmt(f.net)} kcal</b> of training above resting burn. Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, so Trainer adds back ${f.pct}% of the rest as carbs, which refill the glycogen your training used. Watches tend to overestimate calories burned, which is why it doesn't add back all of it.</p>
+    <p class="note">Your watch measured <b>${fmt(f.net)} kcal</b> of training above resting burn. Trainer adds back ${f.pct}% as carbs to refill glycogen.</p>
+    <details class="why"><summary>Why not all of it</summary><p class="note">Your activity level already budgets about ${fmt(f.base)} kcal a day for exercise, and watches tend to overestimate calories burned.</p></details>
     <div class="row" style="justify-content:space-between"><button class="ghost" id="fuSet">Change in Settings</button><button class="primary" id="fuOk">Got it</button></div>`);
   $('fuOk').onclick=closeSheet;$('fuSet').onclick=()=>{closeSheet();openPage('prefs')};
 }
@@ -5564,7 +5651,7 @@ function renderAcNudge(){const el=$('acNudge');if(!el)return;let off=null;try{of
 /* ---- morning check-in: what's your training today? sets today's calories and water ---- */
 function openDayPlan(force){const k=todayKey(),H=hydS(),cur=((H.day[k]||{}).types)||null;let sel=cur?cur.slice():[];
   sheet(`<div><div class="eyebrow">${new Date().getHours()<12?'Good morning':'Today'} · ${esc(niceDate(k,{weekday:'long',month:'short',day:'numeric'}))}</div><h3>What's your training today?</h3><p class="note" style="margin:4px 0 0">Pick everything you plan to do. Your calories, carbs and water update right away.</p></div>
-    <div class="dp-opts">${HYD_TYPES.map(([v,l])=>`<button type="button" class="dp-o" data-dp="${v}" aria-pressed="${v==='rest'?!sel.length&&!!cur:sel.includes(v)}"><b>${{rest:'😴',lift:'🏋️',cardio:'🚴',hard:'🏃',long:'⛰️'}[v]}</b><span>${l}</span></button>`).join('')}</div>
+    <div class="dp-opts">${HYD_TYPES.map(([v,l])=>`<button type="button" class="dp-o" data-dp="${v}" aria-pressed="${v==='rest'?!sel.length&&!!cur:sel.includes(v)}"><b class="gi" data-j="${JEWEL[{rest:'moon',lift:'dumbbell',cardio:'run',hard:'fire',long:'timer'}[v]]||''}">${GI[{rest:'moon',lift:'dumbbell',cardio:'run',hard:'fire',long:'timer'}[v]]||''}</b><span>${l}</span></button>`).join('')}</div>
     <div id="dpLive" class="note" style="margin:0;text-align:center"></div>
     <div class="row" style="justify-content:space-between"><button class="link" type="button" id="dpSkip">${force?'Cancel':'Not now'}</button><button class="primary" type="button" id="dpOk">Update today</button></div>`,{nofocus:true});
   const live=()=>{const was=H.day[k];H.day[k]={...(was||{}),types:sel};const g=goalsFor(k),f=g.fuel;H.day[k]=was;if(!was)delete H.day[k];$('dpLive').innerHTML=sel.length?`Today: <b>${fmt(goalKcal(g))} kcal</b>${f&&f.c?` (+${f.c} g carbs for training)`:''}`:`Rest day: <b>${fmt(goalKcal(g))} kcal</b>${S.plan&&S.plan.type==='bulk'?' · never lower than yesterday on a bulk':''}`};
@@ -5661,7 +5748,7 @@ function renderMe(){
     ${G('Food &amp; water',[
       grow({ga:'fd_ideas',ic:'cloche',t:'Meal ideas'}),
       grow({ga:'fd_prep',ic:'list',t:'Meal prep'}),
-      grow({ga:'diet',ic:'cloche',t:'Eating rules &amp; food traditions',v:dietSummary(),vc:(dietCfg().rules.length||dietCfg().cuisines.length)?'':'warn'}),
+      grow({ga:'diet',ic:'leaf',c:'--good',t:'How you eat',s:'Eating rules &amp; food traditions',v:dietSummary(),vc:(dietCfg().rules.length||dietCfg().cuisines.length)?'':'warn'}),
       grow({pg:'hyd',ic:'drop',t:'Water &amp; fueling'}),
       grow({ga:'foods',ic:'book',t:'My foods',v:String((S.meals||[]).length+(S.custom||[]).length)}),
       grow({pg:'scan',ic:'camera',t:'Photo scanning'}),
@@ -5885,7 +5972,7 @@ function openDrink(){let kind='water';
     <div class="grid2"><div class="field"><label for="dkO">Amount (fl oz)</label><input id="dkO" type="number" inputmode="decimal" placeholder="16"></div>
     <div class="field"><label for="dkN">Sodium (mg) <span class="dim">optional</span></label><input id="dkN" type="number" inputmode="numeric" placeholder="0"></div></div>
     <div class="field"><label>Quick sodium</label><div class="wn-acts" id="dkP">${NA_PRESETS.map(([l,v])=>`<button type="button" class="chip" data-na="${v}">${esc(l)} · ${v} mg</button>`).join('')}</div></div>
-    <p class="note">Coffee, tea and milk count toward your fluids (they hydrate about as well as water). Alcohol doesn’t, so it isn’t an option.</p>
+    <p class="note">Coffee, tea and milk count as fluids. Alcohol doesn’t.</p>
     <div class="row" style="justify-content:flex-end"><button class="ghost" id="dkX">Cancel</button><button class="primary" id="dkOk">Add</button></div>`);
   $('dkK').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;kind=b.dataset.v;$('dkK').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));if(kind==='elec'&&!$('dkN').value)$('dkN').value=500};
   $('dkP').onclick=e=>{const b=e.target.closest('[data-na]');if(!b)return;$('dkN').value=b.dataset.na;if(kind==='water'){kind='elec';$('dkK').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.v==='elec')))}};
@@ -6594,7 +6681,7 @@ const DX={
   honey:[/\b(honey|honeycomb|bee pollen)\b/,'Contains honey']};
 const DX_MEATCERT=new RegExp(DX.meat[0].source.replace('|_sub_',''));
 function fdDietBtn(){const b=$('fdDiet');if(!b)return;const d=dietCfg(),lab=[...d.rules.map(r=>(DIET_RULES.find(x=>x[0]===r)||[,r])[1]),...d.cuisines.map(c=>(DIET_CUIS.find(x=>x[0]===c)||[,c])[1])];
-  b.innerHTML=`<span class="fdd-ic">🍽</span><span class="fdd-t"><b>How you eat</b><em>${lab.length?esc(lab.slice(0,3).join(' · '))+(lab.length>3?` +${lab.length-3}`:''):'Set eating rules & food traditions'}</em></span><span class="fdd-e">${lab.length?'Edit':'Set'}</span>`}
+  b.innerHTML=`<span class="fdd-ic" aria-hidden="true">${(typeof GI!=='undefined'&&GI.cloche)||'🍽'}</span><span class="fdd-t"><b>How you eat</b><em>${lab.length?esc(lab.slice(0,3).join(' · '))+(lab.length>3?` +${lab.length-3}`:''):'Eating rules & food traditions'}</em></span><span class="fdd-e${lab.length?'':' set'}">${lab.length?'Edit':'Set up'}</span><svg class="fdd-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>`}
 document.addEventListener('click',e=>{if(e.target.closest('#fdDiet'))openDiet()});
 setTimeout(()=>{try{FIND.push(['How you eat: eating rules & traditions','diet religion halal kosher vegan vegetarian culture food traditions how i eat rules fasting ramadan',()=>openDiet()]);FIND_META.push(['Foods','leaf'])}catch(e){}},0);
 function dietCfg(){const d=S.diet||{};return {rules:Array.isArray(d.rules)?d.rules:[],cuisines:Array.isArray(d.cuisines)?d.cuisines:[],fast:!!d.fast}}
@@ -6650,15 +6737,24 @@ function dietAI(){const d=dietCfg(),C=dietChecks(),w=[...new Set([...C].map(k=>D
   return parts.length?parts.join('; ')+'. Only suggest foods that fit.':''}
 function dietSummary(){const d=dietCfg(),n=d.rules.length+d.cuisines.length;if(!n)return 'Set up';const f=(DIET_RULES.find(r=>r[0]===d.rules[0])||DIET_CUIS.find(c=>c[0]===d.cuisines[0])||[])[1]||'';return n>1?`${esc(f)} +${n-1}`:esc(f)}
 let dietAll=false;
+// sheet layout: grouped rules (emoji + one-line hint) and tradition tiles; ids and S.diet shape unchanged
+const DIET_GRP=[['Faith & culture',[['kosher','✡️','No pork or shellfish, meat and dairy apart'],['halal','☪️','No pork, alcohol or gelatin'],['hinduveg','🕉️','No meat, no eggs'],['jain','🪷','No meat, eggs or root vegetables'],['buddhist','☸️','No meat, eggs, onion or garlic'],['sda','✝️','Vegetarian, no alcohol or caffeine']]],
+  ['Diet style',[['veg','🥗','No meat or fish'],['vegan','🌱','No animal products'],['pesc','🐟','Fish and seafood, no meat']]],
+  ['Leave out',[['nopork','🐖'],['nobeef','🐄'],['noshell','🦐'],['noalc','🍷']]],
+  ['Sensitivities',[['lactose','🥛'],['gluten','🌾'],['dairy','🧀'],['nuts','🥜']]]];
+const DIET_CEMO={latin:'🌮',carib:'🥥',soul:'🍗',med:'🫒',mideast:'🧆',southasia:'🍛',eastasia:'🍜',seasia:'🍲',wafr:'🍚',eafr:'🫓',jewish:'🥯',italian:'🍝',mexican:'🌯',american:'🍔'};
 function openDiet(o={}){const d=dietCfg(),R=new Set(d.rules),C=new Set(d.cuisines);let fast=d.fast;
-  const chip=(k,l,s,on,attr)=>`<button type="button" class="chip dr-c" ${attr}="${k}" aria-pressed="${on}">${esc(l)}${s?`<small>${esc(s)}</small>`:''}</button>`;
-  sheet(`<div class="dr-sh"><div class="dr-hd"><h3>How do you eat?</h3><p class="note">We'll only suggest foods that fit. Change it anytime in Profile.</p></div>
-    <section><h4 class="dr-h">Eating rules</h4><div class="dr-chips" id="dtR">${DIET_RULES.map(([k,l,s])=>chip(k,l,s,R.has(k),'data-dtr')).join('')}</div></section>
-    <section><h4 class="dr-h">Food traditions you love</h4><div class="dr-chips" id="dtC">${DIET_CUIS.map(([k,l])=>chip(k,l,'',C.has(k),'data-dtc')).join('')}</div></section>
-    <label class="dr-fast"><span><b>Observing a fast?</b><small>Ramadan, Yom Kippur or Lent. Meal ideas become Suhoor and Iftar, with no daytime “eat now” prompts.</small></span><input type="checkbox" id="dtFast" ${fast?'checked':''}></label>
-    <div class="dr-act"><button class="ghost" type="button" id="dtSkip">${o.edit?'Cancel':'Skip for now'}</button><button class="primary" type="button" id="dtSave">Save</button></div></div>`,{nofocus:true});
+  const ck='<span class="dr-ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
+  const row=([k,e,s])=>{const l=(DIET_RULES.find(x=>x[0]===k)||[,k])[1];return `<button type="button" class="dr-r" data-dtr="${k}" aria-pressed="${R.has(k)}"><span class="dr-e" aria-hidden="true">${e}</span><span class="dr-t"><b>${esc(l)}</b>${s?`<small>${esc(s)}</small>`:''}</span>${ck}</button>`};
+  const ic=(typeof GI!=='undefined'&&GI.cloche)||'🍽';
+  sheet(`<div class="dr-sh"><div class="dr-hd"><span class="dr-ic" aria-hidden="true">${ic}</span><h3>How you eat</h3><p class="note">We'll only suggest foods that fit.</p></div>
+    <div id="dtR">${DIET_GRP.map(([h,rs])=>`<section class="dr-g"><h4 class="dr-h">${esc(h)}</h4><div class="dr-l">${rs.map(row).join('')}</div></section>`).join('')}</div>
+    <section class="dr-g"><h4 class="dr-h">Food traditions you love</h4><div class="dr-tiles" id="dtC">${DIET_CUIS.map(([k,l])=>`<button type="button" class="dr-tile" data-dtc="${k}" aria-pressed="${C.has(k)}"><span class="dr-te" aria-hidden="true">${DIET_CEMO[k]||'🍽'}</span><span class="dr-tl">${esc(l)}</span>${ck}</button>`).join('')}</div></section>
+    <section class="dr-g"><h4 class="dr-h">Fasting</h4><div class="dr-l"><label class="dr-r dr-fr"><span class="dr-e" aria-hidden="true">🌙</span><span class="dr-t"><b>Observing a fast</b><small>Suhoor and Iftar ideas, no daytime “eat now” prompts</small></span><input type="checkbox" class="sw" id="dtFast" ${fast?'checked':''} aria-label="Observing a fast"></label></div></section>
+    <div class="dr-bar"><span class="dr-sum" id="dtSum" aria-live="polite"></span><div class="dr-act"><button class="ghost" type="button" id="dtSkip">${o.edit?'Cancel':'Not now'}</button><button class="primary" type="button" id="dtSave">Save</button></div></div></div>`,{nofocus:true});
   const root=$('sheetRoot').querySelector('.sheet');root.classList.add("dr-sheet");
-  root.onclick=e=>{const r=e.target.closest('[data-dtr]'),c=e.target.closest('[data-dtc]');const b=r||c;if(!b)return;const k=r?r.dataset.dtr:c.dataset.dtc,set=r?R:C,on=!set.has(k);on?set.add(k):set.delete(k);b.setAttribute('aria-pressed',String(on))};
+  const sum=()=>{const a=[];if(R.size)a.push(R.size+(R.size>1?' rules':' rule'));if(C.size)a.push(C.size+(C.size>1?' traditions':' tradition'));if($('dtFast').checked)a.push('fasting');$('dtSum').textContent=a.length?a.join(' · '):'Nothing set yet'};sum();$('dtFast').onchange=sum;
+  root.onclick=e=>{const r=e.target.closest('[data-dtr]'),c=e.target.closest('[data-dtc]');const b=r||c;if(!b)return;const k=r?r.dataset.dtr:c.dataset.dtc,set=r?R:C,on=!set.has(k);on?set.add(k):set.delete(k);b.setAttribute('aria-pressed',String(on));sum()};
   $('dtSkip').onclick=()=>{closeSheet();if(o.back)o.back()};
   $('dtSave').onclick=()=>{S.diet={rules:DIET_RULES.map(r=>r[0]).filter(k=>R.has(k)),cuisines:DIET_CUIS.map(c=>c[0]).filter(k=>C.has(k)),fast:$('dtFast').checked};dietAll=false;
     save();_dbC.clear();_avSig='';Object.keys(_miC).forEach(k=>delete _miC[k]);try{cookSeed=0}catch(e){}closeSheet();try{renderAll()}catch(e){}try{if(typeof renderCook==='function')renderCook()}catch(e){}
