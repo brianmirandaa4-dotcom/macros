@@ -593,7 +593,7 @@ async function social(action, req, url, user, env, cors) {
     me.detail = {
       daily: (Array.isArray(D.daily) ? D.daily : []).slice(0, 7).map(x => ({ d: cleanStr(x.d, 10), k: num(x.k, 2e4), p: num(x.p, 2e3), c: num(x.c, 3e3), f: num(x.f, 2e3), gk: num(x.gk, 2e4), gp: num(x.gp, 2e3), gc: num(x.gc, 3e3), gf: num(x.gf, 2e3), n: num(x.n, 500),
         steps: num(x.steps, 2e5), sleep: num(x.sleep, 24), rec: num(x.rec, 100), hrv: num(x.hrv, 400), rhr: num(x.rhr, 250), strain: num(x.strain, 21), w: num(x.w, 1500), ho: num(x.ho, 2000), ht: num(x.ht, 2000), na: num(x.na, 2e4) })),
-      foods: (Array.isArray(D.foods) ? D.foods : []).slice(0, 40).map(x => ({ n: cleanStr(x.n, 40), a: cleanStr(x.a, 24), m: cleanStr(x.m, 10), k: num(x.k, 5e3), p: num(x.p, 500), c: num(x.c, 800), f: num(x.f, 500) })),
+      foods: (Array.isArray(D.foods) ? D.foods : []).slice(0, 40).map(x => ({ n: cleanStr(x.n, 80), a: cleanStr(x.a, 24), m: cleanStr(x.m, 10), k: num(x.k, 5e3), p: num(x.p, 500), c: num(x.c, 800), f: num(x.f, 500) })),
       wks: (Array.isArray(D.wks) ? D.wks : []).slice(0, 10).map(x => ({ name: cleanStr(x.name, 40), d: cleanStr(x.d, 10), min: num(x.min, 600), sets: num(x.sets, 300), vol: num(x.vol, 1e6), prs: num(x.prs, 50), kcal: num(x.kcal, 5e3), strain: num(x.strain, 21), src: cleanStr(x.src, 10),
         ex: (Array.isArray(x.ex) ? x.ex : []).slice(0, 12).map(e => ({ n: cleanStr(e.n, 40), top: cleanStr(e.top, 20), sets: num(e.sets, 50) })) })),
       tpls: (Array.isArray(D.tpls) ? D.tpls : []).slice(0, 30).map(t => ({ name: cleanStr(t.name, 40), ex: (Array.isArray(t.ex) ? t.ex : []).slice(0, 20).map(e => ({ n: cleanStr(e.n, 40), m: cleanStr(e.m, 24), eq: cleanStr(e.eq, 16), s: cleanStr(e.s, 16) })) })).filter(t => t.name && t.ex.length),

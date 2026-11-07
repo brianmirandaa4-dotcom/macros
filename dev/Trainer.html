@@ -2558,6 +2558,17 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 .wkc-r{display:flex;align-items:center;gap:12px}.wkc-r .gi{flex:none}
 .wkc-t{display:flex;flex-direction:column;min-width:0}.wkc-t b{font-weight:600;font-size:14px}.wkc-t span{color:var(--muted);font-size:13px;line-height:1.35}
 .wkc-tip{margin:2px 0 0;padding-top:12px;border-top:1px solid var(--hair);color:var(--fg);font-size:14px;line-height:1.4}
+
+/* friend food rows: name wraps on the left, kcal over P/C/F on the right (never wraps); tap to add to your day */
+.fp-f{align-items:flex-start}
+.fp-n{flex:1;min-width:0;line-height:1.35}
+.fp-v{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}
+.fp-v b{font-weight:600}
+button.fp-f{width:100%;background:none;border:0;border-bottom:1px dashed var(--line);color:inherit;font:inherit;font-size:13.5px;text-align:left;cursor:pointer;border-radius:0}
+button.fp-f:last-of-type{border-bottom:0}
+button.fp-f:active{background:var(--s2)}
+.fp-copy{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:8px;border-radius:14px;border:1px solid var(--line);background:var(--s2);color:var(--fg);font:600 14px var(--f-body);cursor:pointer}
+.fp-copy svg{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -3907,7 +3918,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.96';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.97';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -7073,6 +7084,19 @@ function weekCoachHTML(keys){const tk=todayKey();if(!keys.includes(tk))return ''
 document.addEventListener('click',e=>{if(e.target.closest('[data-deload]'))openDeload()});
 
 
+/* Friends' meals: add a whole meal, or one food, to your own day */
+let FP_FOODS=[],FP_WHO='';
+const fpName=n=>{n=String(n||'');if(n.length<40)return n;const c=n.lastIndexOf(' ',38);return (c>20?n.slice(0,c):n.slice(0,38)).replace(/[\s,(·-]+$/,'')+'…'};
+function fpAdd(list,meal){const k=todayKey(),A=(S.days[k]=S.days[k]||[]),ids=[];
+  list.forEach(x=>{const id=uid();ids.push(id);A.push({id,n:fpName(x.n||'Food'),a:String(x.a||'1 serving'),k:+x.k||0,p:+x.p||0,c:+x.c||0,f:+x.f||0,meal,src:'friend',t:Date.now()})});
+  save();renderAll();const kc=list.reduce((a,x)=>a+(+x.k||0),0);
+  toast(`Added ${list.length===1?esc(fpName(list[0].n)):`${list.length} foods`} to your ${mealName(meal)} · ${fmt(r0(kc))} kcal`,()=>{S.days[k]=(S.days[k]||[]).filter(e=>!ids.includes(e.id));if(!S.days[k].length)delete S.days[k];save();renderAll()})}
+function fpPick(x){const order=[x.m,...MEALS.map(([m])=>m).filter(m=>m!==x.m)];
+  holdSheet({eyebrow:FP_WHO?`From ${FP_WHO}’s ${mealName(x.m)}`:'Add food',title:fpName(x.n),items:order.map((m,i)=>({ic:i?'cloche':'plus',c:i?'--muted':'--good',t:`Add to my ${mealName(m)}`,s:i?'':`${fmt(r0(x.k))} kcal · ${r0(x.p)} g protein`,go:()=>fpAdd([x],m)}))})}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-fpcopy]');if(c){const m=c.dataset.fpcopy,L=FP_FOODS.filter(x=>x.m===m);if(L.length)fpAdd(L,m);return}
+  const f=e.target.closest('[data-fpi]');if(f){const x=FP_FOODS[+f.dataset.fpi];if(x)fpPick(x)}});
+
+
 /* ================= FIND ANYTHING: type a word, jump straight there ================= */
 const FIND=[
   ['Membership: Free, Pro & Elite','membership subscription pro elite upgrade plan premium price billing',()=>openPage('member')],
@@ -8534,7 +8558,8 @@ function renderFriendPage(){
     html+=`<div class="qgrid fp-q">${tiles.map(t=>`<div class="qt${t.hot?' hot':''}" style="--c:${t.c}">${qRing(t.fr,t.c)}<div class="qt-t"><span>${t.lab}</span><b class="num">${t.v}</b><em>${t.s}</em></div></div>`).join('')}</div>`}
   if(!isMe&&!sh.foods)priv.push('food log');
   if(D.foods&&D.foods.length){const by={};D.foods.forEach(x=>(by[x.m]=by[x.m]||[]).push(x));
-    html+=`<div class="glabel">What ${isMe?'you':esc(F.name.split(' ')[0])} ate today</div><div class="card fp-foods">${MEALS.filter(([m])=>by[m]).map(([m,l])=>`<div class="fp-meal"><div class="row" style="justify-content:space-between"><b>${l}</b><span class="num">${fmt(by[m].reduce((a,x)=>a+x.k,0))} kcal</span></div>${by[m].map(x=>`<div class="fp-f"><span>${esc(x.n)} <i>${esc(x.a)}</i></span><span class="num">${fmt(x.k)} · <em style="color:var(--pro)">${x.p}P</em> <em style="color:var(--carb)">${x.c}C</em> <em style="color:var(--fat)">${x.f}F</em></span></div>`).join('')}</div>`).join('')}</div>`}
+    FP_FOODS=isMe?[]:D.foods.slice();FP_WHO=isMe?'':F.name.split(' ')[0];
+    html+=`<div class="glabel">What ${isMe?'you':esc(F.name.split(' ')[0])} ate today</div><div class="card fp-foods">${MEALS.filter(([m])=>by[m]).map(([m,l])=>`<div class="fp-meal"><div class="row" style="justify-content:space-between"><b>${l}</b><span class="num">${fmt(by[m].reduce((a,x)=>a+x.k,0))} kcal</span></div>${by[m].map(x=>{const i=D.foods.indexOf(x),inner=`<span class="fp-n">${esc(fpName(x.n))} <i>${esc(x.a)}</i></span><span class="fp-v num"><b>${fmt(x.k)}</b><span><em style="color:var(--pro)">${x.p}P</em> <em style="color:var(--carb)">${x.c}C</em> <em style="color:var(--fat)">${x.f}F</em></span></span>`;return isMe?`<div class="fp-f">${inner}</div>`:`<button type="button" class="fp-f fp-tap" data-fpi="${i}" aria-label="Add ${esc(x.n)} to my day">${inner}</button>`}).join('')}${isMe?'':`<button type="button" class="fp-copy" data-fpcopy="${m}">${GI.plus||'+'}<span>Add to my ${l}</span></button>`}</div>`).join('')}</div>`}
   else if(!isMe&&!sh.foods&&sh.nutrition)html+='';
   if(days.some(x=>x.ht!=null)){const hx=today.ht!=null?today:days.slice().reverse().find(x=>x.ht!=null),ho=hx.ho||0,ht=hx.ht||1,pc=Math.min(100,ho/ht*100),isT=hx.d===tk,who=isMe?'You':esc(F.name.split(' ')[0]);
     html+=`<div class="glabel">Water this week</div><div class="card fp-hyd"><div class="fp-m" style="--c:var(--fat)"><div class="row" style="justify-content:space-between"><span>${GI.drop} ${isT?'Today':niceDate(hx.d,{weekday:'short',day:'numeric'})}</span><b class="num">${fmt(ho)}<small> / ${fmt(ht)} fl oz</small></b></div><i><u style="width:${pc}%"></u></i></div>
