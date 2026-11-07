@@ -2467,7 +2467,7 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 #pg-report .ra-notes li+li{border-top:1px solid var(--hair)}
 #pg-report .ra-act{min-height:36px;padding:0 12px;border:0;border-radius:12px;background:var(--s2);color:var(--fg);font:600 13px var(--f-body);cursor:pointer}
 #pg-report .ra-up{color:var(--good)}#pg-report .ra-dn{color:var(--muted)}
-.ma-tabs{margin:0}.ma-tabs3 button{line-height:1.2;padding-left:6px;padding-right:6px;white-space:normal;text-wrap:balance}
+.ma-tabs{margin:0}.mb-own{display:flex;align-items:center;gap:12px;padding:14px 16px}.mb-own-i{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,#3ed6a0 16%,transparent);color:#3ed6a0}.mb-own-i svg{width:18px;height:18px}.mb-own>span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}.mb-own b{font-size:14.5px}.mb-own>span:last-child>span{font-size:12.5px;color:var(--muted)}.ma-tabs3 button{line-height:1.2;padding-left:6px;padding-right:6px;white-space:normal;text-wrap:balance}
 .ma-pane{display:flex;flex-direction:column;gap:12px}.ma-pane[hidden]{display:none!important}
 .ma-ml{cursor:default}.ma-ml .ma-n small.num{font-size:11.5px;color:var(--muted)}
 .ma-plus{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:color-mix(in srgb,var(--kcal) 22%,var(--s2));color:var(--kcal);font:600 22px/1 var(--f-body);cursor:pointer}
@@ -5758,23 +5758,29 @@ const MB_ROWS=[['Tracking',[['Calories, macros & water',1,1,1],['Barcode scanner
   ['Training',[['Workout logging & rest timer',1,1,1],['Science-based programs',0,1,1],['Strength curves & sets per muscle',0,0,1],['Lock-screen rest alerts',0,0,1]]],
   ['Social',[['Friends, streaks & points',1,1,1],['Live workout status',0,0,1]]]];
 let mbBill='yr',mbTier='pro';
+/* Access from the server (GET /api/tier). Owners are listed on the server (OWNERS), never in the app, so it can't be faked on a phone. New key 'syncope.tier'. */
+function myAccess(){try{return JSON.parse(localStorage.getItem('syncope.tier')||'null')||{tier:'free'}}catch(e){return {tier:'free'}}}
+async function refreshTier(){try{const c=syncCfg();if(!c.uid||!c.url)return;const r=await fetch(c.url+'/api/tier',{headers:{Authorization:`Bearer ${c.uid}.${c.token}`}});if(!r.ok)return;const j=await r.json();if(!j||!j.tier)return;
+  const was=JSON.stringify(myAccess());localStorage.setItem('syncope.tier',JSON.stringify({tier:j.tier,comp:j.comp||null,until:j.until||null,at:Date.now()}));if(was!==JSON.stringify(myAccess())&&pgStack&&pgStack.includes('member'))renderMember()}catch(e){}}
+setTimeout(refreshTier,2500);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshTier()});
 /* Auto-renew terms shown before anyone pays. Reminder timing: weekly 24h before, monthly 3 days before, annual 30 days and 7 days before
    (meets California's annual-renewal notice rule). Cancel-by is 24 hours before renewal (App Store rule). */
 const MB_REMIND={wk:'a day before',mo:'3 days before',yr:'30 days and again 7 days before'};
 function mbRenewTxt(b){const per={wk:'week',mo:'month',yr:'year'}[b]||'month';return `Renews automatically every ${per} until you cancel. We’ll remind you ${MB_REMIND[b]||MB_REMIND.mo} each renewal with the plan, price, renewal date and the last day to cancel (24 hours before it renews). Cancel anytime in Settings → Apple ID → Subscriptions.`}
-function renderMember(){const el=$('pg-member');if(!el)return;const T=MB_TIERS.find(t=>t.id===mbTier),P=MB_PRICE[mbTier];
+function renderMember(){const el=$('pg-member');if(!el)return;const AC=myAccess();if(AC.comp&&!renderMember._set){mbTier=AC.tier;renderMember._set=1}const T=MB_TIERS.find(t=>t.id===mbTier),P=MB_PRICE[mbTier];const cur=AC.tier===T.id;
   const save=P?Math.round((1-P.yr/(P.mo*12))*100):0;
   const tick=v=>v===1?'<i class="mb-y" aria-label="Included">'+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>':v===0?'<i class="mb-x" aria-label="Not included"></i>':`<i class="mb-t">${v}</i>`;
   const opts=P?[['yr','Annual',`$${P.yr.toFixed(2)}/yr`,`$${(P.yr/12).toFixed(2)}/mo · Save ${save}% · renews yearly`],['mo','Monthly',`$${P.mo.toFixed(2)}/mo`,'Renews monthly'],['wk','Weekly',`$${P.wk.toFixed(2)}/wk`,'Renews weekly']]:[];
   el.innerHTML=`<div class="mbr mb4">
     <div class="seg2 mb-seg" role="tablist" aria-label="Plan">${MB_TIERS.map(t=>`<button type="button" role="tab" data-mbt="${t.id}" aria-pressed="${t.id===mbTier}">${t.name}</button>`).join('')}</div>
+    ${AC.comp?`<div class="card mb-own"><span class="mb-own-i">${GI.shield||''}</span><span><b>Owner access · ${AC.tier==='elite'?'Elite':AC.tier==='pro'?'Pro':'Free'} included</b><span>Set on the Trainer server for the team. No charge to you.</span></span></div>`:''}
     <div class="card mb-plan">
-      <div class="mb-ph"><div><h3>${T.name}${T.id==='free'?' <span class="mb-cur">Current plan</span>':''}</h3><p>${T.line}</p></div>${T.id==='free'?'<b class="num mb-big">$0</b>':''}</div>
+      <div class="mb-ph"><div><h3>${T.name}${cur?' <span class="mb-cur">Current plan</span>':''}</h3><p>${T.line}</p></div>${T.id==='free'?'<b class="num mb-big">$0</b>':''}</div>
       ${P?`<div class="mb-opts" role="radiogroup" aria-label="Billing">${opts.map(([k,l,pr,sub])=>`<button type="button" role="radio" class="mb-opt" data-mbb="${k}" aria-checked="${mbBill===k}"><span class="mb-rd"></span><span class="mb-ol"><b>${l}</b><span>${sub}</span></span><b class="num mb-op">${pr}</b></button>`).join('')}</div>`:''}
       <div class="mb-inc">${T.id==='free'?'Included':`Everything in ${T.id==='pro'?'Free':'Pro'}, plus`}</div>
       <ul class="mb-fl">${T.feat.map(([ic,f])=>`<li class="mb-fr">${tick(1)}<span>${f}</span></li>`).join('')}</ul>
       ${T.id==='pro'?(()=>{const E=MB_PRICE.elite,d=mbBill==='yr'?`$${((E.yr-P.yr)/12).toFixed(2)} more a month`:mbBill==='mo'?`$${(E.mo-P.mo).toFixed(2)} more a month`:`$${(E.wk-P.wk).toFixed(2)} more a week`;return `<button type="button" class="mb-up" data-mbt="elite"><span>Add WHOOP, Oura &amp; Garmin with Elite</span><b>${d} ›</b></button>`})():''}
-      ${T.id==='free'?'':`<button type="button" class="primary mb-cta" data-mbgo="${T.id}">Continue with ${T.name}</button><p class="mb-fine">Free during the beta. Payments aren't live yet.</p><p class="mb-fine mb-renew">${mbRenewTxt(mbBill)}</p>`}
+      ${T.id==='free'||(cur&&AC.comp)?'':`<button type="button" class="primary mb-cta" data-mbgo="${T.id}">Continue with ${T.name}</button><p class="mb-fine">Free during the beta. Payments aren't live yet.</p><p class="mb-fine mb-renew">${mbRenewTxt(mbBill)}</p>`}
     </div>
     ${mbTeamCard()}
     <details class="mb-cmpd"><summary>Compare all plans</summary>
@@ -6281,7 +6287,7 @@ function renderMe(){
       grow({pg:'conn',ic:'watch',t:'WHOOP, Oura &amp; Garmin',v:conn.length?conn.join(', '):'Connect',vc:conn.length?'on':''}),
       grow({ga:'apple',ic:'heart',t:'Apple Health'}),
       grow({pg:'health',ic:'moon',t:'Recovery &amp; sleep'})])}
-    ${G('Membership',[grow({pg:'member',ic:'crown',t:'Trainer Free',v:'Plans'})])}
+    ${G('Membership',[(A=>grow({pg:'member',ic:'crown',t:'Trainer '+(A.tier==='elite'?'Elite':A.tier==='pro'?'Pro':'Free'),v:A.comp?'Owner':'Plans'}))(myAccess())])}
     ${G('Privacy &amp; data',[
       grow({ga:'friends',ic:'user',t:'Friends &amp; sharing',v:sc.on?`${frs.length} friend${frs.length===1?'':'s'}`:'Off'}),
       grow({pg:'data',ic:'download',t:'Backup &amp; export'}),
@@ -9845,7 +9851,10 @@ function devResults(d){const hm=m=>m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m} m
   ${zt?`<div class="dz"><div class="dz-h"><b>Heart-rate zones</b><span>${Math.round(hi/zt*100)}% in zone 2 or higher · peak zone ${peak}</span></div><div class="dz-bar">${z.map((m,i)=>m?`<i style="flex:${m};background:${ZC[i]}"></i>`:'').join('')}</div><div class="dz-k">${z.map((m,i)=>m?`<span><u style="background:${ZC[i]}"></u>${i?'Zone '+i:'Rest'} ${m}m</span>`:'').join('')}</div></div>`:''}`}
 function autoLink(){
   let ch=false;const used=new Set(S.workouts.map(w=>w.devId).filter(Boolean));
-  S.workouts.forEach(w=>{if(w.devId)return;const d=devList().find(x=>!used.has(x.id)&&x.date===w.date&&x.start&&Math.abs(Date.parse(x.start)-w.start)<90*60000);if(d){w.devId=d.id;used.add(d.id);ch=true}});
+  S.workouts.forEach(w=>{if(w.devId)return;const ws=w.start||0,we=w.end||ws;
+    /* same day and the watch session overlaps the logged workout (±45 min), or starts within 3 h of it: the closest one wins */
+    const c=devList().filter(x=>!used.has(x.id)&&x.date===w.date&&x.start&&!(S.dev&&(S.dev.hide||[]).includes(x.id))).map(x=>{const xs=Date.parse(x.start),xe=xs+((+x.min||60)*60000);const ov=xs<=we+45*60000&&xe>=ws-45*60000;return {x,ok:ov||Math.abs(xs-ws)<3*3600000,dist:Math.abs(xs-ws)}}).filter(o=>o.ok&&ws).sort((a,b)=>a.dist-b.dist)[0];
+    if(c){w.devId=c.x.id;used.add(c.x.id);ch=true}});
   if(ch)save();
 }
 var _tf=null,_tfv=-1,saveVer=saveVer||0;
@@ -9878,21 +9887,26 @@ function renderWatchNow(){
     <p class="wn-stats">${[[d.min,'min'],[d.strain,'strain'],[d.kcal!=null?fmt(d.kcal):null,'kcal'],[d.avgHr,'bpm']].filter(x=>x[0]!=null&&x[0]!=='').map(x=>`<span><b>${esc(String(x[0]))}</b> ${x[1]}</span>`).join('')}</p>
     ${f?`<p class="note" style="margin:0;color:var(--good)">Added ${f.c} g carbs to ${d.date===todayKey()?"today's":'that day’s'} target to fuel this session.</p>`:''}
     <details class="why"><summary>Why log the lifts?</summary><p class="note" style="margin:6px 0 0">${esc(d.src)} doesn't share which exercises you did with other apps. Tell Trainer what this was and it fills in the sets from last time${rec.length?'':' (or from a template)'}, so your strength progress keeps tracking.</p></details>
-    <div class="wn-acts">${rec.map((w,j)=>`<button class="chip ${j?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button><button class="chip" data-wnotme>Not me</button></div>`;
+    <div class="wn-acts">${mineFor(d).map(w=>`<button class="chip main" data-wlink="${esc(w.id)}">✓ Logged in Trainer: ${esc(w.name)}</button>`).join('')}${rec.map((w,j)=>`<button class="chip ${j||mineFor(d).length?'':'main'}" data-wcopy="${esc(w.id)}">Same as last ${esc(w.name)}</button>`).join('')}<button class="chip ${rec.length?'':'main'}" data-wpick>${rec.length?'Something else':'Log the lifts'}</button><button class="chip" data-wskip>Not lifting</button><button class="chip" data-wnotme>Not me</button></div>`;
 }
 $('wNow').addEventListener('click',e=>{const id=$('wNow').dataset.id,d=devList().find(x=>x.id===id);if(!d)return;
+  const lk=e.target.closest('[data-wlink]');if(lk)return linkDev(lk.dataset.wlink,d);
   const c=e.target.closest('[data-wcopy]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.wcopy);if(src)quickCopy(src,d);return}
   if(e.target.closest('[data-wpick]'))return pickLiftFor(d);
   if(e.target.closest('[data-wnotme]'))return hideDev(d.id);
   if(e.target.closest('[data-wskip]')){S.dev.skip=[...(S.dev.skip||[]),d.id].slice(-100);save();renderTrain();toast(isLiftDev(d)?'Kept as a watch session':`${esc(d.name)} saved to your training history`)}});
+/* workouts already logged in Trainer that day and not yet matched to a watch session */
+function mineFor(d){return (S.workouts||[]).filter(w=>w.date===d.date&&!w.devId&&(w.ex||[]).length)}
+function linkDev(wid,d){const w=S.workouts.find(x=>x.id===wid);if(!w)return;S.workouts.forEach(x=>{if(x.devId===d.id)delete x.devId});w.devId=d.id;save();closeSheet();renderAll();toast(`${esc(d.src)} session matched to your ${esc(w.name)} log`)}
 function pickLiftFor(d){
-  const rec=recentLogged(6);
+  const rec=recentLogged(6),mine=mineFor(d);
   sheet(`<div><div class="eyebrow">${esc(d.src)} · ${esc(whenStr(d))}</div><h3>What did you train?</h3><p class="note">“Same as last” copies every set and weight in one tap. A template opens the workout so you can enter today's numbers.</p></div>
+    ${mine.length?`<div class="glabel" style="margin:0">Already logged in Trainer</div><div class="glist">${mine.map(w=>`<button class="gr" data-pl="${esc(w.id)}"><span class="gi" style="--c:var(--good)">${GI.check||GI.copy}</span><span class="gt"><b>${esc(w.name)}</b><span>${esc(w.ex.map(x=>x.n).join(' · '))}</span></span><span class="gv">${w.start?new Date(w.start).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):''}</span>${CHEV}</button>`).join('')}</div>`:''}
     ${rec.length?`<div class="glabel" style="margin:0">Same as last time</div><div class="glist">${rec.map(w=>`<button class="gr" data-pc="${esc(w.id)}"><span class="gi" style="--c:var(--good)">${GI.copy}</span><span class="gt"><b>${esc(w.name)}</b><span>${esc(w.ex.map(x=>x.n).join(' · '))}</span></span><span class="gv">${niceDate(w.date,{month:'short',day:'numeric'})}</span>${CHEV}</button>`).join('')}</div>`:''}
     <div class="glabel" style="margin:0">Enter today's numbers</div><div class="glist">${S.templates.map((t,i)=>`<button class="gr" data-pt="${i}"><span class="gi" style="--c:var(--pro)">${GI.dumbbell}</span><span class="gt"><b>${esc(t.name)}</b><span>${esc(t.ex.join(' · '))}</span></span><span></span>${CHEV}</button>`).join('')}<button class="gr" data-pt="-1"><span class="gi" style="--c:var(--muted)">${GI.plus}</span><span class="gt"><b>Empty workout</b><span>Add exercises as you go</span></span><span></span>${CHEV}</button></div>
     <div class="row" style="justify-content:flex-end"><button class="ghost" id="pkX">Cancel</button></div>`);
   $('pkX').onclick=closeSheet;
-  $('sheetRoot').querySelector('.sheet').addEventListener('click',e=>{const c=e.target.closest('[data-pc]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.pc);closeSheet();if(src)quickCopy(src,d);return}
+  $('sheetRoot').querySelector('.sheet').addEventListener('click',e=>{const pl=e.target.closest('[data-pl]');if(pl)return linkDev(pl.dataset.pl,d);const c=e.target.closest('[data-pc]');if(c){const src=S.workouts.find(w=>w.id===c.dataset.pc);closeSheet();if(src)quickCopy(src,d);return}
     const t=e.target.closest('[data-pt]');if(t){const i=+t.dataset.pt,tp=i>=0?S.templates[i]:{name:d.name,ex:[]};closeSheet();startWorkout(tp.name,tp.ex,null,d);if(i<0)setTimeout(()=>openExPicker({eyebrow:d.name,onDone:addExercises}),120)}});
 }
 function openDevWorkout(id){const w=devList().find(x=>x.id===id);if(!w)return;

@@ -1,7 +1,20 @@
 import os
 R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 s=open(os.path.join(R,'dev','Trainer.html')).read()
-head_add='''<meta name="apple-mobile-web-app-capable" content="yes">
+head_add='''<meta name="description" content="Track food, water and training in one place. Fill your heart and win the day.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Trainer">
+<meta property="og:title" content="Trainer">
+<meta property="og:description" content="Track food, water and training in one place. Fill your heart and win the day.">
+<meta property="og:url" content="https://brianmirandaa4-dotcom.github.io/macros/">
+<meta property="og:image" content="https://brianmirandaa4-dotcom.github.io/macros/heart-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="Trainer heart logo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Trainer">
+<meta name="twitter:image" content="https://brianmirandaa4-dotcom.github.io/macros/heart-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Trainer">
