@@ -2514,6 +2514,12 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 #quick .q-add::before{content:"";position:absolute;inset:-6px -6px -10px}
 /* calmer accents: purple only for the main action and selection */
 .statstrip b.c-p{color:var(--fg)!important}
+
+/* HOLD ANYTHING: press and hold opens a menu of shortcuts. No iOS callout or text selection on holdable things; list rows light up instead of shrinking */
+#tabsBottom .tab,#tplGrid [data-tpl],[data-tedit],#mealBar [data-mbar],[data-edit],#hist [data-wk]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.glist:not(.tgrid) .gr:active,.entry:active,.hist button:active{transform:none!important;opacity:1!important;background:var(--s2)}
+#sheetRoot .glist .gr .gt>span{white-space:normal;overflow:visible;text-overflow:clip;text-wrap:pretty}
+.hold-l .gr.hm-x .gt b{color:var(--over)}.hold-l .gr.hm-x .gi{--c:var(--over)!important}
 </style>
 </head>
 <body>
@@ -3862,7 +3868,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.90';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.91';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -6863,6 +6869,61 @@ $('quick').addEventListener('pointerdown',e=>{if(!e.target.closest('[data-qwater
 ['pointerup','pointerleave','pointercancel'].forEach(ev=>$('quick').addEventListener(ev,()=>clearTimeout(qwT)));
 $('quick').addEventListener('contextmenu',e=>{if(!e.target.closest('[data-qwater]'))return;e.preventDefault();clearTimeout(qwT);if(!qwHeld){qwHeld=true;openHydPick()}});
 
+/* ================= HOLD ANYTHING: press and hold (or right-click) for a menu of shortcuts ================= */
+const hsv=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const HI={trash:hsv('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>'),edit:hsv('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>'),search:hsv('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'),scan:hsv('<path d="M4 7V5h3M17 5h3v2M20 17v2h-3M7 19H4v-2M8 9v6M11 9v6M14 9v6M17 9v6"/>'),play:hsv('<path d="M8 5l11 7-11 7z"/>')};
+const HOLD_SEL='#tabsBottom .tab,#tplGrid [data-tpl],[data-tedit],#mealBar [data-mbar],[data-edit],#hist [data-wk]';
+function tplClone(i){const t=S.templates[i];return {...t,ex:t.ex.slice(),xm:JSON.parse(JSON.stringify(t.xm||{})),notes:JSON.parse(JSON.stringify(t.notes||{})),i}}
+function tplHold(i,inSheet){const t=S.templates[i];if(!t)return null;const back=()=>{if(inSheet)openTemplates()};
+  return {eyebrow:'Template',title:t.name,items:[
+    {ic:'play',c:'--good',t:'Start',s:`${t.ex.length} exercise${t.ex.length===1?'':'s'}`,go:()=>startTpl(i)},
+    {ic:'edit',t:'Edit',s:'Name, exercises and order',go:()=>editTemplate(tplClone(i))},
+    {ic:'copy',t:'Duplicate',go:()=>{const c=tplClone(i);delete c.i;c.id=uid();c.name=t.name+' copy';S.templates.splice(i+1,0,c);save();renderTrain();toast(`Made “${esc(c.name)}”`);back()}},
+    {ic:'trash',x:1,t:'Delete',go:()=>{const gone=S.templates.splice(i,1)[0];save();renderTrain();toast(`Deleted “${esc(gone.name)}”`,()=>{S.templates.splice(i,0,gone);save();renderTrain()});back()}}]}}
+function entryHold(id){const k=S.day,L=S.days[k]||[],e=L.find(x=>x.id===id);if(!e)return null;
+  return {eyebrow:mealName(e.meal||'snack'),title:e.n,items:[
+    {ic:'edit',t:'Edit',s:'Amount, meal and numbers',go:()=>openEdit(id)},
+    {ic:'plus',c:'--good',t:'Log it again',s:`${fmt(r0(e.k))} kcal · ${r0(e.p)} g protein`,go:()=>{(S.days[k]=S.days[k]||[]).push({...e,id:uid(),t:Date.now()});save();renderAll();toast(`Logged ${esc(e.n)} again`)}},
+    {ic:'trash',x:1,t:'Delete',go:()=>{const A=S.days[k]||[],j=A.findIndex(x=>x.id===id);if(j<0)return;const gone=A.splice(j,1)[0];if(!A.length)delete S.days[k];save();renderAll();toast(`Removed ${esc(gone.n)}`,()=>{(S.days[k]=S.days[k]||[]).splice(j,0,gone);save();renderAll()})}}]}}
+function tabHold(v){const goPhoto=()=>{const b=$('photoBtn');if(b)b.click()};
+  const M={
+    today:{title:'Today',items:[...MEALS.map(([m,l])=>({ic:'cloche',c:'--kcal',t:`Add to ${l}`,go:()=>{if(S.view!=='today')setView('today');openMealAdd(m)}})),
+      {ic:'drop',c:'--carb',t:'Add water',go:()=>openHydPick()},{ic:'scale',c:'--fat',t:'Weigh in',go:()=>openWeigh()},{ic:'heart',c:'--good',t:'Heart calendar',s:'Every day you won',go:()=>openCal()},{ic:'list',t:'Daily check-in',go:()=>openPage('checkin')}]},
+    foods:{title:'Foods',items:[{ic:'search',t:'Search foods',go:()=>{setView('foods');setTimeout(()=>{const i=$('fSearch');if(i)i.focus()},250)}},{ic:'camera',t:'Scan a photo',s:'Your plate or a label',go:goPhoto},{ic:'scan',t:'Scan a barcode',go:()=>openBarcode()},
+      {ic:'book',t:'Recipes',go:()=>GACT.fd_cook()},{ic:'leaf',c:'--good',t:'Meal ideas',go:()=>GACT.fd_ideas()},{ic:'cloche',t:'Meal prep',go:()=>GACT.fd_prep()},{ic:'list',t:'Grocery list',go:()=>openPage('groc')},{ic:'sliders',t:'How you eat',s:'Eating rules and traditions',go:()=>openDiet({edit:true})}]},
+    add:{title:'Log',items:[{ic:'quill',t:'Type what you ate',go:()=>GACT.goToday()},{ic:'camera',t:'Scan a photo',go:goPhoto},{ic:'scan',t:'Scan a barcode',go:()=>openBarcode()},{ic:'drop',c:'--carb',t:'Water',go:()=>openHydPick()},{ic:'scale',c:'--fat',t:'Weigh in',go:()=>openWeigh()},{ic:'dumbbell',c:'--pro',t:'Workout',go:()=>GACT.startNow()}]},
+    train:{title:'Train',items:[{ic:'play',c:'--good',t:'Start a workout',go:()=>GACT.startNow()},{ic:'plus',t:'Empty workout',s:'Add exercises as you go',go:()=>startTpl(-1)},{ic:'cal',t:'Schedule a session',go:()=>openGymSchedule()},{ic:'dumbbell',c:'--pro',t:'Templates',go:()=>openTemplates()},
+      {ic:'cal',t:'Training calendar',go:()=>openPage('tlog')},{ic:'chart',t:'Lift progress',go:()=>openPage('lifts')},{ic:'bars',t:'Sets per muscle',go:()=>openPage('muscle')},{ic:'book',t:'Programs',go:()=>openPage('progs')}]},
+    progress:{title:'Progress',items:[{ic:'heart',c:'--good',t:'This week',s:'Days won and your numbers',go:()=>setView('week')},{ic:'cal',t:'This month',go:()=>setView('month')},{ic:'plan',t:'Your plan',go:()=>setView('plan')},{ic:'user',t:'Friends',go:()=>setView('friends')},
+      {ic:'target',t:'Daily targets',go:()=>openPage('targets')},{ic:'scale',c:'--fat',t:'Weigh-ins',go:()=>openPage('weigh')},{ic:'chart',t:'Monthly report',go:()=>GACT.report()}]}};
+  const m=M[v];return m?{eyebrow:'Shortcuts',...m}:null}
+function mealHold(m){const l=mealName(m),n=(S.days[S.day]||[]).filter(e=>(e.meal||'snack')===m).length;
+  return {eyebrow:l,title:n?`${n} item${n===1?'':'s'} logged`:`Nothing in ${l} yet`,items:[{ic:'plus',c:'--good',t:`Add to ${l}`,go:()=>openMealAdd(m)},{ic:'camera',t:'Scan a photo',go:()=>{const b=$('photoBtn');if(b)b.click()}},{ic:'scan',t:'Scan a barcode',go:()=>openBarcode()},{ic:'book',t:'Recipes',go:()=>GACT.fd_cook()}]}}
+function wkHold(i){const w=S.workouts[i];if(!w)return null;
+  return {eyebrow:'Workout',title:w.name,items:[{ic:'list',t:'Open',go:()=>openWorkout(i)},{ic:'play',c:'--good',t:'Do it again',go:()=>startWorkout(w.name,(w.ex||[]).map(x=>x.n))},{ic:'dumbbell',c:'--pro',t:'Save as a template',go:()=>editTemplate({name:w.name,ex:(w.ex||[]).map(x=>x.n),i:-1})}]}}
+function holdItems(el){try{const d=el.dataset;
+  if(el.matches('#tabsBottom .tab'))return tabHold(d.v);
+  if(d.tpl!=null&&+d.tpl>=0)return tplHold(+d.tpl,false);
+  if(d.tedit!=null&&+d.tedit>=0)return tplHold(+d.tedit,true);
+  if(d.mbar)return mealHold(d.mbar);
+  if(d.edit)return entryHold(d.edit);
+  if(d.wk!=null)return wkHold(+d.wk);
+  }catch(e){}return null}
+function holdSheet(m){
+  sheet(`<div><div class="eyebrow">${esc(m.eyebrow||'Shortcuts')}</div><h3>${esc(m.title)}</h3></div><div class="glist hold-l">${m.items.map((x,i)=>`<button type="button" class="gr${x.x?' hm-x':''}" data-hm="${i}"><span class="gi" style="--c:var(${x.c||'--muted'})">${HI[x.ic]||GI[x.ic]||''}</span><span class="gt"><b>${esc(x.t)}</b>${x.s?`<span>${esc(x.s)}</span>`:''}</span>${CHEV}</button>`).join('')}</div>`,{nofocus:true});
+  const L=$('sheetRoot').querySelector('.hold-l');if(L)L.onclick=e=>{const b=e.target.closest('[data-hm]');if(!b)return;const it=m.items[+b.dataset.hm];closeSheet();it.go()}}
+let holdT=0,holdEl=null,holdXY=null,holdDone=false,holdAt=0;
+function holdOpen(el){const m=holdItems(el);if(!m||!m.items.length)return false;holdAt=Date.now();try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}holdSheet(m);try{localStorage.setItem('syncope.held','1')}catch(e){}return true}
+document.addEventListener('pointerdown',e=>{holdDone=false;if(e.button>0)return;const el=e.target.closest(HOLD_SEL);if(!el||e.target.closest('[data-qwater],[data-grip],input,textarea,select'))return;
+  clearTimeout(holdT);holdEl=el;holdXY=[e.clientX,e.clientY];holdT=setTimeout(()=>{if(holdEl!==el)return;holdEl=null;holdDone=holdOpen(el)},480)},{passive:true});
+document.addEventListener('pointermove',e=>{if(holdEl&&holdXY&&Math.hypot(e.clientX-holdXY[0],e.clientY-holdXY[1])>10){clearTimeout(holdT);holdEl=null}},{passive:true});
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>{clearTimeout(holdT);holdEl=null},{passive:true}));
+window.addEventListener('scroll',()=>{clearTimeout(holdT);holdEl=null},{passive:true,capture:true});
+/* the finger lifting after a hold must not also tap what's underneath */
+document.addEventListener('click',e=>{if(holdDone&&Date.now()-holdAt<2000){holdDone=false;e.preventDefault();e.stopPropagation()}},true);
+document.addEventListener('contextmenu',e=>{const el=e.target.closest(HOLD_SEL);if(!el||e.target.closest('[data-qwater],[data-grip]'))return;e.preventDefault();clearTimeout(holdT);holdEl=null;if(Date.now()-holdAt>800)holdOpen(el)});
+
+
 /* ================= FIND ANYTHING: type a word, jump straight there ================= */
 const FIND=[
   ['Membership: Free, Pro & Elite','membership subscription pro elite upgrade plan premium price billing',()=>openPage('member')],
@@ -6928,11 +6989,12 @@ $('findBtn').onclick=openFind;
 /* ================= TOUR: six quick stops, replay from the ? anytime ================= */
 const TOUR=[
   ['today','#hero','Today: your numbers','Calories left, the ring and protein, carbs and fat. It fills as you log.'],
+  ['today','#mealBar','Press and hold anything','Trainer is built to be held. Hold a tab, a meal, a food you logged or a template and a menu pops up with everything you can do there, so you rarely need to scroll.'],
   ['today','#quick','One-tap tiles','The water + adds your usual bottle (hold it for other sizes). Training starts today’s workout. Recovery and steps come from your watch.'],
   ['today','.composer','Log in plain words','Type “2 eggs and a coffee”. ▥ scans a barcode, the camera scans your plate or a label. Tap anything you logged to fix it.'],
   ['today','#todayRows','Your shortcuts','Water, meal ideas, meal prep and your daily check-in, right here.'],
   ['train','#gymSlot','Plan your session','Tell Trainer when you’re training. It adds that to your water goal and counts you down: when to drink, how much, and when to top up.'],
-  ['train','#tplGrid','Train','Tap a template to start. Tick ✓ after each set and the rest timer runs. Hold ⋮⋮ to reorder exercises.'],
+  ['train','#tplGrid','Train','Tap a template to start, or hold it to edit, copy or delete it. Tick ✓ after each set and the rest timer runs. Hold ⋮⋮ to reorder exercises.'],
   ['train','#trRows','See your gains','Training calendar, lift progress, sets per muscle and ready-made programs.'],
   ['week','#wTop','Progress','Days on target, weight, workouts, water and recovery for the week or month. Friends lives here too: tap anyone to see their day.'],
   ['plan','#planRows','Plan','Pick cut, maintain or bulk. Trainer sets safe targets and adjusts them as you weigh in.'],
