@@ -2551,6 +2551,13 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 #readyToday .trp-tx b{font:700 15px var(--f-body)}
 #readyToday .trp-tx em{font-style:normal;font-size:13px;color:var(--muted);line-height:1.35}
 #readyToday .trp-row>svg{width:16px;height:16px;color:var(--subtle);flex:none}
+
+.rd-mini{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px}
+.wk-coach{display:flex;flex-direction:column;gap:12px}
+.wkc-h{display:flex;justify-content:space-between;align-items:baseline}.wkc-h b{font:700 17px var(--f-body)}.wkc-h span{color:var(--muted);font-size:13px}
+.wkc-r{display:flex;align-items:center;gap:12px}.wkc-r .gi{flex:none}
+.wkc-t{display:flex;flex-direction:column;min-width:0}.wkc-t b{font-weight:600;font-size:14px}.wkc-t span{color:var(--muted);font-size:13px;line-height:1.35}
+.wkc-tip{margin:2px 0 0;padding-top:12px;border-top:1px solid var(--hair);color:var(--fg);font-size:14px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -3900,7 +3907,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.94';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.95';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4676,7 +4683,7 @@ function renderWeek(){renderTip('week');
   $('wSub').textContent=dW===0?'This week':dW===-1?'Last week':dW<0?`${-dW} weeks ago`:`In ${dW} weeks`;
   $('wTitle').textContent=`${niceDate(keys[0],{month:'short',day:'numeric'})} – ${niceDate(keys[6],{month:'short',day:'numeric'})}`;
   const st=rangeStats(keys);
-  $('wTop').innerHTML=hpWeekCard(keys,true)+progTop(keys,true);dlRecap(ws);
+  $('wTop').innerHTML=hpWeekCard(keys,true)+(()=>{try{return weekCoachHTML(keys)}catch(e){return ''}})()+progTop(keys,true);dlRecap(ws);
   $('wTiles').innerHTML=tilesHTML(st,keys.filter(k=>k<=tk).length||7);
   const gk=goalKcal(st.G),W=chartW('wChart'),H=280,L=58,Rr=10,T=24,B=36,tots=keys.map(dayTotals);
   const max=niceMax(Math.max(gk*1.15,...tots.map(t=>t.k))),y=v=>T+(H-T-B)*(1-v/max),bw=(W-L-Rr)/7;
@@ -6992,8 +6999,8 @@ const RD={low:{t:'Go lighter today',c:'--over',plan:['Do one less set on each li
   high:{t:'Green light: push today',c:'--good',plan:['Good day to try a top set or add 5 lb on your main lift','Add a rep wherever the weight felt easy last time']}};
 function readyRowHTML(i){const r=readiness();if(!r)return '';const L=RD[r.lvl];
   return `<button type="button" class="trp-row rd-row" data-ready="${i==null?-1:i}"><span class="trp-ic rd-dot" style="--c:var(${L.c})" aria-hidden="true"></span><span class="trp-tx"><b>${L.t}</b><em>${esc(r.why.join(' · ')||'From your watch data')}</em></span>${CHEV}</button>`}
-function startLighter(i){const before=S.active&&S.active.id;startTpl(i);const A=S.active;if(!A||A.id===before)return;
-  A.ex.forEach(x=>{if(!isCardio(x.n)&&x.sets.length>=3)x.sets.pop()});A.lite=1;save();renderAll();toast('Lighter version: one less set per lift. Stop 2–3 reps short.')}
+function startLighter(i,half){const before=S.active&&S.active.id;startTpl(i);const A=S.active;if(!A||A.id===before)return;
+  A.ex.forEach(x=>{if(isCardio(x.n))return;if(half){if(x.sets.length>=2)x.sets=x.sets.slice(0,Math.ceil(x.sets.length/2))}else if(x.sets.length>=3)x.sets.pop()});A.lite=half?2:1;save();renderAll();toast(half?'Lighter week: half the sets, about 10% lighter, stop 3 reps short.':'Lighter version: one less set per lift. Stop 2–3 reps short.')}
 function openReady(i){const r=readiness();if(!r)return;const L=RD[r.lvl],tp=i>=0?S.templates[i]:null;
   sheet(`<div><div class="eyebrow">Today’s call</div><h3>${L.t}</h3></div>
     ${r.why.length?`<div class="glabel">Why</div><ul class="rd-list">${r.why.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
@@ -7028,6 +7035,42 @@ function stallRowHTML(){let L=[];try{L=stalledLifts()}catch(e){}if(!L.length)ret
   return `<button type="button" class="trp-row" data-stall="${esc(top.n)}"><span class="trp-ic" aria-hidden="true">🏋️</span><span class="trp-tx"><b>${esc(top.n)} has stalled${L.length>1?` (+${L.length-1} more)`:''}</b><em>${esc(top.F[0]?top.F[0].t:'See what might be holding it back')}</em></span>${CHEV}</button>`}
 document.addEventListener('click',e=>{const r=e.target.closest('[data-ready]');if(r){openReady(+r.dataset.ready);return}
   const st=e.target.closest('[data-stall]');if(st){S.lpLift=st.dataset.stall;S.lpPeriod='4w';openPage('lifts')}});
+
+
+/* Lighter week: several hard weeks in a row plus recovery trending down (or lifts stalling) */
+function weekLoad(i){const tk=todayKey(),to=addDays(tk,-7*i),from=addDays(to,-6),W=S.workouts.filter(w=>w.date>=from&&w.date<=to);
+  return {n:W.length,sets:W.reduce((t,w)=>t+w.ex.filter(x=>!isCardio(x.n)).reduce((u,x)=>u+x.sets.filter(z=>(+z.r||0)>0).length,0),0)}}
+function deloadCheck(){const tk=todayKey();const ak=S.prefs&&S.prefs.deloadAck;if(ak&&ak>addDays(tk,-7))return null;
+  const L=Array.from({length:12},(_,i)=>weekLoad(i)),nz=L.map(x=>x.sets).filter(x=>x>0).sort((a,b)=>a-b),med=nz.length?nz[Math.floor(nz.length/2)]:0;
+  let wk=0;for(let i=0;i<12;i++){const x=L[i];if(x.n>=3&&x.sets>=med*.6)wk++;else if(i===0)continue;else break}
+  if(wk<5)return null;const why=[`${wk} hard weeks in a row`];
+  const num=y=>y==null||y===''?null:+y,avg=(a,b,key)=>{const v=[];for(let d=a;d<b;d++){const x=num(hv(addDays(tk,-d))[key]);if(x!=null&&!isNaN(x))v.push(x)}return v.length>=5?v.reduce((s,y)=>s+y,0)/v.length:null};
+  let down=false;try{const ra=avg(0,14,'recovery'),rb=avg(14,28,'recovery');if(ra!=null&&rb!=null&&rb-ra>=8){down=true;why.push(`Recovery down ${r0(rb-ra)} points over two weeks`)}
+    const ha=avg(0,14,'hrv'),hb=avg(14,28,'hrv');if(ha!=null&&hb!=null&&(hb-ha)/hb>=.08){down=true;why.push(`HRV down ${r0((hb-ha)/hb*100)}% over two weeks`)}}catch(e){}
+  let st=[];try{st=stalledLifts()}catch(e){}if(st.length>=2)why.push(`${st.length} lifts have stalled`);
+  if(!(down||st.length>=2||wk>=8))return null;return {wk,why}}
+function deloadRowHTML(){let d=null;try{d=deloadCheck()}catch(e){}if(!d)return '';
+  return `<button type="button" class="trp-row" data-deload><span class="trp-ic rd-dot" style="--c:var(--fat)" aria-hidden="true"></span><span class="trp-tx"><b>Time for a lighter week</b><em>${esc(d.why.slice(0,2).join(' · '))}</em></span>${CHEV}</button>`}
+function openDeload(){const d=deloadCheck();if(!d)return;const nx=tplNext();
+  sheet(`<div><div class="eyebrow">Coach</div><h3>Time for a lighter week</h3></div>
+    <div class="glabel">Why</div><ul class="rd-list">${d.why.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+    <div class="glabel">For the next 7 days</div><ul class="rd-list"><li>Same lifts, about half the sets</li><li>Weights about 10% lighter, stop 3 reps before failure</li><li>Keep eating at your target and prioritize sleep</li><li>Then go back to normal. Most people come back stronger</li></ul>
+    <div class="row rd-btns">${nx&&!S.active?`<button class="primary" type="button" id="dlGo">Start lighter</button>`:''}<button class="ghost" type="button" id="dlOk">Got it</button></div>
+    <p class="note">Worked out on your phone from your training and recovery. Your watch data never leaves your phone.</p>`);
+  const ack=()=>{S.prefs=S.prefs||{};S.prefs.deloadAck=todayKey();save()};
+  if($('dlGo'))$('dlGo').onclick=()=>{ack();closeSheet();startLighter(nx.i,true)};$('dlOk').onclick=()=>{ack();closeSheet();renderAll()}}
+/* Progress: a short coach note for the week you're looking at */
+function weekCoachHTML(keys){const tk=todayKey();if(!keys.includes(tk))return '';const past=keys.filter(k=>k<=tk);
+  const num=y=>y==null||y===''?null:+y,av=key=>{const v=past.map(k=>num(hv(k)[key])).filter(x=>x!=null&&!isNaN(x));return v.length?v.reduce((a,b)=>a+b,0)/v.length:null};
+  const rows=[],rc=av('recovery'),sl=av('sleep');
+  if(rc!=null||sl!=null)rows.push(['heart','--good','Recovery',[rc!=null?`${r0(rc)}% average`:'',sl!=null?`${r1(sl)} h sleep`:''].filter(Boolean).join(' · ')]);
+  const lows=past.filter(k=>{try{const r=readiness(k);return r&&r.lvl==='low'}catch(e){return false}}).length;if(lows)rows.push(['heart','--over','Lighter days',`${lows} day${lows===1?'':'s'} your body asked for less`]);
+  let st=[];try{st=stalledLifts()}catch(e){}const recent=[...new Set(S.workouts.filter(w=>w.date>=addDays(tk,-27)).flatMap(w=>w.ex.filter(x=>!isCardio(x.n)).map(x=>x.n)))];
+  if(recent.length)rows.push(['dumbbell','--pro','Lifts',st.length?`${recent.length-st.length} moving · ${st.length} stalled (${st.slice(0,2).map(x=>x.n).join(', ')})`:`${recent.length} lift${recent.length===1?'':'s'}, none stalled`]);
+  let tip='';try{const d=deloadCheck();if(d)tip='Time for a lighter week. See Train.';else if(st.length&&st[0].F[0])tip=st[0].F[0].fix;else if(sl!=null&&sl<7)tip='Sleep is your cheapest upgrade: aim for 7.5 hours or more.'}catch(e){}
+  if(!rows.length)return '';
+  return `<div class="card wk-coach"><div class="wkc-h"><b>Coach</b><span>This week</span></div>${rows.map(([ic,c,t,v])=>`<div class="wkc-r"><span class="gi" style="--c:var(${c})">${GI[ic]||''}</span><span class="wkc-t"><b>${t}</b><span>${esc(v)}</span></span></div>`).join('')}${tip?`<p class="wkc-tip">${esc(tip)}</p>`:''}</div>`}
+document.addEventListener('click',e=>{if(e.target.closest('[data-deload]'))openDeload()});
 
 
 /* ================= FIND ANYTHING: type a word, jump straight there ================= */
@@ -9258,7 +9301,7 @@ function trPrimeHTML(nx){const tp=nx?S.templates[nx.i]:null,k=todayKey(),G=gymSt
   if(!G)row=`<button type="button" class="trp-row" data-gymplan><span class="trp-ic">🕒</span><span class="trp-tx"><b>When are you training today?</b><em>Set a time to plan water &amp; food</em></span>${CHEV}</button>`;
   else{const {g,t0,steps,ni}=G,now=Date.now(),st=t0>now?untilTxt(t0):t0+(+g.min||60)*60e3>now?'now':'done',nxs=ni>=0?steps[ni]:null;
     row=`<details class="trp-gym"><summary class="trp-row"><span class="trp-ic">🕒</span><span class="trp-tx"><b>${hhmm(t0)} · ${(GYM_KINDS.find(x=>x[0]===g.t)||[,'Training'])[1]} <small>${st}</small></b>${nxs?`<em>Next: ${esc(nxs.h)} · ${hhmm(nxs.t)}</em>`:''}</span><button class="link" type="button" data-gymplan>Edit</button></summary>${gymCardHTML(k,false)}</details>`}
-  try{row=readyRowHTML(tp?nx.i:-1)+row+stallRowHTML()}catch(e){}
+  try{row=readyRowHTML(tp?nx.i:-1)+deloadRowHTML()+row+stallRowHTML()}catch(e){}
   {const U=gymUpcoming(6).filter(u=>u.k>todayKey());row+=`<button type="button" class="trp-row trp-sched" data-gymsched><span class="trp-ic">📅</span><span class="trp-tx"><b>${U.length?`Next: ${niceDate(U[0].k,{weekday:'short',month:'short',day:'numeric'})} · ${hhmm(atMs(U[0].k,U[0].at))}`:'Schedule a future session'}</b><em>${U.length>1?`${U.length} sessions coming up`:'Plan any day ahead'}</em></span>${CHEV}</button>`}
   return `<div class="card trp"><div class="trp-main"><div class="trp-t"><span class="trp-e">${tp?(nx.done?'Done today ✓':nx.why==='today'?'Today':'Up next'):'Train'}</span><h2>${tp?esc(tp.name):'Start a workout'}</h2><p>${tp?`${tp.ex.length} exercises · ${esc(tp.ex.slice(0,2).join(', '))}${tp.ex.length>2?` +${tp.ex.length-2} more`:''}`:'Pick a template or start empty'}</p></div><button class="primary trp-go" type="button" data-start="${tp?nx.i:-1}">Start</button></div>${row}</div>`}
 function startTpl(i){const t=i>=0?S.templates[i]:{name:i===-2?'Cardio':'Workout',ex:[]};if(!t)return;startWorkout(t.name,t.ex);if(i<0&&S.active&&!S.active.ex.length)setTimeout(()=>openExPicker({eyebrow:i===-2?'Cardio':'New workout',title:i===-2?'What cardio did you do?':undefined,mus:i===-2?'Cardio':undefined,onDone:addExercises}),120)}
@@ -10105,7 +10148,7 @@ function openDevWorkout(id){const w=devList().find(x=>x.id===id);if(!w)return;
 function recoveryTable(keys){
   const rows=keys.map(k=>[k,hv(k)]).filter(([,h])=>['sleep','recovery','hrv','rhr','steps'].some(x=>h[x]!=null));
   if(!rows.length)return '<p class="note">Connect WHOOP, Oura or Garmin (Plan → Connections), or sync from Apple Health on Today, to see sleep and recovery here.</p>';
-  return `<table class="dtable dt-compact"><thead><tr><th>Day</th><th>Sleep</th><th style="color:var(--good)">Recovery</th><th style="color:var(--fat)">HRV</th><th style="color:var(--pro)">RHR</th><th>Steps</th></tr></thead><tbody>${rows.map(([k,h])=>`<tr class="go-row" data-day="${k}"><td><b>${DOW[parseKey(k).getDay()]}</b> <span class="dim">${parseKey(k).getDate()}</span></td><td>${h.sleep!=null?h.sleep+'h':'—'}</td><td>${h.recovery!=null?h.recovery+'%':'—'}</td><td>${h.hrv??'—'}</td><td>${h.rhr??'—'}</td><td>${h.steps!=null?fmt(h.steps):'—'}</td></tr>`).join('')}</tbody></table>`;
+  return `<table class="dtable dt-compact"><thead><tr><th>Day</th><th>Sleep</th><th style="color:var(--good)">Recovery</th><th style="color:var(--fat)">HRV</th><th style="color:var(--pro)">RHR</th><th>Steps</th></tr></thead><tbody>${rows.map(([k,h])=>`<tr class="go-row" data-day="${k}"><td>${(()=>{try{const r=readiness(k);return r?`<i class="rd-mini" style="--c:var(${RD[r.lvl].c})" title="${RD[r.lvl].t}"></i>`:''}catch(e){return ''}})()}<b>${DOW[parseKey(k).getDay()]}</b> <span class="dim">${parseKey(k).getDate()}</span></td><td>${h.sleep!=null?h.sleep+'h':'—'}</td><td>${h.recovery!=null?h.recovery+'%':'—'}</td><td>${h.hrv??'—'}</td><td>${h.rhr??'—'}</td><td>${h.steps!=null?fmt(h.steps):'—'}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function openSetupChooser(){
