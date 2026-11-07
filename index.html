@@ -3477,6 +3477,14 @@ paneer;321;21;3.6;25;oz=28.35
 collard greens|collards;33;2.7;5.6;0.7;cup=190
 black-eyed peas|black eyed peas;116;7.7;21;0.5;cup=170
 coconut milk|canned coconut milk;197;2;2.8;21;cup=240
+chickpea flour|besan|gram flour;387;22.4;57.8;6.7;cup=92,tbsp=7.5
+pea protein|pea protein powder|vegan protein powder|plant protein powder;400;80;6;7;scoop=30
+idli|idly;130;4.5;26;0.8;each=40
+sambar|sambhar;65;3.2;9.5;1.8;cup=240
+poha|kanda poha|flattened rice;130;2.6;23;3.2;cup=160
+dosa|plain dosa;165;3.9;28;4;each=80
+ful medames|ful|foul|fava bean stew;110;6.5;14;3;cup=250
+gallo pinto;150;5;25;3;cup=200
 `;
 
 let CAT='Protein';
@@ -3505,7 +3513,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.80';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.81';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -5184,10 +5192,14 @@ const MB_ROWS=[['Tracking',[['Calories, macros & water',1,1,1],['Barcode scanner
   ['Training',[['Workout logging & rest timer',1,1,1],['Science-based programs',0,1,1],['Strength curves & sets per muscle',0,0,1],['Lock-screen rest alerts',0,0,1]]],
   ['Social',[['Friends, streaks & points',1,1,1],['Live workout status',0,0,1]]]];
 let mbBill='yr',mbTier='pro';
+/* Auto-renew terms shown before anyone pays. Reminder timing: weekly 24h before, monthly 3 days before, annual 30 days and 7 days before
+   (meets California's annual-renewal notice rule). Cancel-by is 24 hours before renewal (App Store rule). */
+const MB_REMIND={wk:'a day before',mo:'3 days before',yr:'30 days and again 7 days before'};
+function mbRenewTxt(b){const per={wk:'week',mo:'month',yr:'year'}[b]||'month';return `Renews automatically every ${per} until you cancel. We’ll remind you ${MB_REMIND[b]||MB_REMIND.mo} each renewal with the plan, price, renewal date and the last day to cancel (24 hours before it renews). Cancel anytime in Settings → Apple ID → Subscriptions.`}
 function renderMember(){const el=$('pg-member');if(!el)return;const T=MB_TIERS.find(t=>t.id===mbTier),P=MB_PRICE[mbTier];
   const save=P?Math.round((1-P.yr/(P.mo*12))*100):0;
   const tick=v=>v===1?'<i class="mb-y" aria-label="Included">'+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>':v===0?'<i class="mb-x" aria-label="Not included"></i>':`<i class="mb-t">${v}</i>`;
-  const opts=P?[['yr','Annual',`$${P.yr.toFixed(2)}/yr`,`$${(P.yr/12).toFixed(2)}/mo · Save ${save}%`],['mo','Monthly',`$${P.mo.toFixed(2)}/mo`,'Billed monthly'],['wk','Weekly',`$${P.wk.toFixed(2)}/wk`,'Billed weekly']]:[];
+  const opts=P?[['yr','Annual',`$${P.yr.toFixed(2)}/yr`,`$${(P.yr/12).toFixed(2)}/mo · Save ${save}% · renews yearly`],['mo','Monthly',`$${P.mo.toFixed(2)}/mo`,'Renews monthly'],['wk','Weekly',`$${P.wk.toFixed(2)}/wk`,'Renews weekly']]:[];
   el.innerHTML=`<div class="mbr mb4">
     <div class="seg2 mb-seg" role="tablist" aria-label="Plan">${MB_TIERS.map(t=>`<button type="button" role="tab" data-mbt="${t.id}" aria-pressed="${t.id===mbTier}">${t.name}</button>`).join('')}</div>
     <div class="card mb-plan">
@@ -5196,13 +5208,13 @@ function renderMember(){const el=$('pg-member');if(!el)return;const T=MB_TIERS.f
       <div class="mb-inc">${T.id==='free'?'Included':`Everything in ${T.id==='pro'?'Free':'Pro'}, plus`}</div>
       <ul class="mb-fl">${T.feat.map(([ic,f])=>`<li class="mb-fr">${tick(1)}<span>${f}</span></li>`).join('')}</ul>
       ${T.id==='pro'?(()=>{const E=MB_PRICE.elite,d=mbBill==='yr'?`$${((E.yr-P.yr)/12).toFixed(2)} more a month`:mbBill==='mo'?`$${(E.mo-P.mo).toFixed(2)} more a month`:`$${(E.wk-P.wk).toFixed(2)} more a week`;return `<button type="button" class="mb-up" data-mbt="elite"><span>Add WHOOP, Oura &amp; Garmin with Elite</span><b>${d} ›</b></button>`})():''}
-      ${T.id==='free'?'':`<button type="button" class="primary mb-cta" data-mbgo="${T.id}">Continue with ${T.name}</button><p class="mb-fine">Free during the beta. Payments aren't live yet.</p>`}
+      ${T.id==='free'?'':`<button type="button" class="primary mb-cta" data-mbgo="${T.id}">Continue with ${T.name}</button><p class="mb-fine">Free during the beta. Payments aren't live yet.</p><p class="mb-fine mb-renew">${mbRenewTxt(mbBill)}</p>`}
     </div>
     ${mbTeamCard()}
     <details class="mb-cmpd"><summary>Compare all plans</summary>
     <div class="mb-cmp"><div class="mb-row mb-hd"><span></span><b>Free</b><b>Pro</b><b>Elite</b></div>
       ${MB_ROWS.map(([g,rows])=>`<div class="mb-g">${g}</div>${rows.map(r=>`<div class="mb-row"><span>${r[0]}</span>${tick(r[1])}${tick(r[2])}${tick(r[3])}</div>`).join('')}`).join('')}</div></details>
-    <p class="note mb-foot">Prices in USD. Cancel anytime. Safety features, like the calorie floor, are on every plan.</p></div>`;
+    <p class="note mb-foot">Prices in USD. Subscriptions renew automatically until cancelled, and we always remind you before you’re charged. Safety features, like the calorie floor, are on every plan.</p></div>`;
   el.onclick=e=>{const t=e.target.closest('[data-mbt]');if(t){mbTier=t.dataset.mbt;renderMember();return}
     const b=e.target.closest('[data-mbb]');if(b){mbBill=b.dataset.mbb;renderMember();return}
     const g=e.target.closest('[data-mbgo]');if(g)toast(`${g.dataset.mbgo==='pro'?'Pro':'Elite'} is coming soon. Everything's unlocked free during the beta.`)}}
@@ -5784,10 +5796,12 @@ function gymSteps(k=todayKey()){const g=gymGet(k);if(!g)return null;const kg=kgN
   const ents=(S.days[k]||[]),sumIn=(a,b)=>ents.filter(e=>e.t>=a&&e.t<b).reduce((o,e)=>({c:o.c+(+e.c||0),p:o.p+(+e.p||0)}),{c:0,p:0}),end=t0+(+g.min||60)*60e3;
   const preC=Math.round(kg*1/5)*5,preP=Math.round(kg*.4/5)*5,snC=Math.round(kg*.3/5)*5,postP=Math.min(40,Math.max(20,Math.round(kg*.4/5)*5)),postC=Math.round(kg*.8/5)*5;
   const preGotF=sumIn(t0-4*H,t0-1.25*H),snackGot=sumIn(t0-1.25*H,t0),postGot=sumIn(end,end+3*H);
-  const ideasPre=g.t==='lift'?'chicken & rice bowl, turkey sandwich + fruit, or oats with whey and a banana':'pasta with lean meat, a bagel with eggs, or rice, chicken and fruit';
+  const dRule=dietCfg().rules.length,ideasPre=dRule?'rice or noodle bowl from Meal ideas, toast with fruit, or oats and a banana':g.t==='lift'?'chicken & rice bowl, turkey sandwich + fruit, or oats with whey and a banana':'pasta with lean meat, a bagel with eggs, or rice, chicken and fruit';
   steps.push({w:1.5*H,t:t0-3*H,ic:'🍚',food:1,h:`Pre-workout meal: ~${preC} g carbs, ~${preP} g protein`,b:`Carb-forward, easy on fat and fiber so it’s digested by ${hhmm(t0)}. Try a ${ideasPre}.`,done:preGotF.c>=preC*.6});
   steps.push({w:45*60e3,t:t0-45*60e3,ic:'🍌',food:1,h:`Optional: ~${snC} g quick carbs`,b:'Only if your last meal was 3+ hours ago: a banana, rice cakes with honey, or applesauce.',done:snackGot.c>=snC*.6||preGotF.c>=preC*.6});
-  steps.push({w:3*H,t:end+5*60e3,ic:'🥩',food:1,h:`Recovery meal: ${postP} g protein + ~${postC} g carbs`,b:'Within about 2 hours. Protein rebuilds muscle and carbs refill what you burned. Greek yogurt + granola, a burrito bowl, or a shake + bagel all work.',done:postGot.p>=postP*.8});
+  steps.push({w:3*H,t:end+5*60e3,ic:'🥩',food:1,h:`Recovery meal: ${postP} g protein + ~${postC} g carbs`,b:'Within about 2 hours. Protein rebuilds muscle and carbs refill what you burned. '+(dRule?'Any protein-rich idea in Meals that fit works; they follow your eating rules.':'Greek yogurt + granola, a burrito bowl, or a shake + bagel all work.'),done:postGot.p>=postP*.8});
+  // observing a daytime fast: no eat or drink prompts between 5am and 7pm
+  if(dietFast())for(let i=steps.length-1;i>=0;i--){const h=new Date(steps[i].t).getHours();if(steps[i].ic!=='🏋️'&&h>=5&&h<19)steps.splice(i,1)}
   steps.sort((a,b)=>a.t-b.t);
   const nxt=steps.findIndex(x=>!x.done&&now<x.t+x.w);
   return {g,t0,steps,next:nxt<0?null:steps[nxt],ni:nxt,pre,top}}
@@ -6396,7 +6410,22 @@ Chicken, black-eyed peas & collards|dR|35|chicken breast:p:oz:6:3:10;black-eyed 
 Pasta with chickpeas & spinach|ldR|20|pasta:c:cup:1:0.5:2.5;chickpeas:p:cup:0.75:0:1.5;spinach:x:cup:1:1:1;marinara:x:cup:0.5:0.5:0.5;olive oil:f:tsp:2:0:4|italian,med
 Tofu scramble & toast|bR|15|tofu:p:oz:7:4:10;wheat bread:c:slice:2:0:3;spinach:x:cup:1:1:1;avocado:f:each:0.25:0:0.5|american
 Soy milk oats & berries|bR|5|oats:c:cup:0.5:0.25:1.25;soy milk:p:cup:1:0.5:2;blueberries:c:cup:0.5:0:1;chia seeds:f:tbsp:1:0:2|american
-Hummus, pita & edamame|s|3|hummus:f:tbsp:3:1:5;pita:c:each:0.5:0:1;edamame:p:cup:0.5:0:1;cucumber:x:cup:0.5:0.5:0.5|mideast,med`;
+Hummus, pita & edamame|s|3|hummus:f:tbsp:3:1:5;pita:c:each:0.5:0:1;edamame:p:cup:0.5:0:1;cucumber:x:cup:0.5:0.5:0.5|mideast,med
+Besan chilla & soy milk|bR|15|chickpea flour:p:cup:0.5:0.25:1;soy milk:p:cup:1:0:2;spinach:x:cup:1:1:1;tomato:x:each:0.5:0.5:0.5;olive oil:f:tsp:2:0:4|southasia
+Idli & sambar|bR|20|idli:c:each:3:2:5;sambar:p:cup:1.5:1:2.5;soy milk:p:cup:0:0:1.5|southasia
+Poha with peas & peanuts|bR|15|poha:c:cup:1.5:1:2.5;peas:c:cup:0.5:0:1;peanuts:f:oz:0.5:0:1;soy milk:p:cup:1:0:2|southasia
+Masala dosa & sambar|blR|20|dosa:c:each:1:1:2;sambar:p:cup:1.5:1:2.5;potato:c:cup:0.5:0:1|southasia
+Tofu breakfast burrito|bR|15|tofu:p:oz:6:3:10;tortilla:c:each:1:1:2;black beans:c:cup:0.5:0:1;salsa:x:tbsp:3:3:3;avocado:f:each:0.25:0:0.5|mexican,latin
+Berry pea-protein smoothie|bsPR|5|pea protein:p:scoop:1:0.5:2;soy milk:p:cup:1:0.5:1.5;strawberries:c:cup:1:0.5:1.5;banana:c:each:1:0:1.5;chia seeds:f:tbsp:1:0:2|american
+Ful medames & pita|blR|15|ful medames:p:cup:1:0.5:2;pita:c:each:1:0:2;olive oil:f:tsp:2:0:4;tomato:x:each:0.5:0.5:0.5;cucumber:x:cup:0.5:0.5:0.5|mideast,eafr
+Gallo pinto & plantain|bR|20|gallo pinto:c:cup:1.5:1:2.5;plantain:c:each:0.5:0:1;tofu:p:oz:4:0:8;avocado:f:each:0.25:0:0.5|latin,carib
+Chia pudding & berries|bsR|5|chia seeds:f:tbsp:2:1:3;soy milk:p:cup:1:0.5:1.5;blueberries:c:cup:0.5:0:1;maple syrup:c:tbsp:0.5:0:1.5|american
+Peanut butter banana toast|bsR|5|wheat bread:c:slice:2:1:3;peanut butter:f:tbsp:1.5:1:2.5;banana:c:each:1:0:1;soy milk:p:cup:1:0:2|american
+Edamame & apple|s|3|edamame:p:cup:0.75:0.5:1.5;apple:c:each:1:0:1|eastasia
+Rice cakes & peanut butter|sP|3|rice cakes:c:each:2:1:4;peanut butter:f:tbsp:1:0.5:2;banana:c:each:0.5:0:1|american
+Dates, almonds & soy milk|s|2|dates:c:each:3:1:5;almonds:f:oz:0.5:0:1;soy milk:p:cup:1:0.5:2|mideast,southasia
+Hummus veggie plate|s|5|hummus:f:tbsp:4:2:6;chickpeas:p:cup:0.5:0:1;carrots:x:cup:1:1:1;cucumber:x:cup:0.5:0.5:0.5|mideast,med
+Pea protein shake & banana|sPR|2|pea protein:p:scoop:1:1:2;oat milk:c:cup:1:0.5:1.5;banana:c:each:0.5:0:1|american`;
 // traditions for the original ideas (the new ones carry theirs in the 5th field)
 const IDEA_TRAD={'Chicken burrito bowl':'mexican,latin','Turkey taco bowl':'mexican,latin','Shrimp stir-fry':'eastasia,seasia','Chicken pasta marinara':'italian','Tofu & edamame rice bowl':'eastasia','Lean egg fried rice':'eastasia','Tuna & rice bowl':'eastasia','Salmon, rice & broccoli':'american','Steak, sweet potato & green beans':'american,soul','Grilled chicken sandwich':'american','Cod, quinoa & asparagus':'med','Chicken thigh & couscous':'med,mideast','Greek yogurt power bowl':'med','Bagel, eggs & turkey':'american','Lean beef & potatoes':'american'};
 const STEP={oz:.5,cup:.25,tbsp:.5,tsp:.5,each:.5,slice:1,scoop:.5,g:10,serving:.5};
@@ -6453,6 +6482,7 @@ whites|Egg whites|egg white|p|each|4|0|8|1|Dairy & eggs|eggs|b
 yogurt|Greek yogurt|greek yogurt|p|g|250|150|400|1|Dairy & eggs|cold|b
 cottage|Cottage cheese|cottage cheese|p|g|200|120|350|1|Dairy & eggs|cold|b
 whey|Whey protein|whey|p|scoop|1|0|2|1|Pantry|shake|b
+pea|Pea protein|pea protein|p|scoop|1|0|2|1|Pantry|shake|b
 rice|White rice|white rice|c|g|180|80|420|0.36|Grains & pasta|rice|ld
 brown|Brown rice|brown rice|c|g|180|80|420|0.38|Grains & pasta|rice|ld
 quinoa|Quinoa|quinoa|c|g|180|80|380|0.37|Grains & pasta|quinoa|ld
@@ -6516,7 +6546,10 @@ const LIKE_DEF={p:['chicken','eggs','yogurt','salmon','beef','shrimp'],c:['rice'
 const XDEF={p:[150,80,300,'Meat & seafood','ld'],c:[150,60,350,'Grains & pasta','bld'],f:[20,10,45,'Pantry','bld'],v:[100,100,100,'Produce','bld'],fr:[120,60,240,'Produce','b']};
 function ingX(){const X=(S.profile&&S.profile.likesX)||{};Object.entries(X).forEach(([k,x])=>{if(ING[k]||!XDEF[x.g])return;const [d,lo,hi,aisle,slots]=XDEF[x.g];
   ING[k]={k,n:x.n,food:x.food,g:x.g,u:'g',d,lo,hi,raw:1,aisle:x.g==='p'?'Other':aisle,cook:'any',slots,custom:true}})}
-function likes(){ingX();const L=(S.profile&&S.profile.likes)||{};const out={},custom=!!(S.profile&&S.profile.likes);LIKE_GROUPS.forEach(([g])=>{const v=(L[g]||[]).filter(k=>ING[k]);out[g]=(v.length?v:LIKE_DEF[g]).filter(k=>ING[k]&&!avoidHit(ING[k].n+' '+ING[k].food))});out.custom=custom;return out}
+function likes(){ingX();const L=(S.profile&&S.profile.likes)||{};const out={},custom=!!(S.profile&&S.profile.likes);LIKE_GROUPS.forEach(([g])=>{const v=(L[g]||[]).filter(k=>ING[k]);out[g]=(v.length?v:LIKE_DEF[g]).filter(k=>ING[k]&&!avoidHit(ING[k].n+' '+ING[k].food));
+    // eating rules can empty a group (vegan: no chicken, eggs or yogurt); top it up with foods that fit so recipes still work
+    if(dietCfg().rules.length&&out[g].length<4)for(const k of DIET_TOP[g]||[]){if(out[g].length>=4)break;if(ING[k]&&!out[g].includes(k)&&!avoidHit(ING[k].n+' '+ING[k].food))out[g].push(k)}});out.custom=custom;return out}
+const DIET_TOP={p:['tofu','tempeh','pea','eggs','yogurt','salmon','cod','chicken','thigh','turkey'],c:['rice','quinoa','oats','sweet','potato','chickpeas','lentils','blackbeans','corn','noodles'],f:['oil','avocado','chia','almonds','pb','hummus'],v:['broccoli','spinach','pepper','zucchini','tomato','greenbeans','cabbage','kale'],fr:['banana','blueberries','strawberries','apple','mango']};
 const grp=(ks,f)=>ks.map(k=>ING[k]).filter(x=>x&&(!f||f(x))&&!avoidHit(x.n+' '+x.food));
 /* Foods you avoid: allergies, diets and specific foods. Anything that matches never shows up in recipes, meal ideas or prep. */
 const AV_TAGS=[['peanut','Peanuts','allergy',/peanut/],['treenut','Tree nuts','allergy',/almond|walnut|cashew|pecan|pistachio|hazelnut|macadamia|brazil nut|pine nut|praline|nutella|\bnut butter|mixed nuts|trail mix/],
@@ -6580,8 +6613,12 @@ function dietNorm(t){return String(t||'').toLowerCase().replace(/[’']/g,"'")
   .replace(/\b(peanut|almond|cashew|sunflower|seed|apple|cocoa|shea|nut|pumpkin|sun)\s?butter\b/g,'$1 _nb_')
   .replace(/\b(rice|fish|crab|potato|corn|oat)\s+cakes?\b/g,'$1 _rc_')
   .replace(/\b(rice|glass|cellophane|kelp|zucchini|shirataki)\s+noodles?\b/g,'_gfn_').replace(/\bcorn\s+tortillas?\b/g,'_ct_')}
-function dietText(x){if(x==null)return '';if(typeof x==='string')return x;const out=[];
-  const add=v=>{if(v)out.push(String(v))};add(x.name);add(x.n);(x.aliases||[]).slice(0,6).forEach(add);if(x.idea)add(x.idea.name);
+// what common dishes are usually made with, when the name doesn't say (a BLT has bacon, a reuben has corned beef and swiss)
+const DX_IMP=Object.fromEntries(`collagen=gelatin;burger patty=beef;ribs=pork ribs;chicken salad=mayo;tuna salad=mayo;fried rice=egg;pancake=milk,butter;waffle=milk,butter;french toast=milk;cornbread=egg,milk,butter;croissant=butter;muffin=milk,butter;mashed potatoes=milk,butter;naan=yogurt,ghee;gnocchi=egg;cookie=butter;brownie=butter;donut=milk;ranch=mayo;caesar dressing=egg,parmesan;banana bread=butter;zucchini bread=egg,butter;pumpkin bread=egg,butter;bran muffin=milk;cinnamon roll=butter,milk,egg;danish=butter,egg;scone=butter,milk,egg;biscuit=butter,buttermilk;dinner roll=butter,milk;garlic bread=butter;apple pie=butter,egg;pumpkin pie=milk,egg,butter;chocolate cake=butter,milk;carrot cake=cream cheese;cupcake=butter,milk;pound cake=butter;coffee cake=butter,milk;eclair=cream,butter;macaron=egg whites,almonds;graham crackers=honey;rice krispie treat=marshmallow,butter;protein ice cream=milk;protein cookie=whey,egg;fruit snacks=gelatin;candy bar=milk;peanut butter cups=milk;cheez its=cheese;goldfish=cheese;energy balls=honey;rxbar=egg whites,nuts;kind bar=nuts,honey;quest bar=whey,milk;gravy=chicken broth,butter,flour;thousand island=mayo;caramel=butter,cream;buffalo sauce=butter;onion rings=egg,milk,flour;coleslaw=mayo;potato salad=mayo,egg;macaroni salad=mayo;stuffing=butter,chicken broth,bread;kimchi=fish sauce;egg mcmuffin=cheese,canadian bacon;breakfast sandwich=egg,cheese;overnight oats=milk,yogurt;protein pancakes=whey,egg;breakfast burrito=egg,cheese;granola bar=honey;pepper jack=cheese;sub=turkey,ham,cheese;pb&j=peanut butter,bread;burrito=beef,cheese,tortilla;burrito bowl=chicken,cheese;tacos=beef,cheese,tortilla;quesadilla=tortilla;nachos=cheese,beef;lo mein=egg noodles,chicken;lasagna=beef,egg;chili=beef;ramen=pork broth,egg;pad thai=egg,fish sauce,shrimp,peanuts;general tso chicken=flour,soy sauce;orange chicken=flour,egg;sesame chicken=flour,soy sauce;gyro=lamb,pita,tzatziki;fajitas=chicken,tortilla;enchilada=chicken,cheese,tortilla;tamale=pork,lard;empanada=beef,flour;clam chowder=cream,butter;caesar salad=parmesan,egg,croutons;cobb salad=chicken,bacon,egg,cheese;chicken caesar wrap=parmesan,tortilla;club sandwich=turkey,ham,bacon,mayo,bread;blt=bacon,mayo,bread;philly cheesesteak=steak,cheese,bread;reuben=corned beef,swiss cheese,rye bread;chicken wrap=tortilla;calzone=cheese,pepperoni,flour;stromboli=cheese,pepperoni,ham,flour;ravioli=cheese,egg,pasta;dumplings=pork,flour;egg roll=pork,flour;hot pocket=pepperoni,cheese,flour;corn dog=hot dog,flour,egg;chicken pot pie=butter,flour,milk;shepherds pie=lamb,butter,milk;deviled eggs=mayo;big mac=cheese,bun;quarter pounder=cheese,bun;whopper=bun,mayo;mcchicken=chicken,mayo,bun;chick fil a sandwich=chicken,butter,bun;matzo ball soup=chicken broth;smoothie=yogurt;hot chocolate=milk;bubble tea=milk;pesto=parmesan;nutella=milk;tikka masala=chicken,cream;chicken tikka masala=cream`.split(';').map(s=>s.split('=')).map(([k,v])=>[k,v.split(',')]));
+function dietText(x){if(x==null)return '';if(typeof x==='string'){const im=DX_IMP[x.trim().toLowerCase()];return im?[x,...im].join(' | '):x}const out=[];
+  const add=(v,top)=>{if(!v)return;v=String(v);out.push(v);const im=!(top&&comp)&&DX_IMP[v.trim().toLowerCase()];if(im)out.push(...im)};
+  // a recipe or idea lists its real ingredients, so its name ("Breakfast burrito") is not read as the usual dish
+  const comp=!!(x.ing||x.parts||x.entries||x.items||x.idea);add(x.name,1);add(x.n,1);(x.aliases||[]).slice(0,6).forEach(add);if(x.idea)add(x.idea.name,1);
   (x.ing||[]).forEach(i=>{add(i.food);if(i._x)add(i._x.n)});(x.entries||[]).forEach(e=>add(e.n));(x.items||[]).forEach(e=>add(e.n));(x.parts||[]).forEach(p=>{if(p.x){add(p.x.n);add(p.x.food)}});
   return out.join(' | ')}
 const _dbC=new Map();
@@ -6611,7 +6648,7 @@ const dietFast=()=>dietCfg().fast;
 function dietQuiet(){if(!dietFast()||S.day!==todayKey())return false;const h=new Date().getHours();return h>=5&&h<19}
 function ideaMeal(slot){if(dietFast()){if(slot==='breakfast')return 'Suhoor';if(slot==='dinner')return 'Iftar'}return mealName(slot)}
 const dietBoost=x=>{const C=dietCfg().cuisines;if(!C.length)return 0;const tr=(x.idea||x).trad||[];return tr.some(t=>C.includes(t))?.12:0};
-function dietAI(){const d=dietCfg(),C=dietChecks(),w=[...new Set([...C].map(k=>DIET_WORDS[k]).filter(Boolean))],cu=d.cuisines.map(k=>(DIET_CUIS.find(c=>c[0]===k)||[])[1]).filter(Boolean);
+function dietAI(){const d=dietCfg(),C=dietChecks(),w=[...new Set([...C].map(k=>DIET_WORDS[k]).filter(Boolean))],cu=d.cuisines.map(k=>({jewish:'Israeli and Eastern European',soul:'Southern US'})[k]||(DIET_CUIS.find(c=>c[0]===k)||[])[1]).filter(Boolean);
   const parts=[];if(w.length)parts.push('Dietary rules: '+w.join(', '));if(cu.length)parts.push((w.length?'prefers ':'Prefers ')+cu.join(' and ')+' food');if(d.fast)parts.push('currently fasting in daylight hours (meals before dawn and after sunset)');
   return parts.length?parts.join('; ')+'. Only suggest foods that fit.':''}
 function dietSummary(){const d=dietCfg(),n=d.rules.length+d.cuisines.length;if(!n)return 'Set up';const f=(DIET_RULES.find(r=>r[0]===d.rules[0])||DIET_CUIS.find(c=>c[0]===d.cuisines[0])||[])[1]||'';return n>1?`${esc(f)} +${n-1}`:esc(f)}
@@ -6634,7 +6671,7 @@ let _dtT=0;
 function maybeDietAsk(){let asked=null;try{asked=localStorage.getItem('syncope.dietask')}catch(e){return}if(asked)return;
   const d=S.diet;if(d&&((d.rules||[]).length||(d.cuisines||[]).length||d.fast)){try{localStorage.setItem('syncope.dietask','1')}catch(e){}return}
   clearTimeout(_dtT);_dtT=setTimeout(()=>{if(S.view!=='foods')return;let a2=null;try{a2=localStorage.getItem('syncope.dietask')}catch(e){}if(a2)return;
-    if(typeof coachOn==='function'&&coachOn())return;const busy=document.querySelector('#sheetRoot .sheet')||$('tourO')||($('onb')&&!$('onb').hidden)||(typeof pgStack!=='undefined'&&pgStack.length);
+    const busy=document.querySelector('#sheetRoot .sheet')||$('tourO')||($('onb')&&!$('onb').hidden)||(typeof pgStack!=='undefined'&&pgStack.length);
     if(busy)return maybeDietAsk();try{localStorage.setItem('syncope.dietask','1')}catch(e){}openDiet()},700)}
 // More favourites to browse: pulled from the built-in food library, sorted into the five groups
 const XTRA_CATS={p:['Protein','Meat & seafood','Dairy','More dairy'],c:['Grains','Grains & pasta','Starches & veg','Vegetables & sides','Bakery & desserts','Breakfast','Beans & nuts','Beans, nuts & seeds'],f:['Beans & nuts','Beans, nuts & seeds','Sauces & spreads','More sauces','Dairy','More dairy'],v:['Starches & veg','Vegetables & sides'],fr:['Fruit','More fruit']};
@@ -6685,7 +6722,7 @@ function buildMeals(slot,seed){
       const w=pick(C,x=>x.k==='wrap',0);if(w)add({fmt:'burrito',name:'Breakfast burrito',parts:[{x:p,role:'p'},{x:w,role:'c'},...(pick(F,x=>x.k==='cheese'||x.k==='avocado',i+s)?[{x:pick(F,x=>x.k==='cheese'||x.k==='avocado',i+s),role:'f'}]:[]),...veg(x=>['pepper','onion','spinach','tomato'].includes(x.k),2,i+s).map(v=>({x:v,role:'x'}))],sauce:'salsa'});
       const av=F.find(x=>x.k==='avocado'),tb=pick(C,x=>x.k==='toast'||x.k==='bagel'||x.k==='muffin',i+s);if(av&&tb)add({fmt:'avotoast',name:`Avocado ${short(tb)} with ${p.k==='whites'?'egg whites':'eggs'}`,parts:[{x:p,role:'p'},{x:tb,role:'c'},{x:av,role:'f'},...veg(x=>x.k==='tomato'||x.k==='spinach',1,i).map(v=>({x:v,role:'x'}))]});
     });
-    P.filter(x=>x.cook==='any').forEach((p,i)=>{const c=pick(C,x=>x.cook==='toast'||x.k==='potato'||x.k==='oats',i+s),f=pick(F,x=>['avocado','cheese','oil'].includes(x.k),i+s),vs=veg(x=>x.slots.includes('b'),1,i+s);
+    P.filter(x=>x.cook==='any'||x.cook==='tofu'||x.cook==='tempeh').forEach((p,i)=>{const c=pick(C,x=>x.cook==='toast'||x.k==='potato'||x.k==='oats',i+s),f=pick(F,x=>['avocado','cheese','oil'].includes(x.k),i+s),vs=veg(x=>x.slots.includes('b'),1,i+s);
       if(c)add({fmt:'plate',name:`${cap1(short(p))} breakfast plate`,parts:[{x:p,role:'p'},{x:c,role:'c'},...(f?[{x:f,role:'f'}]:[]),...vs.map(v=>({x:v,role:'x'}))]})});
     const fruits=FR.length?FR:grp(['banana']);
     const oats=C.find(x=>x.k==='oats');
@@ -6782,7 +6819,7 @@ function recipeSteps(r,sv){const by=f=>r.ing.filter(i=>i._x&&i._x.cook===f),P=r.
   const f=r.fmt;
   if(f==='plate'){const c=C[0];st.push((cookP[P._x.cook]||cookP.any)(P));if(c)st.push((cookC[c._x.cook]||cookC.any)(c));if(V.length)st.push(`Sauté or slice ${vlist}.`);st.push(`Plate it up${F.length?` with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}`:''}.`);return st}
   if(f==='parfait'){const p=P;st.push(`Spoon half of the ${A(p)} ${N(p)} into a glass or jar.`);st.push(`Layer with half of the ${C.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`);st.push(`Repeat the layers${F.length?` and top with ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}. Eat now or refrigerate up to 2 days (add granola just before eating).`);return st}
-  if(f==='oats'){const o=C.find(i=>i._x.k==='oats'),fr=C.find(i=>i._x.g==='fr');st.push(cookC.oats(o));st.push(P._x.k==='whey'?`Let it cool 1 min, then stir in ${A(P)} whey protein (adding it off the heat keeps it smooth).`:`Top with ${A(P)} ${N(P)} for creamy protein.`);if(fr)st.push(`Add ${A(fr)} ${N(fr)}${fr._x.u==='each'?', sliced':''}.`);if(F.length)st.push(`Finish with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`);return st}
+  if(f==='oats'){const o=C.find(i=>i._x.k==='oats'),fr=C.find(i=>i._x.g==='fr');st.push(cookC.oats(o));st.push(P._x.cook==='shake'?`Let it cool 1 min, then stir in ${A(P)} ${N(P)} (adding it off the heat keeps it smooth).`:`Top with ${A(P)} ${N(P)} for creamy protein.`);if(fr)st.push(`Add ${A(fr)} ${N(fr)}${fr._x.u==='each'?', sliced':''}.`);if(F.length)st.push(`Finish with ${F.map(i=>`${A(i)} ${N(i)}`).join(' and ')}.`);return st}
   if(f==='scramble'||f==='burrito'||f==='avotoast'){const c=C[0];if(c&&c._x.k==='potato'){st.push(`Dice ${A(c)} potatoes small and pan-fry with ${oil?A(oil):'a little'} oil, 10–12 min, until crisp.`)}
     if(V.length)st.push(`Sauté ${vlist} in a non-stick pan for 3–4 min until soft.`);st.push(cookP.eggs(P)+` Pour into the pan and stir gently over medium-low heat for 2–3 min until just set.`);
     if(c&&c._x.k!=='potato')st.push(f==='burrito'?(cookC[c._x.cook]||cookC.tortilla)(c)+` Fill with the eggs${F.length?`, ${F.map(i=>`${A(i)} ${N(i)}`).join(', ')}`:''}${sauce?` and ${A(sauce)} salsa`:''}, then roll it up.`:f==='avotoast'?`Toast ${A(c)} ${N(c)} and spread with ${F.map(i=>`${A(i)} mashed ${N(i)}`).join(', ')}, a pinch of salt and chilli flakes. Top with the eggs.`:(cookC[c._x.cook]||cookC.toast)(c));
@@ -6905,6 +6942,11 @@ Chicken pesto pasta|5|30|chicken breast:lb:2;pasta:cup:6;spinach:cup:4;parmesan:
 Overnight protein oats|5|10|oats:cup:2.5;greek yogurt:cup:2.5;whey:scoop:5;skim milk:cup:2.5;blueberries:cup:2.5|In 5 jars, mix ½ cup oats, ½ cup yogurt, 1 scoop whey and ½ cup milk.~Top with berries.~Refrigerate overnight; good for 4–5 days.
 Steak, rice & peppers|4|35|steak:oz:24;white rice:cup:4;bell pepper:each:3;onion:each:1|Sear steak 4 min a side, rest, then slice.~Sauté sliced peppers and onion.~Split steak, rice and peppers into 4 containers.
 Lean turkey meatballs & marinara|5|40|ground turkey:lb:2;egg:each:1;pasta:cup:5;marinara:cup:2.5;parmesan:tbsp:5|Mix turkey, egg, garlic and Italian seasoning; roll about 25 meatballs.~Bake at 400°F for 18–20 min.~Warm marinara, boil pasta.~Split into 5 with parmesan on top.
+Tofu teriyaki rice bowls|5|40|tofu:oz:35;white rice:cup:5;broccoli:cup:5;teriyaki sauce:tbsp:5|Press and cube the tofu, then bake at 400°F for 25 min until golden.~Cook 2 cups dry rice (makes about 5 cups).~Steam or roast the broccoli.~Toss the tofu with teriyaki sauce and split everything into 5 containers.
+Chana masala & rice|5|35|chana masala:cup:6;basmati rice:cup:5;spinach:cup:5|Simmer chickpeas in a tomato and garam masala sauce for 20 min (or warm a ready-made chana masala).~Cook about 1⅔ cups dry basmati rice.~Stir the spinach into the hot chana masala until it wilts.~Split into 5 containers.
+Lentil dal & brown rice|5|40|lentil dal:cup:7;brown rice:cup:5;spinach:cup:5|Simmer 2 cups red lentils with turmeric, cumin and tomato in 6 cups water for 25 min.~Cook about 1⅔ cups dry brown rice.~Fold the spinach into the dal at the end.~Split into 5 containers.
+Black bean & sweet potato bowls|5|45|black beans:cup:4;sweet potato:each:4;white rice:cup:4;salsa:tbsp:10;avocado:each:2|Cube the sweet potatoes and roast at 425°F for 30 min.~Warm the black beans with cumin and a pinch of salt.~Cook about 1⅓ cups dry rice.~Split into 5 containers; add salsa and a little avocado when you eat it.
+Paneer & chickpea rice bowls|5|35|paneer:oz:15;chickpeas:cup:4;basmati rice:cup:5;spinach:cup:5|Cube the paneer and pan-sear in a little oil until golden, 4–5 min.~Warm the chickpeas with cumin, turmeric and a pinch of salt.~Cook about 1⅔ cups dry basmati rice and fold in the spinach.~Split into 5 containers.
 Cottage cheese protein boxes|5|10|cottage cheese:cup:5;pineapple:cup:2.5;almonds:oz:2.5;turkey slices:oz:10|Fill 5 containers with 1 cup cottage cheese and ½ cup pineapple.~Add 2 oz turkey and ½ oz almonds on the side.~Grab-and-go snack for the week.`;
 const PREP=PREP_SRC.split('\n').map(l=>{const [name,sv,min,ing,steps]=l.split('|');return {name,sv:+sv,min:+min,ing:ing.split(';').map(x=>{const [food,unit,q]=x.split(':');return {food,unit,q:+q}}),steps:steps.split('~')}});
 function prepServing(r){const es=r.ing.map(i=>ingEntry({food:i.food,unit:i.unit},i.q)).filter(Boolean),t=sumEntries(es);return {k:t.k/r.sv,p:t.p/r.sv,c:t.c/r.sv,f:t.f/r.sv}}
@@ -8893,7 +8935,7 @@ setTimeout(()=>{let pj=null;try{pj=JSON.parse(localStorage.getItem(TMJ)||'null')
   if(TEAM_LINK&&S.profile.onboarded&&$('onb').hidden)openTeamJoin(TEAM_LINK)},1400);
 setTimeout(()=>{if(teamCfg()){teamRefresh().then(()=>{if(S.view==='today')renderTeamCard()});teamSoon()}},2500);
 /* ---------- start ---------- */
-try{if(sessionStorage.getItem('syncope.updated')){sessionStorage.removeItem('syncope.updated');setTimeout(()=>toast('Syncope updated to the latest version'),1200)}}catch(e){}
+try{if(sessionStorage.getItem('syncope.updated')){sessionStorage.removeItem('syncope.updated');setTimeout(()=>toast('Trainer updated to the latest version'),1200)}}catch(e){}
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>{document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})});setInterval(()=>reg.update().catch(()=>{}),30*60000)}).catch(()=>{});let hadCtl=!!navigator.serviceWorker.controller,reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadCtl){hadCtl=true;return}if(reloaded)return;reloaded=true;try{sessionStorage.setItem('syncope.updated','1')}catch(e){}location.reload()})})}
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
