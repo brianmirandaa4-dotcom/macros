@@ -1,6 +1,6 @@
 /* Overlay (whomadethisline) service worker. It reads and writes only its own "wmtl-" caches, and only for files inside its own
    folder, so it never touches SYNCOPE or SPAN on the same site. Shell: cache first. Slate data: network first. */
-const VERSION = 'wmtl-v56-2026-11-05';
+const VERSION = 'wmtl-v57-2026-11-05';
 const DATA = 'wmtl-data';
 const SCOPE = new URL('./', self.location).pathname;
 const SHELL = ['./', './index.html', './tokens.css', './components.css', './app.css', './icons.js', './charts.js', './app.js', './ui2.js', './weather.js', './wximpact.js', './teams.js', './teams.css', './community.js', './pickem.js', './pickem.css', './community.css','./welcome.js', './welcome.css', './polish.css', './audit-a.css', './audit-c.css','./engage.css', './engage.js', './push.js', './push.css', './books.js', './books.css', './brand/books/dk.png', './brand/books/fd.png', './brand/books/mgm.png', './brand/books/czr.png', './brand/books/br.png', './brand/books/b365.png', './brand/books/fan.png', './brand/books/hr.png', './brand/books/parx.png', './brand/books/poly.png', './brand/books/pp.png', './brand/books/ud.png', './brand/books/slp.png', './brand/books/score.png', './brand/books/novig.png', './brand/books/kal.png', './nba.js', './nba.css', './history.css', './history.js','./schemes/lounge.css', './schemes/bank.css', './schemes/signal.css', './schemes/lounge2.css','./weather.css', './room.js', './vendor/three.min.js', './manifest.webmanifest',
