@@ -1,6 +1,6 @@
 {
  "schema": "wmtl.index.v1",
- "built_utc": "2026-11-06T20:04Z",
+ "built_utc": "2026-11-07T00:10Z",
  "brand": "whomadethisline",
  "slates": [
   {
@@ -241,15 +241,15 @@
    "start_utc": "2026-11-08T14:30:00.000Z",
    "end_utc": "2026-11-10T01:15:00.000Z",
    "n_games": 14,
-   "n_props": 401,
-   "priced": 375,
-   "lines": 400,
+   "n_props": 411,
+   "priced": 383,
+   "lines": 408,
    "bets": 15,
    "watch": 0,
    "leans": 83,
    "model_version": "v4.1 · trained model + Action Network prices",
-   "generated_et": "Fri Nov 6, 3:04 PM ET",
-   "prices_et": "Action Network · Fri Nov 6, 3:02 PM ET",
+   "generated_et": "Fri Nov 6, 7:10 PM ET",
+   "prices_et": "Action Network · Fri Nov 6, 7:07 PM ET",
    "results": {
     "status": "pending"
    },
