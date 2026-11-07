@@ -2184,6 +2184,9 @@ html.edge-swipe #pageRoot{overflow:hidden}
 .sheet.sh-back-in{animation:shBackIn .24s cubic-bezier(.2,.8,.2,1)}
 @keyframes shBackIn{from{transform:translate3d(-24%,0,0);opacity:.6}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.sheet.sh-back-in{animation:none}}
+.fd-diet{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 14px;margin:-4px 0 2px;border:0;border-radius:16px;background:var(--s1);color:var(--fg);text-align:left;cursor:pointer;font:inherit}
+.fd-diet .fdd-ic{font-size:20px}.fd-diet .fdd-t{flex:1;min-width:0;display:flex;flex-direction:column}.fd-diet .fdd-t b{font-size:14.5px}.fd-diet .fdd-t em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.fd-diet .fdd-e{font:600 13px var(--f-body);color:var(--kcal)}
 /* calmer accents: purple only for the main action and selection */
 .statstrip b.c-p{color:var(--fg)!important}
 </style>
@@ -2327,6 +2330,7 @@ html.edge-swipe #pageRoot{overflow:hidden}
   <section class="view" id="v-foods" aria-label="Foods" hidden>
     <div class="tip" id="tip-foods" hidden></div>
     <div class="fd-head"><h1>Foods</h1><button class="fd-new" id="newFood" type="button">+ New food</button></div>
+    <button type="button" class="fd-diet" id="fdDiet" aria-label="How you eat: eating rules and food traditions"></button>
     <div class="fd-left" id="fdLeft" aria-label="Remaining today"></div>
     <div class="fd-sbar"><div class="fd-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="fSearch" type="search" placeholder="Search foods, drinks, meals" aria-label="Search foods" autocomplete="off" enterkeyhint="search"><button type="button" class="fd-clr" id="fClear" aria-label="Clear search" hidden>✕</button><span id="fdMicSlot"></span><button type="button" class="fd-scan" id="fdBar" aria-label="Scan a barcode" title="Scan a barcode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V5h3M17 5h3v2M20 17v2h-3M7 19H4v-2M7 9v6M10 9v6M13 9v6M16 9v6"/></svg></button><button type="button" class="fd-scan pri" id="fdCam" aria-label="Scan a photo of your food or a label" title="Scan food"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button></div></div>
     <div class="fd-hub" id="fdHub" role="tablist" aria-label="Foods sections"></div>
@@ -3513,7 +3517,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.82';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.83';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4405,7 +4409,7 @@ function fdShowSec(){const lib=fdSec==='library';$('fdHub').innerHTML=FD_HUB.fil
   try{(PG_R[fdSec]||(()=>{}))()}catch(e){}return true}
 $('fdHub').addEventListener('click',e=>{const b=e.target.closest('[data-fsec]');if(!b)return;fdSec=b.dataset.fsec;renderFoods();window.scrollTo({top:0,behavior:'instant'})});
 function openFoodsSec(k){fdSec=k;if(typeof closePages==='function'&&pgStack.length)closePages();setView('foods')}
-function renderFoods(){renderTip('foods');try{maybeDietAsk()}catch(e){}try{fdRenderLeft()}catch(e){}if(fdShowSec())return;const q=$('fSearch').value.trim();$('fClear').hidden=!q;
+function renderFoods(){renderTip('foods');try{maybeDietAsk()}catch(e){}try{fdDietBtn()}catch(e){}try{fdRenderLeft()}catch(e){}if(fdShowSec())return;const q=$('fSearch').value.trim();$('fClear').hidden=!q;
   if(q&&FDF&&FDF.q===q&&FDF.box.isConnected&&FDF.box._feed===FDF)return;FDF=null;
   const op=document.querySelector('#fdBody .fd-idea[open]');
   $('fdBody').innerHTML=q?fdSearch(q):`${fdIdeaLine()}<div class="fd-cols">${fdLists()}${fdBrowse()}</div>`;if(q)fdFeedStart(q);if(op&&!q){const d=document.querySelector('#fdBody .fd-idea');if(d)d.open=true}}
@@ -6600,6 +6604,10 @@ const DX={
   pungent:[/\b(onions?|garlic|leeks?|shallots?|scallions?|green onions?|chives?|salsa|marinara|hummus|shakshuka|chana masala|misir wot|jollof|shawarma)\b/,'Contains onion or garlic'],
   honey:[/\b(honey|honeycomb|bee pollen)\b/,'Contains honey']};
 const DX_MEATCERT=new RegExp(DX.meat[0].source.replace('|_sub_',''));
+function fdDietBtn(){const b=$('fdDiet');if(!b)return;const d=dietCfg(),lab=[...d.rules.map(r=>(DIET_RULES.find(x=>x[0]===r)||[,r])[1]),...d.cuisines.map(c=>(DIET_CUIS.find(x=>x[0]===c)||[,c])[1])];
+  b.innerHTML=`<span class="fdd-ic">🍽</span><span class="fdd-t"><b>How you eat</b><em>${lab.length?esc(lab.slice(0,3).join(' · '))+(lab.length>3?` +${lab.length-3}`:''):'Set eating rules & food traditions'}</em></span><span class="fdd-e">${lab.length?'Edit':'Set'}</span>`}
+document.addEventListener('click',e=>{if(e.target.closest('#fdDiet'))openDiet()});
+setTimeout(()=>{try{FIND.push(['How you eat: eating rules & traditions','diet religion halal kosher vegan vegetarian culture food traditions how i eat rules fasting ramadan',()=>openDiet()]);FIND_META.push(['Foods','leaf'])}catch(e){}},0);
 function dietCfg(){const d=S.diet||{};return {rules:Array.isArray(d.rules)?d.rules:[],cuisines:Array.isArray(d.cuisines)?d.cuisines:[],fast:!!d.fast}}
 const dietSig=()=>{const d=dietCfg();return d.rules.join(',')+'|'+d.cuisines.join(',')};
 const dietChecks=()=>{const s=new Set();dietCfg().rules.forEach(r=>(DIET_MAP[r]||[]).forEach(c=>s.add(c)));return s};
