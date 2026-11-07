@@ -2569,6 +2569,10 @@ button.fp-f:last-of-type{border-bottom:0}
 button.fp-f:active{background:var(--s2)}
 .fp-copy{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:44px;margin-top:8px;border-radius:14px;border:1px solid var(--line);background:var(--s2);color:var(--fg);font:600 14px var(--f-body);cursor:pointer}
 .fp-copy svg{width:16px;height:16px}
+
+.wkc-act{margin-top:2px;padding-top:12px;border-top:1px solid var(--hair);display:flex;flex-direction:column;gap:10px}
+.wkc-act p{margin:0;font-size:14px;line-height:1.4;color:var(--fg)}
+.wkc-act .row{gap:10px}.wkc-act .row button{flex:1}
 </style>
 </head>
 <body>
@@ -3918,7 +3922,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.97';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.98';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -7077,10 +7081,12 @@ function weekCoachHTML(keys){const tk=todayKey();if(!keys.includes(tk))return ''
   if(rc!=null||sl!=null)rows.push(['heart','--good','Recovery',[rc!=null?`${r0(rc)}% average`:'',sl!=null?`${r1(sl)} h sleep`:''].filter(Boolean).join(' · ')]);
   const lows=past.filter(k=>{try{const r=readiness(k);return r&&r.lvl==='low'}catch(e){return false}}).length;if(lows)rows.push(['heart','--over','Lighter days',`${lows} day${lows===1?'':'s'} your body asked for less`]);
   let st=[];try{st=stalledLifts()}catch(e){}const recent=[...new Set(S.workouts.filter(w=>w.date>=addDays(tk,-27)).flatMap(w=>w.ex.filter(x=>!isCardio(x.n)).map(x=>x.n)))];
+  {const br=burnRow();if(br)rows.push(br)}
   if(recent.length)rows.push(['dumbbell','--pro','Lifts',st.length?`${recent.length-st.length} moving · ${st.length} stalled (${st.slice(0,2).map(x=>x.n).join(', ')})`:`${recent.length} lift${recent.length===1?'':'s'}, none stalled`]);
   let tip='';try{const d=deloadCheck();if(d)tip='Time for a lighter week. See Train.';else if(st.length&&st[0].F[0])tip=st[0].F[0].fix;else if(sl!=null&&sl<7)tip='Sleep is your cheapest upgrade: aim for 7.5 hours or more.'}catch(e){}
+  let act='';try{const a=burnAdvice();if(a&&!a.need&&a.d)act=`<div class="wkc-act"><p>${esc(burnAdviceText(a))}</p><div class="row"><button class="primary" type="button" data-burnapply="${a.d}">${a.d>0?'Add':'Trim'} ${Math.abs(a.d)} kcal</button><button class="ghost" type="button" data-burnno>Not now</button></div></div>`}catch(e){}
   if(!rows.length)return '';
-  return `<div class="card wk-coach"><div class="wkc-h"><b>Coach</b><span>This week</span></div>${rows.map(([ic,c,t,v])=>`<div class="wkc-r"><span class="gi" style="--c:var(${c})">${GI[ic]||''}</span><span class="wkc-t"><b>${t}</b><span>${esc(v)}</span></span></div>`).join('')}${tip?`<p class="wkc-tip">${esc(tip)}</p>`:''}</div>`}
+  return `<div class="card wk-coach"><div class="wkc-h"><b>Coach</b><span>This week</span></div>${rows.map(([ic,c,t,v])=>`<div class="wkc-r"><span class="gi" style="--c:var(${c})">${GI[ic]||''}</span><span class="wkc-t"><b>${t}</b><span>${esc(v)}</span></span></div>`).join('')}${act||(tip?`<p class="wkc-tip">${esc(tip)}</p>`:'')}</div>`}
 document.addEventListener('click',e=>{if(e.target.closest('[data-deload]'))openDeload()});
 
 
@@ -7095,6 +7101,34 @@ function fpPick(x){const order=[x.m,...MEALS.map(([m])=>m).filter(m=>m!==x.m)];
   holdSheet({eyebrow:FP_WHO?`From ${FP_WHO}’s ${mealName(x.m)}`:'Add food',title:fpName(x.n),items:order.map((m,i)=>({ic:i?'cloche':'plus',c:i?'--muted':'--good',t:`Add to my ${mealName(m)}`,s:i?'':`${fmt(r0(x.k))} kcal · ${r0(x.p)} g protein`,go:()=>fpAdd([x],m)}))})}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-fpcopy]');if(c){const m=c.dataset.fpcopy,L=FP_FOODS.filter(x=>x.m===m);if(L.length)fpAdd(L,m);return}
   const f=e.target.closest('[data-fpi]');if(f){const x=FP_FOODS[+f.dataset.fpi];if(x)fpPick(x)}});
+
+
+/* Measured maintenance: what you ate vs how your weight actually moved over 3 weeks (the most accurate method).
+   Watch numbers add context only; watches tend to overestimate calorie burn. Runs on the phone. */
+function measuredBurn(){const tk=todayKey(),N=21,ks=Array.from({length:N},(_,i)=>addDays(tk,-N+i));
+  const W=ks.map((k,i)=>[i,+(S.weights||{})[k]]).filter(([,w])=>w>0);if(W.length<4||W[W.length-1][0]-W[0][0]<10)return null;
+  const n=W.length,mx=W.reduce((a,x)=>a+x[0],0)/n,my=W.reduce((a,x)=>a+x[1],0)/n,den=W.reduce((a,x)=>a+(x[0]-mx)**2,0);if(!den)return null;
+  const sl=W.reduce((a,x)=>a+(x[0]-mx)*(x[1]-my),0)/den,L=ks.filter(k=>(S.days[k]||[]).length>=2&&dayTotals(k).k>=800);
+  if(L.length<10)return {need:'food',logged:L.length};const intake=L.reduce((a,k)=>a+dayTotals(k).k,0)/L.length;
+  let steps=null;try{const v=ks.map(k=>hv(k).steps).filter(x=>x!=null&&x!==''&&!isNaN(+x)).map(Number);if(v.length>=7)steps=v.reduce((a,b)=>a+b,0)/v.length}catch(e){}
+  let est=null;try{const pi=planInfo(todayKey());if(pi&&pi.wk&&+pi.wk.tdee>0)est=+pi.wk.tdee}catch(e){}
+  return {burn:Math.round((intake-sl*3500)/10)*10,intake:r0(intake),perWk:sl*7,days:L.length,steps,est}}
+function burnAdvice(){const m=measuredBurn();if(!m||m.need)return m;const c=S.calc||{},minor=c.age&&+c.age<18,kind=(S.plan&&S.plan.type)||'maintain';
+  let want=kind==='bulk'?.5:kind==='cut'?-1:0;try{const pi=planInfo(todayKey());if(pi&&!pi.done){const w=S.plan.weeks.map(x=>+x.w).filter(x=>x>0);if(w.length>1)want=(w[w.length-1]-w[0])/(w.length-1)}else if(pi&&pi.done)want=0}catch(e){}
+  if(minor&&want<0)want=0;const gap=want-m.perWk;let d=Math.max(-300,Math.min(300,Math.round(gap*500/50)*50));
+  if(Math.abs(gap)<.25||Math.abs(d)<100)d=0;if(minor&&d<0)d=0;
+  const ak=S.prefs&&S.prefs.burnAt;if(ak&&ak>addDays(todayKey(),-14))d=0;return {...m,want,gap,d,kind}}
+function burnAdviceText(a){const r=x=>r1(Math.abs(x)),g=Math.abs(a.perWk)<.1?'Your weight is holding steady':a.perWk>=0?`Gaining ${r(a.perWk)} lb a week`:`Losing ${r(a.perWk)} lb a week`,aim=a.want===0?'holding steady':a.want>0?`gaining ${r(a.want)} lb a week`:`losing ${r(a.want)} lb a week`;
+  return `${g}; your plan aims for ${aim}. ${a.d>0?'Add':'Trim'} ${Math.abs(a.d)} kcal a day (${r0(Math.abs(a.d)/4)} g carbs)${a.d>0&&a.want<0?' to protect your muscle':''}.`}
+function applyBurn(d){const g=r0(d/4),k0=JSON.stringify({adj:S.plan&&S.plan.adj||null,goals:S.goals});
+  if(S.plan){const a=planAdj();S.plan.adj={p:a.p,c:a.c+g,f:a.f}}else S.goals={...S.goals,c:Math.max(50,(+S.goals.c||0)+g)};
+  S.prefs=S.prefs||{};S.prefs.burnAt=todayKey();save();renderAll();const t=goalsFor(todayKey());
+  toast(`Targets updated · ${fmt(goalKcal(t))} kcal today`,()=>{const o=JSON.parse(k0);if(S.plan){if(o.adj)S.plan.adj=o.adj;else delete S.plan.adj}else S.goals=o.goals;delete S.prefs.burnAt;save();renderAll()})}
+function burnRow(){let a=null;try{a=burnAdvice()}catch(e){}if(!a)return null;
+  if(a.need)return a.logged>=4?['fire','--kcal','Your real burn',`Log food on ${10-a.logged} more day${10-a.logged===1?'':'s'} to measure it`]:null;
+  const bits=[`About ${fmt(a.burn)} kcal a day`];if(a.est&&Math.abs(a.burn-a.est)>=100)bits.push(`${a.burn>a.est?'+':'−'}${fmt(Math.abs(r0(a.burn-a.est)))} vs your plan’s estimate`);if(a.steps!=null)bits.push(`${fmt(r0(a.steps))} steps a day`);
+  return ['fire','--kcal','Your real burn',bits.join(' · ')]}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-burnapply]');if(b){applyBurn(+b.dataset.burnapply);return}const x=e.target.closest('[data-burnno]');if(x){S.prefs=S.prefs||{};S.prefs.burnAt=todayKey();save();renderAll()}});
 
 
 /* ================= FIND ANYTHING: type a word, jump straight there ================= */
