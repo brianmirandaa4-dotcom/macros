@@ -3885,7 +3885,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.88';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.89';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -5797,7 +5797,7 @@ function renderMember(){const el=$('pg-member');if(!el)return;const AC=myAccess(
   const opts=P?[['yr','Annual',`$${P.yr.toFixed(2)}/yr`,`$${(P.yr/12).toFixed(2)}/mo · Save ${save}% · renews yearly`],['mo','Monthly',`$${P.mo.toFixed(2)}/mo`,'Renews monthly'],['wk','Weekly',`$${P.wk.toFixed(2)}/wk`,'Renews weekly']]:[];
   el.innerHTML=`<div class="mbr mb4">
     <div class="seg2 mb-seg" role="tablist" aria-label="Plan">${MB_TIERS.map(t=>`<button type="button" role="tab" data-mbt="${t.id}" aria-pressed="${t.id===mbTier}">${t.name}</button>`).join('')}</div>
-    ${AC.comp?`<div class="card mb-own"><span class="mb-own-i">${GI.shield||''}</span><span><b>Owner access · ${AC.tier==='elite'?'Elite':AC.tier==='pro'?'Pro':'Free'} included</b><span>Set on the Trainer server for the team. No charge to you.</span></span></div>`:''}
+    ${AC.comp?`<div class="card mb-own"><span class="mb-own-i">${GI.shield||''}</span><span><b>${AC.comp==='beta'?'Beta access':'Owner access'} · ${AC.tier==='elite'?'Elite':AC.tier==='pro'?'Pro':'Free'} included</b><span>${AC.comp==='beta'?'Free for everyone during the beta.':'Set on the Trainer server for the team. No charge to you.'}</span></span></div>`:''}
     <div class="card mb-plan">
       <div class="mb-ph"><div><h3>${T.name}${cur?' <span class="mb-cur">Current plan</span>':''}</h3><p>${T.line}</p></div>${T.id==='free'?'<b class="num mb-big">$0</b>':''}</div>
       ${P?`<div class="mb-opts" role="radiogroup" aria-label="Billing">${opts.map(([k,l,pr,sub])=>`<button type="button" role="radio" class="mb-opt" data-mbb="${k}" aria-checked="${mbBill===k}"><span class="mb-rd"></span><span class="mb-ol"><b>${l}</b><span>${sub}</span></span><b class="num mb-op">${pr}</b></button>`).join('')}</div>`:''}
@@ -6311,7 +6311,7 @@ function renderMe(){
       grow({pg:'conn',ic:'watch',t:'WHOOP, Oura &amp; Garmin',v:conn.length?conn.join(', '):'Connect',vc:conn.length?'on':''}),
       grow({ga:'apple',ic:'heart',t:'Apple Health'}),
       grow({pg:'health',ic:'moon',t:'Recovery &amp; sleep'})])}
-    ${G('Membership',[(A=>grow({pg:'member',ic:'crown',t:'Trainer '+(A.tier==='elite'?'Elite':A.tier==='pro'?'Pro':'Free'),v:A.comp?'Owner':'Plans'}))(myAccess())])}
+    ${G('Membership',[(A=>grow({pg:'member',ic:'crown',t:'Trainer '+(A.tier==='elite'?'Elite':A.tier==='pro'?'Pro':'Free'),v:A.comp==='beta'?'Beta':A.comp?'Owner':'Plans'}))(myAccess())])}
     ${G('Privacy &amp; data',[
       grow({ga:'friends',ic:'user',t:'Friends &amp; sharing',v:sc.on?`${frs.length} friend${frs.length===1?'':'s'}`:'Off'}),
       grow({pg:'data',ic:'download',t:'Backup &amp; export'}),
