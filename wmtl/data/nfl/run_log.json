@@ -5742,6 +5742,1511 @@
     "bets_model_run": 86
    },
    "deleted": 0
+  },
+  {
+   "ts": "2026-11-07T12:51:26Z",
+   "mode": "refresh",
+   "reason": "3-hour cadence: 6.87 h since last refresh",
+   "sources": {
+    "nflverse": {
+     "changed": [
+      "pbp_2026.parquet",
+      "snaps_2026.parquet",
+      "inj_2026.parquet",
+      "roster_2026.parquet",
+      "games.csv"
+     ],
+     "failed": [],
+     "complete": true
+    },
+    "pbp_complete": {
+     "ok": true,
+     "missing": []
+    },
+    "espn": {
+     "scoreboard": "ok 15 events",
+     "injuries": "ok 800 rows",
+     "summaries": "ok 14/14",
+     "dk_lines": "ok 1104 rows from 14/14 games"
+    },
+    "action_network": {
+     "props": "ok 11677 rows",
+     "props_books": {
+      "Open": 1106,
+      "consensus": 1098,
+      "B365": 1020,
+      "DK": 948,
+      "FD": 902,
+      "CZR49": 836,
+      "CZR": 836,
+      "POLY": 826,
+      "PP": 808,
+      "PARX": 795,
+      "FAN": 754,
+      "MGM": 747,
+      "HR": 510,
+      "BR": 491
+     },
+     "allprops": "ok 72130 rows",
+     "allprops_books": {
+      "Open": 9408,
+      "consensus": 9361,
+      "DK": 8075,
+      "B365": 6900,
+      "FD": 6165,
+      "CZR49": 4819,
+      "CZR": 4819,
+      "HR": 4353,
+      "FAN": 4266,
+      "MGM": 3959,
+      "KAL": 3363,
+      "PP": 1904,
+      "PARX": 1900,
+      "POLY": 1448,
+      "BR": 1390
+     },
+     "odds": "ok 2150 rows",
+     "pulled": "2026-11-07T12:51:26.000Z"
+    },
+    "dk_lines": {
+     "source": "espn",
+     "status": "ok 496 lines",
+     "events": 14,
+     "week_rows": 546
+    },
+    "prices": {
+     "an_status": "ok 11677 rows",
+     "source": "action_network",
+     "rows": 10912,
+     "priced_rows": 10912
+    },
+    "injuries": {
+     "espn_rows": 227,
+     "raised_by_espn": 71
+    },
+    "weather": "9 games use the NWS forecast",
+    "invariants_log": [
+     "INVARIANT: 2026_09_ARI_SEA ARI: receivers project 203 yds vs QB 156 (>10% apart); QB passing prop rejected, receivers cannot be leans",
+     "INVARIANT: 2026_09_ARI_SEA SEA: receivers project 249 yds vs QB 152 (>10% apart); QB passing prop rejected, receivers cannot be leans",
+     "SHARES: 2026_09_BUF_MIN BUF: historical target shares of this pool sum to 1.13; receiving draws scaled by 0.883 so shares total 100%",
+     "SHARES: 2026_09_CLE_NO CLE: historical target shares of this pool sum to 1.07; receiving draws scaled by 0.934 so shares total 100%",
+     "INVARIANT: 2026_09_CLE_NO CLE: receivers project 221 yds vs QB 159 (>10% apart); QB passing prop rejected, receivers cannot be leans",
+     "SHARES: 2026_09_CLE_NO NO: historical target shares of this pool sum to 1.01; receiving draws scaled by 0.992 so shares total 100%",
+     "SHARES: 2026_09_DEN_CAR CAR: historical target shares of this pool sum to 1.02; receiving draws scaled by 0.978 so shares total 100%",
+     "SHARES: 2026_09_DEN_CAR DEN: historical target shares of this pool sum to 1.07; receiving draws scaled by 0.932 so shares total 100%",
+     "SHARES: 2026_09_DET_MIA MIA: historical target shares of this pool sum to 1.03; receiving draws scaled by 0.972 so shares total 100%",
+     "INVARIANT: 2026_09_DET_MIA MIA: receivers project 232 yds vs QB 206 (>10% apart); QB passing prop rejected, receivers cannot be leans",
+     "SHARES: 2026_09_HOU_LAC HOU: historical target shares of this pool sum to 1.07; receiving draws scaled by 0.934 so shares total 100%",
+     "INVARIANT: 2026_09_HOU_LAC LAC: receivers project 231 yds vs QB 197 (>10% apart); QB passing prop rejected, receivers cannot be leans",
+     "INVARIANT: 2026_09_NYG_PHI PHI: receivers project 184 yds vs QB 127 (>10% apart); QB passing prop rejected, receivers cannot be leans",
+     "SHARES: 2026_09_NYJ_KC KC: historical target shares of this pool sum to 1.08; receiving draws scaled by 0.923 so shares total 100%"
+    ]
+   },
+   "inputs_changed": {
+    "ruled_out": [
+     {
+      "pid": "00-0032228",
+      "name": null,
+      "was": null,
+      "now": "Doubtful"
+     },
+     {
+      "pid": "00-0034342",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0036417",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0036736",
+      "name": null,
+      "was": null,
+      "now": "Doubtful"
+     },
+     {
+      "pid": "00-0037076",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0037297",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0037821",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0038571",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0039819",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     },
+     {
+      "pid": "00-0041113",
+      "name": null,
+      "was": null,
+      "now": "Out"
+     }
+    ],
+    "cleared": [],
+    "status_changed": [
+     {
+      "pid": "00-0029685",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0031330",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0033132",
+      "name": "Kevin Byard",
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0034778",
+      "name": "Carlton Davis III",
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0036968",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0038601",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0039242",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0039352",
+      "name": "Marist Liufau",
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0039808",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0040125",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0040163",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0040541",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     },
+     {
+      "pid": "00-0040687",
+      "name": null,
+      "was": null,
+      "now": "Questionable"
+     }
+    ],
+    "line_moves": [
+     {
+      "key": "Daniel Jones|IND|pass_yds|68",
+      "was": 209.5,
+      "now": 205.5
+     },
+     {
+      "key": "C.J. Stroud|HOU|pass_yds|68",
+      "was": 245.5,
+      "now": 249.5
+     },
+     {
+      "key": "Geno Smith|NYJ|pass_yds|71",
+      "was": 212.5,
+      "now": 217.5
+     },
+     {
+      "key": "Daniel Jones|IND|pass_yds|71",
+      "was": 201.5,
+      "now": 205.5
+     },
+     {
+      "key": "Michael Penix|ATL|pass_yds|79",
+      "was": 237.5,
+      "now": 234.5
+     },
+     {
+      "key": "Patrick Mahomes|KC|pass_yds|79",
+      "was": 251.5,
+      "now": 247.5
+     },
+     {
+      "key": "Daniel Jones|IND|pass_yds|79",
+      "was": 204.5,
+      "now": 207.5
+     },
+     {
+      "key": "Geno Smith|NYJ|pass_yds|1929",
+      "was": 212.5,
+      "now": 217.5
+     },
+     {
+      "key": "Daniel Jones|IND|pass_yds|1929",
+      "was": 201.5,
+      "now": 205.5
+     },
+     {
+      "key": "Shedeur Sanders|CLE|pass_yds|2194",
+      "was": 188.5,
+      "now": 195.5
+     },
+     {
+      "key": "Brock Purdy|SF|pass_yds|2194",
+      "was": 241.5,
+      "now": 247.5
+     },
+     {
+      "key": "Drew Lock|SEA|pass_yds|2194",
+      "was": 207.5,
+      "now": 202.5
+     },
+     {
+      "key": "Drew Lock|SEA|pass_yds|2724",
+      "was": 205.5,
+      "now": 202.5
+     },
+     {
+      "key": "Bryce Young|CAR|pass_yds|2988",
+      "was": 225.5,
+      "now": 220.5
+     },
+     {
+      "key": "C.J. Stroud|HOU|pass_yds|2988",
+      "was": 245.5,
+      "now": 250.5
+     },
+     {
+      "key": "Drew Lock|SEA|pass_yds|2988",
+      "was": 205.5,
+      "now": 200.5
+     },
+     {
+      "key": "Malik Willis|MIA|rush_yds|68",
+      "was": 28.5,
+      "now": 30.5
+     },
+     {
+      "key": "Kimani Vidal|LAC|rush_yds|68",
+      "was": 17.5,
+      "now": 19.5
+     },
+     {
+      "key": "Jonathan Taylor|IND|rush_yds|71",
+      "was": 61.5,
+      "now": 64.5
+     },
+     {
+      "key": "Seth McGowan|IND|rush_yds|71",
+      "was": 29.5,
+      "now": 25.5
+     },
+     {
+      "key": "J.K. Dobbins|DEN|rush_yds|79",
+      "was": 28.5,
+      "now": 26.5
+     },
+     {
+      "key": "Sione Vaki|DET|rush_yds|79",
+      "was": 21.5,
+      "now": 17.5
+     },
+     {
+      "key": "C.J. Stroud|HOU|rush_yds|79",
+      "was": 5.5,
+      "now": 7.5
+     },
+     {
+      "key": "Seth McGowan|IND|rush_yds|1929",
+      "was": 29.5,
+      "now": 25.5
+     },
+     {
+      "key": "Jonathan Taylor|IND|rush_yds|1929",
+      "was": 61.5,
+      "now": 64.5
+     },
+     {
+      "key": "Trevor Etienne|CAR|rush_yds|2194",
+      "was": 7.5,
+      "now": 5.5
+     },
+     {
+      "key": "Chase Brown|CIN|rush_yds|2988",
+      "was": 50.5,
+      "now": 45.5
+     },
+     {
+      "key": "Bijan Robinson|ATL|rush_yds|2988",
+      "was": 95.5,
+      "now": 100.5
+     },
+     {
+      "key": "Chuba Hubbard|CAR|rush_yds|2988",
+      "was": 70.5,
+      "now": 65.5
+     },
+     {
+      "key": "James Cook|BUF|rush_yds|2988",
+      "was": 85.5,
+      "now": 80.5
+     },
+     {
+      "key": "Bijan Robinson|ATL|rush_yds|5203",
+      "was": 59.5,
+      "now": 69.5
+     },
+     {
+      "key": "Saquon Barkley|PHI|rush_yds|5203",
+      "was": 29.5,
+      "now": 69.5
+     },
+     {
+      "key": "J.J. McCarthy|NYG|rush_yds|5203",
+      "was": 19.5,
+      "now": 24.5
+     },
+     {
+      "key": "Jonah Coleman|DEN|rush_yds|5203",
+      "was": 49.5,
+      "now": 59.5
+     },
+     {
+      "key": "J.K. Dobbins|DEN|rush_yds|5203",
+      "was": 19.5,
+      "now": 9.5
+     },
+     {
+      "key": "Chuba Hubbard|CAR|rush_yds|5203",
+      "was": 89.5,
+      "now": 39.5
+     },
+     {
+      "key": "Malik Willis|MIA|rush_yds|5203",
+      "was": 34.5,
+      "now": 44.5
+     },
+     {
+      "key": "Jahmyr Gibbs|DET|rush_yds|5203",
+      "was": 119.5,
+      "now": 99.5
+     },
+     {
+      "key": "Braelon Allen|NYJ|rush_yds|5203",
+      "was": 59.5,
+      "now": 49.5
+     },
+     {
+      "key": "Breece Hall|NYJ|rush_yds|5203",
+      "was": 59.5,
+      "now": 19.5
+     },
+     {
+      "key": "Quinshon Judkins|CLE|rush_yds|5203",
+      "was": 39.5,
+      "now": 49.5
+     },
+     {
+      "key": "Tyler Shough|NO|rush_yds|5203",
+      "was": 9.5,
+      "now": 14.5
+     },
+     {
+      "key": "Rachaad White|WAS|rush_yds|5203",
+      "was": 19.5,
+      "now": 29.5
+     },
+     {
+      "key": "Kyren Williams|LA|rush_yds|5203",
+      "was": 39.5,
+      "now": 59.5
+     },
+     {
+      "key": "Blake Corum|LA|rush_yds|5203",
+      "was": 59.5,
+      "now": 29.5
+     },
+     {
+      "key": "Javonte Williams|DAL|rush_yds|5203",
+      "was": 89.5,
+      "now": 49.5
+     },
+     {
+      "key": "Tyler Goodson|DAL|rush_yds|5203",
+      "was": 29.5,
+      "now": 9.5
+     },
+     {
+      "key": "Jonathan Taylor|IND|rush_yds|5203",
+      "was": 89.5,
+      "now": 39.5
+     },
+     {
+      "key": "Kimani Vidal|LAC|rush_yds|5203",
+      "was": 29.5,
+      "now": 19.5
+     },
+     {
+      "key": "Ashton Jeanty|LV|rush_yds|5203",
+      "was": 29.5,
+      "now": 19.5
+     },
+     {
+      "key": "Christian McCaffrey|SF|rush_yds|5203",
+      "was": 29.5,
+      "now": 39.5
+     },
+     {
+      "key": "Tyler Allgeier|ARI|rush_yds|5203",
+      "was": 39.5,
+      "now": 49.5
+     },
+     {
+      "key": "Josh Jacobs|GB|rush_yds|5203",
+      "was": 49.5,
+      "now": 29.5
+     },
+     {
+      "key": "Aaron Jones|MIN|rush_yds|5203",
+      "was": 9.5,
+      "now": 29.5
+     },
+     {
+      "key": "Kyle Pitts|ATL|receptions|49",
+      "was": 4.5,
+      "now": 3.5
+     },
+     {
+      "key": "Emmett Johnson|KC|receptions|68",
+      "was": 1.5,
+      "now": 2.5
+     },
+     {
+      "key": "Matthew Golden|GB|receptions|79",
+      "was": 4.5,
+      "now": 5.5
+     },
+     {
+      "key": "Kyle Pitts|ATL|receptions|123",
+      "was": 4.5,
+      "now": 3.5
+     },
+     {
+      "key": "Jahan Dotson|ATL|receptions|1929",
+      "was": 2.5,
+      "now": 1.5
+     },
+     {
+      "key": "Bijan Robinson|ATL|receptions|1929",
+      "was": 2.5,
+      "now": 3.5
+     }
+    ],
+    "price_moves": 248,
+    "game_line_moves": [
+     {
+      "game": "None@None",
+      "market": "total",
+      "was": 44,
+      "now": 44.5
+     }
+    ],
+    "public_pct": [],
+    "weather": [
+     {
+      "game": "2026_09_LA_WAS",
+      "was": {
+       "temp_f": 61.0,
+       "wind_mph": 9.0,
+       "short": "Sunny",
+       "pop": 0
+      },
+      "now": {
+       "temp_f": 61.0,
+       "wind_mph": 13.0,
+       "short": "Sunny",
+       "pop": 0
+      }
+     },
+     {
+      "game": "2026_09_GB_NE",
+      "was": {
+       "temp_f": 58.0,
+       "wind_mph": 7.0,
+       "short": "Mostly Sunny",
+       "pop": 0
+      },
+      "now": {
+       "temp_f": 57.0,
+       "wind_mph": 7.0,
+       "short": "Sunny",
+       "pop": 0
+      }
+     },
+     {
+      "game": "2026_09_ARI_SEA",
+      "was": {
+       "temp_f": 56.0,
+       "wind_mph": 12.0,
+       "short": "Partly Sunny",
+       "pop": 10
+      },
+      "now": {
+       "temp_f": 55.0,
+       "wind_mph": 10.0,
+       "short": "Chance Rain Showers",
+       "pop": 35
+      }
+     }
+    ],
+    "lines_new": 21,
+    "lines_gone": 5,
+    "nflverse_files_changed": [
+     "pbp_2026.parquet",
+     "snaps_2026.parquet",
+     "inj_2026.parquet",
+     "roster_2026.parquet",
+     "games.csv"
+    ],
+    "raised_by_espn": [
+     {
+      "pid": "00-0033553",
+      "name": "James Conner",
+      "team": "ARI",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0041027",
+      "name": "Jeremiyah Love",
+      "team": "ARI",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0033307",
+      "name": "Kendrick Bourne",
+      "team": "ARI",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0040432",
+      "name": "Beaux Collins",
+      "team": "ATL",
+      "official": "Questionable",
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0038580",
+      "name": "Yasir Abdullah",
+      "team": "ATL",
+      "official": "Questionable",
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0033945",
+      "name": "Samson Ebukam",
+      "team": "ATL",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0041484",
+      "name": "Anterio Thompson",
+      "team": "ATL",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Out"
+     },
+     {
+      "pid": "00-0039901",
+      "name": "Keon Coleman",
+      "team": "BUF",
+      "official": null,
+      "model_status": "Questionable",
+      "why": "ESPN game page: Questionable"
+     },
+     {
+      "pid": "00-0036037",
+      "name": "Sam Franklin Jr.",
+      "team": "BUF",
+      "official": null,
+      "model_status": "Questionable",
+      "why": "ESPN game page: Questionable"
+     },
+     {
+      "pid": "00-0034827",
+      "name": "DJ Moore",
+      "team": "BUF",
+      "official": null,
+      "model_status": "Questionable",
+      "why": "ESPN game page: Questionable"
+     },
+     {
+      "pid": "00-0036988",
+      "name": "Josh Palmer",
+      "team": "BUF",
+      "official": null,
+      "model_status": "Questionable",
+      "why": "ESPN injuries: Questionable"
+     },
+     {
+      "pid": "00-0040192",
+      "name": "Jordan Hancock",
+      "team": "BUF",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0035667",
+      "name": "Greg Gaines",
+      "team": "BUF",
+      "official": null,
+      "model_status": "Questionable",
+      "why": "ESPN injuries: Questionable"
+     },
+     {
+      "pid": "00-0039344",
+      "name": "Jonathon Brooks",
+      "team": "CAR",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0039342",
+      "name": "Xavier Legette",
+      "team": "CAR",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0038101",
+      "name": "Akayleb Evans",
+      "team": "CAR",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0038440",
+      "name": "Zavier Scott",
+      "team": "CHI",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0034320",
+      "name": "Kentavius Street",
+      "team": "CHI",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0041546",
+      "name": "Cashius Howell",
+      "team": "CIN",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0038619",
+      "name": "Andrei Iosivas",
+      "team": "CIN",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0039814",
+      "name": "Erick All",
+      "team": "CIN",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0035705",
+      "name": "Jalen Thompson",
+      "team": "DAL",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0033093",
+      "name": "Jonathan Bullard",
+      "team": "DAL",
+      "official": "Questionable",
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0040134",
+      "name": "Pat Bryant",
+      "team": "DEN",
+      "official": "Questionable",
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0041442",
+      "name": "Jimmy Rolder",
+      "team": "DET",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0037197",
+      "name": "Isiah Pacheco",
+      "team": "DET",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0038685",
+      "name": "Chris Brooks",
+      "team": "GB",
+      "official": "Questionable",
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0037130",
+      "name": "Reed Blankenship",
+      "team": "HOU",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Out"
+     },
+     {
+      "pid": "00-0035685",
+      "name": "David Montgomery",
+      "team": "HOU",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Out"
+     },
+     {
+      "pid": "00-0040138",
+      "name": "Jaylin Noel",
+      "team": "HOU",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0037664",
+      "name": "Alec Pierce",
+      "team": "IND",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0036374",
+      "name": "L'Jarius Sneed",
+      "team": "KC",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0032103",
+      "name": "Denzel Perryman",
+      "team": "LAC",
+      "official": "Doubtful",
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0033885",
+      "name": "David Njoku",
+      "team": "LAC",
+      "official": "Doubtful",
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0034790",
+      "name": "Derwin James",
+      "team": "LAC",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0037557",
+      "name": "Ronnie Rivers",
+      "team": "LA",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0033868",
+      "name": "Myles Garrett",
+      "team": "LA",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Injured Reserve"
+     },
+     {
+      "pid": "00-0041415",
+      "name": "Dean Connors",
+      "team": "LA",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN injuries: Injured Reserve"
+     },
+     {
+      "pid": "00-0037549",
+      "name": "Darrell Baker Jr.",
+      "team": "MIA",
+      "official": null,
+      "model_status": "Out",
+      "why": "ESPN game page: Out"
+     },
+     {
+      "pid": "00-0041104",
+      "name": "Demond Claiborne",
+      "team": "MIN",
+      "official": null,
+      "model_status": "Questionable",
+      "why": "ESPN game page: Questionable"
+     }
+    ]
+   },
+   "outputs_changed": {
+    "nfl-2026-wk09-sun": {
+     "added": 0,
+     "removed": 1,
+     "flipped": 20,
+     "retiered": 16,
+     "added_ids": [],
+     "removed_ids": [
+      "2026_09_ARI_SEA-00-0035289-pass_yds"
+     ],
+     "flips": [
+      {
+       "id": "2026_09_LA_WAS-00-0031588-rec_yds",
+       "player": "Stefon Diggs",
+       "market": "rec_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_CIN_ATL-00-0037741-rec_yds",
+       "player": "Jahan Dotson",
+       "market": "rec_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_ARI_SEA-00-0038559-rec_yds",
+       "player": "Michael Wilson",
+       "market": "rec_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_HOU_LAC-00-0038608-rec_yds",
+       "player": "Kayshon Boutte",
+       "market": "rec_yds",
+       "was": "under",
+       "now": "over"
+      },
+      {
+       "id": "2026_09_ARI_SEA-00-0039041-rec_yds",
+       "player": "Elijah Higgins",
+       "market": "rec_yds",
+       "was": "under",
+       "now": "over"
+      },
+      {
+       "id": "2026_09_CLE_NO-00-0039424-rec_yds",
+       "player": "Devaughn Vele",
+       "market": "rec_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_CLE_NO-00-0041037-rec_yds",
+       "player": "Denzel Boston",
+       "market": "rec_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_TB_CHI-00-0041048-rec_yds",
+       "player": "Ted Hurst III",
+       "market": "rec_yds",
+       "was": "under",
+       "now": "over"
+      },
+      {
+       "id": "2026_09_NYJ_KC-00-0030506-receptions",
+       "player": "Travis Kelce",
+       "market": "receptions",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_HOU_LAC-00-0038618-receptions",
+       "player": "Xavier Hutchinson",
+       "market": "receptions",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_DET_MIA-00-0039065-receptions",
+       "player": "Sam LaPorta",
+       "market": "receptions",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_ARI_SEA-00-0039793-receptions",
+       "player": "AJ Barner",
+       "market": "receptions",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_HOU_LAC-00-0040583-receptions",
+       "player": "Woody Marks",
+       "market": "receptions",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_LV_SF-00-0033280-rush_yds",
+       "player": "Christian McCaffrey",
+       "market": "rush_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_BUF_MIN-00-0037248-rush_yds",
+       "player": "James Cook",
+       "market": "rush_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_LA_WAS-00-0037840-rush_yds",
+       "player": "Kyren Williams",
+       "market": "rush_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_DEN_CAR-00-0040644-rush_yds",
+       "player": "Trevor Etienne",
+       "market": "rush_yds",
+       "was": "under",
+       "now": "over"
+      },
+      {
+       "id": "2026_09_DAL_IND-00-0033077-pass_yds",
+       "player": "Dak Prescott",
+       "market": "pass_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_DEN_CAR-00-0039150-pass_yds",
+       "player": "Bryce Young",
+       "market": "pass_yds",
+       "was": "over",
+       "now": "under"
+      },
+      {
+       "id": "2026_09_CLE_NO-00-0040743-pass_yds",
+       "player": "Tyler Shough",
+       "market": "pass_yds",
+       "was": "over",
+       "now": "under"
+      }
+     ],
+     "tiers": [
+      {
+       "id": "2026_09_DEN_CAR-00-0033881-rec_yds",
+       "player": "Evan Engram",
+       "market": "rec_yds",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_CIN_ATL-00-0034829-rec_yds",
+       "player": "Mike Gesicki",
+       "market": "rec_yds",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_DAL_IND-00-0036223-rec_yds",
+       "player": "Jonathan Taylor",
+       "market": "rec_yds",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_LA_WAS-00-0037840-rec_yds",
+       "player": "Kyren Williams",
+       "market": "rec_yds",
+       "was": "pass",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_CIN_ATL-00-0038597-rec_yds",
+       "player": "Chase Brown",
+       "market": "rec_yds",
+       "was": "pass",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_HOU_LAC-00-0038977-rec_yds",
+       "player": "Tank Dell",
+       "market": "rec_yds",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_TB_CHI-00-0039021-rec_yds",
+       "player": "Roschon Johnson",
+       "market": "rec_yds",
+       "was": "pass",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_DEN_CAR-00-0039491-rec_yds",
+       "player": "Jalen Coker",
+       "market": "rec_yds",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_NYJ_KC-00-0041013-rec_yds",
+       "player": "Emmett Johnson",
+       "market": "rec_yds",
+       "was": "pass",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_DAL_IND-00-0036223-receptions",
+       "player": "Jonathan Taylor",
+       "market": "receptions",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_CIN_ATL-00-0036970-receptions",
+       "player": "Kyle Pitts",
+       "market": "receptions",
+       "was": "lean",
+       "now": "bet"
+      },
+      {
+       "id": "2026_09_DEN_CAR-00-0037614-receptions",
+       "player": "John Metchie III",
+       "market": "receptions",
+       "was": "pass",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_TB_CHI-00-0039021-receptions",
+       "player": "Roschon Johnson",
+       "market": "receptions",
+       "was": "pass",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_HOU_LAC-00-0039849-receptions",
+       "player": "Marvin Harrison Jr.",
+       "market": "receptions",
+       "was": "bet",
+       "now": "lean"
+      },
+      {
+       "id": "2026_09_GB_NE-00-0040667-receptions",
+       "player": "Matthew Golden",
+       "market": "receptions",
+       "was": "lean",
+       "now": "pass"
+      },
+      {
+       "id": "2026_09_CIN_ATL-00-0040785-receptions",
+       "player": "Dohnte Meyers",
+       "market": "receptions",
+       "was": "pass",
+       "now": "lean"
+      }
+     ],
+     "bets": 15,
+     "leans": 82
+    }
+   },
+   "published": [
+    "index.json",
+    "injuries.json",
+    "nfl/2026-wk09-sun.json",
+    "nfl/board-2026-wk09.json",
+    "nfl/state/lines/an_props_2026_wk09.parquet",
+    "nfl/state/lines/espn_dk_2026_wk09.parquet",
+    "nflp/index.json",
+    "nflp/p/00-0029685.json",
+    "nflp/p/00-0031040.json",
+    "nflp/p/00-0031330.json",
+    "nflp/p/00-0031388.json",
+    "nflp/p/00-0031408.json",
+    "nflp/p/00-0031583.json",
+    "nflp/p/00-0031933.json",
+    "nflp/p/00-0032146.json",
+    "nflp/p/00-0032228.json",
+    "nflp/p/00-0032391.json",
+    "nflp/p/00-0032580.json",
+    "nflp/p/00-0032889.json",
+    "nflp/p/00-0033090.json",
+    "nflp/p/00-0033110.json",
+    "nflp/p/00-0033131.json",
+    "nflp/p/00-0033132.json",
+    "nflp/p/00-0033280.json",
+    "nflp/p/00-0033290.json",
+    "nflp/p/00-0033523.json",
+    "nflp/p/00-0033537.json",
+    "nflp/p/00-0033787.json",
+    "nflp/p/00-0033860.json",
+    "nflp/p/00-0033906.json",
+    "nflp/p/00-0033921.json",
+    "nflp/p/00-0033947.json",
+    "nflp/p/00-0033952.json",
+    "nflp/p/00-0034285.json",
+    "nflp/p/00-0034342.json",
+    "nflp/p/00-0034350.json",
+    "nflp/p/00-0034356.json",
+    "nflp/p/00-0034384.json",
+    "nflp/p/00-0034391.json",
+    "nflp/p/00-0034431.json",
+    "nflp/p/00-0034775.json",
+    "nflp/p/00-0034778.json",
+    "nflp/p/00-0034782.json",
+    "nflp/p/00-0034800.json",
+    "nflp/p/00-0034869.json",
+    "nflp/p/00-0035133.json",
+    "nflp/p/00-0035227.json",
+    "nflp/p/00-0035413.json",
+    "nflp/p/00-0035537.json",
+    "nflp/p/00-0035676.json",
+    "nflp/p/00-0035678.json",
+    "nflp/p/00-0035683.json",
+    "nflp/p/00-0035687.json",
+    "nflp/p/00-0035717.json",
+    "nflp/p/00-0035719.json",
+    "nflp/p/00-0036221.json",
+    "nflp/p/00-0036222.json",
+    "nflp/p/00-0036224.json",
+    "nflp/p/00-0036231.json",
+    "nflp/p/00-0036244.json",
+    "nflp/p/00-0036298.json",
+    "nflp/p/00-0036305.json",
+    "nflp/p/00-0036335.json",
+    "nflp/p/00-0036349.json",
+    "nflp/p/00-0036386.json",
+    "nflp/p/00-0036406.json",
+    "nflp/p/00-0036417.json",
+    "nflp/p/00-0036501.json",
+    "nflp/p/00-0036564.json",
+    "nflp/p/00-0036603.json",
+    "nflp/p/00-0036616.json",
+    "nflp/p/00-0036618.json",
+    "nflp/p/00-0036626.json",
+    "nflp/p/00-0036672.json",
+    "nflp/p/00-0036682.json",
+    "nflp/p/00-0036736.json",
+    "nflp/p/00-0036844.json",
+    "nflp/p/00-0036902.json",
+    "nflp/p/00-0036912.json",
+    "nflp/p/00-0036932.json",
+    "nflp/p/00-0036934.json",
+    "nflp/p/00-0036963.json",
+    "nflp/p/00-0036968.json",
+    "nflp/p/00-0036980.json",
+    "nflp/p/00-0036986.json",
+    "nflp/p/00-0036990.json",
+    "nflp/p/00-0036994.json",
+    "nflp/p/00-0037076.json",
+    "nflp/p/00-0037132.json",
+    "nflp/p/00-0037157.json",
+    "nflp/p/00-0037191.json",
+    "nflp/p/00-0037195.json",
+    "nflp/p/00-0037205.json",
+    "nflp/p/00-0037243.json",
+    "nflp/p/00-0037247.json",
+    "nflp/p/00-0037250.json",
+    "nflp/p/00-0037253.json",
+    "nflp/p/00-0037261.json",
+    "nflp/p/00-0037262.json",
+    "nflp/p/00-0037271.json",
+    "nflp/p/00-0037292.json",
+    "nflp/p/00-0037297.json",
+    "nflp/p/00-0037320.json",
+    "nflp/p/00-0037545.json",
+    "nflp/p/00-0037667.json",
+    "nflp/p/00-0037740.json",
+    "nflp/p/00-0037742.json",
+    "nflp/p/00-0037746.json",
+    "nflp/p/00-0037799.json",
+    "nflp/p/00-0037801.json",
+    "nflp/p/00-0037821.json",
+    "nflp/p/00-0038041.json",
+    "nflp/p/00-0038106.json",
+    "nflp/p/00-0038393.json",
+    "nflp/p/00-0038394.json",
+    "nflp/p/00-0038400.json",
+    "nflp/p/00-0038414.json",
+    "nflp/p/00-0038519.json",
+    "nflp/p/00-0038543.json",
+    "nflp/p/00-0038547.json",
+    "nflp/p/00-0038553.json",
+    "nflp/p/00-0038556.json",
+    "nflp/p/00-0038560.json",
+    "nflp/p/00-0038571.json",
+    "nflp/p/00-0038576.json",
+    "nflp/p/00-0038589.json",
+    "nflp/p/00-0038601.json",
+    "nflp/p/00-0038694.json",
+    "nflp/p/00-0038896.json",
+    "nflp/p/00-0038933.json",
+    "nflp/p/00-0039018.json",
+    "nflp/p/00-0039020.json",
+    "nflp/p/00-0039047.json",
+    "nflp/p/00-0039058.json",
+    "nflp/p/00-0039068.json",
+    "nflp/p/00-0039071.json",
+    "nflp/p/00-0039072.json",
+    "nflp/p/00-0039075.json",
+    "nflp/p/00-0039137.json",
+    "nflp/p/00-0039167.json",
+    "nflp/p/00-0039242.json",
+    "nflp/p/00-0039337.json",
+    "nflp/p/00-0039347.json",
+    "nflp/p/00-0039352.json",
+    "nflp/p/00-0039361.json",
+    "nflp/p/00-0039364.json",
+    "nflp/p/00-0039371.json",
+    "nflp/p/00-0039459.json",
+    "nflp/p/00-0039751.json",
+    "nflp/p/00-0039752.json",
+    "nflp/p/00-0039807.json",
+    "nflp/p/00-0039808.json",
+    "nflp/p/00-0039811.json",
+    "nflp/p/00-0039819.json",
+    "nflp/p/00-0039846.json",
+    "nflp/p/00-0039867.json",
+    "nflp/p/00-0039874.json",
+    "nflp/p/00-0039911.json",
+    "nflp/p/00-0040061.json",
+    "nflp/p/00-0040125.json",
+    "nflp/p/00-0040129.json",
+    "nflp/p/00-0040139.json",
+    "nflp/p/00-0040152.json",
+    "nflp/p/00-0040163.json",
+    "nflp/p/00-0040182.json",
+    "nflp/p/00-0040185.json",
+    "nflp/p/00-0040236.json",
+    "nflp/p/00-0040541.json",
+    "nflp/p/00-0040579.json",
+    "nflp/p/00-0040581.json",
+    "nflp/p/00-0040641.json",
+    "nflp/p/00-0040687.json",
+    "nflp/p/00-0040694.json",
+    "nflp/p/00-0040706.json",
+    "nflp/p/00-0040708.json",
+    "nflp/p/00-0040710.json",
+    "nflp/p/00-0040715.json",
+    "nflp/p/00-0040734.json",
+    "nflp/p/00-0040737.json",
+    "nflp/p/00-0040748.json",
+    "nflp/p/00-0040865.json",
+    "nflp/p/00-0041037.json",
+    "nflp/p/00-0041043.json",
+    "nflp/p/00-0041044.json",
+    "nflp/p/00-0041049.json",
+    "nflp/p/00-0041060.json",
+    "nflp/p/00-0041063.json",
+    "nflp/p/00-0041096.json",
+    "nflp/p/00-0041113.json",
+    "nflp/p/00-0041326.json",
+    "nflp/p/00-0041381.json",
+    "nflp/p/00-0041495.json",
+    "nflp/p/00-0041524.json",
+    "nflp/p/00-0041528.json",
+    "nflp/p/00-0041537.json",
+    "nflp/p/00-0041543.json",
+    "nflp/p/00-0041545.json",
+    "nflp/p/00-0041550.json",
+    "nflp/p/00-0041569.json",
+    "nflp/teams.json"
+   ],
+   "kept": [],
+   "errors": [],
+   "timings": {},
+   "week": 9,
+   "params": {
+    "version": "v4.1-seed",
+    "through_week": 8
+   },
+   "book_set": {
+    "best_set": "core7",
+    "best_from": [
+     "DraftKings",
+     "FanDuel",
+     "BetMGM",
+     "Caesars",
+     "BetRivers",
+     "bet365",
+     "Fanatics"
+    ],
+    "books_seen": {
+     "DraftKings": 346,
+     "FanDuel": 330,
+     "BetMGM": 287,
+     "Caesars": 341,
+     "BetRivers": 163,
+     "bet365": 365,
+     "Fanatics": 289,
+     "Hard Rock": 198,
+     "BetParx": 289,
+     "theScore": 0,
+     "Polymarket": 328,
+     "Novig": 0,
+     "Kalshi": 0,
+     "PrizePicks": 299,
+     "Underdog": 0,
+     "Sleeper": 0,
+     "Open": 387
+    },
+    "compare": {
+     "core5": {
+      "raw": {
+       "priced": 346,
+       "bets": 60,
+       "best_changed_vs_core5": 0,
+       "priced_only_here": 0,
+       "bets_added_vs_core5": 0,
+       "bets_dropped_vs_core5": 0
+      },
+      "stale_guarded": {
+       "priced": 345,
+       "bets": 55,
+       "best_changed_vs_core5": 0,
+       "priced_only_here": 0,
+       "bets_added_vs_core5": 0,
+       "bets_dropped_vs_core5": 0
+      }
+     },
+     "core7": {
+      "raw": {
+       "priced": 387,
+       "bets": 81,
+       "best_changed_vs_core5": 127,
+       "priced_only_here": 41,
+       "bets_added_vs_core5": 21,
+       "bets_dropped_vs_core5": 0
+      },
+      "stale_guarded": {
+       "priced": 385,
+       "bets": 66,
+       "best_changed_vs_core5": 117,
+       "priced_only_here": 40,
+       "bets_added_vs_core5": 11,
+       "bets_dropped_vs_core5": 0
+      }
+     },
+     "all": {
+      "raw": {
+       "priced": 395,
+       "bets": 168,
+       "best_changed_vs_core5": 305,
+       "priced_only_here": 49,
+       "bets_added_vs_core5": 109,
+       "bets_dropped_vs_core5": 1
+      },
+      "stale_guarded": {
+       "priced": 394,
+       "bets": 130,
+       "best_changed_vs_core5": 246,
+       "priced_only_here": 49,
+       "bets_added_vs_core5": 76,
+       "bets_dropped_vs_core5": 1
+      }
+     }
+    },
+    "priced": 387,
+    "bets_model_run": 81
+   },
+   "deleted": 0
   }
  ]
 }
