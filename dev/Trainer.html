@@ -70,6 +70,17 @@ p.note{color:var(--muted);font-size:13px;margin:0;max-width:64ch}
 .pnav{display:flex;align-items:center;gap:10px}
 .pnav h1{font:800 clamp(26px,5vw,36px)/1.05 var(--f-display);margin:0;letter-spacing:-.01em;text-wrap:balance}
 .pnav .sub{color:var(--muted);font-size:13px;font-weight:600}
+.pnav .sub.motto{font:800 13px/1.2 var(--f-display);letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(90deg,#5ff0b8,#3ed6a0 45%,#bff7e0);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;padding-bottom:2px}
+.pnav .sub.motto.won::after{content:' ✓';color:#3ed6a0}
+.cal-h{display:flex;align-items:center;gap:10px}.cal-t{flex:1;text-align:center;display:flex;flex-direction:column;gap:2px}.cal-t h3{margin:0}.cal-won{font-size:12.5px;font-weight:700;color:#3ed6a0}
+.cal-w{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11.5px;font-weight:700;color:var(--muted);margin-top:4px}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-d{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border:1px solid transparent;border-radius:14px;background:none;color:var(--fg);font:inherit;cursor:pointer;padding:4px 0}
+.cal-d b{font-size:14px;font-weight:700;line-height:1}.cal-d svg{width:20px;height:19px}.cal-d i{display:block;width:20px;height:19px}
+.cal-d.fut b{color:var(--muted)}.cal-d.today{border-color:var(--hair);background:var(--s2)}
+.cal-d.sel{border-color:var(--kcal);background:color-mix(in srgb,var(--kcal) 14%,transparent)}
+.cal-d.won svg{filter:drop-shadow(0 0 4px rgba(62,214,160,.55))}
+.cal-n{margin:0;text-align:center;font-size:12px}
 .pnav .title{flex:1;min-width:0}
 .icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none;position:relative}
 .icon-btn:hover{background:var(--surface-2)}
@@ -1277,6 +1288,21 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 @keyframes hpbeat{0%,60%,100%{transform:scale(1)}8%{transform:scale(1.14)}16%{transform:scale(1)}24%{transform:scale(1.1)}32%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.hp-beat .hp-logo{animation:none}}
 .hp-rows{display:flex;flex-direction:column;gap:10px;width:100%;margin:6px 0 4px}
+/* the heart as a thread: tiny stripe icons beside each goal, one-line log notes, hearts in Progress */
+.hp-ic{flex:none;width:15px;height:14px;vertical-align:-2px}
+.qt-t>span .hp-ic,.eyebrow .hp-ic{margin-right:5px}
+.hp-full{color:#3ed6a0!important}
+.toast .hp-tl{display:block;font-size:12px;font-weight:600;opacity:.72;margin-top:1px;overflow:hidden;text-overflow:ellipsis}
+.toast:has(.hp-tl){border-radius:18px}
+.rw-ic .rw-hp{width:24px;height:23px}.rw-ic .rw-hpf{width:30px;height:30px}
+.hp-tag{display:flex;align-items:center;gap:5px;font-style:normal;font-size:12px;line-height:1.3;color:color-mix(in srgb,#3ed6a0 80%,var(--muted));margin-top:2px}.hp-tag .hp-ti{width:14px;height:13px;flex:none}
+.hp-line{display:flex;align-items:center;gap:8px;margin:0;font-size:13.5px;font-weight:600;color:var(--fg)}.hp-line .hp-mini{width:22px;height:21px}.hp-line.on{color:#3ed6a0}
+.hpw{padding:16px 18px}.hpw-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.hpw-h b{font-size:15px}.hpw-h span{font-size:13px;color:var(--muted)}
+.hpw-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:12px 0 10px}
+.hpw-d{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;font:600 11.5px var(--f-body)}
+.hpw-d svg{width:100%;max-width:40px;aspect-ratio:1}.hpw-d.fut svg{opacity:.35}.hpw-d.tod span{color:var(--fg);font-weight:800}
+.hpw-s{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--hair,var(--line));font-size:13px;color:var(--muted)}.hpw-s b{color:var(--fg);margin-left:4px}
+.hpw:not(:has(.hpw-row)) .hpw-s{margin-top:10px}
 .hp-row{display:grid;grid-template-columns:62px minmax(0,1fr);grid-template-areas:"l t" "l d";column-gap:12px;row-gap:4px;align-items:center}
 .hp-l{grid-area:l;font-weight:700;font-size:14px}.hp-tr{grid-area:t;height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}.hp-tr i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#17a07a,#5ff0b8)}
 .hp-d{grid-area:d;font-size:12.5px;color:var(--muted)}.hp-d.on{color:#3ed6a0}
@@ -2511,7 +2537,7 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
       <button class="icon-btn" id="dPrev" aria-label="Previous day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="title"><div class="sub" id="dSub">Today</div><h1 id="dTitle">—</h1></div>
       <button class="pill-btn" id="dToday" hidden>Today</button>
-      <label class="icon-btn" aria-label="Pick a date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><input type="date" id="dPick" aria-label="Pick a date"></label>
+      <button class="icon-btn" type="button" id="dCal" aria-label="Open calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></button>
       <button class="icon-btn" id="dNext" aria-label="Next day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
 
@@ -3835,7 +3861,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.85';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.86';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4152,18 +4178,19 @@ function gaugeSVG(t,goal){
   return `<svg viewBox="-14 -14 228 228" role="img" aria-label="${fmt(t.k)} of ${fmt(goal)} calories"><circle cx="100" cy="100" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="16"/>${arcs}${over}${ticks}</svg>`;
 }
 function renderToday(){if(ctTodayHook())return;const pgOpen=typeof pgStack!=='undefined'?pgStack[pgStack.length-1]:null;if(pgOpen==='checkin')renderCheckin();if(pgOpen==='health')renderHealth();renderJust();renderCoach();renderTodayRows();renderTip('today');renderIdeasCard();renderPrepCard();renderQuick();renderHP();renderAcNudge();try{renderPlanTip()}catch(e){}try{renderUpNext()}catch(e){}
-  const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk;
+  const k=S.day,t=dayTotals(k),g=goalsFor(k),gk=goalKcal(g),tk=todayKey(),isToday=k===tk,HP=hpNow(k);
   $('dTitle').textContent=niceDate(k,{weekday:'short',month:'short',day:'numeric'});
   const diff=Math.round((parseKey(k)-parseKey(tk))/864e5);
-  $('dSub').textContent=isToday?(firstName()?`${greet()}, ${firstName()}`:'Today'):diff===-1?'Yesterday':diff===1?'Tomorrow':diff<0?`${-diff} days ago`:`In ${diff} days`;
-  $('dToday').hidden=isToday; $('dPick').value=k;
+  {const ds=$('dSub'),won=diff<=0&&hpParts(k).every(x=>x.v>=1);ds.className='sub'+(isToday||won?' motto':'')+(won?' won':'');
+    ds.textContent=won?(isToday?'Day won':'Day won · '+(diff===-1?'yesterday':`${-diff} days ago`)):isToday?'Win the day':diff===-1?'Yesterday':diff===1?'Tomorrow':diff<0?`${-diff} days ago`:`In ${diff} days`}
+  $('dToday').hidden=isToday;
   const left=gk-t.k;
   const pct=gk?Math.round(t.k/gk*100):0,over=left<0;
   const mac=(key,lab,v,goal,col)=>{const rem=goal-v,p2=goal?Math.min(v/goal,1):0;
-    return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}</div><div class="hm-v num"><b data-cu="${key}" data-v="${r0(Math.abs(rem))}">${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':key==='p'?'extra':'over'}</span></div><div class="bar ${v>goal&&key!=='p'?'over':''}"><i style="width:${p2*100}%"></i></div><div class="hm-o num">${key==='f'&&planKind()==='cut'?`aim ≤ ${r0(goal)} g`:`${r0(v)} / ${r0(goal)}`}</div></div>`};
-  $('hero').innerHTML=`<div class="hv-top"><div class="hv-l"><div class="eyebrow">${over?(isToday?'Over today':'Over that day'):(isToday?'Left today':'Left that day')}</div>
+    return `<div class="hm" style="--c:var(${col})"><div class="hm-n">${lab}${key==='p'&&HP?hpMini(1,HP[1].v,'hp-ic'):''}</div><div class="hm-v num"><b data-cu="${key}" data-v="${r0(Math.abs(rem))}">${r0(Math.abs(rem))}</b><span>g ${rem>=0?'left':key==='p'?'extra':'over'}</span></div><div class="bar ${v>goal&&key!=='p'?'over':''}"><i style="width:${p2*100}%"></i></div><div class="hm-o num">${key==='f'&&planKind()==='cut'?`aim ≤ ${r0(goal)} g`:`${r0(v)} / ${r0(goal)}`}</div></div>`};
+  $('hero').innerHTML=`<div class="hv-top"><div class="hv-l"><div class="eyebrow">${HP?hpMini(0,HP[0].v,'hp-ic'):''}${over?(isToday?'Over today':'Over that day'):(isToday?'Left today':'Left that day')}</div>
       <div class="hv-big ${over?'over':''}"><b class="num" data-cu="left" data-v="${Math.abs(left)}">${fmt(Math.abs(left))}</b><small>kcal</small></div>
-      <div class="hv-sub num">${fmt(t.k)} eaten of ${fmt(gk)}</div></div>
+      <div class="hv-sub num">${fmt(t.k)} eaten of ${fmt(gk)}${HP&&HP[0].v>=1&&!over?'<span class="hp-full"> · stripe full</span>':''}</div></div>
       <div class="gauge ${over?'over':''}">${gaugeSVG(t,gk)}<div class="c"><b class="num" data-cu="pct" data-v="${pct}">${pct}</b><span>%</span></div></div></div>
     <div class="hv-mac">${mac('p','Protein',t.p,g.p,'--pro')}${mac('c','Carbs',t.c,g.c,'--carb')}${mac('f','Fat',t.f,g.f,'--fat')}</div>
     <div class="hv-pills">${!t.k?`<span class="note" style="margin:0">Nothing logged ${isToday?'yet today':'on this day'}. Type what you ate or drank below.</span>`:''}
@@ -4197,7 +4224,23 @@ $('mealPick').addEventListener('click',e=>{const b=e.target.closest('[data-meal]
 $('dPrev').onclick=()=>{S.day=addDays(S.day,-1);renderToday()};
 $('dNext').onclick=()=>{S.day=addDays(S.day,1);renderToday()};
 $('dToday').onclick=()=>{S.day=todayKey();renderToday()};
-$('dPick').onchange=e=>{if(e.target.value){S.day=e.target.value;renderToday()}};
+$('dCal').onclick=()=>openCal(S.day);
+/* calendar: every day shows its heart, so the month reads as days you won */
+function hpTiny(fr,u){const xs=[18,35,52,69];return `<svg viewBox="16 20 70 66" aria-hidden="true"><defs><clipPath id="hpc${u}"><path d="${HP_PATH}"/></clipPath></defs><g clip-path="url(#hpc${u})">${xs.map((x,i)=>{const v=fr[i],[t0,b0]=HP_RNG[i],h=v>=1?58:(b0-t0)*v;return `<rect x="${x}" y="24" width="15" height="58" fill="#3ed6a0" fill-opacity=".12"/>${h>0?`<rect x="${x}" y="${v>=1?24:b0-h}" width="15" height="${h}" fill="#3ed6a0" fill-opacity="${v>=1?1:.55}"/>`:''}`}).join('')}</g><path d="${HP_PATH}" fill="none" stroke="#bff7e0" stroke-opacity=".35" stroke-width="3"/></svg>`}
+function openCal(sel,ym){const tk=todayKey();sel=sel||tk;ym=ym||sel.slice(0,7);const [Y,M]=ym.split('-').map(Number),first=new Date(Y,M-1,1),days=new Date(Y,M,0).getDate(),lead=first.getDay();
+  const key=d=>`${Y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`;let won=0,cells='';
+  for(let i=0;i<lead;i++)cells+='<span class="cal-x"></span>';
+  for(let d=1;d<=days;d++){const k=key(d),past=k<=tk,has=(S.days[k]||[]).length||((hydS().day||{})[k]);let fr=[0,0,0,0];if(past&&has){try{fr=hpParts(k).map(x=>x.v)}catch(e){}}const full=fr.every(v=>v>=1);if(full)won++;
+    cells+=`<button type="button" class="cal-d${k===tk?' today':''}${k===sel?' sel':''}${full?' won':''}${past?'':' fut'}" data-cal="${k}" aria-label="${niceDate(k,{weekday:'long',month:'long',day:'numeric'})}${full?', day won':''}"><b class="num">${d}</b>${past?hpTiny(fr,'c'+d):'<i></i>'}</button>`}
+  const prev=new Date(Y,M-2,1),next=new Date(Y,M,1),ymOf=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`;
+  const mName=first.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  sheet(`<div class="cal-h"><button class="icon-btn" type="button" data-calm="${ymOf(prev)}" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><div class="cal-t"><h3>${esc(mName)}</h3><span class="cal-won">${ym<=tk.slice(0,7)?`${won} day${won===1?'':'s'} won`:'Plan ahead'}</span></div><button class="icon-btn" type="button" data-calm="${ymOf(next)}" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    <div class="cal-w" aria-hidden="true">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div>
+    <div class="cal-g">${cells}</div>
+    <p class="note cal-n">A full heart means you filled all four: food, protein, water and move.</p>
+    ${sel!==tk?`<button class="ghost" type="button" data-cal="${tk}" style="width:100%">Jump to today</button>`:''}`,{nofocus:true,stack:false});
+  const sh=$('sheetRoot').querySelector('.sheet');sh.classList.add('cal-sh');if(ym&&openCal._open)sh.style.animation='none';openCal._open=1;
+  sh.addEventListener('click',e=>{const m=e.target.closest('[data-calm]');if(m){openCal(sel,m.dataset.calm);return}const d=e.target.closest('[data-cal]');if(d){openCal._open=0;S.day=d.dataset.cal;closeSheet();renderToday();window.scrollTo({top:0,behavior:'instant'})}})}
 $('meals').addEventListener('click',e=>{const gb=e.target.closest('[data-grade]');if(gb){openGrade(gb.dataset.grade);return}
   const b=e.target.closest('[data-edit]');if(b)return openEdit(b.dataset.edit);
   const ad=e.target.closest('[data-addto]');if(ad){openMealAdd(ad.dataset.addto);return}
@@ -4212,7 +4255,7 @@ function dtPickMeal(then){sheet(`<div><div class="eyebrow">Rebuild this day</div
   $('dtX').onclick=closeSheet;$('dtM').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;S.mealSel=b.dataset.v;closeSheet();then()}}
 $('meals').addEventListener('click',e=>{if(e.target.closest('[data-dtphoto]'))dtPickMeal(()=>$('photoIn').click());else if(e.target.closest('[data-dttype]'))dtPickMeal(()=>{renderToday();setTimeout(()=>{$('foodIn').scrollIntoView({block:'center'});$('foodIn').focus()},150)})});
 function addEntries(entries,k=S.day,meal=S.mealSel){
-  if(!entries.length)return;const _before=dayTotals(k);setTimeout(()=>checkRewards(k,_before),0);
+  if(!entries.length)return;const _before=dayTotals(k),_hp0=hpNow(k);setTimeout(()=>checkRewards(k,_before),0);
   if(meal!=='drinks'&&entries.every(e=>isBooze(e.n))){meal='drinks';setTimeout(()=>toast('Added to Drinks 🍺'),400)}
   entries.forEach(e=>e.meal=meal);try{window._mealOpen=window._mealOpen||{};window._mealOpen[k+meal]=true}catch(_){}
   const ids=entries.map(e=>e.id),kc=entries.reduce((a,e)=>a+e.k,0);
@@ -4222,7 +4265,7 @@ function addEntries(entries,k=S.day,meal=S.mealSel){
     try{if(matchMedia('(pointer:coarse)').matches&&document.activeElement&&document.activeElement.id==='foodIn')document.activeElement.blur()}catch(e){}
     setTimeout(()=>{const j=$('justAdded');if(j&&!j.hidden)j.scrollIntoView({behavior:'smooth',block:'nearest'})},80);
   }
-  toast(`Added ${entries.length===1?esc(entries[0].n):entries.length+' items'} to ${mealName(meal)} · ${fmt(kc)} kcal`,()=>{S.days[k]=(S.days[k]||[]).filter(e=>!ids.includes(e.id));if(!S.days[k].length)delete S.days[k];S.just=null;save();renderAll()});
+  toast(`Added ${entries.length===1?esc(entries[0].n):entries.length+' items'} to ${mealName(meal)} · ${fmt(kc)} kcal${hpTL(hpFoodLine(k,_before,_hp0))}`,()=>{S.days[k]=(S.days[k]||[]).filter(e=>!ids.includes(e.id));if(!S.days[k].length)delete S.days[k];S.just=null;save();renderAll()});
 }
 const input=$('foodIn'),status=$('status');
 function submitFood(){
@@ -6001,7 +6044,8 @@ function hpParts(k=todayKey()){const t=sumEntries(S.days[k]||[]),g=goalsFor(k),g
     {id:'water',l:'Water',v:cl(hd.oz/(wt||1)),d:`${r0(hd.oz)} of ${r0(wt)} oz`,left:`${Math.max(1,Math.ceil(wt-hd.oz))} oz to go`},
     {id:'move',l:'Move',v:wk?1:cl(st/10000),d:wk?'Workout done':`${fmt(st)} of 10,000 steps`,left:'Log a workout or walk'}]}
 /* one stripe lit, the rest faint: shows which part of the heart each goal is */
-function hpMini(i,v){const xs=[18,35,52,69],u='m'+i;return `<svg class="hp-mini" viewBox="16 20 70 66" aria-hidden="true"><defs><clipPath id="hpc${u}"><path d="${HP_PATH}"/></clipPath><linearGradient id="hpg${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0b8"/><stop offset="1" stop-color="#17a07a"/></linearGradient></defs><g clip-path="url(#hpc${u})">${xs.map((x,j)=>j===i?(([t0,b0])=>{const h=v>=1?58:(b0-t0)*v,y=v>=1?24:b0-h;return `<rect x="${x}" y="24" width="15" height="58" fill="#3ed6a0" fill-opacity=".22"/><rect x="${x}" y="${y}" width="15" height="${h}" fill="url(#hpg${u})"/>`})(HP_RNG[j]):`<rect x="${x}" y="24" width="15" height="58" fill="#ffffff" fill-opacity=".06"/>`).join('')}</g><path d="${HP_PATH}" fill="none" stroke="#bff7e0" stroke-opacity=".5" stroke-width="2.4"/></svg>`}
+let hpMiniN=0;
+function hpMini(i,v,cls){const xs=[18,35,52,69],u='m'+i+'_'+(++hpMiniN%100000);return `<svg class="hp-mini${cls?' '+cls:''}" viewBox="16 20 70 66" aria-hidden="true"><defs><clipPath id="hpc${u}"><path d="${HP_PATH}"/></clipPath><linearGradient id="hpg${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0b8"/><stop offset="1" stop-color="#17a07a"/></linearGradient></defs><g clip-path="url(#hpc${u})">${xs.map((x,j)=>j===i?(([t0,b0])=>{const h=v>=1?58:(b0-t0)*v,y=v>=1?24:b0-h;return `<rect x="${x}" y="24" width="15" height="58" fill="#3ed6a0" fill-opacity=".22"/><rect x="${x}" y="${y}" width="15" height="${h}" fill="url(#hpg${u})"/>`})(HP_RNG[j]):`<rect x="${x}" y="24" width="15" height="58" fill="#ffffff" fill-opacity=".06"/>`).join('')}</g><path d="${HP_PATH}" fill="none" stroke="#bff7e0" stroke-opacity=".5" stroke-width="2.4"/></svg>`}
 const HP_RNG=[[27,62],[25,74],[25,74],[27,62]];
 function hpSVG(fr,uid){const xs=[18,35,52,69],full=fr.every(v=>v>=1);
   return `<defs><linearGradient id="hpg${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0b8"/><stop offset="1" stop-color="#17a07a"/></linearGradient><clipPath id="hpc${uid}"><path d="${HP_PATH}"/></clipPath></defs>
@@ -6010,10 +6054,41 @@ function hpSVG(fr,uid){const xs=[18,35,52,69],full=fr.every(v=>v>=1);
   <path d="${HP_PATH}" fill="none" stroke="#bff7e0" stroke-opacity="${full?.9:.45}" stroke-width="1.8"/>`}
 let hpLast='';
 function hpHint(){const b=$('hpBtn');if(!b)return;let n=0;try{n=+localStorage.getItem('syncope.hptap')||0}catch(e){}b.classList.toggle('hp-beat',n<3)}
-function renderHP(){const el=$('hpLogo');if(!el)return;let parts;try{parts=hpParts()}catch(e){return}const fr=parts.map(p=>p.v),key=fr.map(v=>v.toFixed(2)).join();
-  hpHint();if(key===hpLast)return;const before=hpLast?hpLast.split(',').filter(v=>+v>=1).length:null;hpLast=key;el.innerHTML=hpSVG(fr,'H');
+function renderHP(){const el=$('hpLogo');if(!el)return;let parts;try{parts=hpParts()}catch(e){return}const fr=parts.map(p=>p.v),tk=todayKey(),key=tk+'|'+fr.map(v=>v.toFixed(2)).join();
+  hpHint();if(key===hpLast)return;const [lk,lv]=hpLast.split('|'),prev=lk===tk&&lv?lv.split(',').map(Number):null,before=prev?prev.filter(v=>v>=1).length:null;hpLast=key;el.innerHTML=hpSVG(fr,'H');
   const n=fr.filter(v=>v>=1).length,btn=$('hpBtn');if(btn){btn.setAttribute('aria-label',`Today's heart: ${n} of 4 full`);btn.classList.toggle('hp-max',n===4);
-    if(before!=null&&n>before){btn.classList.remove('hp-pop');void btn.offsetWidth;btn.classList.add('hp-pop');if(n===4)toast('Max heart today. Every bar is full ❤️')}}}
+    if(before!=null&&n>before){btn.classList.remove('hp-pop');void btn.offsetWidth;btn.classList.add('hp-pop');hpCheer(parts,prev)}}}
+/* a stripe filling is a small moment; all four is the big one. Each fires once a day, and a log toast that already said it counts */
+function hpCheer(P,prev){const n=P.filter(p=>p.v>=1).length,nw=P.map((p,i)=>p.v>=1&&prev[i]<1?i:-1).filter(i=>i>=0);
+  if(S.active&&nw.some(i=>P[i].id==='move'))return;/* a workout in progress: the moment comes when it's finished */
+  setTimeout(()=>{try{if(n===4){nw.forEach(i=>rewardOnce('hp_'+P[i].id));if(rewardOnce('hp_all')){dlSave();reward(`<svg class="rw-hpf" viewBox="0 0 100 100" aria-hidden="true">${hpSVG([1,1,1,1],'RW')}</svg>`,'Full heart','You won the day.')}return}
+    const fr=nw.filter(i=>rewardOnce('hp_'+P[i].id));if(!fr.length)return;dlSave();const i=fr[fr.length-1];reward(hpMini(i,1,'rw-hp'),`${P[i].l} stripe full`,`${n} of 4 today${n===3?` · ${P.find(p=>p.v<1).l.toLowerCase()} is the last one`:''}`)}catch(e){}},1000)}
+/* one short line for a log toast: what it just did to the heart */
+const hpTL=s=>s?`<small class="hp-tl">${s}</small>`:'';
+function hpNow(k){try{return hpParts(k)}catch(e){return null}}
+function hpFullMsg(P,i,k){const n=P.filter(p=>p.v>=1).length;if(k===todayKey()&&rewardOnce('hp_'+P[i].id))dlSave();return `${P[i].l} stripe full · ${n} of 4`}
+function hpFoodLine(k,t0,hp0){try{const P=hpParts(k),t=dayTotals(k),g=goalsFor(k),dp=Math.round(t.p-t0.p);if(!hp0)return '';
+  if(P[1].v>=1&&hp0[1].v<1)return hpFullMsg(P,1,k);
+  if(P[0].v>=1&&hp0[0].v<1)return hpFullMsg(P,0,k);
+  if(dp>0&&P[1].v<1)return `+${dp} g protein · ${Math.max(1,Math.ceil(g.p-t.p))} g to fill your protein stripe`;
+  return ''}catch(e){return ''}}
+function hpWaterLine(k,hp0){try{const P=hpParts(k);if(P[2].v>=1)return hp0&&hp0[2].v<1?hpFullMsg(P,2,k):'Water stripe full';
+  const hd=hydDay(k),wt=hydPlan(k).oz.total;return `${fmt(Math.max(1,Math.ceil(wt-hd.oz)))} oz to fill your water stripe`}catch(e){return ''}}
+/* food suggestions say which stripe they help. Protein only: food is never pushed past the target to "fill" it */
+let hpTagC=null;
+function hpTag(p,kc){try{if(!hpTagC){const g=goalsFor(S.day),t=dayTotals(S.day);hpTagC={rp:(g.p||0)-t.p,rk:goalKcal(g)-t.k};setTimeout(()=>{hpTagC=null},0)}const C=hpTagC;p=+p||0;kc=+kc||0;
+  if(C.rp<=0||p<5||kc>Math.max(C.rk,0)+60)return '';const fills=p>=C.rp;if(!fills&&!(p>=20&&p*4>=kc*.3))return '';
+  return `<em class="hp-tag">${hpMini(1,1,'hp-ti')}${fills?'Fills protein':'Helps protein'}</em>`}catch(e){return ''}}
+/* full-heart days, read from the log itself (no stored copy). A day needs food logged to be full, so only logged days are checked */
+function hpFull(k){try{return hpParts(k).every(p=>p.v>=1)}catch(e){return false}}
+function hpStreaks(){const tk=todayKey(),ks=Object.keys(S.days||{}).filter(k=>k<=tk&&(S.days[k]||[]).length).sort(),full=new Set(ks.filter(hpFull));
+  let best=0,run=0,last=null;ks.forEach(k=>{if(full.has(k)){run=last&&addDays(last,1)===k?run+1:1;last=k;best=Math.max(best,run)}});
+  let cur=0,k=full.has(tk)?tk:addDays(tk,-1);while(full.has(k)&&cur<3650){cur++;k=addDays(k,-1)}
+  return {cur,best,full}}
+function hpWeekCard(keys,isWeek){try{const tk=todayKey(),{cur,best,full}=hpStreaks(),past=keys.filter(k=>k<=tk),nF=past.filter(k=>full.has(k)).length;
+  const row=isWeek?`<div class="hpw-row">${keys.map((k,i)=>{const fut=k>tk,fr=fut?[0,0,0,0]:hpParts(k).map(p=>p.v),d=parseKey(k);return `<button type="button" class="hpw-d${fut?' fut':''}${k===tk?' tod':''}" data-day="${k}" aria-label="${niceDate(k,{weekday:'long'})}: ${fut?'not yet':fr.filter(v=>v>=1).length+' of 4 full'}"><svg viewBox="0 0 100 100" aria-hidden="true">${hpSVG(fr,'W'+i)}</svg><span>${DOW[d.getDay()].slice(0,1)}</span></button>`}).join('')}</div>`:'';
+  return `<div class="card hpw"><div class="hpw-h"><b>${isWeek?'Hearts this week':'Hearts this month'}</b><span class="num">${nF} full</span></div>${row}
+    <div class="hpw-s"><span>Full-heart streak <b class="num">${cur} day${cur===1?'':'s'}</b></span><span>Best <b class="num">${best}</b></span></div></div>`}catch(e){return ''}}
 function openHP(){try{localStorage.setItem('syncope.hptap',String((+localStorage.getItem('syncope.hptap')||0)+1))}catch(e){}hpHint();const parts=hpParts(),n=parts.filter(p=>p.v>=1).length;
   sheet(`<div class="hp-sh"><svg class="hp-big" viewBox="0 0 100 100" aria-hidden="true">${hpSVG(parts.map(p=>p.v),'S')}</svg>
     <h2>${n===4?'Full heart today':`${n} of 4 full`}</h2><p class="note" style="margin:0;text-align:center">Each stripe is one goal. It fills as you hit it. Fill all four every day.</p>
@@ -6383,7 +6458,7 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-gymsched]')){e.
 setTimeout(()=>{try{FIND.push(['Schedule a workout','schedule plan calendar workout session time future train',()=>openGymSchedule()]);FIND_META.push(['Train','cal'])}catch(e){}},0);
 document.addEventListener('click',e=>{if(e.target.closest('[data-gymplan]')){e.preventDefault();openGymPlan()}
   if(e.target.closest('[data-gymfood]')){setView('today');setTimeout(()=>{const f=$('foodIn');if(f){f.scrollIntoView({block:'center'});f.focus()}},150);return}
-  const d=e.target.closest('[data-gymdrink]');if(d){hydAdd(+d.dataset.gymdrink,'water',0,todayKey());renderAll();toast(`+${d.dataset.gymdrink} oz water`)}});
+  const d=e.target.closest('[data-gymdrink]');if(d){const ln=hydAdd(+d.dataset.gymdrink,'water',0,todayKey());renderAll();toast(`+${d.dataset.gymdrink} oz water${hpTL(ln)}`)}});
 setInterval(()=>{if(document.visibilityState==='visible'&&gymGet()){if(S.view==='train'||S.view==='today')renderAll()}},60000);
 function hydTypes(k){const d=hydS().day[k]||{};if(Array.isArray(d.types))return {types:d.types.filter(t=>HYD_TYPES.some(x=>x[0]===t&&t!=='rest')),auto:false};
   if(d.type)return {types:d.type==='rest'?[]:[d.type],auto:false};const a=hydAutoTypes(k),g=gymGet(k);if(g&&g.t&&!a.includes(g.t))a.push(g.t);return {types:a,auto:true}}
@@ -6404,8 +6479,9 @@ function hydPlan(k=S.day){const H=hydS(),d=H.day[k]||{},ty=hydTypes(k),hot=!!d.h
   return {type,types,label:hydLabel(types),segs,hot,auto:ty.auto,base,sweat,heat,total,mins,rate,kg,naGoal,logged:segs.some(x=>x.logged),
     oz:{total:ozR(base/ML_OZ)+segs.reduce((a,x)=>a+x.oz,0)+ozR(heat/ML_OZ)+(+d.rehydOz||0),base:ozR(base/ML_OZ),sweat:ozR((sweat+heat)/ML_OZ),pre:[ozR(5*kg/ML_OZ),ozR(7*kg/ML_OZ)],during:mins>=45?[4,8]:null,wake:16}}}
 function hydDay(k=S.day){const l=hydS().log[k]||[];return {list:l,oz:l.reduce((a,x)=>a+(+x.oz||0),0),na:l.reduce((a,x)=>a+(+x.na||0),0)}}
-function hydAdd(oz,kind='water',na=0,k=S.day,label){oz=Math.round(+oz*10)/10;if(!(oz>0)&&!(na>0))return;const H=hydS();(H.log[k]=H.log[k]||[]).push({id:uid(),t:Date.now(),oz,kind,...(na?{na:Math.round(na)}:{}),...(label?{l:label}:{})});save();
-  const p=hydPlan(k),d=hydDay(k);try{if(k===todayKey()&&d.oz>=p.oz.total&&d.oz-oz<p.oz.total&&rewardOnce('water'))setTimeout(()=>{reward('💧','Water goal hit',`${fmt(d.oz)} of ${fmt(p.oz.total)} oz today.`);dlFx($('hpBtn'),'dl-glow');dlSave()},900)}catch(e){}toast(`+${r1(oz)} oz · ${fmt(d.oz)} of ${fmt(p.oz.total)} oz today`,()=>{const L=H.log[k];L.pop();save();renderHyd();renderTodayRows()});renderHyd();renderTodayRows()}
+function hydAdd(oz,kind='water',na=0,k=S.day,label){oz=Math.round(+oz*10)/10;if(!(oz>0)&&!(na>0))return;const H=hydS(),hp0=hpNow(k);(H.log[k]=H.log[k]||[]).push({id:uid(),t:Date.now(),oz,kind,...(na?{na:Math.round(na)}:{}),...(label?{l:label}:{})});save();
+  const p=hydPlan(k),d=hydDay(k);try{if(k===todayKey()&&d.oz>=p.oz.total&&d.oz-oz<p.oz.total&&rewardOnce('water')){dlSave();setTimeout(()=>dlFx($('hpBtn'),'dl-glow'),900)}}catch(e){}
+  const ln=oz>0?hpWaterLine(k,hp0):'';toast(`+${r1(oz)} oz · ${fmt(d.oz)} of ${fmt(p.oz.total)} oz today${hpTL(ln)}`,()=>{const L=H.log[k];L.pop();save();renderHyd();renderTodayRows();renderHP()});renderHyd();renderTodayRows();renderHP();return ln}
 async function scanBottle(file){
   const st=$('hyScanSt');if(st){st.className='status';st.textContent='Claude is sizing up your bottle…'}
   try{const u=await shrinkImage(file),t=await aiAsk(u,`This photo shows a drink container (water bottle, tumbler, jug, glass or cup). Work out how many US fluid ounces it holds when full. Read any printed capacity or recognize the brand and model (for example Stanley Quencher 40 oz, Owala FreeSip 24 oz, Hydro Flask 32 oz, gallon jug 128 oz, Nalgene 32 oz, standard 16.9 oz water bottle). If nothing is printed or recognizable, estimate from its proportions and nearby objects. Also estimate roughly what fraction is filled right now.
@@ -6738,7 +6814,7 @@ function decorate(){const sec=$('v-'+S.view);if(!sec)return;const pn=sec.querySe
 /* ================= QUICK TILES: the things you check all day, one tap away on Today ================= */
 function qRing(fr,col){const R=17,C=2*Math.PI*R,f=Math.max(0,Math.min(1,fr||0));return `<svg class="qr" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="22" cy="22" r="${R}" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${f*C} ${C}" transform="rotate(-90 22 22)" style="transition:stroke-dasharray .6s var(--ease-out)"/></svg>`}
 function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayKey();
-  const hd=hydDay(k),hp=hydPlan(k),wo=r0(hd.oz),wt=hp.oz.total;
+  const hd=hydDay(k),hp=hydPlan(k),wo=r0(hd.oz),wt=hp.oz.total,HPq=hpNow(k);
   const h=hv(k),stepGoal=+((S.prefs||{}).stepGoal)||10000;
   const done=(S.workouts||[]).filter(w=>w.date===k),dv=devList().filter(d=>d.date===k&&!done.some(w=>w.devId===d.id)),nx=k===tk?tplNext():null;
   let tr;
@@ -6749,14 +6825,14 @@ function renderQuick(){const el=$('quick');if(!el)return;const k=S.day,tk=todayK
   else tr={v:k===tk?'Start':'Rest',s:k===tk?'Tap to log a workout':'No training logged',fr:0,go:k===tk?'start':'train'};
   const rec=h.recovery,sl=h.sleep;
   const tiles=[
-    {id:'water',c:'var(--j-sapphire)',ic:GI.drop||'',lab:'Water',v:`${fmt(wo)}<small>/${fmt(wt)} oz</small>`,s:wo>=wt?'Goal hit 🎉':`${fmt(Math.max(0,wt-wo))} oz to go`,fr:wt?wo/wt:0,act:(()=>{const b=hydDefault(),oz=b?r1(b.oz):12;return `<button class="q-add" data-qwater aria-label="Add ${oz} oz of water${b?' ('+esc(b.name)+')':''}. Hold for more sizes">+${oz}</button>`})()},
-    {id:'train',c:'var(--pro)',lab:'Training',v:tr.v,s:tr.s,fr:tr.fr,hot:tr.hot},
+    {id:'water',c:'var(--j-sapphire)',ic:GI.drop||'',lab:`${HPq?hpMini(2,HPq[2].v,'hp-ic'):''}Water`,v:`${fmt(wo)}<small>/${fmt(wt)} oz</small>`,s:wo>=wt?'<i class="hp-full" style="font-style:normal">✓ Stripe full</i>':`${fmt(Math.max(0,wt-wo))} oz to fill`,fr:wt?wo/wt:0,act:(()=>{const b=hydDefault(),oz=b?r1(b.oz):12;return `<button class="q-add" data-qwater aria-label="Add ${oz} oz of water${b?' ('+esc(b.name)+')':''}. Hold for more sizes">+${oz}</button>`})()},
+    {id:'train',c:'var(--pro)',lab:`${HPq?hpMini(3,HPq[3].v,'hp-ic'):''}Training`,v:tr.v,s:tr.s,fr:tr.fr,hot:tr.hot},
     {id:'rec',c:'var(--good)',lab:h.recovery!=null&&h.ouraReady?'Readiness':h.garminBB?'Body Battery':'Recovery',v:rec!=null?`${rec}<small>%</small>`:'—',s:sl!=null?`${sl}h sleep${h.hrv!=null?` · HRV ${h.hrv}`:''}`:'Connect a wearable',fr:rec!=null?rec/100:0},
     {id:'steps',c:'var(--carb)',lab:'Steps',v:h.steps!=null?fmt(h.steps):'—',s:h.steps!=null?(h.steps>=stepGoal?'Goal hit 🎉':`${fmt(stepGoal-h.steps)} to ${fmt(stepGoal/1000)}k`):'Syncs from your watch',fr:h.steps!=null?h.steps/stepGoal:0}];
   el.innerHTML=tiles.map(t=>`<div class="qt${t.hot?' hot':''}" role="button" tabindex="0" data-q="${t.id}" style="--c:${t.c}">${qRing(t.fr,t.c)}<div class="qt-t"><span>${t.lab}</span><b class="num">${t.v}</b><em>${t.s}</em></div>${t.act||''}</div>`).join('');
   el.dataset.go=tr.go}
 $('quick').addEventListener('click',e=>{
-  if(e.target.closest('[data-qwater]')){e.stopPropagation();if(qwHeld){qwHeld=false;return}const d=hydDefault(),oz=d?r1(d.oz):12;hydAdd(oz,d?d.kind||'water':'water',0,S.day,d?d.name:undefined);renderQuick();toast(`+${oz} oz ${d?esc(d.name):'water'}`,()=>{const L=hydS().log[S.day]||[];L.pop();save();renderQuick();renderTodayRows()});return}
+  if(e.target.closest('[data-qwater]')){e.stopPropagation();if(qwHeld){qwHeld=false;return}const d=hydDefault(),oz=d?r1(d.oz):12;const ln=hydAdd(oz,d?d.kind||'water':'water',0,S.day,d?d.name:undefined);renderQuick();toast(`+${oz} oz ${d?esc(d.name):'water'}${hpTL(ln)}`,()=>{const L=hydS().log[S.day]||[];L.pop();save();renderQuick();renderTodayRows();renderHP()});return}
   const t=e.target.closest('[data-q]');if(!t)return;const q=t.dataset.q;
   if(q==='water')openPage('hyd');else if(q==='train'){const g=$('quick').dataset.go||'';if(g.startsWith('dev:'))openDevWorkout(g.slice(4));else if(g==='start'&&!S.active){setView('train');openStart()}else setView('train')}
   else if(q==='rec')openPage('health');else if(q==='steps')openPage('health')});
@@ -8315,7 +8391,7 @@ function reward(icon,title,sub){const r=$('toastRoot');clearTimeout(toastT);
   try{navigator.vibrate&&navigator.vibrate(18)}catch(e){}toastT=setTimeout(()=>r.innerHTML='',3200)}
 function rewardOnce(key){S.prefs.rw=S.prefs.rw||{};const d=todayKey();if(S.prefs.rw.d!==d)S.prefs.rw={d};if(S.prefs.rw[key])return false;S.prefs.rw[key]=1;return true}
 function checkRewards(k,before){if(k!==todayKey())return;const g=goalsFor(k),t=dayTotals(k);
-  if(before.p<g.p*.9&&t.p>=g.p*.9&&rewardOnce('protein'))setTimeout(()=>{reward('💪','Protein goal hit',`${r0(t.p)} g of ${r0(g.p)} g. That's what keeps the muscle.`);dlGlow('#hero .hv-mac .hm:first-child .bar');dlSave()},900);}
+  if(before.p<g.p*.9&&t.p>=g.p*.9&&t.p<g.p&&rewardOnce('protein'))setTimeout(()=>{reward(hpMini(1,t.p/g.p,'rw-hp'),'Protein stripe almost full',`${Math.max(1,Math.ceil(g.p-t.p))} g to go. That's what keeps the muscle.`);dlGlow('#hero .hv-mac .hm:first-child .bar');dlSave()},900);}
 /* ---- DS3 delight: quick, calm feedback for showing up. Never blocks input, never throws, honours reduced motion ---- */
 const DL={k:null,bars:[],just:null,pr:{}};
 function dlSave(){setTimeout(()=>{try{save()}catch(e){}},0)}
@@ -9240,9 +9316,10 @@ function finishWorkout(){
     <div class="live"><div style="--c:var(--pro)"><b>${fmtDur(end-st)}</b><span>time</span></div>${sets||!cds.length?`<div style="--c:var(--kcal)"><b data-dlc="${sets}">${sets}</b><span>sets</span></div><div style="--c:var(--fat)"><b data-dlv="${vol}">${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div>`:`<div style="--c:var(--kcal)"><b>${ct.mi?r1(ct.mi):'—'}</b><span>miles</span></div><div style="--c:var(--fat)"><b>${r0(ct.min)}</b><span>cardio min</span></div>`}<div style="--c:var(--carb)"><b>${cds.length?fmt(ct.kcal):prs.length}</b><span>${cds.length?'cardio kcal':'new PRs'}</span></div></div>
     ${cds.length?`<ul class="ml-items">${cds.map(x=>`<li><span>${esc(x.n)}</span><span class="num">${esc(cardioLine(x.cardio))}</span></li>`).join('')}</ul>`:''}
     ${prs.length?`<ul class="ml-items">${prs.map(p=>`<li><span>${esc(p.n)} <span class="pr">PR</span></span><span class="num">${r0(p.e)} lb est. 1RM <span class="dim">(was ${r0(p.prev)})</span></span></li>`).join('')}</ul>`:''}
+    ${(()=>{const P=hpNow(wk.date);if(!P||P[3].v<1)return '';const n=P.filter(p=>p.v>=1).length;return `<p class="hp-line on">${hpMini(3,1)}${n===4?'Full heart. You won the day.':`Move stripe full · ${n} of 4`}</p>`})()}
     <div class="row" style="justify-content:flex-end"><button class="primary" id="wdOk">Done</button></div>`);
   let dlFirst=false;try{dlFirst=wk.date===todayKey()&&rewardOnce('train');if(dlFirst)dlSave();const sr=$('sheetRoot');dlCount(sr.querySelector('[data-dlc]'),sets,String,400);dlCount(sr.querySelector('[data-dlv]'),vol,v=>v>=10000?r1(v/1000)+'k':fmt(v),400);dlFx(sr.querySelector('.done-badge'),'dl-pop',600);dlBuzz()}catch(e){}
-  $('wdOk').onclick=()=>{closeSheet();if(dlFirst)setTimeout(()=>{try{reward('✓','Training done','Your move bar is full today.');dlFx($('hpBtn'),'dl-glow')}catch(e){}},250)};
+  $('wdOk').onclick=()=>{closeSheet();renderHP();if(dlFirst)setTimeout(()=>{try{const P=hpNow(todayKey()),n=P?P.filter(p=>p.v>=1).length:0;rewardOnce('hp_move');if(n===4&&rewardOnce('hp_all'))reward(`<svg class="rw-hpf" viewBox="0 0 100 100" aria-hidden="true">${hpSVG([1,1,1,1],'RW')}</svg>`,'Full heart','You won the day.');else reward(hpMini(3,1,'rw-hp'),'Move stripe full',n?`${n} of 4 today`:'');dlSave();dlFx($('hpBtn'),'dl-glow')}catch(e){}},250)};
 }
 function openWorkout(i){
   const w=S.workouts[i];if(!w)return;
