@@ -2874,7 +2874,7 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 'use strict';
 /* Computers show the exact phone app inside a phone-sized frame (same layout, same data), unless ?desktop=1 */
 if(window.top===window&&!/[?&](inframe|desktop)=1/.test(location.search)&&Math.min(screen.width,innerWidth)>700&&!/iPhone|iPad|Android/i.test(navigator.userAgent)){
-  const src=location.pathname+(location.search?location.search+'&':'?')+'inframe=1'+location.hash;
+  const src=location.pathname+(location.search?location.search+'&':'?')+'inframe=1'+(/^#join=/.test(location.hash)?location.hash:'');try{if(location.hash&&!/^#join=/.test(location.hash))history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   document.body.innerHTML=`<div class="pf-wrap"><div class="pf-phone"><iframe class="pf-frame" src="${src}" title="Trainer" allow="camera; microphone; clipboard-read; clipboard-write; fullscreen; geolocation"></iframe></div><p class="pf-cap">Exact iPhone view · <a href="?desktop=1">open full width</a></p></div>`;
   const st=document.createElement('style');st.textContent=`html,body{margin:0;height:100%;background:#050608;overflow:hidden}.pf-wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:13px/1.4 system-ui,-apple-system,sans-serif;color:#8C92A4}.pf-phone{width:402px;height:min(874px,calc(100vh - 60px));border-radius:46px;padding:10px;background:#111318;box-shadow:0 0 0 2px #2a2e38,0 30px 80px rgba(0,0,0,.6)}.pf-frame{width:100%;height:100%;border:0;border-radius:38px;background:#0B0C10;display:block}.pf-cap a{color:#C7B6FF}`;document.head.appendChild(st);
   return}
@@ -3872,7 +3872,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.86';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.87';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -10075,7 +10075,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.add
 load(); buildFoods();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 const jm=location.hash.match(/^#join=([A-Za-z0-9]{4,10})/);if(jm){try{localStorage.setItem('syncope.join',jm[1].toUpperCase())}catch(e){}try{history.replaceState(null,'','#friends')}catch(e){}}
-applyPrefs(); setTimeout(warmOffline,3000); setTimeout(()=>{try{maybeTour()}catch(e){}},1200); setTimeout(()=>{if((S.prefs||{}).restSound==='custom')rsLoadCustom()},1500); checkBackup(); setView(jm?'friends':(location.hash.slice(1)||'today')); renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
+applyPrefs(); setTimeout(warmOffline,3000); setTimeout(()=>{try{maybeTour()}catch(e){}},1200); setTimeout(()=>{if((S.prefs||{}).restSound==='custom')rsLoadCustom()},1500); checkBackup(); setView(jm?'friends':'today');/* every open and every reload starts on Today */ renderRecent(); checkBackup(); renderProfileBtn(); if(!S.profile.onboarded)openOnb(); setTimeout(()=>syncDevices(false),600);setTimeout(async()=>{const c=socCfg();const pj=localStorage.getItem('syncope.join');if(c.on&&pj){localStorage.removeItem('syncope.join');try{const a=await socApi('add',{q:pj});toast(`You and ${esc(a.name)} are now friends`)}catch(e){toast(esc(e.message))}}if(c.on){await socPush(true);await socBoard();if(S.view==='today')renderTodayRows();if(S.view==='friends')renderFriends()}},1500);
 if(!storageOK){$('saved').textContent='Not saving — storage blocked';$('saved').style.color='var(--over)'}
 if(window.__restoredFrom){save();setTimeout(()=>toast('Your log was recovered from its automatic safety copy'),900)}
 if(loadBlocked){$('backupBanner').hidden=false;$('backupText').textContent='Trainer couldn’t read your saved log, so it paused saving to protect it. Restore from a backup in Profile → Backup & export.'}
