@@ -1284,8 +1284,8 @@ input.pf{color:var(--subtle)!important;font-weight:500!important}
 .hp-row2{display:flex;align-items:center;gap:12px}.hp-mini{flex:none;width:40px;height:38px}
 .hp-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.hp-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.hp-top b{font-size:14.5px}.hp-top em{font-style:normal;font-size:13px;font-weight:700;color:var(--fg);white-space:nowrap}.hp-top em.on{color:#3ed6a0}
 .hp-row2 .hp-d{font-size:12px}
-.hp-beat .hp-logo{animation:hpbeat 2.6s ease-in-out infinite;transform-origin:50% 55%}
-@keyframes hpbeat{0%,60%,100%{transform:scale(1)}8%{transform:scale(1.14)}16%{transform:scale(1)}24%{transform:scale(1.1)}32%{transform:scale(1)}}
+.hp-beat .hp-logo{animation:hpbeat 1.1s infinite;transform-origin:50% 55%;will-change:transform}
+@keyframes hpbeat{0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.7,.4,1)}11%{transform:scale(1.13);animation-timing-function:cubic-bezier(.5,0,.6,1)}21%{transform:scale(.99);animation-timing-function:cubic-bezier(.2,.7,.4,1)}30%{transform:scale(1.07);animation-timing-function:cubic-bezier(.5,0,.6,1)}44%,100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.hp-beat .hp-logo{animation:none}}
 .hp-rows{display:flex;flex-direction:column;gap:10px;width:100%;margin:6px 0 4px}
 /* the heart as a thread: tiny stripe icons beside each goal, one-line log notes, hearts in Progress */
@@ -2543,10 +2543,10 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 
     <div class="mbar" id="mealBar" role="group" aria-label="Log a meal"></div>
     <div id="teamCard" hidden></div>
-    <div class="upnext" id="upNext" hidden aria-live="polite"></div>
     <div class="card hero v2" id="hero"></div>
     <div class="pg-tip" id="planTip" hidden></div>
     <div class="qgrid" id="quick" aria-label="Quick look"></div>
+    <div class="upnext" id="upNext" hidden aria-live="polite"></div>
     <div id="acNudge"></div>
     <div class="card prep-card" id="prepCard" hidden></div>
     <div class="card coach" id="coach" hidden></div>
@@ -2790,6 +2790,7 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
         </div>
         <div class="flow"><div class="st final"><small>DAILY CALORIES</small><b id="gK">—</b></div></div>
         <div class="row"><button class="primary" id="gSave">Save targets</button><span class="status" id="gStatus"></span></div>
+        <button class="link" type="button" id="gReset" hidden>Go back to the plan’s numbers</button>
         <div class="facts">
           <div class="fact" style="--c:var(--pro)"><b>4</b><span>kcal/g protein</span></div>
           <div class="fact" style="--c:var(--carb)"><b>4</b><span>kcal/g carbs</span></div>
@@ -3861,7 +3862,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.89';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.90';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4631,7 +4632,7 @@ function renderWeek(){renderTip('week');
   $('wSub').textContent=dW===0?'This week':dW===-1?'Last week':dW<0?`${-dW} weeks ago`:`In ${dW} weeks`;
   $('wTitle').textContent=`${niceDate(keys[0],{month:'short',day:'numeric'})} – ${niceDate(keys[6],{month:'short',day:'numeric'})}`;
   const st=rangeStats(keys);
-  $('wTop').innerHTML=progTop(keys,true);dlRecap(ws);
+  $('wTop').innerHTML=hpWeekCard(keys,true)+progTop(keys,true);dlRecap(ws);
   $('wTiles').innerHTML=tilesHTML(st,keys.filter(k=>k<=tk).length||7);
   const gk=goalKcal(st.G),W=chartW('wChart'),H=280,L=58,Rr=10,T=24,B=36,tots=keys.map(dayTotals);
   const max=niceMax(Math.max(gk*1.15,...tots.map(t=>t.k))),y=v=>T+(H-T-B)*(1-v/max),bw=(W-L-Rr)/7;
@@ -4676,7 +4677,7 @@ function renderMonth(){renderTip('month');
   const md=(Y-+tk.slice(0,4))*12+(M-+tk.slice(5,7));
   $('mSub').textContent=md===0?'This month':md===-1?'Last month':md<0?`${-md} months ago`:`In ${md} months`;
   const st=rangeStats(keys);if($('mSplit'))$('mSplit').innerHTML=pgSplitHTML(st);
-  $('mHead').innerHTML=progTop(keys,false);
+  $('mHead').innerHTML=hpWeekCard(keys,false)+progTop(keys,false);
   $('mTiles').innerHTML=tilesHTML(st,keys.filter(k=>k<=tk).length||nDays);
   const gk=goalKcal(st.G),lead=(first.getDay()+6)%7;
   let h=['M','T','W','T','F','S','S'].map(d=>`<div class="dow">${d}</div>`).join('');
@@ -4937,10 +4938,14 @@ function applySafe(g,k){const f=safeFloor(k);if(!f)return g;const kc=g.p*4+g.c*4
   const add=f.k-kc,fAdd=Math.min(add*.3,Math.max(0,f.k*.25/9-g.f)*9);
   return {...g,c:r0(g.c+(add-fAdd)/4),f:r0(g.f+fAdd/9),safe:{from:r0(kc),to:f.k,why:f.why,tdee:f.tdee}}}
 function goalsBase(k){return applySafe(goalsBaseRaw(k),k)}
+/* Your own changes on top of the plan: grams added or taken away, kept for every week of the plan and after it. New optional field S.plan.adj. */
+function planAdj(){const a=S.plan&&S.plan.adj;return a?{p:+a.p||0,c:+a.c||0,f:+a.f||0}:{p:0,c:0,f:0}}
+function withAdj(g){const a=planAdj();if(!a.p&&!a.c&&!a.f)return g;return {...g,p:Math.max(0,r0(g.p+a.p)),c:Math.max(0,r0(g.c+a.c)),f:Math.max(0,r0(g.f+a.f)),adj:a}}
+function planOnly(k){const pi=planInfo(k);if(!pi)return null;return pi.done?{...S.plan.after}:{p:pi.wk.p,c:pi.wk.c,f:pi.wk.f}}
 function goalsBaseRaw(k){
   const pi=planInfo(k);
-  if(pi){if(pi.done)return {...S.plan.after,plan:true,after:true};
-    return {p:pi.wk.p,c:pi.wk.c,f:pi.wk.f,plan:true,week:pi.i+1,of:S.plan.N,ph:pi.wk.ph,rec:pi.rec,rw:pi.i-S.plan.N+1,rf:pi.wk.rf}}
+  if(pi){if(pi.done)return withAdj({...S.plan.after,plan:true,after:true});
+    return withAdj({p:pi.wk.p,c:pi.wk.c,f:pi.wk.f,plan:true,week:pi.i+1,of:S.plan.N,ph:pi.wk.ph,rec:pi.rec,rw:pi.i-S.plan.N+1,rf:pi.wk.rf})}
   return (S.goals&&S.goals.starter&&starterFromBody())||S.goals;
 }
 /* No plan yet and the targets were never set by hand: use maintenance from the person's own body stats
@@ -5095,7 +5100,7 @@ function splitChart(pl){
 function weeksTable(pl){
   const cur=planInfo(todayKey()),act=S.plan&&S.plan.start===pl.start;
   const pct=(w,m)=>{const sm=w.p*4+w.c*4+w.f*9||1;return r0(m/sm*100)};
-  const row=(w,i)=>`<tr ${act&&cur&&cur.i===i?'class="cur"':''}><td>${i<pl.N?i+1:'R'+(i-pl.N+1)}</td><td><span class="ph" style="--c:${PH_COL[w.ph]||'var(--muted)'}">${w.ph}</span>${w.rf?'<span class="tag" title="One higher-carb day this week">refeed</span>':''}</td><td>${niceDate(addDays(pl.start,i*7),{month:'short',day:'numeric'})}</td><td>${fmt(w.k)}</td><td>${w.p}</td><td>${w.c}</td><td>${w.f}</td><td class="dim">${pct(w,w.p*4)}/${pct(w,w.c*4)}/${pct(w,w.f*9)}</td><td>${w.w}${w.bf!=null?`<span class="dim"> · ${w.bf}%</span>`:''}</td></tr>`;
+  const A=act?planAdj():{p:0,c:0,f:0};const row=(w0,i)=>{const w=A.p||A.c||A.f?{...w0,p:Math.max(0,w0.p+A.p),c:Math.max(0,w0.c+A.c),f:Math.max(0,w0.f+A.f),k:w0.k+A.p*4+A.c*4+A.f*9}:w0;return `<tr ${act&&cur&&cur.i===i?'class="cur"':''}><td>${i<pl.N?i+1:'R'+(i-pl.N+1)}</td><td><span class="ph" style="--c:${PH_COL[w.ph]||'var(--muted)'}">${w.ph}</span>${w.rf?'<span class="tag" title="One higher-carb day this week">refeed</span>':''}</td><td>${niceDate(addDays(pl.start,i*7),{month:'short',day:'numeric'})}</td><td>${fmt(w.k)}</td><td>${w.p}</td><td>${w.c}</td><td>${w.f}</td><td class="dim">${pct(w,w.p*4)}/${pct(w,w.c*4)}/${pct(w,w.f*9)}</td><td>${w.w}${w.bf!=null?`<span class="dim"> · ${w.bf}%</span>`:''}</td></tr>`};
   return `<table class="dtable"><thead><tr><th>Wk</th><th style="text-align:left">Phase</th><th>Starts</th><th>kcal</th><th style="color:var(--pro)">P</th><th style="color:var(--carb)">C</th><th style="color:var(--fat)">F</th><th>% P/C/F</th><th>Weight · est. BF</th></tr></thead><tbody>${pl.weeks.map(row).join('')}<tr><td>Then</td><td><span class="ph" style="--c:var(--good)">Maintenance</span></td><td>${niceDate(addDays(pl.start,pl.weeks.length*7),{month:'short',day:'numeric'})}</td><td>${fmt(pl.after.p*4+pl.after.c*4+pl.after.f*9)}</td><td>${pl.after.p}</td><td>${pl.after.c}</td><td>${pl.after.f}</td><td></td><td></td></tr></tbody></table>`;
 }
 function renderPlanLive(){try{renderPlanGuide()}catch(e){}
@@ -5131,7 +5136,7 @@ function renderPlanLive(){try{renderPlanGuide()}catch(e){}
     const remainW=Math.max(1,pl.N-Math.max(0,planInfo(tk)?Math.min(planInfo(tk).i,pl.N-1):0));
     const left=pl.type==='maintain'?0:Math.max(0,(pl.type==='cut'?1:-1)*(lw2.w-pl.endW));
     const np=buildPlan({...p,wt:wAvg(lw2.k)||lw2.w,type:pl.type,lbs:left,dur:remainW,unit:'weeks',style:pl.style,start:tk,pro:pl.ppl||p.pro,breaks:pl.breaks?'on':'off'});
-    S.plan=np;save();renderAll();toast(`Plan rebuilt: ${fmt(np.weeks[0].k)} kcal this week`);
+    if(S.plan&&S.plan.adj)np.adj=S.plan.adj;S.plan=np;save();renderAll();toast(`Plan rebuilt: ${fmt(np.weeks[0].k)} kcal this week`);
   };
 }
 /* ---------- PLAN GUIDE: what your cut / maintain / bulk means, in plain words ----------
@@ -5396,15 +5401,23 @@ $('pStop').onclick=()=>{const b=$('pStop');if(!stopArmed){b.textContent='Tap aga
 
 /* manual targets */
 const gIn={p:$('gP'),c:$('gC'),f:$('gF')};
-function renderManual(){
-  if(!['gP','gC','gF'].includes(document.activeElement.id))['p','c','f'].forEach(k=>gIn[k].value=r0(S.goals[k]));
-  updGoalPreview();
-  $('gNote').textContent=S.plan?'Your plan is setting daily targets right now. These come back when the plan ends.':'Used whenever no plan is running.';
+/* the plan's own numbers right now (before your changes); a plan that starts later uses its first week */
+function planBaseNow(){if(!S.plan)return null;const b=planOnly(todayKey());if(b)return b;const w=Array.isArray(S.plan.weeks)&&S.plan.weeks[0];return w?{p:w.p,c:w.c,f:w.f}:null}
+function adjText(a){const L=[['p','Protein'],['c','Carbs'],['f','Fat']].filter(([k])=>a[k]).map(([k,l])=>`${l} ${a[k]>0?'+':'−'}${Math.abs(r0(a[k]))} g`);return L.join(' · ')}
+function renderManual(){const base=planBaseNow(),a=planAdj(),cur=base?{p:base.p+a.p,c:base.c+a.c,f:base.f+a.f}:S.goals;
+  if(!['gP','gC','gF'].includes(document.activeElement.id))['p','c','f'].forEach(k=>gIn[k].value=r0(Math.max(0,cur[k])));
+  updGoalPreview();const at=base?adjText(a):'';
+  $('gNote').textContent=base?(at?`Your plan sets these, with your changes on top for every week of the plan: ${at}.`:'Your plan sets these. Change any number and it carries through every week of your plan and onto Today.'):'Used whenever no plan is running.';
+  $('gReset').hidden=!(base&&at);
 }
 function updGoalPreview(){const p=+gIn.p.value||0,c=+gIn.c.value||0,f=+gIn.f.value||0;
   $('gPk').textContent=`${fmt(p*4)} kcal`;$('gCk').textContent=`${fmt(c*4)} kcal`;$('gFk').textContent=`${fmt(f*9)} kcal`;$('gK').textContent=`${fmt(p*4+c*4+f*9)} kcal`}
 Object.values(gIn).forEach(i=>i.oninput=updGoalPreview);
-$('gSave').onclick=()=>{S.goals={p:+gIn.p.value||0,c:+gIn.c.value||0,f:+gIn.f.value||0};save();$('gStatus').textContent='Saved';setTimeout(()=>$('gStatus').textContent='',2000);renderRecent()};
+$('gSave').onclick=()=>{const v={p:+gIn.p.value||0,c:+gIn.c.value||0,f:+gIn.f.value||0},base=planBaseNow();
+  if(base){const a={p:r0(v.p-base.p),c:r0(v.c-base.c),f:r0(v.f-base.f)};if(a.p||a.c||a.f)S.plan.adj=a;else delete S.plan.adj}else S.goals=v;
+  save();renderAll();renderManual();const g=goalsFor(todayKey());$('gStatus').textContent='Saved';setTimeout(()=>$('gStatus').textContent='',2000);
+  toast(`Saved · ${fmt(goalKcal(g))} kcal today`)};
+$('gReset').onclick=()=>{if(S.plan)delete S.plan.adj;save();renderAll();renderManual();toast('Back to your plan’s numbers')};
 function renderDataNote(){
   const nd=Object.keys(S.days).filter(k=>(S.days[k]||[]).length).length,ne=Object.values(S.days).reduce((a,l)=>a+l.length,0);
   $('dataNote').textContent=`${nd} day${nd===1?'':'s'} and ${ne} entr${ne===1?'y':'ies'} logged, ${Object.keys(S.weights).length} weigh-ins, ${S.custom.length} saved food${S.custom.length===1?'':'s'}. Everything lives in this browser on this device. Download a backup every week or so; clearing browser data or switching browsers erases it. ${S.lastBackup?`Last backup: ${new Date(S.lastBackup).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}.`:'No backup yet.'}`;
@@ -6059,7 +6072,7 @@ function hpSVG(fr,uid){const xs=[18,35,52,69],full=fr.every(v=>v>=1);
   <g clip-path="url(#hpc${uid})">${xs.map((x,i)=>{const v=fr[i],[t0,b0]=HP_RNG[i],h=v>=1?58:(b0-t0)*v,y=v>=1?24:b0-h;return `<rect x="${x}" y="24" width="15" height="58" fill="#3ed6a0" fill-opacity=".13"/><rect class="hp-bar" x="${x}" y="${y}" width="15" height="${h}" fill="url(#hpg${uid})" fill-opacity="${v>=1?1:.55}"/>`}).join('')}</g>
   <path d="${HP_PATH}" fill="none" stroke="#bff7e0" stroke-opacity="${full?.9:.45}" stroke-width="1.8"/>`}
 let hpLast='';
-function hpHint(){const b=$('hpBtn');if(!b)return;let n=0;try{n=+localStorage.getItem('syncope.hptap')||0}catch(e){}b.classList.toggle('hp-beat',n<3)}
+function hpHint(){const b=$('hpBtn');if(!b)return;let n=0;try{n=+localStorage.getItem('syncope.hptap')||0}catch(e){}b.classList.add('hp-beat')}
 function renderHP(){const el=$('hpLogo');if(!el)return;let parts;try{parts=hpParts()}catch(e){return}const fr=parts.map(p=>p.v),tk=todayKey(),key=tk+'|'+fr.map(v=>v.toFixed(2)).join();
   hpHint();if(key===hpLast)return;const [lk,lv]=hpLast.split('|'),prev=lk===tk&&lv?lv.split(',').map(Number):null,before=prev?prev.filter(v=>v>=1).length:null;hpLast=key;el.innerHTML=hpSVG(fr,'H');
   const n=fr.filter(v=>v>=1).length,btn=$('hpBtn');if(btn){btn.setAttribute('aria-label',`Today's heart: ${n} of 4 full`);btn.classList.toggle('hp-max',n===4);
@@ -6091,10 +6104,11 @@ function hpStreaks(){const tk=todayKey(),ks=Object.keys(S.days||{}).filter(k=>k<
   let best=0,run=0,last=null;ks.forEach(k=>{if(full.has(k)){run=last&&addDays(last,1)===k?run+1:1;last=k;best=Math.max(best,run)}});
   let cur=0,k=full.has(tk)?tk:addDays(tk,-1);while(full.has(k)&&cur<3650){cur++;k=addDays(k,-1)}
   return {cur,best,full}}
+document.addEventListener('click',e=>{const b=e.target.closest('.hpw-d[data-day]');if(!b||b.classList.contains('fut'))return;S.day=b.dataset.day;setView('today')});
 function hpWeekCard(keys,isWeek){try{const tk=todayKey(),{cur,best,full}=hpStreaks(),past=keys.filter(k=>k<=tk),nF=past.filter(k=>full.has(k)).length;
   const row=isWeek?`<div class="hpw-row">${keys.map((k,i)=>{const fut=k>tk,fr=fut?[0,0,0,0]:hpParts(k).map(p=>p.v),d=parseKey(k);return `<button type="button" class="hpw-d${fut?' fut':''}${k===tk?' tod':''}" data-day="${k}" aria-label="${niceDate(k,{weekday:'long'})}: ${fut?'not yet':fr.filter(v=>v>=1).length+' of 4 full'}"><svg viewBox="0 0 100 100" aria-hidden="true">${hpSVG(fr,'W'+i)}</svg><span>${DOW[d.getDay()].slice(0,1)}</span></button>`}).join('')}</div>`:'';
-  return `<div class="card hpw"><div class="hpw-h"><b>${isWeek?'Hearts this week':'Hearts this month'}</b><span class="num">${nF} full</span></div>${row}
-    <div class="hpw-s"><span>Full-heart streak <b class="num">${cur} day${cur===1?'':'s'}</b></span><span>Best <b class="num">${best}</b></span></div></div>`}catch(e){return ''}}
+  return `<div class="card hpw"><div class="hpw-h"><b>${isWeek?'Days won this week':'Days won this month'}</b><span class="num">${nF} of ${past.length||keys.length}</span></div>${row}
+    <div class="hpw-s"><span>Win streak <b class="num">${cur} day${cur===1?'':'s'}</b></span><span>Best <b class="num">${best}</b></span></div></div>`}catch(e){return ''}}
 function openHP(){try{localStorage.setItem('syncope.hptap',String((+localStorage.getItem('syncope.hptap')||0)+1))}catch(e){}hpHint();const parts=hpParts(),n=parts.filter(p=>p.v>=1).length;
   sheet(`<div class="hp-sh"><svg class="hp-big" viewBox="0 0 100 100" aria-hidden="true">${hpSVG(parts.map(p=>p.v),'S')}</svg>
     <h2>${n===4?'Full heart today':`${n} of 4 full`}</h2><p class="note" style="margin:0;text-align:center">Each stripe is one goal. It fills as you hit it. Fill all four every day.</p>
@@ -6259,7 +6273,7 @@ function renderMe(){
         <button type="button" class="me4-nm" data-pg="account"><b>${esc(S.profile.name||'Your profile')}</b><span>${ac.un?'@'+esc(ac.un):'Not signed in'} · ${planLabel()}</span></button>
         <button type="button" class="me4-badge" data-pg="member">Free</button></div>
       <div class="me4-st">
-        <button type="button" data-ga="friends"><b class="num">${sk}</b><span>day streak</span></button>
+        <button type="button" data-ga="friends"><b class="num">${(()=>{try{return hpStreaks().full.size}catch(e){return 0}})()}</b><span>days won</span></button>
         <button type="button" data-pg="weigh"><b class="num">${lw?r1(lw.w):'—'}</b><span>${wAge!=null&&wAge>3?'weigh in':'lb'}</span></button>
         <button type="button" data-ga="templates"><b class="num">${nWk}</b><span>workouts</span></button>
         <button type="button" data-ga="friends"><b class="num">${sc.on?'#'+rank:'—'}</b><span>${sc.on?'this week':'rank'}</span></button></div>
@@ -6578,7 +6592,7 @@ function renderHyd(){const el=$('pg-hyd');if(!el||!pgStack||!pgStack.includes('h
   tips.push([`Rest of the day`,`Spread the other ${fmt(Math.max(0,p.oz.total-p.oz.wake-(p.type!=='rest'?p.oz.pre[1]:0)))} oz through the day. Front-load it so you aren’t up at night; ease off 1–2 hours before bed.`]);
   const na=p.naGoal?`Plan on about <b>${fmt(p.naGoal)} mg sodium</b> around today’s training (300–600 mg per hour for sessions over an hour or in heat). You’ve had <b>${fmt(d.na)} mg</b> from drinks so far.`:`Today doesn’t need extra electrolytes; normal meals cover it. Add them if you sweat heavily, see salt stains on your shirt, or train over an hour or in heat.`;
   el.innerHTML=(k===todayKey()?gymCardHTML(k):'')+`<button type="button" class="mb-up" data-pg="fuel"><span>Fueling & timing: when to eat what</span><b>Open</b></button><div class="card hy-top"><div class="hy-ring" style="--p:${pct}"><div><b class="num">${fmt(d.oz)}</b><span>of ${fmt(p.oz.total)} oz</span></div></div>
-      <div class="hy-sum"><div class="eyebrow">${k===todayKey()?'Today':esc(niceDate(k,{weekday:'short',month:'short',day:'numeric'}))} · ${esc(p.label)}${p.hot?' · hot':''}</div><h2>${left?`${fmt(left)} oz to go`:'Target hit 💧'}</h2>
+      <div class="hy-sum"><div class="eyebrow">${k===todayKey()?'Today':esc(niceDate(k,{weekday:'short',month:'short',day:'numeric'}))} · ${esc(p.label)}${p.hot?' · hot':''}</div><h2>${left?`${fmt(left)} oz to go`:'Water stripe full'}</h2>
       <p class="note">${fmt(p.oz.base)} oz baseline for ${kgTxt}${p.segs.map(x=>` + ${fmt(x.oz)} oz for ${x.mins} min of ${esc(x.label.toLowerCase())}${x.logged?' (logged)':''}`).join('')}${p.heat?` + ${fmt(ozR(p.heat/ML_OZ))} oz for the heat`:''}.${d.na?` Sodium from drinks: ${fmt(d.na)} mg.`:''}</p></div></div>
     <div class="card hy-add"><div class="glabel" style="margin:0 0 8px">Add water</div>
       <div class="hy-q" id="hyQ">${H.shortcuts.map(b=>`<button type="button" class="hy-b mine${H.defaultShortcut===b.id?' def':''}" data-boz="${b.id}" aria-label="Add ${esc(b.name)}, ${r1(b.oz)} oz"><b>+${r1(b.oz)}</b><span>${esc(b.name)}</span></button>`).join('')}${[8,12,16,24,32].map(v=>`<button type="button" class="hy-b" data-oz="${v}"><b>+${v}</b><span>oz</span></button>`).join('')}<button type="button" class="hy-b plus" id="hyAmt" aria-label="Custom amount"><b>+</b><span>Custom</span></button></div>
@@ -6725,7 +6739,7 @@ async function renderReport(){const el=$('pg-report');if(!el)return;S.repYM=S.re
     :`<p class="note">Not enough fully logged days yet (needs 5+ days where most food matches the USDA database). Keep logging and this fills in.</p>`;
   el.innerHTML=`<div class="wn-acts rp-months">${months.map(x=>{const [y,m]=x.split('-').map(Number);return `<button class="chip" type="button" data-ym="${x}" aria-pressed="${x===ym}">${MON[m-1].slice(0,3)}${y!==+todayKey().slice(0,4)?' '+y:''}</button>`}).join('')}</div>
     <div class="card rp-hd"><div class="eyebrow">${cur?'Month so far':'Monthly report'}</div><h2>${title}</h2>
-      <div class="live">${tile(`${R.foodDays}/${R.daysIn}`,'food days','--kcal')}${tile(R.sessions,'workouts','--pro')}${tile(R.sleepN?r1(R.sleepAvg)+'h':'—','avg sleep','--good')}${tile(R.hyDays?fmt(R.hyAvg)+' oz':'—','avg water','--fat')}</div></div>
+      <div class="live">${tile(`${(R.keys||[]).filter(k=>k<=todayKey()&&hpFull(k)).length}/${R.daysIn}`,'days won','--good')}${tile(R.sessions,'workouts','--pro')}${tile(R.sleepN?r1(R.sleepAvg)+'h':'—','avg sleep','--good')}${tile(R.hyDays?fmt(R.hyAvg)+' oz':'—','avg water','--fat')}</div></div>
     <div class="card"><div class="glabel" style="margin:0 0 8px">✅ What went well</div>${R.wins.length?`<ul class="rp-l">${R.wins.map(li).join('')}</ul>`:'<p class="note" style="margin:0">Nothing stood out as a clear win this month. The list below is where to start.</p>'}</div>
     <div class="card"><div class="glabel" style="margin:0 0 8px">🎯 What to improve</div>${R.imps.length?`<ul class="rp-l">${R.imps.map(li).join('')}</ul>`:`<p style="margin:0"><b>Honestly, nothing major.</b> Every number we track was on target. Keep doing what you’re doing.</p>`}</div>
     <div class="card"><div class="glabel" style="margin:0 0 8px">Nutrition</div>${R.foodDays?`<ul class="ml-items"><li><span>Calories</span><span class="num">${fmt(R.kAvg)} <span class="dim">/ ${fmt(R.kGoal)} kcal</span></span></li><li><span>Protein</span><span class="num">${r0(R.pAvg)} <span class="dim">/ ${r0(R.pGoal)} g · hit ${R.pHit}/${R.foodDays} days</span></span></li><li><span>Carbs</span><span class="num">${r0(R.cAvg)} <span class="dim">/ ${r0(R.cGoal)} g</span></span></li><li><span>Fat</span><span class="num">${r0(R.fAvg)} <span class="dim">/ ${r0(R.fGoal)} g</span></span></li><li><span>Days within 10% of calories</span><span class="num">${R.kIn}/${R.foodDays}</span></li>${R.wChg!=null?`<li><span>Weight change</span><span class="num">${R.wChg>0?'+':''}${r1(R.wChg)} lb</span></li>`:''}${R.alcDays?`<li><span>Alcohol</span><span class="num">${r1(R.alcDrinks)} drinks <span class="dim">· ${R.alcDays} days · ${r1(R.alcWeek)}/week</span></span></li>`:''}</ul>`:'<p class="note" style="margin:0">No food logged this month.</p>'}</div>
@@ -8865,7 +8879,7 @@ function renderPlanRows(){
   const row=(o)=>`<button type="button" ${o.pg?`data-pg="${o.pg}"`:`data-ga="${o.ga}"`}><span>${o.t}</span>${o.v?`<em${o.w?' class="warn"':''}>${o.v}</em>`:''}</button>`;
   el.innerHTML=`<div class="card-h"><h2>Plan settings</h2></div>`+row({pg:'body',t:'Body metrics',v:bl||'Not set',w:!bl})
     +row({pg:'weigh',t:'Weigh-ins',v:lw?`${r1(lw.w)} lb`:'None yet'})
-    +row({pg:'targets',t:'Daily targets',v:S.plan?'Set by plan':fmt(goalKcal(S.goals))+' kcal'})
+    +row({pg:'targets',t:'Daily targets',v:S.plan?(adjText(planAdj())?'Plan + your changes':'Set by plan'):fmt(goalKcal(S.goals))+' kcal'})
     +row({ga:'report',t:'Monthly reports'})
     +row({pg:'method',t:'The science'})
     +row({pg:'member',t:'Membership',v:'Free'});
@@ -9091,7 +9105,7 @@ function renderTrain(){
   $('trTiles').className='card statstrip';
   if($('gymSlot'))$('gymSlot').innerHTML=trPrimeHTML(nx);
   $('trTiles').innerHTML=`<div><b class="c-p">${fWk.length}</b><span>workouts</span></div><div><b>${sets}</b><span>hard sets</span></div><div><b>${vol>=10000?r1(vol/1000)+'k':fmt(vol)}</b><span>lb volume</span></div><div><b style="color:var(--carb)">${prs}</b><span>new PRs</span></div><p class="ss-cap">This week${burn?` · ${fmt(burn)} kcal burned on your watch`:''}</p>`;
-  $('trSub').textContent=fWk.length?`${fWk.length} workout${fWk.length>1?'s':''} this week`:'Lifts and workouts';
+  {let mv=false;try{mv=hpParts(todayKey()).some(p=>p.id==='move'&&p.v>=1)}catch(e){}$('trSub').textContent=(fWk.length?`${fWk.length} workout${fWk.length>1?'s':''} this week`:'Lifts and workouts')+(mv?' · Move stripe full':'')}
   // muscle sets
   const cnt={};inWk.forEach(w=>w.ex.forEach(x=>{const m=musOf(x.n);cnt[m]=(cnt[m]||0)+x.sets.length}));
   const max=Math.max(24,...Object.values(cnt));
