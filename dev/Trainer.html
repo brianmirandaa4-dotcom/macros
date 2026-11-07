@@ -2520,6 +2520,20 @@ html.bigtext .sheet{max-height:calc((var(--vvh,100vh) - env(safe-area-inset-top,
 .glist:not(.tgrid) .gr:active,.entry:active,.hist button:active{transform:none!important;opacity:1!important;background:var(--s2)}
 #sheetRoot .glist .gr .gt>span{white-space:normal;overflow:visible;text-overflow:clip;text-wrap:pretty}
 .hold-l .gr.hm-x .gt b{color:var(--over)}.hold-l .gr.hm-x .gi{--c:var(--over)!important}
+
+/* Smooth tabs: the new screen fades in (opacity only, so nothing fixed inside it moves); the segment highlight eases across */
+@keyframes vIn{from{opacity:.25}to{opacity:1}}
+.view.v-in{animation:vIn .2s cubic-bezier(.2,.7,.3,1)}
+.seg2 button{transition:background-color .2s,color .2s,box-shadow .2s}
+@media (prefers-reduced-motion:reduce){.view.v-in{animation:none}.seg2 button{transition:none}}
+
+/* Today composer: the typing box gets its own full-width line; barcode, photo, mic and a wide Add sit underneath */
+.composer #addForm{flex-wrap:wrap}
+.composer #addForm .inbox{flex:1 1 100%;position:relative}
+.composer #addForm .go{flex:1 1 auto;justify-content:center}
+.composer #addForm .cam,.composer #addForm .go{min-height:46px}
+/* scrolling rows fade at the edge while there's more to see, instead of a hard cut */
+.hs-more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent)}
 </style>
 </head>
 <body>
@@ -3868,7 +3882,7 @@ const LS='macros.offline.v1';
 const S={view:'today',day:todayKey(),weekRef:todayKey(),monthRef:todayKey().slice(0,7),
   days:{},goals:{p:160,c:260,f:75,starter:true},calc:{sex:'m',ht:68},custom:[],lastBackup:0,mealSel:autoMeal(),fCat:'All',weights:{},plan:null,pType:'cut',meals:[],checkins:{},profile:{name:'',onboarded:false},workouts:[],templates:[],tplSeeded:false,active:null,health:{},restSec:120,dev:{days:{},workouts:[]},prefs:{},customLifts:[],favLifts:[],hyd:{log:{},bottles:[],day:{}},diet:{rules:[],cuisines:[],fast:false}};
 let storageOK=true;
-const APP_VER='syncope-2.92';let loadBlocked=false,wipeOK=false;
+const APP_VER='syncope-2.93';let loadBlocked=false,wipeOK=false;
 function readStore(){let raw=null;try{raw=localStorage.getItem(LS)}catch(e){return null}
   if(raw){try{return JSON.parse(raw)}catch(e){loadBlocked=true}}
   for(const k of [LS+'.safe',LS+'.update']){try{const b=localStorage.getItem(k);if(b){const j=JSON.parse(b);if(j&&j.days){loadBlocked=false;window.__restoredFrom=k;return j}}}catch(e){}}
@@ -4120,7 +4134,8 @@ function mk(n,a,g,k,p,c,f,src){return {id:uid(),n,a,g:r1(g),k:r0(k),p:r1(p),c:r1
 /* ---------- tabs / routing ---------- */
 function tabsHTML(list=TABS){const cur=(S.view==='week'||S.view==='month'||S.view==='friends'||(S.view==='plan'&&list===TABS_M))?'progress':S.view;return list.map(([k,l])=>`<button class="tab${k==='add'?' add':''}" data-v="${k}" ${cur===k?'aria-current="page"':''} ${k==='add'?'aria-label="Log something"':''}><i class="ti">${IC[k]}</i><span>${l}</span></button>`).join('')}
 let viewStack=[];
-function setView(v,back){const prev=S.view;
+const VSCROLL={},PROGV=['week','month','plan','friends'];
+function setView(v,back){const prev=S.view,y0=scrollY;if(prev)VSCROLL[prev]=y0;
   if(typeof pgStack!=='undefined'&&pgStack.length)closePages();closeSheet();
   if(v==='progress')v=S.prog||'week';
   if(!VIEWS.some(x=>x[0]===v))v='today';
@@ -4129,7 +4144,12 @@ function setView(v,back){const prev=S.view;
   S.view=v; VIEWS.forEach(([k])=>$('v-'+k).hidden=k!==v);
   $('tabsTop').innerHTML=tabsHTML(); $('tabsBottom').innerHTML=tabsHTML(TABS_M);
   if(location.hash.slice(1)!==v){try{history.replaceState(null,'','#'+v)}catch(e){}}
-  renderView(); decorate(); window.scrollTo({top:0});navSync();
+  renderView(); decorate();
+  {let y=VSCROLL[v]||0;const vEl=$('v-'+v);
+   if(prev&&prev!==v&&PROGV.includes(prev)&&PROGV.includes(v)){const sg=vEl&&vEl.querySelector('.seg2'),hd=document.querySelector('header'),top=sg?Math.max(0,sg.getBoundingClientRect().top+scrollY-((hd&&hd.offsetHeight)||0)-8):0;y=Math.min(y0,top)}
+   window.scrollTo({top:y,behavior:'instant'});
+   if(vEl&&prev&&prev!==v&&!(()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}})()){vEl.classList.remove('v-in');void vEl.offsetWidth;vEl.classList.add('v-in')}}
+  navSync();
   if(v==='train'||v==='today')setTimeout(()=>syncDevices('fresh'),300);
 }
 /* One "back" for the whole app: close the sheet on top, else leave the page, else return to the previous tab. */
@@ -4155,7 +4175,7 @@ $('navBack').onclick=()=>goBack();
       setTimeout(()=>{el.style.transition='none';el.style.transform='';el.style.boxShadow='';el.classList.remove('swiping');document.documentElement.classList.remove('edge-swipe');goBack()},250)}
     else{el.style.transform='translate3d(0,0,0)';el.style.boxShadow='';if(s0.L.dim)s0.L.dim.style.backgroundColor='';setTimeout(()=>{el.style.transition='';el.style.transform='';el.classList.remove('swiping');document.documentElement.classList.remove('edge-swipe')},270)}};
   document.addEventListener('touchend',end,{passive:true});document.addEventListener('touchcancel',end,{passive:true})})();
-document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t){if(t.dataset.v==='add')openAdd();else setView(t.dataset.v)};const g=e.target.closest('[data-goto]');if(g)setView(g.dataset.goto)});
+document.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t){if(t.dataset.v==='add')openAdd();else if(t.getAttribute('aria-current')==='page'&&!(typeof pgStack!=='undefined'&&pgStack.length)&&!($('sheetRoot')&&$('sheetRoot').firstChild)){window.scrollTo({top:0,behavior:RM()?'auto':'smooth'})}else setView(t.dataset.v)};const g=e.target.closest('[data-goto]');if(g)setView(g.dataset.goto)});
 window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);const jm=h.match(/^join=([A-Za-z0-9]{4,10})/);if(jm){try{localStorage.setItem('syncope.join',jm[1].toUpperCase())}catch(e){}setView('friends');if(socCfg().on){const pj=jm[1];localStorage.removeItem('syncope.join');socApi('add',{q:pj}).then(a=>{toast(`You and ${esc(a.name)} are now friends`);socBoard().then(()=>S.view==='friends'&&renderFriends())}).catch(e=>toast(esc(e.message)))}return}if(h&&h!==S.view)setView(h)});
 function renderAll(){renderView();renderRecent();if(typeof pgStack!=='undefined'&&pgStack.length){const id=pgStack[pgStack.length-1];if(id==='me'||id==='prefs')(PG_R[id])()}}
 function renderView(){({today:renderToday,week:renderWeek,month:renderMonth,friends:openFriends,foods:renderFoods,plan:renderPlan,train:renderTrain})[S.view]()}
@@ -6918,10 +6938,16 @@ document.addEventListener('pointerdown',e=>{holdDone=false;if(e.button>0)return;
   clearTimeout(holdT);holdEl=el;holdXY=[e.clientX,e.clientY];holdT=setTimeout(()=>{if(holdEl!==el)return;holdEl=null;holdDone=holdOpen(el)},480)},{passive:true});
 document.addEventListener('pointermove',e=>{if(holdEl&&holdXY&&Math.hypot(e.clientX-holdXY[0],e.clientY-holdXY[1])>10){clearTimeout(holdT);holdEl=null}},{passive:true});
 ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>{clearTimeout(holdT);holdEl=null},{passive:true}));
-window.addEventListener('scroll',()=>{clearTimeout(holdT);holdEl=null},{passive:true,capture:true});
 /* the finger lifting after a hold must not also tap what's underneath */
 document.addEventListener('click',e=>{if(holdDone&&Date.now()-holdAt<2000){holdDone=false;e.preventDefault();e.stopPropagation()}},true);
 document.addEventListener('contextmenu',e=>{const el=e.target.closest(HOLD_SEL);if(!el||e.target.closest('[data-qwater],[data-grip]'))return;e.preventDefault();clearTimeout(holdT);holdEl=null;if(Date.now()-holdAt>800)holdOpen(el)});
+
+
+/* scrolling rows (templates, Train links): soft fade on the right while more is hidden */
+(()=>{const ids=['tplGrid','trRows','recent'];const upd=el=>{if(!el)return;el.classList.toggle('hs-more',el.scrollWidth-el.clientWidth-el.scrollLeft>6)};
+  const hook=()=>ids.forEach(id=>{const el=$(id);if(!el||el._hs)return;el._hs=1;el.addEventListener('scroll',()=>upd(el),{passive:true});
+    try{new ResizeObserver(()=>upd(el)).observe(el);new MutationObserver(()=>requestAnimationFrame(()=>upd(el))).observe(el,{childList:true,subtree:true})}catch(e){}upd(el)});
+  hook();setTimeout(hook,1500)})();
 
 
 /* ================= FIND ANYTHING: type a word, jump straight there ================= */
